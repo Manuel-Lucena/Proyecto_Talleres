@@ -1,0 +1,88 @@
+<div class="contenedor-login">
+  <div class="card tarjeta-login shadow-lg border-0 overflow-hidden">
+    <div class="row g-0">
+
+      <div class="col-md-6 bg-white d-flex align-items-center">
+        <div class="card-body p-4 p-lg-5">
+          <div class="text-center mb-4">
+            <h1 class="h2 mt-2 fw-bold">Aula Viva</h1>
+            <p class="text-muted small">Gestión de Talleres</p>
+          </div>
+
+          <div *ngIf="errorLogin" class="alert alert-danger d-flex align-items-center mb-4 py-2 border-0 shadow-sm"
+            role="alert" style="border-left: 4px solid #dc3545 !important;">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <div class="small fw-bold">
+              {{ mensajeError }}
+            </div>
+          </div>
+
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-secondary">CORREO ELECTRÓNICO</label>
+              <div class="input-group custom-focus"
+                [class.is-invalid]="loginForm.get('email')?.touched && loginForm.get('email')?.invalid">
+                <span class="input-group-text">
+                  <i class="bi bi-envelope"></i>
+                </span>
+                <input type="email" formControlName="email" class="form-control shadow-none"
+                  placeholder="nombre@ejemplo.com">
+              </div>
+              <div class="text-danger small mt-1"
+                *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid">
+                <span *ngIf="loginForm.get('email')?.errors?.['required']">El correo es obligatorio</span>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-bold small text-secondary">CONTRASEÑA</label>
+              <div class="input-group custom-focus"
+                [class.is-invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
+                <span class="input-group-text">
+                  <i class="bi bi-lock"></i>
+                </span>
+                <input [type]="verPassword ? 'text' : 'password'" formControlName="password"
+                  class="form-control shadow-none" placeholder="••••••••">
+                <button class="btn btn-ojito shadow-none" type="button" (click)="togglePassword()">
+                  <i class="bi" [ngClass]="verPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                </button>
+              </div>
+              <div class="text-danger small mt-1"
+                *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
+                <span *ngIf="loginForm.get('password')?.errors?.['required']">La contraseña es obligatoria</span>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-3 fw-bold shadow-sm">
+              ENTRAR <i class="bi bi-arrow-right-short ms-2"></i>
+            </button>
+
+            <div class="text-center mt-4 pt-3 border-top">
+              <p class="small text-muted mb-2">¿Eres nuevo alumno?</p>
+              <button type="button" (click)="abrirRegistro()" class="btn btn-outline-success btn-sm px-4 fw-bold">
+                CREAR CUENTA AHORA
+              </button>
+            </div>
+
+            <div class="text-center mt-3">
+              <a href="#" class="enlace-olvido small text-decoration-none">¿Olvidaste tu contraseña?</a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-md-6 d-none d-md-flex seccion-derecha-imagen align-items-center justify-content-center">
+        <img src="icons/Logo.png" alt="Logo Aula Viva" class="logo-sobre-imagen">
+      </div>
+
+    </div>
+  </div>
+</div>
+
+@if (mostrarModalRegistro) {
+  <app-form-alumno 
+    (cerrar)="cerrarRegistro()" 
+    (usuarioGuardado)="onAlumnoGuardado($event)">
+  </app-form-alumno>
+}

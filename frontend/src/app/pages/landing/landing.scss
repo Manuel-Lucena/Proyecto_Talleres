@@ -1,0 +1,203 @@
+@use '../../../styles/variables' as v;
+
+.landing-container {
+  font-family: v.$fuente-lectura;
+  background-color: #ffffff;
+
+  // --- HERO ZONE ---
+  .hero-zone-slim {
+    position: relative;
+    padding: 80px 0;
+    min-height: 320px;
+    display: flex;
+    align-items: center;
+    background-color: #1a3a3a;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url('/images/banner.jpg') center 20% / cover;
+      z-index: 1;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(14, 43, 30, 0.9) 0%, rgba(14, 43, 30, 0.4) 100%);
+      z-index: 2;
+    }
+
+    .container {
+      position: relative;
+      z-index: 3;
+    }
+
+    .hero-text h1.h1-title {
+      font-family: v.$fuente-enfasis;
+      font-size: 3rem;
+      color: white;
+      font-weight: 800;
+      margin: 0;
+
+      span {
+        color: #a2d9a2;
+      }
+    }
+  }
+
+  // --- CONTENT ZONE ---
+  .content-zone {
+    padding: 60px 0;
+
+    // Recuperamos los estilos del título y divisores
+    .title-group {
+      .section-title {
+        font-family: v.$fuente-enfasis;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2d3436;
+        margin-bottom: 0;
+      }
+
+      .title-line {
+        width: 50px;
+        height: 5px;
+        background: v.$color-marca-principal;
+        margin-top: 5px;
+        border-radius: 10px;
+      }
+    }
+
+    .vertical-divider {
+      width: 1px;
+      height: 30px;
+      background-color: #dfe6e9;
+      margin: 0 20px;
+      align-self: center;
+    }
+
+    .btn-add-news-mini {
+      background: transparent;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #0984e3;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        color: darken(#0984e3, 10%);
+      }
+    }
+
+    // --- CARDS (CON EL FIX QUE SÍ FUNCIONA) ---
+    .news-card {
+      background: white;
+      border-radius: 20px;
+      border: 1px solid #f0f0f0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+
+      &:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        .news-img {
+          transform: scale(1.08);
+        }
+      }
+
+      .card-img-wrapper {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        flex: 0 0 200px; // Bloqueo para que no se estire
+        overflow: hidden;
+        background-color: #f8f9fa;
+
+        .news-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover; // Corta la imagen en lugar de deformarla
+          display: block;
+          transition: transform 0.6s ease;
+        }
+
+        .category-tag {
+          position: absolute;
+          top: 15px;
+          left: 15px;
+          background: v.$color-marca-principal;
+          color: white;
+          padding: 5px 12px;
+          border-radius: 6px;
+          font-weight: 700;
+          font-size: 0.7rem;
+          z-index: 2;
+        }
+      }
+
+      .card-body-v {
+        padding: 24px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+
+        .date {
+          color: #b2bec3;
+          font-size: 0.85rem;
+          margin-bottom: 10px;
+        }
+
+        h3 {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: #2d3436;
+          margin-bottom: 12px;
+          display: -webkit-box;
+
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        p {
+          color: #636e72;
+          font-size: 0.95rem;
+          line-height: 1.6;
+          margin-bottom: 20px;
+          flex-grow: 1;
+          display: -webkit-box;
+ 
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        .btn-read {
+          background: none;
+          border: none;
+          color: v.$color-marca-principal;
+          font-weight: 800;
+          font-size: 0.8rem;
+          text-transform: uppercase;
+          padding: 0;
+          text-align: left;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+}

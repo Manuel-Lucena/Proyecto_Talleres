@@ -1,0 +1,22 @@
+@if (config$ | async; as config) {
+  <div class="modal-overlay" (click)="cerrar()">
+    <div class="modal-body" (click)="$event.stopPropagation()">
+      
+      <div class="icono-contenedor" [ngClass]="config.tipo">
+        @if (config.tipo === 'exito') { <i class="bi bi-check-circle-fill"></i> }
+        @if (config.tipo === 'error') { <i class="bi bi-x-circle-fill"></i> }
+        @if (config.tipo === 'info') { <i class="bi bi-info-circle-fill"></i> }
+      </div>
+
+      <h3 class="modal-titulo">{{ config.titulo }}</h3>
+      <p class="modal-texto">{{ config.mensaje }}</p>
+
+      <div class="modal-acciones">
+        <button class="btn-aceptar" [ngClass]="'btn-' + config.tipo" (click)="cerrar()">
+          ACEPTAR
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

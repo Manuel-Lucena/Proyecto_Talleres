@@ -1,0 +1,79 @@
+@import '../../../../styles/variables';
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-body {
+  background: white;
+  width: 100%;
+  max-width: 420px;
+  padding: 2.5rem;
+  border-radius: 24px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  animation: entradaConfirmacion 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.icono-pregunta {
+  font-size: 4rem;
+  color: #fbbf24; // Un amarillo/naranja suave para indicar advertencia/pregunta
+  margin-bottom: 1rem;
+}
+
+.modal-titulo {
+  color: $color-secundario-frio-2;
+  font-weight: 800;
+  font-size: 1.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.modal-texto {
+  color: #64748b;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 2.5rem;
+}
+
+.modal-acciones {
+  display: flex;
+  gap: 12px;
+
+  button {
+    flex: 1;
+    padding: 14px;
+    border-radius: 14px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    text-transform: uppercase;
+  }
+
+  .btn-cancelar {
+    background: #f1f5f9;
+    color: #475569;
+    &:hover { background: #e2e8f0; }
+  }
+
+  .btn-confirmar {
+    background: $color-secundario-frio-2;
+    color: white;
+    box-shadow: 0 4px 12px rgba($color-secundario-frio-2, 0.2);
+    &:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  }
+}
+
+@keyframes entradaConfirmacion {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}

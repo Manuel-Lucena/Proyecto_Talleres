@@ -1,0 +1,162 @@
+@use '../../../styles/variables' as v;
+
+.profile-layout {
+    display: flex;
+    min-height: 100vh;
+    background: #f4f7f6; // Contraste con tarjeta blanca
+    font-family: v.$fuente-lectura;
+    color: v.$color-secundario-frio-2;
+
+    .sidebar {
+        width: 260px;
+        background: v.$color-secundario-frio-2;
+        display: flex;
+        flex-direction: column;
+
+        .user-info {
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(white, 0.05);
+
+            .avatar {
+                position: relative;
+                width: 80px;
+                margin: 0 auto 15px;
+
+                img {
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 15px;
+                    background: white;
+                    padding: 5px;
+                    border: 2px solid v.$color-marca-principal;
+                }
+
+                label {
+                    position: absolute;
+                    bottom: -5px;
+                    right: -5px;
+                    background: v.$color-marca-principal;
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    color: v.$color-secundario-frio-2;
+                }
+            }
+
+            h5 {
+                color: white;
+                margin: 0;
+            }
+
+            span {
+                color: v.$color-marca-principal;
+                font-size: 0.7rem;
+                font-weight: 800;
+                text-transform: uppercase;
+            }
+        }
+
+        .menu {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+
+            .item {
+                padding: 12px 15px;
+                color: rgba(white, 0.6);
+                text-decoration: none;
+                border-radius: 10px;
+                font-weight: 600;
+
+                i {
+                    margin-right: 10px;
+                }
+
+                &.active,
+                &:hover {
+                    background: rgba(white, 0.1);
+                    color: white;
+                }
+
+                // Hover sutil aclarando
+                &.active {
+                    color: v.$color-marca-principal;
+                }
+
+                &.out {
+                    color: v.$color-secundario-calido-1;
+                    margin-top: auto;
+
+                    &:hover {
+                        background: rgba(v.$color-secundario-calido-1, 0.1);
+                    }
+                }
+            }
+        }
+    }
+
+    .content {
+        flex: 1;
+        padding: 60px;
+
+        .main-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid #e0e0e0;
+            max-width: 800px;
+
+            .grid-fields {
+                display: grid;
+                gap: 20px;
+
+                .f-box {
+                    border-bottom: 1px solid #eee;
+
+                    label {
+                        display: block;
+                        font-size: 0.7rem;
+                        color: #999;
+                        text-transform: uppercase;
+                        font-weight: 800;
+                    }
+
+                    input {
+                        border: none;
+                        width: 100%;
+                        font-weight: 600;
+                        color: v.$color-secundario-frio-2;
+                        outline: none;
+                        padding: 8px 0;
+                        background: transparent;
+                    }
+
+                    &[readonly] {
+                        opacity: 0.5;
+                    }
+                }
+            }
+
+            .btn-av {
+                background: v.$color-secundario-frio-2;
+                color: white;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 8px;
+                font-weight: 700;
+
+                &:hover {
+                    background: v.$color-marca-principal;
+                    color: v.$color-secundario-frio-2;
+                }
+            }
+        }
+    }
+}

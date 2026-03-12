@@ -1,0 +1,129 @@
+@import 'variables';
+
+@mixin estilo-formulario-base {
+
+    .contenedor-formulario {
+        background: $color-neutro-max;
+        padding: 2rem;
+        border-radius: $radio-curvatura * 2;
+        box-shadow: 0 10px 30px rgba($color-neutro-min, 0.08);
+        border: 1px solid rgba($color-marca-principal, 0.1); // Un toque sutil de verde en el borde del modal
+    }
+
+    .titulo-formulario {
+        font-family: $fuente-enfasis;
+        font-size: $tamaño-titular-md;
+        font-weight: 800;
+        color: $color-secundario-frio-2;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        &::after {
+            content: '';
+            flex-grow: 1;
+            height: 2px;
+            background: $color-marca-principal; // LÍNEA VERDE para que se vea la identidad
+            margin-left: 10px;
+            opacity: 0.3;
+        }
+    }
+
+    .fila-formulario {
+        display: flex;
+        gap: 1.25rem;
+        margin-bottom: 1rem;
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+    }
+
+    .campo-formulario {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+
+        label {
+            font-family: $fuente-enfasis;
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: $color-secundario-frio-2; // Azul oscuro para que se lea bien
+            text-transform: uppercase;
+        }
+    }
+
+    .input-personalizado {
+        width: 100%;
+        padding: 10px 14px;
+        // Borde con tu VERDE CLARO para que por fin se distingan los campos
+        border: 2px solid rgba($color-marca-principal, 0.4);
+        border-radius: $radio-curvatura;
+        font-family: $fuente-lectura;
+        font-size: 0.95rem;
+        color: $color-neutro-min;
+        background-color: #ffffff; // Blanco para máximo contraste
+        transition: all 0.2s ease;
+
+        &::placeholder {
+            color: $color-superficie-suave;
+        }
+
+        &:focus {
+            outline: none;
+            background-color: #ffffff;
+            border-color: $color-marca-principal; // Verde intenso al escribir
+            box-shadow: 0 0 0 4px rgba($color-marca-principal, 0.15);
+        }
+    }
+
+    .acciones-formulario {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 2px solid $color-fondo-pagina;
+
+        .btn-cancelar {
+            padding: 10px 20px;
+            border-radius: $radio-curvatura;
+            font-weight: 700;
+            background: $color-fondo-pagina;
+            color: $color-secundario-frio-2;
+            border: none;
+            cursor: pointer;
+
+            &:hover {
+                background: $color-superficie-suave;
+            }
+        }
+
+        .btn-guardar {
+            padding: 12px 30px;
+            border-radius: $radio-curvatura;
+            font-weight: 800;
+            background: $color-marca-principal; // TU VERDE
+            color: $color-neutro-max;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+
+            &:hover:not(:disabled) {
+                background: $color-marca-oscuro;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba($color-marca-principal, 0.4);
+            }
+
+            &:disabled {
+                background: $color-superficie-suave;
+                cursor: not-allowed;
+            }
+        }
+    }
+}

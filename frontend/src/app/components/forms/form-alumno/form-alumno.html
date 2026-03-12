@@ -1,0 +1,72 @@
+<div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal-body" (click)="$event.stopPropagation()">
+
+        <div class="cabecera-formulario">
+            <h4 class="titulo-formulario">Registro de Alumno</h4>
+            <div class="linea-decorativa"></div>
+        </div>
+
+        <form [formGroup]="form" (submit)="$event.preventDefault()">
+
+            <div class="fila-formulario">
+                <div class="campo-formulario">
+                    <label>DNI / NIE</label>
+                    <input type="text" formControlName="dni" class="input-personalizado" placeholder="12345678X">
+                </div>
+                <div class="campo-formulario">
+                    <label>Email</label>
+                    <input type="email" formControlName="email" class="input-personalizado"
+                        placeholder="correo@ejemplo.com">
+                </div>
+            </div>
+
+            <div class="fila-formulario">
+                <div class="campo-formulario">
+                    <label>Nombre</label>
+                    <input type="text" formControlName="nombre" class="input-personalizado">
+                </div>
+                <div class="campo-formulario">
+                    <label>Apellidos</label>
+                    <input type="text" formControlName="apellidos" class="input-personalizado">
+                </div>
+            </div>
+
+            <div class="fila-formulario" *ngIf="!usuarioParaEditar">
+                <div class="campo-formulario">
+                    <label>Contraseña</label>
+                    <div class="posicion-relativa">
+                        <input [type]="verPassword ? 'text' : 'password'" formControlName="password"
+                            class="input-personalizado" placeholder="••••••">
+                        <button type="button" class="btn-ver-pass" (click)="verPassword = !verPassword">
+                            <i class="bi" [ngClass]="verPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="campo-formulario">
+                    <label>Repetir Contraseña</label>
+                    <input type="password" formControlName="repetirPassword" class="input-personalizado"
+                        placeholder="••••••">
+                </div>
+            </div>
+
+            <div class="fila-formulario">
+                <div class="campo-formulario">
+                    <label>Foto de perfil</label>
+                    <div class="zona-subida-alumno" (click)="fileInput.click()">
+                        <input type="file" #fileInput (change)="onFileSelected($event)" hidden accept="image/*">
+                        <i class="bi bi-camera-fill me-2"></i>
+                        <span>{{ fileSeleccionado ? fileSeleccionado.name : 'Seleccionar imagen' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="acciones-formulario">
+                <button type="button" class="btn-cancelar" (click)="cerrarModal()">CANCELAR</button>
+                <button type="submit" class="btn-guardar" [disabled]="form.invalid" (click)="enviar()">
+                    FINALIZAR REGISTRO
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>

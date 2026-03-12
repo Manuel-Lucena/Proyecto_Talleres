@@ -1,0 +1,54 @@
+<div class="modal-overlay" (click)="cerrarModal()">
+  <div class="modal-body" (click)="$event.stopPropagation()">
+    <button type="button" class="btn-close" (click)="cerrarModal()">&times;</button>
+
+    <div class="noticia-grid-container">
+      
+      <div class="noticia-form-col">
+        <h4 class="titulo-formulario">{{ noticiaParaEditar ? 'Editar' : 'Nueva' }} Noticia</h4>
+        
+        <form [formGroup]="form" class="form-flex" (submit)="$event.preventDefault()">
+          <div class="campo-formulario">
+            <label>TÍTULO DE LA NOTICIA</label>
+            <input type="text" formControlName="titulo" class="input-personalizado" placeholder="Ej: Gran apertura...">
+          </div>
+          
+          <div class="campo-formulario">
+            <label>CONTENIDO</label>
+            <textarea formControlName="contenido" class="input-personalizado area-texto" rows="9" placeholder="Escribe aquí el cuerpo de la noticia..."></textarea>
+          </div>
+          
+          <div class="zona-subida" (click)="fileInput.click()">
+            <input type="file" #fileInput (change)="onFileSelected($event)" hidden>
+            <i class="bi bi-image me-2"></i> 
+            {{ fileSeleccionado ? fileSeleccionado.name : 'Cambiar imagen destacada' }}
+          </div>
+        </form>
+      </div>
+
+      <div class="noticia-preview-col">
+        <div class="preview-top-content">
+          <p class="preview-label">VISTA PREVIA</p>
+          
+          <div class="vista-previa-tarjeta">
+            <div class="img-contenedor">
+              <img [src]="imagenPreview || '/icons/Logo.png'">
+            </div>
+            <div class="p-3">
+              <h5 class="preview-title">{{ form.value.titulo || 'Título de ejemplo' }}</h5>
+              <p class="preview-text">{{ (form.value.contenido || 'Sin contenido aún...') | slice:0:80 }}...</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="acciones-finales">
+          <button type="button" class="btn-guardar-noticia" [disabled]="form.invalid" (click)="enviar()">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ noticiaParaEditar ? 'Guardar Cambios' : 'Publicar Ahora' }}
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

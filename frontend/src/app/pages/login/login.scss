@@ -1,0 +1,147 @@
+@use '../../../styles/variables' as v;
+
+// 1. CONTENEDOR PRINCIPAL (Fondo de pantalla completa)
+.contenedor-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  // Usamos la carpeta images para el fondo general
+  background: linear-gradient(135deg, rgba(v.$color-marca-principal, 0.2), rgba(v.$color-neutro-min, 0.8)),
+              url('/images/fondo.jpg'); 
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  font-family: v.$fuente-lectura;
+}
+
+// 2. LA TARJETA (Simetría 50/50)
+.tarjeta-login {
+  max-width: 900px;
+  width: 100%;
+  border-radius: v.$radio-curvatura;
+  background-color: v.$color-neutro-max;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+// 3. COLUMNA DERECHA (Imagen de apoyo + Logo)
+.seccion-derecha-imagen {
+  // Usamos la carpeta images para la foto de la tarjeta
+  background-image: url('/images/card.jpg'); 
+  background-size: cover;
+  background-position: center;
+  min-height: 550px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  // Capa oscura para que el logo resalte
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    z-index: 1;
+  }
+}
+
+// 4. EL LOGO (Sobre la imagen)
+.logo-sobre-imagen {
+  position: relative;
+  z-index: 2;
+  max-width: 180px; // Ajusta según el tamaño de tu Logo.png
+  height: auto;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+}
+
+// 5. ESTILOS DEL FORMULARIO Y MARCA
+.icono-marca {
+  color: v.$color-marca-principal;
+}
+
+h1 {
+  font-family: v.$fuente-enfasis;
+  color: v.$color-neutro-min;
+}
+
+// Contenedores de Input con Focus personalizado
+.custom-focus {
+  border: 1px solid v.$color-superficie-suave !important;
+  border-radius: v.$radio-curvatura !important;
+  transition: all 0.3s ease;
+  overflow: hidden;
+
+  .input-group-text, 
+  .form-control {
+    border: none;
+    background: transparent;
+    padding: 0.8rem;
+    color: v.$color-superficie-oscura;
+  }
+
+  &:focus-within {
+    border-color: v.$color-marca-principal !important;
+    box-shadow: 0 0 0 0.25rem rgba(v.$color-marca-principal, 0.1);
+    
+    .bi {
+      color: v.$color-marca-principal !important;
+    }
+  }
+}
+
+// Botón de ver contraseña (Ojito)
+.btn-ojito {
+  border: none;
+  background: transparent;
+  color: v.$color-superficie-suave;
+  padding-right: 1rem;
+  
+  &:hover {
+    color: v.$color-marca-principal;
+  }
+}
+
+// Botón principal de Entrar
+.btn-primary {
+  background-color: v.$color-marca-principal;
+  border: none;
+  color: v.$color-neutro-min;
+  border-radius: v.$radio-curvatura;
+  font-family: v.$fuente-enfasis;
+  font-weight: 700;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: v.$color-marca-oscuro;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(v.$color-marca-principal, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Enlace de recuperar contraseña
+.enlace-olvido {
+  color: v.$color-secundario-frio-2;
+  font-weight: 500;
+  transition: color 0.2s;
+
+  &:hover {
+    color: v.$color-marca-principal !important;
+  }
+}
+
+// Añade esto al final de tu archivo .scss
+.is-invalid {
+  border-color: #dc3545 !important;
+  .bi {
+    color: #dc3545 !important;
+  }
+}
