@@ -4,7 +4,7 @@ import { Navbar } from '../../components/layout/navbar/navbar';
 import { Footer } from "../../components/layout/footer/footer";
 import { NoticiaService } from '../../services/Noticia.Service';
 import { TokenService } from '../../services/Token.Service';
-import { NoticiaResponse } from '../../models/Noticia.Interface';
+import { NoticiaResponse } from '../../interfaces/Noticia.Interface';
 import { FormNoticia } from '../../components/forms/form-noticia/form-noticia';
 
 @Component({

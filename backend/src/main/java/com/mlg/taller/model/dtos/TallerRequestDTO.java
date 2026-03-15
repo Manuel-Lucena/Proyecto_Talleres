@@ -27,5 +27,7 @@ public class TallerRequestDTO {
     @NotNull(message = "La fecha de fin es obligatoria")
     private LocalDate fechaFin;
 
+    private String fotoRuta;
+
     private Long idProfesor;
 }

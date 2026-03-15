@@ -1,10 +1,7 @@
 package com.mlg.taller.service;
 
 import com.mlg.taller.exception.*;
-import com.mlg.taller.model.dtos.AuthResponseDTO;
-import com.mlg.taller.model.dtos.LoginRequestDTO;
-import com.mlg.taller.model.dtos.UsuarioRequestDTO;
-import com.mlg.taller.model.dtos.UsuarioResponseDTO;
+import com.mlg.taller.model.dtos.*;
 import com.mlg.taller.model.entities.Rol;
 import com.mlg.taller.model.entities.Usuario;
 import com.mlg.taller.model.mappers.UsuarioMapper;
@@ -13,7 +10,6 @@ import com.mlg.taller.repositories.UsuarioRepository;
 import com.mlg.taller.security.jwt.JwtService;
 import com.mlg.taller.util.FileUtil;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio encargado de la gestión de usuarios, autenticación y seguridad.
+ * Centraliza las operaciones de registro, login y mantenimiento de perfiles.
+ */
 @Service
 @RequiredArgsConstructor
 public class UsuarioService {
@@ -37,138 +37,152 @@ public class UsuarioService {
     private final FileUtil fileUtil;
 
     /**
-     * Login de usuario
+     * Autentica un usuario y genera un token de acceso.
+     * @param dto Credenciales de acceso (email y password).
+     * @return AuthResponseDTO con el token JWT e información básica del perfil.
      */
     public AuthResponseDTO login(LoginRequestDTO dto) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword()));
 
-        // Cambiado a ResourceNotFoundException
         Usuario usuario = usuarioRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "No existe ningún usuario con el email: " + dto.getEmail()));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con email: " + dto.getEmail()));
 
-        String token = jwtService.generateToken(usuario);
-
-        AuthResponseDTO response = new AuthResponseDTO();
-        response.setToken(token);
-        response.setNombre(usuario.getNombre());
-
-        if (usuario.getRol() != null) {
-            response.setRol(usuario.getRol().getNombre());
-        }
-
-        return response;
+        return mapearAuthResponse(usuario);
     }
 
     /**
-     * Registrar usuario con autologin
+     * Registra un nuevo usuario, asigna su rol, cifra la contraseña y gestiona su imagen de perfil.
+     * @param dto Datos del nuevo usuario.
+     * @param archivo Imagen opcional de perfil.
+     * @return AuthResponseDTO con token de acceso tras el registro exitoso.
      */
     @Transactional
     public AuthResponseDTO registrar(UsuarioRequestDTO dto, MultipartFile archivo) {
-        // Cambiado a DuplicateResourceException
-        if (usuarioRepository.existsByEmail(dto.getEmail())) {
-            throw new DuplicateResourceException("El email " + dto.getEmail() + " ya está registrado en el sistema");
-        }
+        validarEmailUnico(dto.getEmail());
 
         Usuario usuario = usuarioMapper.toEntity(dto);
-
-        // Cambiado a ResourceNotFoundException
-        Rol rol = rolRepository.findById(dto.getIdRol())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "El rol seleccionado (ID: " + dto.getIdRol() + ") no existe"));
-
-        usuario.setRol(rol);
+        usuario.setRol(obtenerRol(dto.getIdRol()));
         usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
         usuario.setActivo(true);
 
         usuario = usuarioRepository.save(usuario);
+        gestionarImagenPerfil(usuario, archivo);
 
-        if (archivo != null && !archivo.isEmpty()) {
-            String nombreImagen = "user_" + usuario.getId() + ".jpg";
-            fileUtil.guardar(archivo, "usuarios", nombreImagen);
-            usuario.setFotoPerfilRuta(nombreImagen);
-            usuario = usuarioRepository.save(usuario);
-        }
-
-        String token = jwtService.generateToken(usuario);
-
-        AuthResponseDTO response = new AuthResponseDTO();
-        response.setToken(token);
-        response.setNombre(usuario.getNombre());
-
-        if (usuario.getRol() != null) {
-            response.setRol(usuario.getRol().getNombre());
-        }
-
-        return response;
+        return mapearAuthResponse(usuario);
     }
 
+
     /**
-     * Buscar usuario por ID
+     * Busca un usuario por su ID.
+     * @param id Identificador único.
+     * @return DTO del usuario encontrado.
+     * @throws ResourceNotFoundException si no existe.
      */
     @Transactional(readOnly = true)
     public UsuarioResponseDTO buscarPorId(Long id) {
-        // Cambiado a ResourceNotFoundException
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario con ID " + id + " no encontrado"));
-        return usuarioMapper.toResponse(usuario);
-    }
-
-    @Transactional(readOnly = true)
-    public UsuarioResponseDTO buscarPorEmail(String email) {
-        Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario con email " + email + " no encontrado"));
-        return usuarioMapper.toResponse(usuario);
+        return usuarioRepository.findById(id)
+                .map(usuarioMapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
     }
 
     /**
-     * Actualizar usuario
+     * Busca un usuario por su correo electrónico.
+     * @param email Correo a buscar.
+     * @return DTO del usuario encontrado.
+     * @throws ResourceNotFoundException si no existe.
+     */
+    @Transactional(readOnly = true)
+    public UsuarioResponseDTO buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email)
+                .map(usuarioMapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con email: " + email));
+    }
+
+    /**
+     * Actualiza los datos de un usuario existente, incluyendo validaciones de seguridad y gestión de archivos.
+     * @param id Identificador del usuario a modificar.
+     * @param dto Nuevos datos.
+     * @param archivo Nueva imagen opcional.
+     * @return UsuarioResponseDTO actualizado con un nuevo token JWT.
      */
     @Transactional
     public UsuarioResponseDTO actualizar(Long id, UsuarioRequestDTO dto, MultipartFile archivo) {
-        // Cambiado a ResourceNotFoundException
-        Usuario usuarioExistente = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "No se puede actualizar: Usuario con ID " + id + " no encontrado"));
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
 
-        usuarioMapper.updateEntityFromDto(dto, usuarioExistente);
+        validarCambioDatosUnicos(dto, usuario);
+        usuarioMapper.updateEntityFromDto(dto, usuario);
 
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
-            usuarioExistente.setPassword(passwordEncoder.encode(dto.getPassword()));
+            usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
 
         if (dto.getIdRol() != null) {
-            Rol nuevoRol = rolRepository.findById(dto.getIdRol())
-                    .orElseThrow(() -> new ResourceNotFoundException("El nuevo rol seleccionado no existe"));
-            usuarioExistente.setRol(nuevoRol);
+            usuario.setRol(obtenerRol(dto.getIdRol()));
         }
 
+        gestionarImagenPerfil(usuario, archivo);
+        Usuario usuarioGuardado = usuarioRepository.save(usuario);
+
+        UsuarioResponseDTO response = usuarioMapper.toResponse(usuarioGuardado);
+        response.setToken(jwtService.generateToken(usuarioGuardado));
+        return response;
+    }
+
+    // --- MÉTODOS PRIVADOS DE APOYO (REFACTORIZACIÓN) ---
+
+    private Rol obtenerRol(Long idRol) {
+        return rolRepository.findById(idRol)
+                .orElseThrow(() -> new ResourceNotFoundException("Rol no encontrado con ID: " + idRol));
+    }
+
+    private void validarEmailUnico(String email) {
+        if (usuarioRepository.existsByEmail(email)) {
+            throw new DuplicateResourceException("El email " + email + " ya está registrado");
+        }
+    }
+
+    private void validarCambioDatosUnicos(UsuarioRequestDTO dto, Usuario existente) {
+        if (dto.getEmail() != null && !existente.getEmail().equalsIgnoreCase(dto.getEmail())) {
+            validarEmailUnico(dto.getEmail());
+        }
+        if (dto.getDni() != null && !existente.getDni().equalsIgnoreCase(dto.getDni())) {
+            if (usuarioRepository.existsByDni(dto.getDni())) {
+                throw new DuplicateResourceException("El DNI ya pertenece a otro usuario");
+            }
+        }
+    }
+
+    private void gestionarImagenPerfil(Usuario usuario, MultipartFile archivo) {
         if (archivo != null && !archivo.isEmpty()) {
-            String nombreImagen = "user_" + id + ".jpg";
-            fileUtil.guardar(archivo, "usuarios", nombreImagen);
-            usuarioExistente.setFotoPerfilRuta(nombreImagen);
+            String nombreImagen = "user_" + usuario.getId() + ".jpg";
+            fileUtil.guardar(archivo, "Usuarios", nombreImagen);
+            usuario.setFotoPerfilRuta(nombreImagen);
         }
-
-        return usuarioMapper.toResponse(usuarioRepository.save(usuarioExistente));
     }
 
-    /**
-     * Borrado lógico
-     */
-    @Transactional
-    public void eliminar(Long id) {
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "No se pudo eliminar: El usuario con ID " + id + " no existe"));
-
-        usuarioRepository.delete(usuario);
+    private AuthResponseDTO mapearAuthResponse(Usuario usuario) {
+        AuthResponseDTO response = new AuthResponseDTO();
+        response.setToken(jwtService.generateToken(usuario));
+        response.setNombre(usuario.getNombre());
+        if (usuario.getRol() != null) response.setRol(usuario.getRol().getNombre());
+        return response;
     }
 
+    // Métodos estándar (Listar, Eliminar...)
     @Transactional(readOnly = true)
     public List<UsuarioResponseDTO> listarTodos() {
         return usuarioRepository.findAll().stream()
                 .map(usuarioMapper::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void eliminar(Long id) {
+        if (!usuarioRepository.existsById(id)) {
+            throw new ResourceNotFoundException("No existe el usuario con ID: " + id);
+        }
+        usuarioRepository.deleteById(id);
     }
 }

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { ApiResponse } from '../models/ApiResponse.Interface';
-import { LoginRequest, AuthResponse } from '../models/Auth.Interface';
-import { UsuarioResponse, UsuarioRequest } from '../models/Usuario.Interface';
+import { ApiResponse } from '../interfaces/ApiResponse.Interface';
+import { LoginRequest, AuthResponse } from '../interfaces/Auth.Interface';
+import { UsuarioResponse, UsuarioRequest } from '../interfaces/Usuario.Interface';
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
@@ -42,6 +42,7 @@ export class UsuarioService {
   }
 
   // 5. ACTUALIZAR 
+  
   actualizarUsuario(id: number, formData: FormData): Observable<ApiResponse<UsuarioResponse>> {
     return this.http.put<ApiResponse<UsuarioResponse>>(`${this.apiUrl}/${id}`, formData);
   }

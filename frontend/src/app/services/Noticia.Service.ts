@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiResponse } from '../models/ApiResponse.Interface';
-import { NoticiaResponse } from '../models/Noticia.Interface';
+import { ApiResponse } from '../interfaces/ApiResponse.Interface';
+import { NoticiaResponse } from '../interfaces/Noticia.Interface';
 
 @Injectable({ providedIn: 'root' })
 export class NoticiaService {

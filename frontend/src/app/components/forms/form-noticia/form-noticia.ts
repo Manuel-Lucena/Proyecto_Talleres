@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { NoticiaResponse } from '../../../models/Noticia.Interface';
+import { NoticiaResponse } from '../../../interfaces/Noticia.Interface';
 import { Subscription } from 'rxjs';
 
 @Component({

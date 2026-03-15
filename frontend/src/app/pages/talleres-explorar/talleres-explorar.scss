@@ -1,0 +1,195 @@
+@import '../../../styles/variables';
+
+.pagina-explorar-full {
+    width: 100%;
+    padding: 50px 4%;
+    background-color: #fcfcfc;
+}
+
+.header-principal {
+    margin-bottom: 40px;
+
+    h2 {
+        font-size: 2.8rem;
+        color: $color-secundario-frio-2;
+        font-weight: 800;
+    }
+
+    p {
+        color: #666;
+        font-size: 1.1rem;
+    }
+}
+
+.layout-flex {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+.sidebar-reserva {
+    width: 220px;
+    min-width: 220px;
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid #eee;
+
+    h3 {
+        font-size: 1rem;
+        color: $color-secundario-frio-2;
+        margin-bottom: 10px;
+    }
+
+    .nota-sidebar {
+        font-size: 0.85rem;
+        color: #aaa;
+    }
+}
+
+.seccion-lista-cursos {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.card-curso-horizontal {
+    display: flex;
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid #f0f0f0;
+    overflow: hidden;
+    height: 270px;
+    width: 100%;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.03);
+
+    .imagen-container {
+        width: 340px;
+        min-width: 340px;
+        position: relative;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .badge-profesor {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            backdrop-filter: blur(4px);
+        }
+    }
+
+    .contenido-curso {
+        flex: 1;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        .periodo-curso {
+            color: $color-marca-principal;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .titulo-curso {
+            font-size: 1.7rem;
+            color: $color-secundario-frio-2;
+            margin: 5px 0;
+            font-weight: 800;
+        }
+
+        .descripcion-curso {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    }
+
+    .footer-curso {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 15px;
+        border-top: 1px solid #f9f9f9;
+
+        .detalles-tecnicos {
+            color: #888;
+            font-size: 0.9rem;
+
+            i {
+                color: $color-marca-principal;
+                margin-right: 6px;
+            }
+
+            .sin-plazas {
+                color: #dc3545;
+                font-weight: 700;
+            }
+        }
+
+        .precio-inscripcion {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+
+            .moneda {
+                font-size: 2rem;
+                font-weight: 900;
+                color: $color-secundario-frio-2;
+            }
+
+            .btn-inscripcion {
+                background: $color-marca-principal;
+                color: white;
+                border: none;
+                padding: 10px 24px;
+                border-radius: 10px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: 0.2s;
+
+                &:disabled {
+                    background: #ccc;
+                    cursor: not-allowed;
+                }
+
+                &:not(:disabled):hover {
+                    background: darken($color-marca-principal, 10%);
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 1000px) {
+    .layout-flex {
+        flex-direction: column;
+    }
+
+    .sidebar-reserva {
+        width: 100%;
+    }
+
+    .card-curso-horizontal {
+        flex-direction: column;
+        height: auto;
+
+        .imagen-container {
+            width: 100%;
+            height: 200px;
+        }
+    }
+}

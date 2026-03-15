@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { UsuarioRequest } from '../../../models/Usuario.Interface';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { UsuarioRequest } from '../../../interfaces/Usuario.Interface';
+import { Validator } from '../../../validators/Validator'; 
 
 @Component({
   selector: 'app-form-alumno',
@@ -19,14 +20,16 @@ export class FormAlumno implements OnInit {
   verPassword = false;
 
   form = new FormGroup({
-    dni: new FormControl('', [Validators.required]),
-    nombre: new FormControl('', [Validators.required]),
-    apellidos: new FormControl('', [Validators.required]),
-    email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required, Validators.minLength(6)]),
-    repetirPassword: new FormControl('', [Validators.required]), 
+    dni: new FormControl('', { validators: [Validators.required, Validator.dni], updateOn: 'blur' }),
+    nombre: new FormControl('', { validators: [Validators.required], updateOn: 'blur' }),
+    apellidos: new FormControl('', { validators: [Validators.required], updateOn: 'blur' }),
+    email: new FormControl('', { validators: [Validators.required, Validators.email], updateOn: 'blur' }),
+    telefono: new FormControl('', { validators: [Validator.telefono], updateOn: 'blur' }),
+    direccion: new FormControl('', { updateOn: 'blur' }), 
+    password: new FormControl('', { validators: [Validators.required, Validators.minLength(6)], updateOn: 'blur' }),
+    repetirPassword: new FormControl('', { validators: [Validators.required], updateOn: 'blur' }),
     idRol: new FormControl(2)
-  }, { validators: this.passwordMatchValidator });
+  }, { validators: Validator.passwordMatch });
 
   ngOnInit(): void {
     if (this.usuarioParaEditar) {
@@ -37,10 +40,23 @@ export class FormAlumno implements OnInit {
     }
   }
 
-  passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
-    const password = control.get('password')?.value;
-    const repetirPassword = control.get('repetirPassword')?.value;
-    return password === repetirPassword ? null : { passwordMismatch: true };
+  mostrarError(controlName: string): boolean {
+    const control = this.form.get(controlName);
+    // Solo mostramos error si el usuario ha salido del campo (touched)
+    return !!(control && control.invalid && control.touched);
+  }
+
+  getErrorMessage(controlName: string): string {
+    const control = this.form.get(controlName);
+    if (!control || !control.errors) return '';
+
+    if (control.errors['required']) return 'Este campo es obligatorio';
+    if (control.errors['email']) return 'Email inválido';
+    if (control.errors['minlength']) return 'Mínimo 6 caracteres';
+    if (control.errors['invalidDni']) return 'DNI no válido';
+    if (control.errors['invalidTel']) return 'Teléfono no válido';
+    
+    return 'Campo inválido';
   }
 
   onFileSelected(event: any): void {
@@ -62,7 +78,9 @@ export class FormAlumno implements OnInit {
       nombre: rawValues.nombre!,
       apellidos: rawValues.apellidos!,
       email: rawValues.email!,
-      password: rawValues.password!,
+      telefono: rawValues.telefono!,
+      direccion: rawValues.direccion!, 
+      password: rawValues.password || undefined,
       idRol: rawValues.idRol || 2
     };
 

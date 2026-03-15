@@ -10,24 +10,23 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface TallerMapper {
 
-    // Entidad -> Response
-    // Mapeamos 'id' de la entidad a 'idTaller' del DTO
+    // METODO: ENTIDAD -> RESPONSE
     @Mapping(target = "idTaller", source = "id")
-    @Mapping(target = "nombreCompletoProfesor", 
-             expression = "java(taller.getProfesor().getNombre() + \" \" + taller.getProfesor().getApellidos())")
-    @Mapping(target = "plazasDisponibles", ignore = true) 
+    @Mapping(target = "nombreCompletoProfesor", expression = "java(taller.getProfesor() != null ? taller.getProfesor().getNombre() + \" \" + taller.getProfesor().getApellidos() : \"Sin profesor\")")
+    @Mapping(target = "plazasDisponibles", source = "plazasMaximas")
     TallerResponseDTO toResponse(Taller taller);
 
-    // Request -> Entidad
-    @Mapping(target = "id", ignore = true) // El id de la entidad se ignora (es auto-incremental)
-    @Mapping(target = "profesor", ignore = true) // Se asigna manualmente en el Service
-    @Mapping(target = "activo", ignore = true)
-    Taller toEntity(TallerRequestDTO dto);
-
-
-    // NUEVO MÉTODO PARA ACTUALIZAR
+    // METODO: REQUEST -> ENTIDAD (CREAR)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "profesor", ignore = true)
     @Mapping(target = "activo", ignore = true)
+    @Mapping(target = "fotoRuta", ignore = true)
+    Taller toEntity(TallerRequestDTO dto);
+
+    // METODO: ACTUALIZAR ENTIDAD DESDE DTO
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "profesor", ignore = true)
+    @Mapping(target = "activo", ignore = true)
+    @Mapping(target = "fotoRuta", ignore = true)
     void updateEntityFromDto(TallerRequestDTO dto, @MappingTarget Taller taller);
 }

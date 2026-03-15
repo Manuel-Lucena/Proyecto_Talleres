@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg sticky-top main-nav">
   <div class="container-fluid px-lg-5">
-    
+
     <div class="d-flex align-items-center">
       <a routerLink="/landing" class="navbar-brand d-flex align-items-center p-0 m-0">
         <div class="logo-wrapper-static">
@@ -14,19 +14,42 @@
       </a>
     </div>
 
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
     <div class="collapse navbar-collapse" id="navContent">
       <ul class="navbar-nav ms-auto align-items-center">
-        <li class="nav-item"><a class="nav-link" routerLink="/landing" routerLinkActive="active-link">Inicio</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/talleres" routerLinkActive="active-link">Talleres</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/noticias" routerLinkActive="active-link">Noticias</a></li>
         
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/landing" routerLinkActive="active-link">Inicio</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/talleres-explorar" routerLinkActive="active-link">Talleres</a>
+        </li>
+
+        @if (isLogged) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/mis-talleres" routerLinkActive="active-link">Mis Talleres</a>
+          </li>
+        }
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/noticias" routerLinkActive="active-link">Noticias</a>
+        </li>
+
         <li class="nav-item ms-lg-4">
           @if (isLogged) {
             <div class="user-menu-container">
               <div class="user-trigger" (click)="toggleDropdown($event)">
                 <span class="user-display-name">{{ usuarioData?.nombre }}</span>
                 <div class="avatar-box">
-                  <img [src]="usuarioData?.fotoUrl ? 'assets/usuarios/' + usuarioData?.fotoUrl : 'icons/Logo.png'" alt="User">
+                  @if (usuarioData && usuarioData.fotoPerfilRuta) {
+                    <img [src]="'/Usuarios/' + usuarioData.fotoPerfilRuta" alt="User">
+                  } @else {
+                    <img src="/Usuarios/Predeterminada.png" alt="User">
+                  }
                 </div>
                 <i class="bi bi-chevron-down arrow" [class.open]="mostrarDropdown"></i>
               </div>
@@ -36,14 +59,14 @@
                   <div class="dropdown-header-box">
                     <span class="user-full-name">{{ usuarioData?.nombre }} {{ usuarioData?.apellidos }}</span>
                   </div>
-                  
+
                   <div class="menu-divider"></div>
-                  
+
                   <div class="dropdown-links-list">
                     <a routerLink="/perfil" class="item-link" (click)="mostrarDropdown = false">
                       <i class="bi bi-person-circle"></i> Mi Perfil
                     </a>
-                    
+
                     <button type="button" class="item-link logout-btn" (click)="logout()">
                       <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
                     </button>

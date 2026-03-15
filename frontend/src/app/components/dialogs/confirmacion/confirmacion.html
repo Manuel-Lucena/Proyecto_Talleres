@@ -1,20 +1,18 @@
 @if (config$ | async; as config) {
   <div class="modal-overlay" (click)="responder(false)">
-    <div class="modal-body" (click)="$event.stopPropagation()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
       
-      <div class="icono-pregunta">
-        <i class="bi bi-question-circle-fill"></i>
+      <div class="text-content">
+        <h3>{{ config.titulo }}</h3>
+        <p>{{ config.mensaje }}</p>
       </div>
 
-      <h3 class="modal-titulo">{{ config.titulo }}</h3>
-      <p class="modal-texto">{{ config.mensaje }}</p>
-
-      <div class="modal-acciones">
-        <button type="button" class="btn-cancelar" (click)="responder(false)">
-          {{ config.textoCancelar || 'CANCELAR' }}
+      <div class="modal-actions">
+        <button type="button" class="btn-alt" (click)="responder(false)">
+          {{ config.textoCancelar || 'Cancelar' }}
         </button>
-        <button type="button" class="btn-confirmar" (click)="responder(true)">
-          {{ config.textoConfirmar || 'CONFIRMAR' }}
+        <button type="button" class="btn-main" (click)="responder(true)">
+          {{ config.textoConfirmar || 'Confirmar' }}
         </button>
       </div>
 

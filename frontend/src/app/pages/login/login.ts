@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UsuarioService } from '../../services/Usuario.Service';
-import { LoginRequest } from '../../models/Auth.Interface';
+import { LoginRequest } from '../../interfaces/Auth.Interface';
 import { FormAlumno } from '../../components/forms/form-alumno/form-alumno';
 
 @Component({

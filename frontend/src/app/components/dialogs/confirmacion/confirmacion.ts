@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
-import { ModalService } from '../../../services/Modal.Service';
-import { ConfirmacionConfig } from '../../../models/Modal.Interface';
+import { NotificacionService } from '../../../services/Notificacion.Service';
+import { ConfirmacionConfig } from '../../../interfaces/Modal.Interface';
 
 @Component({
   selector: 'app-confirmacion',
@@ -14,11 +14,11 @@ import { ConfirmacionConfig } from '../../../models/Modal.Interface';
 export class Confirmacion {
   public config$: Observable<ConfirmacionConfig | null>;
 
-  constructor(private modalService: ModalService) {
-    this.config$ = this.modalService.confirmacionState$;
+  constructor(private notificacionService: NotificacionService) {
+    this.config$ = this.notificacionService.confirmacionState$;
   }
 
   responder(respuesta: boolean) {
-    this.modalService.responderConfirmacion(respuesta);
+    this.notificacionService.responderConfirmacion(respuesta);
   }
 }

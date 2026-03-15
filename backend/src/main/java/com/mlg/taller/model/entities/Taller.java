@@ -42,6 +42,9 @@ public class Taller {
     @Column(name = "fecha_fin")
     private LocalDate fechaFin;
 
+    @Column(name = "foto_ruta")
+    private String fotoRuta;
+
     @Builder.Default
     private boolean activo = true;
 }

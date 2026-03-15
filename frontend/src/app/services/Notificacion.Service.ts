@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { ModalConfig, ConfirmacionConfig } from '../models/Modal.Interface';
+import { ModalConfig, ConfirmacionConfig } from '../interfaces/Modal.Interface';
 
 @Injectable({ providedIn: 'root' })
-export class ModalService {
+export class NotificacionService {
   // --- Lógica para Modal de Mensaje ---
   private modalSubject = new Subject<ModalConfig | null>();
   public modalState$ = this.modalSubject.asObservable();

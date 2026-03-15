@@ -18,12 +18,12 @@ import java.util.List;
 @Entity
 @Table(name = "USUARIO")
 @SQLDelete(sql = "UPDATE usuario SET activo = false WHERE id_usuario = ?")
-@SQLRestriction("activo = true") 
+@SQLRestriction("activo = true")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Usuario implements UserDetails { 
+public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,6 +44,12 @@ public class Usuario implements UserDetails {
 
     @Column(nullable = false)
     private String password;
+
+    @Column(length = 255) 
+    private String direccion;
+
+    @Column(length = 20)
+    private String telefono;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_rol", nullable = false)
@@ -78,7 +84,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; 
+        return true;
     }
 
     @Override

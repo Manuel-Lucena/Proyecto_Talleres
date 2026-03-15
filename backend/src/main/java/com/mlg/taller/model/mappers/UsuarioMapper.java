@@ -5,16 +5,32 @@ import com.mlg.taller.model.dtos.UsuarioResponseDTO;
 import com.mlg.taller.model.entities.Usuario;
 import org.mapstruct.*;
 
-// Añadimos NullValuePropertyMappingStrategy.IGNORE para mayor seguridad
-@Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true), nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+/**
+ * Mapper para la entidad Usuario.
+ * Permite actualizaciones parciales ignorando valores nulos en el DTO.
+ */
+@Mapper(
+    componentModel = "spring", 
+    builder = @Builder(disableBuilder = true), 
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface UsuarioMapper {
 
-    // 1. De Entidad a Response (Salida)
+    /**
+     * Mapea entidad a DTO de respuesta.
+     * @param usuario Entidad persistida.
+     * @return DTO con el nombre del rol y sin datos sensibles.
+     */
     @Mapping(target = "idUsuario", source = "id")
     @Mapping(target = "nombreRol", source = "rol.nombre")
+    @Mapping(target = "token", ignore = true)
     UsuarioResponseDTO toResponse(Usuario usuario);
 
-    // 2. De Request a Entidad Nueva (Registro)
+    /**
+     * Convierte DTO de registro en nueva entidad.
+     * @param dto Datos de entrada.
+     * @return Entidad lista para procesar en el servicio.
+     */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "rol", ignore = true)
     @Mapping(target = "activo", ignore = true)
@@ -22,7 +38,12 @@ public interface UsuarioMapper {
     @Mapping(target = "fotoPerfilRuta", ignore = true)
     Usuario toEntity(UsuarioRequestDTO dto);
 
-    // 3. Actualizar Entidad Existente
+    /**
+     * Actualiza una entidad existente con los datos del DTO.
+     * Ignora campos de seguridad y sistema para proteger la integridad del usuario.
+     * @param dto Datos nuevos.
+     * @param usuario Entidad a modificar.
+     */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "rol", ignore = true)
     @Mapping(target = "password", ignore = true)

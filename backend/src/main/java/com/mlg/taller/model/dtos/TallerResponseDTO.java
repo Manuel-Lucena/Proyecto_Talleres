@@ -20,5 +20,6 @@ public class TallerResponseDTO {
     private Double precio;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
+    private String fotoRuta;
     private String nombreCompletoProfesor; 
 }

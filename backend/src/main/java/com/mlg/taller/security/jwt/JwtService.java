@@ -10,6 +10,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.mlg.taller.model.entities.Usuario;
+
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,9 +21,8 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    // Cambia esto por una clave de al menos 32 caracteres
     private static final String SECRET_KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
-    private static final long JWT_EXPIRATION = 86400000; // 24 horas
+    private static final long JWT_EXPIRATION = 86400000;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -40,6 +41,10 @@ public class JwtService {
                 .findFirst()
                 .orElse("ROLE_USER");
         extraClaims.put("role", role);
+
+        if (userDetails instanceof Usuario) {
+            extraClaims.put("id", ((Usuario) userDetails).getId());
+        }
 
         return generateToken(extraClaims, userDetails);
     }

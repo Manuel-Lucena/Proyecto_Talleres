@@ -1,0 +1,60 @@
+<app-navbar></app-navbar>
+
+<div class="pagina-explorar-full">
+  <header class="header-principal">
+    <h2>Explorar Talleres</h2>
+    <p>Cursos prácticos dirigidos por expertos en la materia.</p>
+  </header>
+
+  <div class="layout-flex">
+    <aside class="sidebar-reserva">
+      <div class="info-sidebar">
+        <h3>Filtrar talleres</h3>
+        <p class="nota-sidebar">Configura tus preferencias para encontrar el taller ideal.</p>
+      </div>
+    </aside>
+
+    <main class="seccion-lista-cursos">
+      <div class="card-curso-horizontal" *ngFor="let taller of talleres">
+        
+        <div class="imagen-container">
+          <img [src]="taller.fotoRuta || 'assets/images/placeholder-taller.jpg'" [alt]="taller.nombre">
+          <div class="badge-profesor">Prof. {{ taller.nombreCompletoProfesor }}</div>
+        </div>
+
+        <div class="contenido-curso">
+          <div class="cuerpo-superior">
+            <div class="periodo-curso">
+              <i class="bi bi-calendar-range"></i> 
+              {{ taller.fechaInicio | date:'dd MMM' }} - {{ taller.fechaFin | date:'dd MMM, yyyy' }}
+            </div>
+            <h3 class="titulo-curso">{{ taller.nombre }}</h3>
+            <p class="descripcion-curso">{{ taller.descripcion }}</p>
+          </div>
+
+          <div class="footer-curso">
+            <div class="detalles-tecnicos">
+              <span [class.sin-plazas]="taller.plazasDisponibles === 0">
+                <i class="bi bi-people"></i> 
+                {{ taller.plazasDisponibles }} de {{ taller.plazasMaximas }} plazas libres
+              </span>
+            </div>
+            
+            <div class="precio-inscripcion">
+              <div class="precio-container">
+                <span class="moneda">{{ taller.precio }}€</span>
+              </div>
+              <button class="btn-inscripcion" 
+                      [disabled]="taller.plazasDisponibles === 0"
+                      [routerLink]="['/inscripcion', taller.idTaller]">
+                {{ taller.plazasDisponibles > 0 ? 'Inscribirme ahora' : 'Agotado' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<app-footer></app-footer>

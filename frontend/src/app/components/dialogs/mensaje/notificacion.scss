@@ -1,0 +1,88 @@
+@import '../../../../styles/variables';
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba($color-neutro-min, 0.4);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+
+  .modal-content {
+    background: $color-neutro-max;
+    padding: 2.2rem;
+    border-radius: $radio-curvatura * 3; // Bordes suaves y modernos
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+
+    .text-wrap {
+      margin-bottom: 1.8rem;
+
+      h3 {
+        font-family: $fuente-enfasis;
+        font-size: $tamaño-titular-md;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+
+        // El color del título indica el estado
+        &.exito {
+          color: $color-marca-principal;
+        }
+
+        &.error {
+          color: $danger;
+        }
+
+        &.info {
+          color: $info;
+        }
+      }
+
+      p {
+        font-family: $fuente-lectura;
+        color: $color-superficie-oscura;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        margin: 0;
+      }
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: $radio-curvatura * 1.5;
+      font-family: $fuente-enfasis;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: $color-neutro-max;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &.exito {
+        background: $color-marca-principal;
+      }
+
+      &.error {
+        background: $danger;
+      }
+
+      &.info {
+        background: $info;
+      }
+
+      &:hover {
+        filter: brightness(1.05);
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+}

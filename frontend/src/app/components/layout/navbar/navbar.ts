@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TokenService } from '../../../services/Token.Service';
 import { UsuarioService } from '../../../services/Usuario.Service';
-import { UsuarioResponse } from '../../../models/Usuario.Interface';
+import { UsuarioResponse } from '../../../interfaces/Usuario.Interface';
 
 @Component({
   selector: 'app-navbar',
@@ -13,7 +13,7 @@ import { UsuarioResponse } from '../../../models/Usuario.Interface';
   styleUrl: './navbar.scss'
 })
 export class Navbar implements OnInit {
-  // Quitamos la inicialización fija para que se evalúe correctamente
+
   public isLogged = false;
   public mostrarDropdown = false;
   public usuarioData?: UsuarioResponse;
@@ -21,7 +21,8 @@ export class Navbar implements OnInit {
   constructor(
     private router: Router,
     public tokenService: TokenService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -33,17 +34,21 @@ export class Navbar implements OnInit {
   }
 
   private cargarDatos(): void {
-    const dec = this.tokenService.decode();
-    const email = dec?.sub; // Esto es "admin@admin.com" según tu consola
+    const userId = this.tokenService.getId();
 
-    if (email) {
-      this.usuarioService.obtenerPorEmail(email).subscribe({
+    if (userId) {
+      this.usuarioService.obtenerPorId(userId).subscribe({
         next: (res) => {
-          console.log('¡USUARIO CARGADO!', res.data);
-          this.usuarioData = res.data; // Aquí ya tendrás nombre, foto, etc.
+
+          this.usuarioData = res.data;
+          this.cdr.detectChanges(); 
         },
-        error: (err) => console.error("Error al traer datos por email", err)
+        error: (err) => {
+          console.error("Error en Navbar al traer datos por ID", err);
+        }
       });
+    } else {
+      console.warn("No se pudo obtener el ID del token para el Navbar");
     }
   }
 
