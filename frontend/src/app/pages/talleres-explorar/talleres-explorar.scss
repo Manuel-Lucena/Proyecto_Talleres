@@ -1,17 +1,49 @@
-@import '../../../styles/variables';
+@use '../../../styles/variables' as v;
+@use '../../../styles/mixins' as m;
+
+.header-principal {
+    .linea-vertical {
+        width: 2px;
+        height: 35px;
+        background-color: #ddd;
+        margin: 0 10px;
+    }
+
+    .btn-azul-plus {
+        background-color: v.$color-secundario-frio-2; // Azul corporativo según guía
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: v.$radio-curvatura;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease-in-out;
+
+        &:hover {
+            background-color: v.$color-marca-principal;
+            transform: scale(1.02);
+            box-shadow: v.$sombra-nivel-2;
+        }
+    }
+}
 
 .pagina-explorar-full {
     width: 100%;
     padding: 50px 4%;
-    background-color: #fcfcfc;
+    background-color: v.$color-fondo-pagina;
+    min-height: 100vh;
+    font-family: v.$fuente-lectura;
 }
 
 .header-principal {
     margin-bottom: 40px;
 
     h2 {
+        font-family: v.$fuente-enfasis;
         font-size: 2.8rem;
-        color: $color-secundario-frio-2;
+        color: v.$color-secundario-frio-2;
         font-weight: 800;
     }
 
@@ -32,13 +64,16 @@
     min-width: 220px;
     background: white;
     padding: 25px;
-    border-radius: 16px;
-    border: 1px solid #eee;
+    border-radius: v.$radio-curvatura;
+    border: 1px solid #f0f0f0;
+    box-shadow: v.$sombra-nivel-1;
 
     h3 {
+        font-family: v.$fuente-enfasis;
         font-size: 1rem;
-        color: $color-secundario-frio-2;
+        color: v.$color-secundario-frio-2;
         margin-bottom: 10px;
+        font-weight: 700;
     }
 
     .nota-sidebar {
@@ -55,14 +90,44 @@
 }
 
 .card-curso-horizontal {
+    @include m.card-elevada;
     display: flex;
-    background: #fff;
-    border-radius: 20px;
-    border: 1px solid #f0f0f0;
-    overflow: hidden;
+    position: relative;
     height: 270px;
     width: 100%;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.03);
+    overflow: visible; // Para el dropdown
+
+    .admin-dropdown {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        z-index: 10;
+
+        .btn-kebab {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #eee;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            transition: 0.3s ease-in-out;
+
+            &:hover {
+                color: v.$color-marca-principal;
+                background: white;
+            }
+        }
+
+        .dropdown-menu {
+            border: none;
+            border-radius: v.$radio-curvatura;
+            box-shadow: v.$sombra-nivel-3;
+            padding: 8px;
+        }
+    }
 
     .imagen-container {
         width: 340px;
@@ -96,25 +161,24 @@
         justify-content: space-between;
 
         .periodo-curso {
-            color: $color-marca-principal;
+            color: v.$color-marca-principal;
             font-weight: 700;
             font-size: 0.9rem;
         }
 
         .titulo-curso {
+            font-family: v.$fuente-enfasis;
             font-size: 1.7rem;
-            color: $color-secundario-frio-2;
-            margin: 5px 0;
+            color: v.$color-secundario-frio-2;
             font-weight: 800;
+            margin: 5px 0;
         }
 
         .descripcion-curso {
             color: #666;
             font-size: 0.95rem;
             line-height: 1.5;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            @include m.limitar-lineas(2);
         }
     }
 
@@ -125,50 +189,20 @@
         padding-top: 15px;
         border-top: 1px solid #f9f9f9;
 
-        .detalles-tecnicos {
-            color: #888;
-            font-size: 0.9rem;
-
-            i {
-                color: $color-marca-principal;
-                margin-right: 6px;
-            }
-
-            .sin-plazas {
-                color: #dc3545;
-                font-weight: 700;
-            }
-        }
-
         .precio-inscripcion {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 25px; // SEPARACIÓN PRECIO Y BOTÓN
 
             .moneda {
+                font-family: v.$fuente-enfasis;
                 font-size: 2rem;
                 font-weight: 900;
-                color: $color-secundario-frio-2;
+                color: v.$color-secundario-frio-2;
             }
 
             .btn-inscripcion {
-                background: $color-marca-principal;
-                color: white;
-                border: none;
-                padding: 10px 24px;
-                border-radius: 10px;
-                font-weight: 700;
-                cursor: pointer;
-                transition: 0.2s;
-
-                &:disabled {
-                    background: #ccc;
-                    cursor: not-allowed;
-                }
-
-                &:not(:disabled):hover {
-                    background: darken($color-marca-principal, 10%);
-                }
+                @include m.boton-inscripcion-aula; // Aplicado el naranja de la guía
             }
         }
     }

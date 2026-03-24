@@ -25,10 +25,15 @@ export class TallerService {
     return this.http.get<ApiResponse<TallerResponse>>(`${this.apiUrl}/${id}`);
   }
 
+  listarPorUsuario(idUsuario: number): Observable<ApiResponse<TallerResponse[]>> {
+    return this.http.get<ApiResponse<TallerResponse[]>>(`${this.apiUrl}/usuario/${idUsuario}`);
+  }
+
   // 4. ACTUALIZAR TALLER
   // Recibe ID y FormData para permitir la actualización de la imagen
+
   actualizar(id: number, formData: FormData): Observable<ApiResponse<TallerResponse>> {
-    return this.http.put<ApiResponse<TallerResponse>>(`${this.apiUrl}/${id}`, formData);
+    return this.http.put<ApiResponse<TallerResponse>>(`${this.apiUrl}/${id.toString()}`, formData);
   }
 
   // 5. ELIMINAR (Borrado lógico configurado en el Backend)

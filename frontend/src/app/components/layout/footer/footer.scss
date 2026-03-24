@@ -4,7 +4,7 @@
     background-color: v.$color-superficie-oscura;
     color: rgba(v.$color-neutro-max, 0.7);
     padding: 70px 0 30px;
-    border-top: 4px solid v.$color-marca-principal; // El toque verde arriba
+    border-top: 4px solid v.$color-marca-principal; // El toque verde arriba oficial
     font-family: v.$fuente-lectura;
 
     .footer-logo {
@@ -15,26 +15,24 @@
 
         .logo-img {
             width: 45px;
-            // Ya no hace falta el filter: brightness(0) invert(1);
         }
 
         span {
             font-family: v.$fuente-enfasis;
             font-size: 1.6rem;
             font-weight: 800;
-            color: #fff;
+            color: v.$color-neutro-max;
         }
     }
 
     .footer-title {
-        color: #fff;
+        color: v.$color-neutro-max;
         font-family: v.$fuente-enfasis;
         font-size: 1.2rem;
         margin-bottom: 25px;
         position: relative;
 
         &::after {
-            // La línea verde que te molaba
             content: '';
             position: absolute;
             left: 0;
@@ -57,7 +55,7 @@
             a {
                 color: inherit;
                 text-decoration: none;
-                transition: 0.3s;
+                transition: 0.3s ease-in-out;
 
                 &:hover {
                     color: v.$color-marca-principal;
@@ -85,23 +83,24 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: rgba(v.$color-neutro-max, 0.1);
+            color: v.$color-neutro-max;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: 0.3s;
+            transition: 0.3s ease-in-out;
 
             &:hover {
                 background: v.$color-marca-principal;
                 transform: translateY(-3px);
+                box-shadow: v.$sombra-nivel-2;
             }
         }
     }
 
     .footer-divider {
         margin: 40px 0 25px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 1px solid rgba(v.$color-neutro-max, 0.1);
     }
 
     .footer-bottom {
@@ -113,12 +112,13 @@
         gap: 10px;
 
         .footer-legal a {
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(v.$color-neutro-max, 0.4);
             text-decoration: none;
             margin-left: 20px;
+            transition: color 0.3s ease-in-out;
 
             &:hover {
-                color: #fff;
+                color: v.$color-neutro-max;
             }
         }
     }

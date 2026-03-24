@@ -1,0 +1,93 @@
+<div class="modal-overlay" (click)="cerrar.emit()">
+  <div class="modal-body" (click)="$event.stopPropagation()">
+    <button class="btn-close" (click)="cerrar.emit()">&times;</button>
+
+    <div class="titulo-formulario">
+      {{ tallerParaEditar ? 'Editar Taller' : 'Nuevo Taller' }}
+    </div>
+
+    <form [formGroup]="tallerForm" (ngSubmit)="enviar()" class="noticia-grid-container">
+
+      <div class="noticia-form-col">
+        <div class="form-flex">
+          <div class="campo-formulario">
+            <label>Nombre del Taller</label>
+            <input type="text" formControlName="nombre" placeholder="Ej: Taller de Acuarela Avanzada">
+          </div>
+
+          <div class="fila-formulario">
+            <div class="campo-formulario">
+              <label>Fecha Inicio</label>
+              <input type="date" formControlName="fechaInicio">
+            </div>
+            <div class="campo-formulario">
+              <label>Fecha Fin</label>
+              <input type="date" formControlName="fechaFin">
+            </div>
+          </div>
+
+          <div class="fila-formulario">
+            <div class="campo-formulario">
+              <label>Plazas Máximas</label>
+              <input type="number" formControlName="plazasMaximas">
+            </div>
+            <div class="campo-formulario">
+              <label>Precio (€)</label>
+              <input type="number" formControlName="precio">
+            </div>
+          </div>
+
+          <div class="campo-formulario">
+            <label>Profesor / Instructor</label>
+            <input type="text" formControlName="nombreCompletoProfesor" placeholder="Nombre del docente">
+          </div>
+
+          <div class="campo-formulario">
+            <label>Descripción del curso</label>
+            <textarea formControlName="descripcion" class="input-personalizado"
+              placeholder="¿Qué aprenderán los alumnos?"></textarea>
+          </div>
+
+          <div class="zona-subida" [class.archivo-listo]="archivoSeleccionado || fotoPreview"
+            (click)="fileInput.click()">
+            <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/*">
+            <i class="bi" [class.bi-image]="!archivoSeleccionado"
+              [class.bi-check-circle-fill]="archivoSeleccionado"></i>
+            <span>{{ archivoSeleccionado ? archivoSeleccionado.name : 'Subir portada del taller' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="noticia-preview-col">
+        <label class="label-preview">VISTA PREVIA DE TARJETA</label>
+
+        <div class="vista-previa-tarjeta">
+          <div class="img-contenedor">
+            <img [src]="fotoPreview || 'assets/images/placeholder-taller.jpg'">
+          </div>
+          <div class="p-3-preview">
+            <span class="preview-date">
+              {{ (tallerForm.get('fechaInicio')?.value | date:'dd MMM') || '--' }} - {{
+              (tallerForm.get('fechaFin')?.value | date:'dd MMM') || '--' }}
+            </span>
+            <h3 class="preview-title">{{ tallerForm.get('nombre')?.value || 'Título del Taller' }}</h3>
+            <p class="preview-text">{{ tallerForm.get('descripcion')?.value || 'Descripción breve...' }}</p>
+
+            <div class="preview-footer">
+              <small class="text-muted"><i class="bi bi-people"></i> {{ tallerForm.get('plazasMaximas')?.value }}
+                plazas</small>
+              <strong class="preview-price">{{ tallerForm.get('precio')?.value }}€</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="acciones-finales">
+          <button type="submit" class="btn-guardar-noticia" [disabled]="tallerForm.invalid">
+            {{ tallerParaEditar ? 'Actualizar Taller' : 'Publicar Taller' }}
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>

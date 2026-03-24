@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Data
 public class TallerRequestDTO {
 
@@ -22,9 +24,11 @@ public class TallerRequestDTO {
     private Double precio;
 
     @NotNull(message = "La fecha de inicio es obligatoria")
+    @JsonFormat(pattern = "yyyy-MM-dd") 
     private LocalDate fechaInicio;
 
     @NotNull(message = "La fecha de fin es obligatoria")
+    @JsonFormat(pattern = "yyyy-MM-dd") 
     private LocalDate fechaFin;
 
     private String fotoRuta;

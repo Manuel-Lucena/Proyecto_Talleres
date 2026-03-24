@@ -46,6 +46,17 @@ public class TallerController {
     }
 
     /**
+     * Obtiene los talleres en los que un usuario específico está inscrito.
+     * @param idUsuario ID del alumno.
+     * @return Lista de talleres para la vista "Mis Talleres".
+     */
+    @GetMapping("/usuario/{idUsuario}")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<List<TallerResponseDTO>> listarPorUsuario(@PathVariable Long idUsuario) {
+        return ApiResponse.success(tallerService.listarTalleresPorUsuarioId(idUsuario), "Mis talleres obtenidos correctamente");
+    }
+
+    /**
      * Registra un nuevo taller en el sistema, permitiendo adjuntar una imagen promocional.
      * El cuerpo de la petición debe ser {@code multipart/form-data}.
      * * @param request Datos del taller en formato JSON (parte 'taller').

@@ -1,92 +1,50 @@
 @import '../../../../styles/variables';
 
 .modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba($color-neutro-min, 0.4);
-  backdrop-filter: blur(3px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99999;
-  padding: 1rem;
+  position: fixed; inset: 0;
+  background: rgba($color-neutro-min, 0.5); // Un poco más oscuro para foco
+  backdrop-filter: blur(4px); // Aumentado ligeramente según tendencia
+  display: flex; align-items: center; justify-content: center;
+  z-index: 99999; padding: 1rem;
 }
 
 .modal-card {
   background: $color-neutro-max;
-  width: 100%;
-  max-width: 320px;
-  padding: 2rem;
-  border-radius: $radio-curvatura * 3;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  animation: modalIn 0.2s ease-out;
+  width: 100%; max-width: 360px;
+  padding: 2.5rem;
+  border-radius: $radio-curvatura; // 0.5rem consistente
+  box-shadow: $sombra-nivel-3; 
+  animation: modalIn 0.3s ease-out;
 
   .text-content {
-    text-align: center;
-    margin-bottom: 2rem;
-
+    text-align: center; margin-bottom: 2rem;
     h3 {
-      font-family: $fuente-enfasis;
-      color: $color-secundario-frio-2;
-      font-size: $tamaño-titular-md;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
+      font-family: $fuente-enfasis; color: $color-secundario-frio-2;
+      font-size: $tamaño-titular-md; font-weight: 800; margin-bottom: 0.8rem;
     }
-
     p {
-      font-family: $fuente-lectura;
-      color: $color-superficie-oscura;
-      font-size: 0.95rem;
-      line-height: 1.4;
-      margin: 0;
+      font-family: $fuente-lectura; color: #666;
+      font-size: 0.95rem; line-height: 1.5; margin: 0;
     }
   }
 }
 
 .modal-actions {
-  display: flex;
-  gap: 10px;
-
+  display: flex; gap: 12px;
   button {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    border-radius: $radio-curvatura * 1.5;
-    font-family: $fuente-enfasis;
-    font-weight: 600;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.2s;
+    flex: 1; padding: 12px; border: none;
+    border-radius: $radio-curvatura;
+    font-family: $fuente-enfasis; font-weight: 700;
+    font-size: 0.9rem; cursor: pointer;
+    transition: all 0.3s ease-in-out;
   }
-
   .btn-alt {
-    background: $color-fondo-pagina;
-    color: $color-superficie-oscura;
+    background: $color-fondo-pagina; color: $color-superficie-oscura;
     border: 1px solid $color-superficie-suave;
-
-    &:hover {
-      background: darken($color-fondo-pagina, 3%);
-    }
+    &:hover { background: darken($color-fondo-pagina, 5%); }
   }
-
   .btn-main {
-    background: $color-secundario-frio-2;
-    color: $color-neutro-max;
-
-    &:hover {
-      filter: brightness(1.1);
-    }
-  }
-}
-
-@keyframes modalIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
+    background: $color-secundario-frio-2; color: $color-neutro-max;
+    &:hover { background: lighten($color-secundario-frio-2, 5%); box-shadow: $sombra-nivel-2; }
   }
 }

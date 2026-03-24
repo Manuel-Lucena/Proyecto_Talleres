@@ -3,8 +3,8 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba($color-neutro-min, 0.4);
-  backdrop-filter: blur(3px);
+  background: rgba($color-neutro-min, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,76 +12,71 @@
 
   .modal-content {
     background: $color-neutro-max;
-    padding: 2.2rem;
-    border-radius: $radio-curvatura * 3; // Bordes suaves y modernos
+    padding: 2.5rem;
+    border-radius: $radio-curvatura;
     width: 100%;
-    max-width: 300px;
+    max-width: 340px;
     text-align: center;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    box-shadow: $sombra-nivel-3;
 
     .text-wrap {
-      margin-bottom: 1.8rem;
+      margin-bottom: 2rem;
 
       h3 {
         font-family: $fuente-enfasis;
         font-size: $tamaño-titular-md;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
+        font-weight: 800;
+        margin-bottom: 0.8rem;
 
-        // El color del título indica el estado
         &.exito {
           color: $color-marca-principal;
         }
 
         &.error {
-          color: $danger;
+          color: $color-secundario-calido-1;
         }
 
         &.info {
-          color: $info;
+          color: $color-secundario-frio-1;
         }
       }
 
       p {
         font-family: $fuente-lectura;
-        color: $color-superficie-oscura;
-        font-size: 0.95rem;
-        line-height: 1.4;
+        color: #666;
+        font-size: 1rem;
+        line-height: 1.5;
         margin: 0;
       }
     }
 
     button {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       border: none;
-      border-radius: $radio-curvatura * 1.5;
+      border-radius: $radio-curvatura;
       font-family: $fuente-enfasis;
-      font-weight: 600;
-      font-size: 0.9rem;
+      font-weight: 700;
       color: $color-neutro-max;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease-in-out;
 
       &.exito {
         background: $color-marca-principal;
       }
 
       &.error {
-        background: $danger;
+        background: $color-secundario-calido-1;
       }
 
       &.info {
-        background: $info;
+        background: $color-secundario-frio-1;
       }
 
       &:hover {
-        filter: brightness(1.05);
-        transform: translateY(-1px);
-      }
-
-      &:active {
-        transform: translateY(0);
+        filter: brightness(1.1);
+        transform: translateY(-2px);
+        box-shadow: $sombra-nivel-2;
       }
     }
   }

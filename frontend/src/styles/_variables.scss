@@ -13,7 +13,7 @@ $color-neutro-min:       #000000;
 // 2. COLORES SECUNDARIOS POR TEMPERATURA / FUNCIÓN
 $color-secundario-frio-1:   #00bcd4;
 $color-secundario-frio-2:   #2d4059;
-$color-secundario-calido-1: #f2994a;
+$color-secundario-calido-1: #f2994a; // Naranja de acción según guía
 $color-secundario-calido-2: #f2c94c;
 
 // 3. SUPERFICIES Y GRISES
@@ -43,4 +43,9 @@ $tamaño-titular-lg:  calc(28rem / 16);
 $tamaño-titular-md:  calc(22rem / 16); 
 
 // 6. ESTRUCTURA
-$radio-curvatura:    0.5rem;
+$radio-curvatura:    0.5rem; // Ajustado a 8px según guía
+
+// 7. PROFUNDIDAD (Sombras Guía de Estilo)
+$sombra-nivel-1: 0 2px 4px rgba(0,0,0,0.05);
+$sombra-nivel-2: 0 10px 20px rgba(0,0,0,0.08);
+$sombra-nivel-3: 0 20px 40px rgba(0,0,0,0.12);

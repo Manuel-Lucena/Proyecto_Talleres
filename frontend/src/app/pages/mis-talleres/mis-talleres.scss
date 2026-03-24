@@ -1,0 +1,187 @@
+@use '../../../styles/variables' as v;
+@use '../../../styles/mixins' as m;
+
+.contenedor-mis-talleres {
+    padding: 3rem 10%;
+    min-height: 85vh;
+    background-color: v.$color-fondo-pagina; // #f8f9fa oficial
+    font-family: v.$fuente-lectura;
+
+    @media (max-width: 768px) {
+        padding: 2rem 5%;
+    }
+}
+
+.header-seccion {
+    margin-bottom: 2.5rem;
+
+    h1 {
+        @include m.titulo-seccion(v.$color-secundario-frio-2);
+        font-size: 2.2rem; // Un pelín más de presencia
+        margin-bottom: 0.5rem;
+    }
+
+    p {
+        color: #666;
+        font-size: 1rem;
+    }
+}
+
+.grid-mis-talleres {
+    display: grid;
+    // Mantenemos tus tarjetas anchas
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); 
+    gap: 2rem; // Un poco más de aire entre tarjetas según la tendencia minimalista
+}
+
+.card-inscripcion {
+    background: v.$color-neutro-max;
+    border-radius: v.$radio-curvatura;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    overflow: hidden;
+    border: 1px solid #eee;
+    // Aplicamos sombra Nivel 1 (estática)
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.3s ease-in-out; // Transición estándar de 300ms
+
+    &:hover {
+        border-color: v.$color-marca-principal;
+        transform: translateY(-5px); // Micro-interacción de la guía
+        box-shadow: v.$sombra-nivel-2; // Elevación Nivel 2 al interactuar
+
+        .overlay-click {
+            opacity: 1;
+        }
+    }
+
+    .banner-taller {
+        height: 200px;
+        position: relative;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .overlay-click {
+            position: absolute;
+            inset: 0;
+            background: rgba(v.$color-secundario-frio-2, 0.6); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: v.$fuente-enfasis;
+            font-weight: 700;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+    }
+
+    .info-cuerpo {
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        h3 {
+            font-family: v.$fuente-enfasis;
+            color: v.$color-secundario-frio-2;
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+
+        .profesor {
+            margin: 6px 0 0;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        .fecha-info {
+            font-size: 0.85rem;
+            color: v.$color-marca-principal;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+    }
+
+    .acciones-rapidas {
+        display: flex;
+        border-top: 1px solid #f0f0f0;
+        padding: 15px 0;
+        background-color: #fafafa;
+
+        .accion-item {
+            flex: 1;
+            border: none;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s ease;
+
+            i {
+                font-size: 1.3rem;
+            }
+
+            span {
+                font-family: v.$fuente-enfasis;
+                font-size: 0.7rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            &:hover {
+                color: v.$color-marca-principal;
+            }
+        }
+
+        .divisor-vertical {
+            width: 1px;
+            height: 25px;
+            background: #eee;
+            align-self: center;
+        }
+    }
+}
+
+.sin-talleres {
+    @include m.card-elevada; // Aplicamos el estilo de contenedor limpio
+    text-align: center;
+    padding: 5rem 2rem;
+    background: v.$color-neutro-max;
+    border-radius: v.$radio-curvatura;
+
+    i {
+        font-size: 3rem;
+        color: #eee;
+        margin-bottom: 1.5rem;
+        display: block;
+    }
+
+    h3 {
+        font-family: v.$fuente-enfasis;
+        color: v.$color-secundario-frio-2;
+        font-weight: 800;
+        margin-bottom: 2rem;
+    }
+
+    .btn-explorar {
+        @include m.boton-primario;
+        padding: 12px 30px;
+    }
+}

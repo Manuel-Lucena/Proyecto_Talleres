@@ -1,8 +1,9 @@
 @use '../../../styles/variables' as v;
+@use '../../../styles/mixins' as m;
 
 .landing-container {
   font-family: v.$fuente-lectura;
-  background-color: #ffffff;
+  background-color: v.$color-neutro-max; // #ffffff oficial
 
   // --- HERO ZONE ---
   .hero-zone-slim {
@@ -11,7 +12,7 @@
     min-height: 320px;
     display: flex;
     align-items: center;
-    background-color: #1a3a3a;
+    background-color: v.$color-secundario-frio-2; // Color oscuro oficial
     overflow: hidden;
 
     &::before {
@@ -26,6 +27,7 @@
       content: '';
       position: absolute;
       inset: 0;
+      // Gradiente ajustado a los verdes de la marca
       background: linear-gradient(90deg, rgba(14, 43, 30, 0.9) 0%, rgba(14, 43, 30, 0.4) 100%);
       z-index: 2;
     }
@@ -37,13 +39,13 @@
 
     .hero-text h1.h1-title {
       font-family: v.$fuente-enfasis;
-      font-size: 3rem;
-      color: white;
+      font-size: 3.5rem; // Un poco más grande para impacto
+      color: v.$color-neutro-max;
       font-weight: 800;
       margin: 0;
 
       span {
-        color: #a2d9a2;
+        color: v.$color-marca-principal; // El verde brillante oficial
       }
     }
   }
@@ -52,29 +54,14 @@
   .content-zone {
     padding: 60px 0;
 
-    // Recuperamos los estilos del título y divisores
-    .title-group {
-      .section-title {
-        font-family: v.$fuente-enfasis;
-        font-size: 2rem;
-        font-weight: 700;
-        color: #2d3436;
-        margin-bottom: 0;
-      }
-
-      .title-line {
-        width: 50px;
-        height: 5px;
-        background: v.$color-marca-principal;
-        margin-top: 5px;
-        border-radius: 10px;
-      }
+    .section-title {
+      @include m.titulo-seccion; // Usa el mixin que ya tienes
     }
 
     .vertical-divider {
       width: 1px;
       height: 30px;
-      background-color: #dfe6e9;
+      background-color: #dfe6e9; // Separador sutil
       margin: 0 20px;
       align-self: center;
     }
@@ -85,52 +72,40 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #0984e3;
+      color: v.$color-secundario-frio-1; // Azul oficial de la guía
       font-weight: 700;
-      font-size: 0.85rem;
       text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease-in-out;
 
       &:hover {
         transform: translateY(-2px);
-        color: darken(#0984e3, 10%);
+        filter: brightness(1.2);
       }
     }
 
-    // --- CARDS (CON EL FIX QUE SÍ FUNCIONA) ---
+    // --- CARDS ---
     .news-card {
-      background: white;
-      border-radius: 20px;
-      border: 1px solid #f0f0f0;
-      overflow: hidden;
+      @include m.card-elevada; // Mantiene tu sombra y borde
       display: flex;
       flex-direction: column;
       height: 100%;
-      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      border-radius: v.$radio-curvatura;
+      overflow: hidden;
 
-      &:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-
-        .news-img {
-          transform: scale(1.08);
-        }
+      &:hover .news-img {
+        transform: scale(1.08);
       }
 
       .card-img-wrapper {
         position: relative;
-        width: 100%;
         height: 200px;
-        flex: 0 0 200px; // Bloqueo para que no se estire
+        flex: 0 0 200px;
         overflow: hidden;
-        background-color: #f8f9fa;
 
         .news-img {
           width: 100%;
           height: 100%;
-          object-fit: cover; // Corta la imagen en lugar de deformarla
-          display: block;
+          object-fit: cover;
           transition: transform 0.6s ease;
         }
 
@@ -139,12 +114,12 @@
           top: 15px;
           left: 15px;
           background: v.$color-marca-principal;
-          color: white;
+          color: v.$color-neutro-max;
           padding: 5px 12px;
           border-radius: 6px;
-          font-weight: 700;
+          font-family: v.$fuente-enfasis;
+          font-weight: 800;
           font-size: 0.7rem;
-          z-index: 2;
         }
       }
 
@@ -155,43 +130,39 @@
         flex-direction: column;
 
         .date {
-          color: #b2bec3;
+          color: #999;
           font-size: 0.85rem;
           margin-bottom: 10px;
+          font-weight: 600;
         }
 
         h3 {
+          font-family: v.$fuente-enfasis;
           font-size: 1.25rem;
-          font-weight: 700;
-          color: #2d3436;
-          margin-bottom: 12px;
-          display: -webkit-box;
-
-          -webkit-box-orient: vertical;
-          overflow: hidden;
+          font-weight: 800;
+          color: v.$color-secundario-frio-2;
+          @include m.limitar-lineas(2);
         }
 
         p {
-          color: #636e72;
+          font-family: v.$fuente-lectura;
+          color: #666;
           font-size: 0.95rem;
           line-height: 1.6;
-          margin-bottom: 20px;
-          flex-grow: 1;
-          display: -webkit-box;
- 
-          -webkit-box-orient: vertical;
-          overflow: hidden;
+          @include m.limitar-lineas(3);
         }
 
         .btn-read {
           background: none;
           border: none;
           color: v.$color-marca-principal;
+          font-family: v.$fuente-enfasis;
           font-weight: 800;
-          font-size: 0.8rem;
           text-transform: uppercase;
           padding: 0;
-          text-align: left;
+          margin-top: auto; // Lo empuja al final
+          cursor: pointer;
+          align-self: flex-start;
 
           &:hover {
             text-decoration: underline;

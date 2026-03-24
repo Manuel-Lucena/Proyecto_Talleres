@@ -11,25 +11,77 @@
   z-index: 1001; // Un punto por encima de la capa de click-outside
 
   .logo-wrapper-static {
-    height: 85px; width: 85px;
-    img { height: 100%; width: 100%; object-fit: contain; }
+    height: 85px;
+    width: 85px;
+
+    img {
+      height: 100%;
+      width: 100%;
+      object-fit: contain;
+    }
   }
 
-  .v-divider { width: 2px; height: 50px; background: #eee; margin: 0 25px; }
+  .v-divider {
+    width: 2px;
+    height: 50px;
+    background: #eee;
+    margin: 0 25px;
+  }
 
   .brand-text {
-    h1 { font-family: v.$fuente-enfasis; font-size: 2.4rem; font-weight: 800; color: v.$color-secundario-frio-2; margin: 0; line-height: 1; }
-    p { font-size: 0.9rem; letter-spacing: 2px; color: #777; margin: 0; }
+    h1 {
+      font-family: v.$fuente-enfasis;
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: v.$color-secundario-frio-2;
+      margin: 0;
+      line-height: 1;
+    }
+
+    p {
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+      color: #777;
+      margin: 0;
+    }
   }
 
   .navbar-nav .nav-link {
-    font-family: v.$fuente-enfasis; font-size: 1.2rem; font-weight: 800;
-    color: v.$color-superficie-oscura; margin: 0 15px;
-    position: relative; padding: 8px 0; transition: color 0.3s ease;
-    
-    &::after { content: ''; position: absolute; width: 0; height: 3px; bottom: 0; left: 0; background-color: #2ecc71; transition: width 0.3s ease; }
-    &:hover { color: #2ecc71; &::after { width: 100%; } }
-    &.active-link { color: #2ecc71; &::after { width: 100%; } }
+    font-family: v.$fuente-enfasis;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: v.$color-superficie-oscura;
+    margin: 0 15px;
+    position: relative;
+    padding: 8px 0;
+    transition: color 0.3s ease-in-out;
+
+    &::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 3px;
+      bottom: 0;
+      left: 0;
+      background-color: v.$color-marca-principal; // Verde oficial
+      transition: width 0.3s ease-in-out;
+    }
+
+    &:hover {
+      color: v.$color-marca-principal;
+
+      &::after {
+        width: 100%;
+      }
+    }
+
+    &.active-link {
+      color: v.$color-marca-principal;
+
+      &::after {
+        width: 100%;
+      }
+    }
   }
 
   // --- DROPDOWN CONTAINER ---
@@ -37,36 +89,77 @@
     position: relative;
 
     .user-trigger {
-      display: flex; align-items: center; gap: 12px; cursor: pointer;
-      padding: 5px 15px; border-radius: 50px; transition: 0.3s;
-      &:hover { background: #f8f9fa; }
-      .avatar-box { 
-        width: 48px; height: 48px; border-radius: 50%; overflow: hidden; border: 2px solid #2ecc71;
-        img { width: 100%; height: 100%; object-fit: cover; }
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      padding: 5px 15px;
+      border-radius: 50px;
+      transition: background 0.3s ease-in-out;
+
+      &:hover {
+        background: v.$color-fondo-pagina;
       }
-      .arrow { transition: transform 0.3s; &.open { transform: rotate(180deg); } }
+
+      .avatar-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid v.$color-marca-principal; // Verde oficial
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      .arrow {
+        transition: transform 0.3s ease-in-out;
+
+        &.open {
+          transform: rotate(180deg);
+        }
+      }
     }
 
     .custom-dropdown-menu {
       position: absolute;
-      top: 110%; right: 0;
+      top: 110%;
+      right: 0;
       width: 260px;
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+      background: v.$color-neutro-max;
+      border-radius: v.$radio-curvatura; // Ajustado a 0.5rem (8px)
+      box-shadow: v.$sombra-nivel-3; // Nivel 3 para elementos emergentes
       padding: 15px;
-      z-index: 1002; // El dropdown debe estar por encima de TODO
+      z-index: 1002;
       border: 1px solid #f0f0f0;
 
       .dropdown-header-box {
         padding: 5px 10px 10px;
-        .user-full-name { font-size: 1.1rem; font-weight: 800; color: #333; display: block; }
-        .user-role-badge { font-size: 0.75rem; font-weight: 900; color: #2ecc71; text-transform: uppercase; }
+
+        .user-full-name {
+          font-size: 1.1rem;
+          font-weight: 800;
+          color: v.$color-secundario-frio-2;
+          display: block;
+        }
+
+        .user-role-badge {
+          font-size: 0.75rem;
+          font-weight: 900;
+          color: v.$color-marca-principal;
+          text-transform: uppercase;
+        }
       }
 
-      .menu-divider { height: 1px; background: #f1f1f1; margin: 8px 0; }
+      .menu-divider {
+        height: 1px;
+        background: #f1f1f1;
+        margin: 8px 0;
+      }
 
-      // --- EL SECRETO DEL HOVER SIN IMPORTANT ---
       .dropdown-links-list {
         display: flex;
         flex-direction: column;
@@ -77,31 +170,35 @@
           align-items: center;
           gap: 12px;
           padding: 12px 15px;
-          border-radius: 10px;
+          border-radius: v.$radio-curvatura;
           font-size: 1rem;
           font-weight: 700;
           color: #555;
           text-decoration: none;
           border: none;
-          background: none; // Reset de botón
+          background: none;
           width: 100%;
           text-align: left;
-          transition: all 0.25s ease-in-out;
+          transition: all 0.3s ease-in-out;
           cursor: pointer;
 
           &:hover {
-            background-color: #f4fbf7; // Verde claro suave
-            color: #2ecc71;
+            background-color: rgba(v.$color-marca-principal, 0.05);
+            color: v.$color-marca-principal;
             padding-left: 20px;
           }
 
-          i { font-size: 1.2rem; color: inherit; }
+          i {
+            font-size: 1.2rem;
+            color: inherit;
+          }
 
           &.logout-btn {
-            color: #e74c3c;
+            color: v.$color-secundario-calido-1; // Usando $danger/$secundario-calido-1
+
             &:hover {
-              background-color: #fff5f5;
-              color: #ff4757;
+              background-color: rgba(v.$color-secundario-calido-1, 0.05);
+              color: darken(v.$color-secundario-calido-1, 10%);
             }
           }
         }
@@ -110,11 +207,10 @@
   }
 }
 
-// CAPA EXTERNA: IMPORTANTE EL Z-INDEX
 .click-outside-layer {
   position: fixed;
   inset: 0;
-  z-index: 1000; // Por debajo de la nav y el dropdown
+  z-index: 1000;
   background: transparent;
 }
 
@@ -125,7 +221,13 @@
   border-radius: v.$radio-curvatura;
   text-decoration: none;
   background: v.$color-secundario-frio-2;
-  color: #fff;
+  color: v.$color-neutro-max;
   display: inline-block;
-  &:hover { opacity: 0.9; transform: translateY(-1px); }
+  transition: all 0.3s ease-in-out;
+
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: v.$sombra-nivel-2;
+  }
 }

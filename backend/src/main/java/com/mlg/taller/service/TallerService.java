@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 
 /**
  * Servicio para la gestión de talleres y cursos.
- * Controla la asignación de profesores y el almacenamiento de imágenes descriptivas.
+ * Controla la asignación de profesores y el almacenamiento de imágenes
+ * descriptivas.
  */
 @Service
 @RequiredArgsConstructor
@@ -35,6 +36,7 @@ public class TallerService {
     /**
      * Crea un nuevo taller asociándolo a un profesor y procesando su imagen.
      * * @param dto Datos del taller a crear (incluye ID del profesor).
+     * 
      * @param archivo Imagen opcional para el taller.
      * @return DTO con la información del taller persistido.
      * @throws ResourceNotFoundException si el profesor indicado no existe.
@@ -43,7 +45,7 @@ public class TallerService {
     public TallerResponseDTO crear(TallerRequestDTO dto, MultipartFile archivo) {
         Taller taller = tallerMapper.toEntity(dto);
         taller.setProfesor(obtenerProfesor(dto.getIdProfesor()));
-        
+
         taller = tallerRepository.save(taller);
         gestionarImagenTaller(taller, archivo);
 
@@ -53,6 +55,7 @@ public class TallerService {
     /**
      * Busca un taller por su identificador.
      * * @param id Identificador único del taller.
+     * 
      * @return DTO del taller encontrado.
      * @throws ResourceNotFoundException si no existe el taller.
      */
@@ -77,10 +80,12 @@ public class TallerService {
     /**
      * Actualiza la información de un taller existente.
      * * @param id ID del taller a modificar.
-     * @param dto Nuevos datos.
+     * 
+     * @param dto     Nuevos datos.
      * @param archivo Nueva imagen opcional.
      * @return DTO del taller actualizado.
-     * @throws ResourceNotFoundException si el taller o el nuevo profesor no existen.
+     * @throws ResourceNotFoundException si el taller o el nuevo profesor no
+     *                                   existen.
      */
     @Transactional
     public TallerResponseDTO actualizar(Long id, TallerRequestDTO dto, MultipartFile archivo) {
@@ -88,15 +93,30 @@ public class TallerService {
                 .orElseThrow(() -> new ResourceNotFoundException("Taller no encontrado con ID: " + id));
 
         tallerMapper.updateEntityFromDto(dto, taller);
-        taller.setProfesor(obtenerProfesor(dto.getIdProfesor()));
+
+        if (dto.getIdProfesor() != null) {
+            taller.setProfesor(obtenerProfesor(dto.getIdProfesor()));
+        } else {
+            taller.setProfesor(null);
+        }
+
         gestionarImagenTaller(taller, archivo);
 
         return tallerMapper.toResponse(tallerRepository.save(taller));
     }
 
+    @Transactional(readOnly = true)
+    public List<TallerResponseDTO> listarTalleresPorUsuarioId(Long idUsuario) {
+        List<Taller> entidades = tallerRepository.findTalleresByUsuarioId(idUsuario);
+        return entidades.stream()
+                .map(tallerMapper::toResponse) // Usamos tu mapper de siempre
+                .collect(Collectors.toList());
+    }
+
     /**
      * Elimina un taller del sistema.
      * * @param id ID del taller a borrar.
+     * 
      * @throws ResourceNotFoundException si el taller no existe.
      */
     @Transactional
@@ -112,17 +132,20 @@ public class TallerService {
     /**
      * Busca un usuario con rol de profesor en la base de datos.
      * * @param idProfesor Identificador del usuario.
+     * 
      * @return Entidad Usuario encontrada.
      * @throws ResourceNotFoundException si el profesor no existe.
      */
     private Usuario obtenerProfesor(Long idProfesor) {
         return usuarioRepository.findById(idProfesor)
-                .orElseThrow(() -> new ResourceNotFoundException("El profesor asignado (ID: " + idProfesor + ") no existe"));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("El profesor asignado (ID: " + idProfesor + ") no existe"));
     }
 
     /**
      * Procesa y guarda físicamente la imagen del taller si se proporciona.
      * * @param taller Entidad taller que recibirá la ruta de la foto.
+     * 
      * @param archivo Archivo MultipartFile recibido.
      */
     private void gestionarImagenTaller(Taller taller, MultipartFile archivo) {
