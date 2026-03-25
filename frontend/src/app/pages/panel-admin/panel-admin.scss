@@ -1,0 +1,93 @@
+@use '../../../styles/variables' as v;
+
+.contenedor-admin {
+    display: flex;
+    // Restamos la altura de tu navbar (ajusta si es necesario)
+    height: calc(100vh - 80px);
+    background-color: #f0f2f5; 
+}
+
+.barra-lateral-admin {
+    width: 280px;
+    background-color: v.$color-secundario-frio-2; // Tu azul oscuro
+    display: flex;
+    flex-direction: column;
+    padding: 30px 0;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+
+    .etiqueta-seccion {
+        padding: 0 30px 20px;
+        font-family: v.$fuente-enfasis;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: rgba(255, 255, 255, 0.4); 
+        font-weight: 800;
+    }
+
+    .menu-pestanas {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+
+        .enlace-pestana {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 18px 30px;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: v.$fuente-lectura;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-left: 5px solid transparent;
+
+            i {
+                font-size: 1.2rem;
+                color: rgba(255, 255, 255, 0.3);
+                transition: color 0.3s;
+            }
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.05);
+                color: white;
+
+                i {
+                    color: v.$color-marca-principal; // Tu verde aquí
+                }
+            }
+
+            &.activo {
+                background-color: rgba(255, 255, 255, 0.1);
+                color: white;
+                border-left-color: v.$color-marca-principal; 
+                font-weight: 700;
+
+                i {
+                    color: v.$color-marca-principal;
+                    filter: drop-shadow(0 0 5px rgba(v.$color-marca-principal, 0.4));
+                }
+            }
+        }
+    }
+}
+
+.contenido-principal-admin {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+
+    // Estilo común para los títulos dentro de cada pestaña
+    .cabecera-pestana {
+        margin-bottom: 2rem;
+
+        h1 {
+            font-family: v.$fuente-enfasis;
+            color: v.$color-secundario-frio-2;
+            font-weight: 800;
+            font-size: 2rem;
+        }
+    }
+}

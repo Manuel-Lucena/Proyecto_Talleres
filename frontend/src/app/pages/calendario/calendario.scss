@@ -1,0 +1,140 @@
+@use '../../../styles/variables' as v;
+
+.calendario-seccion {
+  background-color: v.$color-fondo-pagina;
+  padding: 60px 20px;
+  min-height: 85vh;
+}
+
+.calendario-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: v.$sombra-nivel-1;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+.calendario-toolbar {
+  padding: 25px 35px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border-bottom: 1px solid #f0f0f0;
+
+  .titulo-horario {
+    font-family: v.$fuente-enfasis;
+    font-weight: 800;
+    color: v.$color-secundario-frio-2;
+    margin: 0;
+    font-size: 1.6rem;
+  }
+
+  .tag-semanal {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: v.$color-marca-principal;
+    font-weight: 700;
+  }
+
+  .filter-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f8f9fa;
+    padding: 5px 15px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+
+    i { color: v.$color-superficie-suave; }
+  }
+
+  .maquina-select {
+    border: none;
+    background: transparent;
+    font-family: v.$fuente-lectura;
+    color: v.$color-secundario-frio-2;
+    padding: 8px;
+    min-width: 200px;
+    outline: none;
+  }
+}
+
+.calendario-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  background-color: #f0f0f0; 
+  gap: 1px; 
+}
+
+.dia-columna {
+  background: white;
+  min-height: 550px;
+  display: flex;
+  flex-direction: column;
+
+  .dia-header {
+    padding: 20px;
+    text-align: center;
+    font-family: v.$fuente-enfasis;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: v.$color-secundario-frio-2;
+    border-bottom: 1px solid #f8f8f8;
+    background: #fafafa;
+  }
+}
+
+.eventos-container {
+  padding: 15px;
+  flex-grow: 1;
+}
+
+.evento-card {
+  display: flex;
+  background: white;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+
+  .card-line {
+    width: 4px;
+    background: v.$color-marca-principal;
+  }
+
+  .card-content {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    
+    .hora {
+      display: block;
+      font-weight: 800;
+      color: v.$color-marca-oscuro;
+      font-size: 0.75rem;
+      font-family: v.$fuente-lectura;
+    }
+
+    .nombre {
+      font-family: v.$fuente-enfasis;
+      color: v.$color-secundario-frio-2;
+      font-size: 0.9rem;
+      line-height: 1.2;
+      font-weight: 600;
+    }
+  }
+}
+
+.vacio-placeholder {
+  padding: 40px 10px;
+  text-align: center;
+  color: #ddd;
+  font-size: 0.75rem;
+  font-style: italic;
+}

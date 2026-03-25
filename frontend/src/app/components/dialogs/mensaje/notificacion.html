@@ -1,0 +1,16 @@
+@if (config$ | async; as config) {
+  <div class="modal-overlay" (click)="cerrar()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      
+      <div class="text-wrap">
+        <h3 [ngClass]="config.tipo">{{ config.titulo }}</h3>
+        <p>{{ config.mensaje }}</p>
+      </div>
+
+      <button (click)="cerrar()" [ngClass]="config.tipo">
+        Aceptar
+      </button>
+
+    </div>
+  </div>
+}

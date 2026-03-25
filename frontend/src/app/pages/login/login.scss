@@ -1,0 +1,111 @@
+@use '../../../styles/variables' as v;
+@use '../../../styles/mixins' as m;
+
+.contenedor-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(v.$color-marca-principal, 0.2), rgba(v.$color-secundario-frio-2, 0.8)),
+    url('/images/fondo.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  font-family: v.$fuente-lectura;
+}
+
+.tarjeta-login {
+  max-width: 900px;
+  width: 100%;
+  border-radius: v.$radio-curvatura;
+  background-color: v.$color-neutro-max;
+  box-shadow: v.$sombra-nivel-3; // Nivel 3 para modales/login
+}
+
+.seccion-derecha-imagen {
+  background-image: url('/images/card.jpg');
+  background-size: cover;
+  background-position: center;
+  min-height: 550px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(v.$color-secundario-frio-2, 0.2);
+    z-index: 1;
+  }
+}
+
+.logo-sobre-imagen {
+  position: relative;
+  z-index: 2;
+  max-width: 180px;
+  height: auto;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+}
+
+h1 {
+  font-family: v.$fuente-enfasis;
+  color: v.$color-secundario-frio-2;
+  font-weight: 800;
+}
+
+.icono-marca {
+  color: v.$color-marca-principal;
+}
+
+.custom-focus {
+  @include m.input-group-personalizado; // Mixin oficial
+
+  .input-group-text,
+  .form-control {
+    border: none;
+    background: transparent;
+    padding: 0.8rem;
+    color: v.$color-superficie-oscura;
+    box-shadow: none; 
+  }
+}
+
+.btn-primary {
+  @include m.boton-primario;
+  width: 100%;
+}
+
+.btn-ojito {
+  border: none;
+  background: transparent;
+  color: v.$color-superficie-suave;
+  padding-right: 1rem;
+  cursor: pointer;
+  transition: color 0.3s ease-in-out;
+
+  &:hover {
+    color: v.$color-marca-principal;
+  }
+}
+
+.enlace-olvido {
+  color: v.$color-secundario-frio-2;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.3s ease-in-out;
+
+  &:hover {
+    color: v.$color-marca-principal;
+  }
+}
+
+.is-invalid {
+  border-color: v.$danger;
+  .bi { color: v.$danger; }
+}

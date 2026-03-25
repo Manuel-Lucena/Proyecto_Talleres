@@ -1,0 +1,21 @@
+@if (config$ | async; as config) {
+  <div class="modal-overlay" (click)="responder(false)">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      
+      <div class="text-content">
+        <h3>{{ config.titulo }}</h3>
+        <p>{{ config.mensaje }}</p>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-alt" (click)="responder(false)">
+          {{ config.textoCancelar || 'Cancelar' }}
+        </button>
+        <button type="button" class="btn-main" (click)="responder(true)">
+          {{ config.textoConfirmar || 'Confirmar' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

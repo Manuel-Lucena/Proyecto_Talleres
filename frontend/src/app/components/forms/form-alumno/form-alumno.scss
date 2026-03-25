@@ -1,0 +1,109 @@
+@use '../../../../styles/variables' as v;
+@use '../../../../styles/mixins' as m;
+@use '../../../../styles/formularios' as f;
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(v.$color-neutro-min, 0.5); // Ajustado a opacidad de la guía
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @include m.animacion-entrada;
+}
+
+.modal-body {
+    // Restauramos la herencia que conecta con tu _formularios.scss
+    @extend .contenedor-formulario; 
+    
+    width: 95%;
+    max-width: 950px; 
+    padding: 3rem;
+    position: relative;
+    box-shadow: v.$sombra-nivel-3; // Profundidad de modal oficial
+    
+    // Aseguramos que el fondo sea el de la guía
+    background: v.$color-neutro-max;
+}
+
+// --- LÓGICA ESPECÍFICA DE ESTE FORMULARIO ---
+
+.posicion-relativa {
+    position: relative;
+    width: 100%;
+}
+
+.btn-ver-pass {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: v.$color-secundario-frio-2;
+    cursor: pointer;
+    font-size: 1.2rem;
+    z-index: 5;
+    transition: color 0.3s ease;
+
+    &:hover {
+        color: v.$color-marca-principal;
+    }
+}
+
+.zona-subida-alumno {
+    // Mantenemos tu diseño pero vinculamos variables
+    border: 2px dashed rgba(v.$color-marca-principal, 0.3);
+    border-radius: v.$radio-curvatura;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background: v.$color-fondo-pagina;
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+        background: rgba(v.$color-marca-principal, 0.05);
+        border-color: v.$color-marca-principal;
+        transform: translateY(-2px);
+    }
+}
+
+.error-container {
+    min-height: 20px;
+    margin-top: 4px;
+
+    .error-message {
+        color: v.$color-secundario-calido-1; // Usamos el rojo oficial
+        font-size: 0.75rem;
+        font-weight: 700;
+        font-family: v.$fuente-lectura;
+    }
+}
+
+.acciones-formulario {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    
+    // Aquí los botones ya heredarán .btn-guardar del global
+    .btn-cancelar {
+        // Estilo específico para el botón neutro
+        background: transparent;
+        border: 2px solid #eee;
+        padding: 12px 25px;
+        border-radius: v.$radio-curvatura;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+            background: #f5f5f5;
+            border-color: #ddd;
+        }
+    }
+}

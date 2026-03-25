@@ -1,0 +1,174 @@
+@use '../../../styles/variables' as v;
+@use '../../../styles/mixins' as m;
+
+.contenedor-mis-talleres {
+    padding: 3rem 10%;
+    min-height: 85vh;
+    background-color: v.$color-fondo-pagina; // #f8f9fa
+    font-family: v.$fuente-lectura;
+
+    @media (max-width: 768px) {
+        padding: 2rem 5%;
+    }
+}
+
+.header-seccion {
+    margin-bottom: 2.5rem;
+
+    h1 {
+        @include m.titulo-seccion(v.$color-secundario-frio-2);
+        font-size: 2.2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    p {
+        color: #666;
+        font-size: 1rem;
+    }
+}
+
+.grid-mis-talleres {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 2rem;
+}
+
+.card-inscripcion {
+    background: v.$color-neutro-max;
+    border-radius: v.$radio-curvatura;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    overflow: hidden;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.3s ease;
+
+    // Solo cambiamos el color del borde para indicar interacción
+    &:hover {
+        border-color: v.$color-marca-principal;
+    }
+
+    .banner-taller {
+        height: 200px;
+        position: relative;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        // Eliminado el overlay-click para mantener la imagen limpia
+    }
+
+    .info-cuerpo {
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        h3 {
+            font-family: v.$fuente-enfasis;
+            color: v.$color-secundario-frio-2;
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+
+        .profesor {
+            margin: 6px 0 0;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        .fecha-info {
+            font-size: 0.85rem;
+            color: v.$color-marca-principal;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+    }
+
+    .acciones-rapidas {
+        display: flex;
+        border-top: 1px solid #f0f0f0;
+        padding: 15px 0;
+        background-color: #fafafa;
+
+        .accion-item {
+            flex: 1;
+            border: none;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.2s ease;
+
+            i {
+                font-size: 1.3rem;
+            }
+
+            span {
+                font-family: v.$fuente-enfasis;
+                font-size: 0.7rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            &:hover {
+                color: v.$color-marca-principal;
+            }
+        }
+
+        .divisor-vertical {
+            width: 1px;
+            height: 25px;
+            background: #eee;
+            align-self: center;
+        }
+    }
+}
+
+.sin-talleres {
+    @include m.card-elevada;
+    text-align: center;
+    padding: 5rem 2rem;
+    background: v.$color-neutro-max;
+    border-radius: v.$radio-curvatura;
+    margin: 0 auto;
+    max-width: 600px;
+
+    .icon-container {
+        margin-bottom: 1.5rem;
+
+        i {
+            font-size: 3.5rem;
+            color: #eee;
+        }
+    }
+
+    h3 {
+        font-family: v.$fuente-enfasis;
+        color: v.$color-secundario-frio-2;
+        font-weight: 800;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        color: #777;
+        margin-bottom: 2rem;
+    }
+
+    .btn-explorar {
+        @include m.boton-primario;
+        padding: 12px 30px;
+    }
+}

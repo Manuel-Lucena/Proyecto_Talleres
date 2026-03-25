@@ -1,0 +1,98 @@
+<app-navbar></app-navbar>
+
+<div class="pagina-explorar-full">
+  <header class="header-principal">
+    <div class="d-flex align-items-center gap-3">
+      <h2>Explorar Talleres</h2>
+
+      <ng-container *ngIf="puedeGestionar">
+        <div class="linea-vertical"></div>
+        <button class="btn-azul-plus" (click)="abrirCreacion()">
+          <i class="bi bi-plus-lg"></i>
+          Nuevo Taller
+        </button>
+      </ng-container>
+    </div>
+    <p>Cursos prácticos dirigidos por expertos en la materia.</p>
+  </header>
+
+  <div class="layout-flex">
+    <aside class="sidebar-reserva">
+      <div class="info-sidebar">
+        <h3>Filtrar talleres</h3>
+        <p class="nota-sidebar">Configura tus preferencias para encontrar el taller ideal.</p>
+      </div>
+    </aside>
+
+    <main class="seccion-lista-cursos">
+      <div class="card-curso-horizontal" *ngFor="let taller of talleres">
+
+        <div class="dropdown admin-dropdown" *ngIf="puedeGestionar">
+          <button class="btn-kebab" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-three-dots-vertical"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+            <li>
+              <button class="dropdown-item" (click)="abrirEdicion(taller)">
+                <i class="bi bi-pencil me-2 text-primary"></i> Actualizar
+              </button>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li>
+              <button class="dropdown-item text-danger" (click)="eliminarTaller(taller)">
+                <i class="bi bi-trash me-2"></i> Eliminar
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div class="imagen-container">
+          <img [src]="'/talleres/' + taller.fotoRuta" alt="Portada">
+          <div class="badge-profesor">Prof. {{ taller.nombreCompletoProfesor }}</div>
+        </div>
+
+        <div class="contenido-curso">
+          <div class="cuerpo-superior">
+            <div class="periodo-curso">
+              <i class="bi bi-calendar-range"></i>
+              {{ taller.fechaInicio | date:'dd MMM' }} - {{ taller.fechaFin | date:'dd MMM, yyyy' }}
+            </div>
+            <h3 class="titulo-curso">{{ taller.nombre }}</h3>
+            <p class="descripcion-curso">{{ taller.descripcion }}</p>
+          </div>
+
+          <div class="footer-curso">
+            <div class="detalles-tecnicos">
+              <span [class.sin-plazas]="taller.plazasDisponibles === 0">
+                <i class="bi bi-people"></i>
+                {{ taller.plazasDisponibles }} de {{ taller.plazasMaximas }} plazas libres
+              </span>
+            </div>
+
+            <div class="precio-inscripcion">
+              <span class="moneda">{{ taller.precio }}€</span>
+              <button class="btn-inscripcion" [disabled]="taller.plazasDisponibles === 0"
+                (click)="abrirInscripcion(taller)">
+                {{ taller.plazasDisponibles > 0 ? 'Inscribirme ahora' : 'Agotado' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<app-form-taller *ngIf="mostrarModalForm" [tallerParaEditar]="tallerSeleccionado" (cerrar)="mostrarModalForm = false"
+  (guardado)="guardarCambios($event)">
+</app-form-taller>
+
+<app-form-inscripcion *ngIf="mostrarModalInscripcion" [tallerParaInscribir]="tallerSeleccionado"
+  (cerrar)="mostrarModalInscripcion = false" (guardado)="finalizarInscripcion($event)">
+</app-form-inscripcion>
+
+<app-confirmacion></app-confirmacion>
+<app-modal-notificacion></app-modal-notificacion>
+<app-footer></app-footer>

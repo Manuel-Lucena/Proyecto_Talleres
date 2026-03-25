@@ -1,0 +1,95 @@
+<nav class="navbar navbar-expand-lg sticky-top main-nav">
+  <div class="container-fluid px-lg-5">
+
+    <div class="d-flex align-items-center">
+      <a routerLink="/landing" class="navbar-brand d-flex align-items-center p-0 m-0">
+        <div class="logo-wrapper-static">
+          <img src="icons/Logo.png" alt="Logo" class="logo-img">
+        </div>
+        <div class="v-divider"></div>
+        <div class="brand-text">
+          <h1 class="m-0 fw-bold">Aula Viva</h1>
+          <p class="m-0 text-uppercase ls-2">Centro Educativo</p>
+        </div>
+      </a>
+    </div>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navContent">
+      <ul class="navbar-nav ms-auto align-items-center">
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/landing" routerLinkActive="active-link">Inicio</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/talleres-explorar" routerLinkActive="active-link">Talleres</a>
+        </li>
+
+        @if (isLogged) {
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/mis-talleres" routerLinkActive="active-link">Mis Talleres</a>
+        </li>
+        }
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/calendario" routerLinkActive="active-link">Calendario</a>
+        </li>
+
+        @if (tokenService.getRol()?.toLowerCase() === 'admin') {
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/panel-admin" routerLinkActive="active-link">Panel Admin</a>
+        </li>
+        }
+
+
+        <li class="nav-item ms-lg-4">
+          @if (isLogged) {
+          <div class="user-menu-container">
+            <div class="user-trigger" (click)="toggleDropdown($event)">
+              <span class="user-display-name">{{ usuarioData?.nombre }}</span>
+              <div class="avatar-box">
+                @if (usuarioData && usuarioData.fotoPerfilRuta) {
+                <img [src]="'/Usuarios/' + usuarioData.fotoPerfilRuta" alt="User">
+                } @else {
+                <img src="/Usuarios/Predeterminada.png" alt="User">
+                }
+              </div>
+              <i class="bi bi-chevron-down arrow" [class.open]="mostrarDropdown"></i>
+            </div>
+
+            @if (mostrarDropdown) {
+            <div class="custom-dropdown-menu">
+              <div class="dropdown-header-box">
+                <span class="user-full-name">{{ usuarioData?.nombre }} {{ usuarioData?.apellidos }}</span>
+              </div>
+
+              <div class="menu-divider"></div>
+
+              <div class="dropdown-links-list">
+                <a routerLink="/perfil" class="item-link" (click)="mostrarDropdown = false">
+                  <i class="bi bi-person-circle"></i> Mi Perfil
+                </a>
+
+                <button type="button" class="item-link logout-btn" (click)="logout()">
+                  <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </button>
+              </div>
+            </div>
+            }
+          </div>
+          } @else {
+          <a routerLink="/login" class="btn-custom btn-primary-v">ACCESO</a>
+          }
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+@if (mostrarDropdown) {
+<div class="click-outside-layer" (click)="mostrarDropdown = false"></div>
+}

@@ -1,0 +1,66 @@
+<app-navbar></app-navbar>
+
+<div class="contenedor-mis-talleres">
+    <header class="header-seccion">
+        <h1>Mis Talleres</h1>
+        <p>Gestiona tus cursos y consulta tus horarios desde tu panel personal.</p>
+    </header>
+
+    <div *ngIf="!cargando && talleres.length === 0" class="sin-talleres">
+        <div class="icon-container">
+            <i class="bi bi-journal-x"></i>
+        </div>
+        <h3>Aún no estás inscrito en ningún taller</h3>
+        <p>Explora nuestro catálogo y encuentra tu próxima formación.</p>
+        <button class="btn-explorar" routerLink="/talleres-explorar">Ver Catálogo de Talleres</button>
+    </div>
+
+    <div class="grid-mis-talleres" *ngIf="talleres.length > 0">
+        <div class="card-inscripcion" *ngFor="let item of talleres" (click)="entrarAlAula(item.idTaller)">
+
+            <div class="banner-taller">
+                <img [src]="'/talleres/' + item.fotoRuta" alt="Portada">
+                <div class="overlay-click">
+                    <span>ENTRAR AL AULA <i class="bi bi-arrow-right-short"></i></span>
+                </div>
+            </div>
+
+            <div class="info-cuerpo">
+                <div class="texto">
+                    <h3>{{ item.nombre }}</h3>
+                    <p class="profesor">Prof. {{ item.nombreCompletoProfesor }}</p>
+                </div>
+                <div class="fecha-info">
+                    <i class="bi bi-calendar3"></i>
+                    <span>Inicio: {{ item.fechaInicio | date:'dd MMM yyyy' }}</span>
+                </div>
+            </div>
+
+            <div class="acciones-rapidas">
+                <button class="accion-item" (click)="$event.stopPropagation(); verTareas(item.idTaller)">
+                    <i class="bi bi-card-checklist"></i>
+                    <span>Tareas</span>
+                </button>
+                <div class="divisor-vertical"></div>
+                <button class="accion-item" (click)="$event.stopPropagation(); verHorario(item)">
+                    <i class="bi bi-clock"></i>
+                    <span>Horario</span>
+                </button>
+                <div class="divisor-vertical"></div>
+                <button class="accion-item" (click)="$event.stopPropagation(); verRecursos(item.idTaller)">
+                    <i class="bi bi-folder2-open"></i>
+                    <span>Recursos</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<app-footer></app-footer>
+
+<app-horario-taller 
+  *ngIf="mostrarModalHorario" 
+  [idTaller]="idTallerSeleccionado" 
+  [nombreTaller]="nombreTallerSeleccionado"
+  (cerrar)="mostrarModalHorario = false">
+</app-horario-taller>

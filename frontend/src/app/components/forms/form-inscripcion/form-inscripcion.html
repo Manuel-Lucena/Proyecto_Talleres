@@ -1,0 +1,62 @@
+<div class="modal-overlay" (click)="cerrar.emit()">
+  <div class="modal-body contenedor-formulario" (click)="$event.stopPropagation()">
+    <button class="btn-close" (click)="cerrar.emit()">&times;</button>
+
+    <div class="checkout-layout">
+      
+      <div class="resumen-checkout-taller" *ngIf="tallerParaInscribir">
+        <div class="mini-card-info">
+          <img [src]="tallerParaInscribir.fotoRuta || 'assets/images/placeholder-taller.jpg'" class="img-preview">
+          <div class="p-4">
+            <span class="etiqueta-pago">Resumen del pedido</span>
+            <h4 class="nombre-taller">{{ tallerParaInscribir.nombre }}</h4>
+            <p class="profesor-taller">Prof. {{ tallerParaInscribir.nombreCompletoProfesor }}</p>
+            
+            <div class="separador-puntos"></div>
+            
+            <div class="fila-total">
+              <span>Total a pagar</span>
+              <span class="precio-destacado">{{ tallerParaInscribir.precio }}€</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="seccion-formulario-pago">
+        <div class="titulo-formulario mb-4">Finalizar Compra</div>
+
+        <form [formGroup]="inscripcionForm" (ngSubmit)="enviar()">
+          
+          <input type="hidden" formControlName="idUsuario">
+          <input type="hidden" formControlName="idTaller">
+
+          <div class="alerta-seguridad mb-4">
+            <i class="bi bi-shield-lock-fill"></i>
+            <div>
+              <p class="m-0">Pago procesado de forma segura</p>
+              <small>Referencia: {{ inscripcionForm.get('orderId')?.value }}</small>
+            </div>
+          </div>
+
+          <div class="campo-formulario mb-4">
+            <label>Confirmar Importe</label>
+            <div class="input-checkout-grande">
+                <span>{{ tallerParaInscribir?.precio }}</span>
+                <small>EUR</small>
+            </div>
+          </div>
+
+          <div class="acciones-finales mt-auto">
+            <button type="submit" class="btn-guardar w-100" [disabled]="inscripcionForm.invalid">
+              Confirmar y Pagar Ahora
+            </button>
+            <p class="text-center mt-3 text-muted small">
+              Al confirmar, aceptas los términos de Aula Viva.
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,133 @@
+@import 'variables';
+
+@mixin estilo-formulario-base {
+
+    .contenedor-formulario {
+        background: $color-neutro-max;
+        padding: 2rem;
+        border-radius: $radio-curvatura * 2;
+        box-shadow: 0 10px 30px rgba($color-neutro-min, 0.08);
+        border: 1px solid rgba($color-marca-principal, 0.1);
+    }
+
+    .titulo-formulario {
+        font-family: $fuente-enfasis;
+        font-size: $tamaño-titular-md;
+        font-weight: 800;
+        color: $color-secundario-frio-2;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        &::after {
+            content: '';
+            flex-grow: 1;
+            height: 2px;
+            background: $color-marca-principal;
+            margin-left: 10px;
+            opacity: 0.3;
+        }
+    }
+
+    .fila-formulario {
+        display: flex;
+        gap: 1.5rem; // Más separación entre columnas
+        margin-bottom: 0.2rem; // El espacio real lo dará el contenedor de error
+        width: 100%;
+
+        .campo-formulario {
+            // ESTO EVITA QUE CADA UNO TENGA UN TAMAÑO:
+            // flex-basis: 0px obliga a ignorar el contenido y dividir el ancho exacto.
+            flex: 1 1 0px; 
+            min-width: 0; 
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+
+            label {
+                font-family: $fuente-enfasis;
+                font-weight: 700;
+                font-size: 0.75rem;
+                color: $color-secundario-frio-2;
+                text-transform: uppercase;
+            }
+        }
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+
+    .input-personalizado {
+        width: 100%;
+        height: 48px; // Altura fija para que todos sean gemelos
+        padding: 0 14px;
+        border: 2px solid rgba($color-marca-principal, 0.4);
+        border-radius: $radio-curvatura;
+        font-family: $fuente-lectura;
+        font-size: 0.95rem;
+        color: $color-neutro-min;
+        background-color: #ffffff;
+        box-sizing: border-box; 
+        transition: all 0.2s ease;
+
+        &::placeholder {
+            color: $color-superficie-suave;
+        }
+
+        &:focus {
+            outline: none;
+            background-color: #ffffff;
+            border-color: $color-marca-principal;
+            box-shadow: 0 0 0 4px rgba($color-marca-principal, 0.15);
+        }
+    }
+
+    .acciones-formulario {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 2px solid $color-fondo-pagina;
+
+        .btn-cancelar {
+            padding: 10px 20px;
+            border-radius: $radio-curvatura;
+            font-weight: 700;
+            background: $color-fondo-pagina;
+            color: $color-secundario-frio-2;
+            border: none;
+            cursor: pointer;
+
+            &:hover { background: $color-superficie-suave; }
+        }
+
+        .btn-guardar {
+            padding: 12px 30px;
+            border-radius: $radio-curvatura;
+            font-weight: 800;
+            background: $color-marca-principal;
+            color: $color-neutro-max;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+
+            &:hover:not(:disabled) {
+                background: $color-marca-oscuro;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba($color-marca-principal, 0.4);
+            }
+
+            &:disabled {
+                background: #d8d0cd;
+                color: white;
+                cursor: not-allowed;
+            }
+        }
+    }
+}

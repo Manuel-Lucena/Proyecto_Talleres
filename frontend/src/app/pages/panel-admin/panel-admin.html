@@ -1,0 +1,30 @@
+<app-navbar></app-navbar>
+
+<div class="contenedor-admin">
+  <aside class="barra-lateral-admin">
+    <div class="etiqueta-seccion">Gestión de Academia</div>
+    
+    <nav class="menu-pestanas">
+      <a routerLink="talleres" routerLinkActive="activo" class="enlace-pestana">
+        <i class="bi bi-palette"></i>
+        <span>Talleres</span>
+      </a>
+
+      <a routerLink="usuarios" routerLinkActive="activo" class="enlace-pestana">
+        <i class="bi bi-people"></i>
+        <span>Usuarios</span>
+      </a>
+
+      <a routerLink="noticias" routerLinkActive="activo" class="enlace-pestana">
+        <i class="bi bi-newspaper"></i>
+        <span>Noticias</span>
+      </a>
+    </nav>
+  </aside>
+
+  <main class="contenido-principal-admin">
+    <div class="container-fluid">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

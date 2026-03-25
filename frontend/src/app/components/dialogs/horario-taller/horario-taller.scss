@@ -1,0 +1,119 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba($color-neutro-min, 0.7); // Usando tu variable de negro
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    // Si quisieras la animación que tienes en mixins la pondrías aquí, 
+    // pero como no quieres animaciones, lo dejamos seco.
+}
+
+.modal-container {
+    background: $color-neutro-max;
+    width: 90%;
+    max-width: 380px;
+    border-radius: $radio-curvatura; // Tus 0.5rem (8px)
+    box-shadow: $sombra-nivel-3; // Máxima profundidad para el modal
+    border-top: 5px solid $color-marca-principal;
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid rgba($color-superficie-suave, 0.2);
+
+    .modal-title {
+        margin: 0;
+        font-family: $fuente-enfasis;
+        font-size: $tamaño-titular-md;
+        font-weight: 700;
+        color: $color-secundario-frio-2; // Tu color de títulos
+        text-transform: uppercase;
+        letter-spacing: -0.5px;
+    }
+
+    .btn-close {
+        background: transparent;
+        border: none;
+        font-size: 1.2rem;
+        color: $color-superficie-suave;
+        cursor: pointer;
+        transition: color 0.3s;
+
+        &:hover {
+            color: $color-secundario-calido-1; // Tu naranja de acción/danger
+        }
+    }
+}
+
+.modal-body {
+    padding: 1.5rem;
+    font-family: $fuente-lectura;
+}
+
+.horarios-list {
+    .horario-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba($color-superficie-suave, 0.1);
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        .day-label {
+            font-weight: 700;
+            color: $color-secundario-frio-2;
+            text-transform: capitalize;
+        }
+
+        .time-label {
+            font-family: 'Inter', monospace; // Usando tu variable Inter si existe
+            font-size: 1rem;
+            color: $color-neutro-min;
+            background: rgba($color-marca-principal, 0.05); // Fondo muy suave de tu verde
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+    }
+}
+
+.status-msg {
+    text-align: center;
+    padding: 2rem 0;
+    color: $color-superficie-suave;
+
+    i {
+        font-size: 2rem;
+        color: $color-secundario-frio-1; // Tu cyan de info
+        display: block;
+        margin-bottom: 10px;
+    }
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba($color-marca-principal, 0.1);
+    border-top: 3px solid $color-marca-principal;
+    border-radius: 50%;
+    margin: 0 auto;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

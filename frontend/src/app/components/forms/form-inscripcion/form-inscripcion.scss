@@ -1,0 +1,190 @@
+@use '../../../../styles/variables' as v;
+@use '../../../../styles/mixins' as m;
+@use '../../../../styles/formularios' as f;
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(v.$color-neutro-min, 0.75); // Mantenemos tu opacidad más alta para foco total
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-body {
+    @include m.animacion-entrada;
+    @include f.estilo-contenedor-formulario;
+
+    max-width: 850px;
+    width: 95%;
+    padding: 0; // Importante: 0 para que las columnas toquen los bordes
+    overflow: hidden;
+    border: none;
+    box-shadow: v.$sombra-nivel-3;
+    position: relative;
+
+    .btn-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        z-index: 10;
+        background: v.$color-neutro-max;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        border: 1px solid #eee;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+
+        &:hover {
+            color: v.$color-marca-principal;
+            border-color: v.$color-marca-principal;
+        }
+    }
+}
+
+.checkout-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    min-height: 500px;
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+// Columna Izquierda: Resumen (Mantenemos tu diseño limpio)
+.resumen-checkout-taller {
+    background: v.$color-fondo-pagina; // #f8f9fa
+    border-right: 1px solid #eee;
+    padding: 2.5rem;
+
+    .mini-card-info {
+        .img-preview {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: v.$radio-curvatura;
+            margin-bottom: 1.5rem;
+        }
+
+        .etiqueta-pago {
+            font-family: v.$fuente-enfasis;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: v.$color-marca-principal;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nombre-taller {
+            font-family: v.$fuente-enfasis;
+            font-size: 1.5rem;
+            color: v.$color-secundario-frio-2;
+            margin: 10px 0;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .profesor-taller {
+            color: #777;
+            font-size: 0.95rem;
+            font-family: v.$fuente-lectura;
+        }
+    }
+}
+
+.separador-puntos {
+    border-top: 2px dashed #ddd;
+    margin: 2rem 0;
+}
+
+.fila-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    span {
+        font-family: v.$fuente-enfasis;
+        font-weight: 700;
+        color: v.$color-secundario-frio-2;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+
+    .precio-destacado {
+        font-family: v.$fuente-enfasis;
+        font-size: 2.2rem;
+        color: v.$color-marca-principal;
+        font-weight: 900;
+    }
+}
+
+// Columna Derecha: Formulario de Usuario
+.seccion-formulario-pago {
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    .alerta-seguridad {
+        display: flex;
+        gap: 15px;
+        padding: 1.2rem;
+        background: rgba(v.$color-marca-principal, 0.05);
+        border-radius: v.$radio-curvatura;
+        color: v.$color-secundario-frio-2;
+        align-items: center;
+
+        i {
+            color: v.$color-marca-principal;
+            font-size: 1.8rem;
+        }
+
+        p {
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        small {
+            display: block;
+            margin-top: 5px;
+            opacity: 0.6;
+            font-family: monospace;
+            font-weight: bold;
+        }
+    }
+}
+
+// Tu input destacado de ID/Usuario
+.input-checkout-grande {
+    background: v.$color-neutro-max;
+    border: 2px solid v.$color-marca-principal;
+    padding: 1.2rem;
+    border-radius: v.$radio-curvatura;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(v.$color-marca-principal, 0.1);
+
+    span {
+        font-family: v.$fuente-enfasis;
+        font-size: 2rem;
+        font-weight: 900;
+        color: v.$color-secundario-frio-2;
+    }
+
+    small {
+        font-family: v.$fuente-enfasis;
+        font-weight: 800;
+        color: #bbb;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+    }
+}

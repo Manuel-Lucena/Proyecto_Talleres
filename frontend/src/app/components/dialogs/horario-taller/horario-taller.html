@@ -1,0 +1,33 @@
+<div class="modal-overlay" (click)="cerrar.emit()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+            <h3 class="modal-title">{{ nombreTaller }}</h3>
+            <button class="btn-close" (click)="cerrar.emit()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div *ngIf="cargando" class="status-msg">
+                <div class="spinner"></div>
+                <span>Buscando horarios...</span>
+            </div>
+
+            <div class="horarios-list" *ngIf="!cargando && horarios.length > 0">
+                <div class="horario-row" *ngFor="let h of horarios">
+                    <span class="day-label">{{ h.diaSemana }}</span>
+                    <span class="time-label">
+                        {{ h.horaInicio.substring(0,5) }} - {{ h.horaFin.substring(0,5) }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="status-msg" *ngIf="!cargando && horarios.length === 0">
+                <i class="bi bi-info-circle"></i>
+                <span>No hay horarios registrados</span>
+            </div>
+        </div>
+
+    </div>
+</div>

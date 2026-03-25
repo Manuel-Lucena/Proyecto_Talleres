@@ -1,0 +1,127 @@
+<app-navbar></app-navbar>
+
+<div class="perfil-full-container" *ngIf="usuario">
+  <div class="split-layout">
+
+    <aside class="aside-info">
+      <div class="sticky-content">
+        <div class="profile-avatar">
+          <img [src]="usuario.fotoPerfilRuta 
+            ? '/Usuarios/' + usuario.fotoPerfilRuta 
+            : '/Usuarios/Predeterminada.png'" alt="Foto de perfil">
+          <label for="f-up" class="cam-btn"><i class="bi bi-camera-fill"></i></label>
+          <input type="file" id="f-up" hidden (change)="onFileSelected($event)">
+        </div>
+
+        <div class="profile-header">
+          <span class="user-role">{{ usuario.nombreRol }}</span>
+          <h1>{{usuario.nombre}} <br> {{usuario.apellidos}}</h1>
+        </div>
+
+        <div class="data-list">
+          <div class="data-item">
+            <i class="bi bi-person-vcard"></i>
+            <div class="text-content">
+              <label>DNI / NIE</label>
+              <p>{{usuario.dni}}</p>
+            </div>
+          </div>
+
+          <div class="data-item">
+            <i class="bi bi-envelope-at"></i>
+            <div class="text-content">
+              <label>Email</label>
+              <p>{{usuario.email}}</p>
+            </div>
+          </div>
+
+          <div class="data-item">
+            <i class="bi bi-telephone"></i>
+            <div class="text-content">
+              <label>Teléfono</label>
+              <p>{{usuario.telefono || 'Sin asignar'}}</p>
+            </div>
+          </div>
+
+          <div class="data-item">
+            <i class="bi bi-geo-alt"></i>
+            <div class="text-content">
+              <label>Dirección</label>
+              <p>{{usuario.direccion || 'Sin dirección'}}</p>
+            </div>
+          </div>
+        </div>
+
+        <button class="logout-btn" (click)="logout()">
+          <i class="bi bi-door-open"></i> Cerrar Sesión
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-form">
+      <div class="form-wrapper">
+        <div class="section-title">
+          <h2>Ajustes de Perfil</h2>
+          <p>Modifica tus datos personales. El DNI está bloqueado por seguridad.</p>
+        </div>
+
+        <form [formGroup]="perfilForm" (ngSubmit)="actualizarPerfil()" class="av-form">
+          <div class="row-inputs">
+            <div class="av-input-group">
+              <label>Nombre</label>
+              <input type="text" formControlName="nombre" [class.is-invalid]="mostrarError('nombre')">
+              <div class="error-container">
+                <small class="error-text" *ngIf="mostrarError('nombre')">{{getErrorMessage('nombre')}}</small>
+              </div>
+            </div>
+            <div class="av-input-group">
+              <label>Apellidos</label>
+              <input type="text" formControlName="apellidos" [class.is-invalid]="mostrarError('apellidos')">
+              <div class="error-container">
+                <small class="error-text" *ngIf="mostrarError('apellidos')">{{getErrorMessage('apellidos')}}</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="row-inputs">
+            <div class="av-input-group">
+              <label>Email de contacto</label>
+              <input type="email" formControlName="email" [class.is-invalid]="mostrarError('email')">
+              <div class="error-container">
+                <small class="error-text" *ngIf="mostrarError('email')">{{getErrorMessage('email')}}</small>
+              </div>
+            </div>
+            <div class="av-input-group">
+              <label>Teléfono</label>
+              <input type="text" formControlName="telefono" [class.is-invalid]="mostrarError('telefono')">
+              <div class="error-container">
+                <small class="error-text" *ngIf="mostrarError('telefono')">{{getErrorMessage('telefono')}}</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="av-input-group">
+            <label>Dirección</label>
+            <input type="text" formControlName="direccion">
+            <div class="error-container"></div>
+          </div>
+
+          <div class="av-input-group readonly">
+            <label>Identificación (DNI bloqueado)</label>
+            <input type="text" formControlName="dni" readonly>
+            <div class="error-container"></div>
+          </div>
+
+          <div class="form-footer">
+            <button type="submit" class="save-btn" [disabled]="perfilForm.invalid">
+              Guardar todos los cambios
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+</div>
+
+<app-modal-notificacion></app-modal-notificacion>
+<app-confirmacion></app-confirmacion>

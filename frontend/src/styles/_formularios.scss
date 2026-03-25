@@ -1,0 +1,128 @@
+// src/styles/_formularios.scss
+@import 'variables';
+@import 'mixins';
+
+@mixin estilo-contenedor-formulario {
+    background: $color-neutro-max;
+    padding: 2.5rem;
+    border-radius: $radio-curvatura * 2;
+    box-shadow: 0 10px 30px rgba($color-neutro-min, 0.08);
+    border: 1px solid rgba($color-marca-principal, 0.1);
+
+    &:hover {
+        transform: none;
+    }
+
+    .titulo-formulario {
+        font-family: $fuente-enfasis;
+        font-size: $tamaño-titular-md;
+        font-weight: 800;
+        color: $color-secundario-frio-2;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+
+        &::after {
+            content: '';
+            flex-grow: 1;
+            height: 2px;
+            background: $color-marca-principal;
+            margin-left: 15px;
+            opacity: 0.2;
+        }
+    }
+
+    .fila-formulario {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1.2rem;
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+        }
+    }
+
+    .campo-formulario {
+        flex: 1 1 0px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        label {
+            font-family: $fuente-enfasis;
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: $color-secundario-frio-2;
+            text-transform: uppercase;
+        }
+
+        input,
+        select,
+        textarea {
+            @include estilo-input-base;
+        }
+    }
+
+    .btn-guardar {
+        @include boton-primario;
+
+        &:hover {
+            transform: none;
+        }
+    }
+}
+
+.contenedor-formulario {
+    @include estilo-contenedor-formulario;
+}
+
+// ZONA DE SUBIDA CORREGIDA (Sin el prefijo v.)
+.zona-subida {
+    border: 2px dashed #ddd;
+    padding: 30px 20px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    background-color: #fafafa;
+    color: #888;
+    transition: all 0.3s ease;
+    text-align: center;
+
+    i {
+        font-size: 2.5rem;
+        color: #ccc;
+        transition: color 0.3s ease;
+    }
+
+    span {
+        font-size: 0.95rem;
+        font-weight: 600;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &:hover {
+        background-color: rgba($color-marca-principal, 0.03); // Corregido: sin v.
+        border-color: $color-marca-principal; // Corregido: sin v.
+        color: $color-marca-principal; // Corregido: sin v.
+
+        i {
+            color: $color-marca-principal; // Corregido: sin v.
+            transform: translateY(-3px);
+        }
+    }
+
+    &.archivo-listo {
+        border-style: solid;
+        border-color: #27ae60;
+        background-color: rgba(39, 174, 96, 0.02);
+        color: #27ae60;
+        i { color: #27ae60; }
+    }
+}
