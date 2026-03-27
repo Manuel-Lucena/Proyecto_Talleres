@@ -1,21 +1,33 @@
 <app-navbar></app-navbar>
 
-<div class="contenedor-admin">
-  <aside class="barra-lateral-admin">
-    <div class="etiqueta-seccion">Gestión de Academia</div>
+<button class="btn-movil-toggle" (click)="toggleMenuMovil()">
+  <i class="bi" [class.bi-list]="!menuMovilAbierto" [class.bi-x-lg]="menuMovilAbierto"></i>
+</button>
+
+<div class="contenedor-admin" [class.colapsado]="sidebarColapsado">
+  
+  <div class="sidebar-overlay" [class.show]="menuMovilAbierto" (click)="toggleMenuMovil()"></div>
+
+  <aside class="barra-lateral-admin" [class.movil-show]="menuMovilAbierto">
+    <div class="sidebar-header">
+      <span class="etiqueta-seccion">Gestión</span>
+      <button class="btn-colapsar-pc" (click)="toggleSidebar()">
+        <i class="bi bi-list"></i>
+      </button>
+    </div>
     
     <nav class="menu-pestanas">
-      <a routerLink="talleres" routerLinkActive="activo" class="enlace-pestana">
+      <a routerLink="talleres" routerLinkActive="activo" class="enlace-pestana" (click)="menuMovilAbierto = false">
         <i class="bi bi-palette"></i>
         <span>Talleres</span>
       </a>
 
-      <a routerLink="usuarios" routerLinkActive="activo" class="enlace-pestana">
+      <a routerLink="usuarios" routerLinkActive="activo" class="enlace-pestana" (click)="menuMovilAbierto = false">
         <i class="bi bi-people"></i>
         <span>Usuarios</span>
       </a>
 
-      <a routerLink="noticias" routerLinkActive="activo" class="enlace-pestana">
+      <a routerLink="noticias" routerLinkActive="activo" class="enlace-pestana" (click)="menuMovilAbierto = false">
         <i class="bi bi-newspaper"></i>
         <span>Noticias</span>
       </a>
@@ -23,8 +35,6 @@
   </aside>
 
   <main class="contenido-principal-admin">
-    <div class="container-fluid">
-      <router-outlet></router-outlet>
-    </div>
+    <router-outlet></router-outlet>
   </main>
 </div>

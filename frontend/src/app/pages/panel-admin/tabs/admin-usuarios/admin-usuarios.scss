@@ -251,3 +251,51 @@
 .text-right {
     text-align: right;
 }
+
+
+
+@media (max-width: 992px) {
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+
+        .btn-primario-aula {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    .admin-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        padding: 1.2rem;
+
+        .search-box,
+        .filter-box {
+            flex: none;
+            width: 100%;
+        }
+    }
+
+    .admin-card {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: $radio-curvatura;
+
+        .admin-table {
+            min-width: 900px; 
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-wrapper {
+        padding: 1.2rem; 
+    }
+
+    .txt-h1 {
+        font-size: 1.8rem;
+    }
+}

@@ -5,11 +5,13 @@ import { UsuarioService } from '../../../../services/Usuario.Service';
 import { NotificacionService } from '../../../../services/Notificacion.Service';
 import { UsuarioResponse } from '../../../../interfaces/Usuario.Interface';
 import { FormAlumno } from '../../../../components/forms/form-alumno/form-alumno';
+import { Confirmacion } from "../../../../components/dialogs/confirmacion/confirmacion";
+import { Notificacion } from "../../../../components/dialogs/mensaje/notificacion";
 
 @Component({
   selector: 'app-admin-usuarios',
   standalone: true,
-  imports: [CommonModule, FormsModule, FormAlumno],
+  imports: [CommonModule, FormsModule, FormAlumno, Confirmacion, Notificacion],
   templateUrl: './admin-usuarios.html',
   styleUrl: './admin-usuarios.scss'
 })

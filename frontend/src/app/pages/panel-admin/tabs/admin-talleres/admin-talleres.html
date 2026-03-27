@@ -1,1 +1,97 @@
-<p>admin-talleres works!</p>
+<div class="admin-wrapper">
+  <header class="admin-header">
+    <div class="title-group">
+      <h1 class="txt-h1">Gestión de Talleres</h1>
+      <p class="txt-bajada">Administra la oferta formativa y el control de cupos</p>
+    </div>
+    <button class="btn-primario-aula" (click)="abrirCrear()">
+      <i class="bi bi-palette-fill"></i>
+      <span class="btn-text">Nuevo Taller</span>
+    </button>
+  </header>
+
+  <section class="admin-toolbar shadow-1">
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input type="text" placeholder="Buscar taller por nombre o profesor..." [(ngModel)]="busqueda" class="input-aula">
+    </div>
+  </section>
+
+  <div class="admin-card shadow-1">
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Taller</th>
+            <th>Profesor</th>
+            <th>Fechas</th>
+            <th>Cupos</th>
+            <th>Precio</th>
+            <th class="text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (t of talleresFiltrados; track t.idTaller) {
+            <tr>
+              <td class="col-main">
+                <div class="workshop-item">
+                  <div class="img-frame">
+                    <img [src]="t.fotoRuta ? '/talleres/' + t.fotoRuta : 'assets/default-taller.png'" alt="Taller">
+                  </div>
+                  <div class="workshop-info">
+                    <span class="t-name">{{ t.nombre }}</span>
+                    <p class="t-desc">{{ t.descripcion }}</p>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="prof-tag">
+                  <i class="bi bi-person-badge"></i>
+                  <span>{{ t.nombreCompletoProfesor }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="date-stack">
+                  <span class="d-range">{{ t.fechaInicio | date:'dd/MM' }} - {{ t.fechaFin | date:'dd/MM' }}</span>
+                  <span class="d-year">{{ t.fechaInicio | date:'yyyy' }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="plazas-box">
+                  <span class="p-count">{{ t.plazasDisponibles }}/{{ t.plazasMaximas }}</span>
+                  <div class="p-bar">
+                    <div class="p-fill" [style.width.%]="(t.plazasDisponibles / t.plazasMaximas) * 100"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="price-tag">{{ t.precio | currency:'EUR' }}</span>
+              </td>
+              <td class="text-right">
+                <div class="actions-group">
+                  <button class="btn-tool edit" (click)="abrirEditar(t)" title="Editar">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button class="btn-tool delete" (click)="eliminarTaller(t.idTaller)" title="Eliminar">
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+@if (mostrarModal) {
+  <app-form-taller 
+    [tallerParaEditar]="tallerSeleccionado" 
+    (cerrar)="mostrarModal = false" 
+    (guardado)="ejecutarGuardado($event)">
+  </app-form-taller>
+}
+
+<app-confirmacion></app-confirmacion>
+<app-modal-notificacion></app-modal-notificacion>

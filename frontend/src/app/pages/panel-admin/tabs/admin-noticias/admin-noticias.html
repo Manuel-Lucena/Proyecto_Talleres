@@ -1,1 +1,78 @@
-<p>admin-noticias works!</p>
+<div class="admin-wrapper">
+  <header class="admin-header">
+    <div class="title-group">
+      <h1 class="txt-h1">Gestión de Noticias</h1>
+      <p class="txt-bajada">Publica avisos, eventos y novedades de Aula Viva</p>
+    </div>
+    <button class="btn-primario-aula" (click)="abrirCrear()">
+      <i class="bi bi-megaphone-fill"></i>
+      <span class="btn-text">Nueva Noticia</span>
+    </button>
+  </header>
+
+  <section class="admin-toolbar shadow-1">
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input type="text" placeholder="Buscar por título..." [(ngModel)]="busqueda" class="input-aula">
+    </div>
+  </section>
+
+  <div class="admin-card-container shadow-1">
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Imagen</th>
+            <th>Título y Fecha</th>
+            <th>Contenido</th>
+            <th class="text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (n of noticiasFiltradas; track n.idNoticia) {
+            <tr>
+              <td>
+                <div class="img-preview-table">
+                  <img [src]="n.imagenUrl ? '/noticias/' + n.imagenUrl : 'assets/default-noticia.png'">
+                </div>
+              </td>
+              <td>
+                <div class="news-meta">
+                  <span class="u-name">{{ n.titulo }}</span>
+                  <div class="u-date-tag">
+                    <i class="bi bi-calendar3"></i>
+                    <span>{{ n.fechaPublicacion | date:'dd MMM, yyyy • HH:mm' }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <p class="txt-resumen">{{ n.contenido }}</p>
+              </td>
+              <td class="text-right">
+                <div class="actions-group">
+                  <button class="btn-tool edit" (click)="abrirEditar(n)" title="Editar">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button class="btn-tool delete" (click)="eliminarNoticia(n.idNoticia)" title="Eliminar">
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+@if (mostrarModal) {
+  <app-form-noticia 
+    [noticiaParaEditar]="noticiaSeleccionada" 
+    (cerrar)="mostrarModal = false" 
+    (noticiaGuardada)="ejecutarGuardado($event)">
+  </app-form-noticia>
+}
+
+<app-modal-notificacion></app-modal-notificacion>
+<app-confirmacion></app-confirmacion>

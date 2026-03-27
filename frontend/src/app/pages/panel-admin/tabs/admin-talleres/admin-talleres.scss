@@ -1,0 +1,190 @@
+@import '../../../../../styles/variables';
+@import '../../../../../styles/mixins';
+
+.admin-wrapper {
+    padding: 2.5rem;
+    background-color: $color-fondo-pagina;
+    min-height: 100vh;
+    font-family: $fuente-lectura;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+
+    .txt-h1 {
+        font-family: $fuente-enfasis;
+        font-weight: 700;
+        font-size: $tamaño-titular-xl;
+        color: $color-secundario-frio-2;
+        margin: 0;
+    }
+
+    .txt-bajada {
+        color: $color-superficie-suave;
+        font-size: 1rem;
+    }
+
+    .btn-primario-aula {
+        @include boton-primario;
+        display: flex;
+        align-items: center;
+        padding: 0.8rem 1.5rem;
+
+        .bi { margin-right: 10px; }
+        .btn-text { font-family: $fuente-enfasis; font-weight: 600; }
+    }
+}
+
+.admin-toolbar {
+    padding: 0.8rem 1.5rem;
+    background: white;
+    border-radius: $radio-curvatura;
+    margin-bottom: 1.5rem;
+    display: flex;
+    box-shadow: $sombra-nivel-1;
+
+    .search-box {
+        position: relative;
+        flex: 1;
+        display: flex;
+        align-items: center;
+
+        i { position: absolute; left: 15px; color: $color-marca-principal; z-index: 2; }
+        .input-aula { @include estilo-input-base; padding-left: 45px; width: 100%; }
+    }
+}
+
+.admin-card {
+    background: white;
+    border-radius: $radio-curvatura;
+    box-shadow: $sombra-nivel-1;
+    overflow: hidden;
+
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 950px;
+
+    th {
+        padding: 1.2rem;
+        text-align: left;
+        background: #fafafa;
+        color: $color-superficie-suave;
+        font-family: $fuente-enfasis;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        border-bottom: 1px solid #eee;
+    }
+
+    td {
+        padding: 1rem 1.2rem;
+        border-bottom: 1px solid #f8f8f8;
+        vertical-align: middle;
+        color: $color-secundario-frio-2;
+    }
+
+    // Info del Taller (Imagen + Texto)
+    .workshop-item {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+
+        .img-frame {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #eee;
+            flex-shrink: 0;
+            img { width: 100%; height: 100%; object-fit: cover; }
+        }
+
+        .t-name { display: block; font-weight: 700; font-family: $fuente-enfasis; }
+        .t-desc { font-size: 0.75rem; color: $color-superficie-suave; @include limitar-lineas(1); max-width: 220px; margin: 0; }
+    }
+
+    // Profesor e iconos
+    .prof-tag {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        i { color: $color-marca-principal; }
+    }
+
+    // Fechas
+    .date-stack {
+        display: flex;
+        flex-direction: column;
+        .d-range { font-weight: 600; font-size: 0.85rem; }
+        .d-year { font-size: 0.7rem; color: $color-superficie-suave; }
+    }
+
+    // Barra de Cupos
+    .plazas-box {
+        width: 110px;
+        .p-count { font-size: 0.8rem; font-weight: 700; margin-bottom: 5px; display: block; }
+        .p-bar {
+            height: 6px;
+            background: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+            .p-fill { height: 100%; background: $color-marca-principal; border-radius: 10px; transition: width 0.5s ease; }
+        }
+    }
+
+    .price-tag { font-weight: 800; font-family: $fuente-enfasis; color: $color-secundario-frio-2; }
+}
+
+// Botones de Acción
+.actions-group {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+
+    .btn-tool {
+        width: 36px;
+        height: 36px;
+        border: 1px solid #eee;
+        background: white;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+
+        &:hover { border-color: $color-marca-principal; color: $color-marca-principal; transform: translateY(-2px); }
+        &.delete:hover { background: #fff1f1; color: $color-secundario-calido-1; border-color: $color-secundario-calido-1; }
+    }
+}
+
+.text-right { text-align: right; }
+
+// --- RESPONSIVE ---
+@media (max-width: 992px) {
+    .admin-wrapper { padding: 1.5rem; }
+    
+    .admin-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
+        text-align: center;
+
+        .btn-primario-aula { width: 100%; justify-content: center; }
+    }
+
+    .admin-toolbar {
+        padding: 1rem;
+        .search-box { width: 100%; }
+    }
+}

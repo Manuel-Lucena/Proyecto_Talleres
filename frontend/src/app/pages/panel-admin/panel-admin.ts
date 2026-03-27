@@ -11,5 +11,14 @@ import { Navbar } from "../../components/layout/navbar/navbar";
   styleUrl: './panel-admin.scss',
 })
 export class PanelAdmin {
-  // Aquí gestionaremos la lógica de la vista administrativa
+  sidebarColapsado = false;
+  menuMovilAbierto = false;
+
+  toggleSidebar() {
+    this.sidebarColapsado = !this.sidebarColapsado;
+  }
+
+  toggleMenuMovil() {
+    this.menuMovilAbierto = !this.menuMovilAbierto;
+  }
 }

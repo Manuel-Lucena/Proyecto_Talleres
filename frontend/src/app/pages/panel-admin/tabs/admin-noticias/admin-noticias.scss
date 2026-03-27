@@ -1,0 +1,221 @@
+@import '../../../../../styles/variables';
+@import '../../../../../styles/mixins';
+
+// 1. Estructura General
+.admin-wrapper {
+    padding: 2.5rem;
+    background-color: $color-fondo-pagina;
+    min-height: 100vh;
+    font-family: $fuente-lectura;
+
+    @media (max-width: 768px) {
+        padding: 1.5rem;
+    }
+}
+
+// 2. Encabezado
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+
+    .txt-h1 {
+        font-family: $fuente-enfasis;
+        font-weight: 700;
+        font-size: $tamaño-titular-xl;
+        color: $color-secundario-frio-2;
+        margin: 0;
+    }
+
+    .txt-bajada {
+        color: $color-superficie-suave;
+        font-size: 1rem;
+    }
+
+    .btn-primario-aula {
+        @include boton-primario;
+        display: flex;
+        align-items: center;
+        padding: 0.8rem 1.5rem;
+
+        .btn-text {
+            margin-left: 12px;
+            font-family: $fuente-enfasis;
+            font-weight: 600;
+        }
+    }
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
+
+        .btn-primario-aula {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+}
+
+// 3. Toolbar (Buscador)
+.admin-toolbar {
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    margin-bottom: 1.5rem;
+    align-items: center;
+    background: white;
+    border-radius: $radio-curvatura;
+    box-shadow: $sombra-nivel-1;
+
+    .search-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+        flex: 1;
+
+        i {
+            position: absolute;
+            left: 15px;
+            color: $color-marca-principal;
+            z-index: 2;
+        }
+
+        .input-aula {
+            @include estilo-input-base;
+            padding-left: 45px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        padding: 1rem;
+
+        .search-box {
+            width: 100%;
+        }
+    }
+}
+
+// 4. Contenedor de Tabla y Scroll
+.admin-card {
+    background: white;
+    border-radius: $radio-curvatura;
+    box-shadow: $sombra-nivel-1;
+    overflow: hidden; // Corta los bordes de la tabla interna
+
+    // Contenedor para scroll horizontal en móvil
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 850px; // Forzamos ancho para que respiren las columnas en móvil
+
+    th {
+        padding: 1.2rem;
+        text-align: left;
+        background: #fafafa;
+        color: $color-superficie-suave;
+        font-family: $fuente-enfasis;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        border-bottom: 1px solid #eee;
+    }
+
+    td {
+        padding: 1rem 1.2rem;
+        border-bottom: 1px solid #f8f8f8;
+        vertical-align: middle;
+        color: $color-secundario-frio-2;
+    }
+
+    // Miniatura
+    .img-preview-table {
+        width: 70px;
+        height: 45px;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid #eee;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    // Título y Fecha
+    .news-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .u-name {
+            font-weight: 700;
+            font-family: $fuente-enfasis;
+            font-size: 0.95rem;
+        }
+
+        .u-date-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: $color-superficie-suave;
+
+            i {
+                color: $color-marca-principal;
+            }
+        }
+    }
+
+    // Resumen de contenido
+    .txt-resumen {
+        font-size: 0.85rem;
+        color: $color-superficie-suave;
+        @include limitar-lineas(2); // Máximo 2 líneas para no estirar la fila
+        max-width: 350px;
+        margin: 0;
+    }
+}
+
+// 5. Botones de Acción
+.actions-group {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+
+    .btn-tool {
+        width: 36px;
+        height: 36px;
+        border: 1px solid #eee;
+        background: white;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.2s;
+        color: $color-secundario-frio-2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+            border-color: $color-marca-principal;
+            color: $color-marca-principal;
+            transform: translateY(-2px);
+        }
+
+        &.delete:hover {
+            background: #fff1f1;
+            color: $color-secundario-calido-1;
+            border-color: $color-secundario-calido-1;
+        }
+    }
+}
+
+.text-right {
+    text-align: right;
+}

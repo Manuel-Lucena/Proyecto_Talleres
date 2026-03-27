@@ -2,73 +2,101 @@
 
 .contenedor-admin {
     display: flex;
-    // Restamos la altura de tu navbar (ajusta si es necesario)
     height: calc(100vh - 80px);
-    background-color: #f0f2f5; 
+    background-color: #f0f2f5;
+    position: relative;
+
+    // Estado colapsado en PC
+    &.colapsado {
+        .barra-lateral-admin {
+            width: 80px;
+
+            .etiqueta-seccion,
+            span {
+                display: none;
+            }
+
+            .sidebar-header {
+                justify-content: center;
+                padding: 0;
+            }
+
+            .enlace-pestana {
+                justify-content: center;
+                padding: 18px 0;
+                gap: 0;
+            }
+        }
+    }
 }
 
 .barra-lateral-admin {
     width: 280px;
-    background-color: v.$color-secundario-frio-2; // Tu azul oscuro
+    background-color: v.$color-secundario-frio-2;
     display: flex;
     flex-direction: column;
-    padding: 30px 0;
-    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
-    z-index: 10;
+    padding: 20px 0;
+    transition: width 0.3s ease;
+    z-index: 100;
 
-    .etiqueta-seccion {
-        padding: 0 30px 20px;
-        font-family: v.$fuente-enfasis;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: rgba(255, 255, 255, 0.4); 
-        font-weight: 800;
-    }
-
-    .menu-pestanas {
+    .sidebar-header {
         display: flex;
-        flex-direction: column;
-        gap: 5px;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 25px 20px;
 
-        .enlace-pestana {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 18px 30px;
-            text-decoration: none;
-            color: rgba(255, 255, 255, 0.7);
-            font-family: v.$fuente-lectura;
-            font-size: 1rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            border-left: 5px solid transparent;
+        .etiqueta-seccion {
+            font-family: v.$fuente-enfasis;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 800;
+        }
+
+        .btn-colapsar-pc {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+
+            @media (max-width: 992px) {
+                display: none;
+            }
+        }
+    }
+}
+
+.menu-pestanas {
+    display: flex;
+    flex-direction: column;
+
+    .enlace-pestana {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 18px 30px;
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.7);
+        font-family: v.$fuente-lectura;
+        transition: 0.2s;
+        border-left: 5px solid transparent;
+
+        i {
+            font-size: 1.2rem;
+        }
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        &.activo {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: v.$color-marca-principal;
 
             i {
-                font-size: 1.2rem;
-                color: rgba(255, 255, 255, 0.3);
-                transition: color 0.3s;
-            }
-
-            &:hover {
-                background-color: rgba(255, 255, 255, 0.05);
-                color: white;
-
-                i {
-                    color: v.$color-marca-principal; // Tu verde aquí
-                }
-            }
-
-            &.activo {
-                background-color: rgba(255, 255, 255, 0.1);
-                color: white;
-                border-left-color: v.$color-marca-principal; 
-                font-weight: 700;
-
-                i {
-                    color: v.$color-marca-principal;
-                    filter: drop-shadow(0 0 5px rgba(v.$color-marca-principal, 0.4));
-                }
+                color: v.$color-marca-principal;
             }
         }
     }
@@ -76,18 +104,62 @@
 
 .contenido-principal-admin {
     flex: 1;
-    padding: 40px;
+    padding: 30px;
     overflow-y: auto;
+}
 
-    // Estilo común para los títulos dentro de cada pestaña
-    .cabecera-pestana {
-        margin-bottom: 2rem;
+// BOTÓN FLOTANTE MÓVIL
+.btn-movil-toggle {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: v.$color-marca-principal;
+    color: white;
+    border: none;
+    z-index: 200;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 
-        h1 {
-            font-family: v.$fuente-enfasis;
-            color: v.$color-secundario-frio-2;
-            font-weight: 800;
-            font-size: 2rem;
+    @media (max-width: 992px) {
+        display: block;
+    }
+}
+
+// RESPONSIVE MÓVIL
+@media (max-width: 992px) {
+    .barra-lateral-admin {
+        position: fixed;
+        left: -280px;
+        top: 80px;
+        height: 100%;
+        transition: left 0.3s ease;
+
+        &.movil-show {
+            left: 0;
+        }
+    }
+
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 80px 0 0 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 90;
+
+        &.show {
+            display: block;
+        }
+    }
+
+    .contenedor-admin.colapsado .barra-lateral-admin {
+        width: 280px; // Evita que se colapse en móvil si estaba colapsado en PC
+
+        .etiqueta-seccion,
+        span {
+            display: block;
         }
     }
 }

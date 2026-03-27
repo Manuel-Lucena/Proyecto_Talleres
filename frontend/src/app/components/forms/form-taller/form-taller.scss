@@ -2,8 +2,22 @@
 @use '../../../../styles/mixins' as m;
 @use '../../../../styles/formularios' as f;
 
+// ESTO ES LO QUE ARREGLA QUE NO SE VEA
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; // Asegura que esté por encima de la tabla
+    backdrop-filter: blur(4px);
+}
+
 .modal-body {
-    // Restauramos el uso del mixin como base pero manteniendo TU estructura interna
     @include f.estilo-contenedor-formulario; 
     max-width: 1100px; 
     padding: 45px; 
@@ -11,7 +25,6 @@
     box-shadow: v.$sombra-nivel-3;
     background: v.$color-neutro-max;
 
-    // Tu grid de dos columnas que permite la edición y vista previa simultánea
     .noticia-grid-container {
         display: grid; 
         grid-template-columns: 1.2fr 0.8fr; 
@@ -19,7 +32,6 @@
         @media (max-width: 900px) { grid-template-columns: 1fr; }
     }
 
-    // Lógica específica para las filas de tu formulario de taller
     .fila-formulario {
         display: flex; 
         gap: 20px;
@@ -28,11 +40,9 @@
         
         .campo-formulario { 
             flex: 1; 
-            // Esto ya hereda labels e inputs de _formularios.scss
         }
     }
 
-    // Tu pie de tarjeta de previsualización con el precio destacado
     .preview-footer {
         display: flex; 
         justify-content: space-between; 
@@ -45,7 +55,7 @@
             font-family: v.$fuente-enfasis; 
             font-size: 1.8rem; 
             font-weight: 900; 
-            color: v.$color-secundario-frio-2; // El azul oscuro de la guía
+            color: v.$color-secundario-frio-2; 
         }
     }
 
@@ -58,12 +68,11 @@
         font-weight: 800;
         
         &:hover {
-            transform: none !important; // Evita conflictos con mixins de hover
+            transform: none; 
         }
     }
 }
 
-// El botón de cierre flotante
 .btn-close {
     position: absolute; 
     top: 15px; 
@@ -73,7 +82,7 @@
     background: none;
     cursor: pointer; 
     color: #ccc; 
-    transition: color 0.3s ease; // Transición de 300ms de la guía
+    transition: color 0.3s ease;
 
     &:hover { 
         color: v.$color-marca-principal; 

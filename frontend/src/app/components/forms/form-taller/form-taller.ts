@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common'; // Importamos DatePipe
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-form-taller',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
+  providers: [DatePipe], // <--- Necesario para formatear fechas
   templateUrl: './form-taller.html',
   styleUrl: './form-taller.scss'
 })
@@ -18,20 +19,25 @@ export class FormTaller implements OnInit {
   fotoPreview: string | null = null;
   archivoSeleccionado: File | null = null;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private datePipe: DatePipe) {
     this.initForm();
   }
 
   ngOnInit(): void {
     if (this.tallerParaEditar) {
-      // Importante: Si las fechas vienen como objeto Date o String largo, 
-      // el input type="date" necesita formato YYYY-MM-DD
+      // FORMATEO OBLIGATORIO PARA HTML5 DATE INPUT
+      const fechaInicioFormateada = this.datePipe.transform(this.tallerParaEditar.fechaInicio, 'yyyy-MM-dd');
+      const fechaFinFormateada = this.datePipe.transform(this.tallerParaEditar.fechaFin, 'yyyy-MM-dd');
+
       this.tallerForm.patchValue({
         ...this.tallerParaEditar,
-        idProfesor: this.tallerParaEditar.idProfesor || 1 // Valor por defecto o el que venga
+        fechaInicio: fechaInicioFormateada,
+        fechaFin: fechaFinFormateada,
+        idProfesor: this.tallerParaEditar.idProfesor || 1
       });
-      
+
       if (this.tallerParaEditar.fotoRuta) {
+        // Asegúrate de que la ruta sea accesible (ej: concatenar base URL si es necesario)
         this.fotoPreview = this.tallerParaEditar.fotoRuta;
       }
     }
@@ -45,27 +51,40 @@ export class FormTaller implements OnInit {
       fechaFin: ['', Validators.required],
       plazasMaximas: [20, [Validators.required, Validators.min(1)]],
       precio: [0, [Validators.required, Validators.min(0)]],
-      idProfesor: [1], // <--- ESTO ES LO QUE NECESITA TU JAVA
-      nombreCompletoProfesor: [''] // Solo para mostrar en la preview
+      idProfesor: [1],
+      nombreCompletoProfesor: ['']
     });
   }
 
+  // Añade este método dentro de la clase FormTaller
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
       this.archivoSeleccionado = file;
       const reader = new FileReader();
-      reader.onload = () => this.fotoPreview = reader.result as string;
+
+      // Esto es lo que genera la miniatura que ves en la preview
+      reader.onload = () => {
+        this.fotoPreview = reader.result as string;
+      };
+
       reader.readAsDataURL(file);
     }
   }
 
   enviar() {
-    if (this.tallerForm.invalid) return;
+    if (this.tallerForm.invalid) {
+      this.tallerForm.markAllAsTouched();
+      return;
+    }
 
     const formData = new FormData();
     const tallerData = { ...this.tallerForm.value };
 
+    // Si es edición, necesitamos el ID dentro del JSON para el Backend
+    if (this.tallerParaEditar?.idTaller) {
+      tallerData.idTaller = this.tallerParaEditar.idTaller;
+    }
 
     delete tallerData.nombreCompletoProfesor;
 
