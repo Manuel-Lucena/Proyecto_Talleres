@@ -1,0 +1,212 @@
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
+
+.seguimiento-wrapper {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    animation: fadeInSeguimiento 0.5s ease-in-out;
+}
+
+.seguimiento-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+
+    .header-left {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+
+        .btn-circular {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 1px solid #e0e0e0;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            color: v.$color-secundario-frio-2;
+
+            &:hover {
+                background: v.$color-marca-principal;
+                color: white;
+                border-color: v.$color-marca-principal;
+            }
+        }
+
+        .titulos {
+            h1 {
+                font-size: 1.8rem;
+                font-weight: 800;
+                color: v.$color-secundario-frio-2;
+                margin: 0;
+            }
+
+            .subtitulo {
+                color: #888;
+                margin-top: 4px;
+                font-weight: 500;
+            }
+        }
+    }
+
+    .header-stats {
+        display: flex;
+        gap: 2rem;
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+
+            .label {
+                font-size: 0.75rem;
+                color: #999;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .valor {
+                font-size: 1.5rem;
+                font-weight: 800;
+                color: v.$color-secundario-frio-2;
+            }
+
+            &.highlight .valor {
+                color: v.$color-marca-principal;
+            }
+        }
+    }
+}
+
+.card-tabla {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    border: 1px solid #f0f0f0;
+    min-height: 300px;
+    overflow: hidden;
+}
+
+.tabla-gestion {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+        padding: 1.2rem;
+        background: #fafafa;
+        color: #999;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        border-bottom: 2px solid #f0f0f0;
+        text-align: left;
+    }
+
+    td {
+        padding: 1.2rem;
+        border-bottom: 1px solid #f5f5f5;
+        vertical-align: middle;
+    }
+
+    .user-info {
+        display: flex;
+        flex-direction: column;
+
+        .user-name {
+            font-weight: 700;
+            color: v.$color-secundario-frio-2;
+        }
+
+        .user-email {
+            font-size: 0.8rem;
+            color: #999;
+        }
+    }
+
+    .nota-valor {
+        font-weight: 800;
+        color: #ccc;
+
+        &.tiene-nota {
+            color: v.$color-marca-principal;
+            font-size: 1.1rem;
+        }
+    }
+
+    tr.fila-pendiente {
+        background-color: #fafafa;
+    }
+}
+
+.badge-status {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    display: inline-block;
+    text-transform: uppercase;
+
+    &.pendiente {
+        background: #fff1f0;
+        color: #ff4d4f;
+    }
+
+    &.entregado {
+        background: #e6f7ff;
+        color: #1890ff;
+    }
+
+    &.calificado {
+        background: #f6ffed;
+        color: #52c41a;
+    }
+}
+
+.btn-accion-revisar {
+    background: v.$color-marca-principal;
+    color: white;
+    padding: 10px 20px;
+    font-size: 0.85rem;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s;
+
+    &:hover {
+        transform: scale(1.05);
+    }
+}
+
+.empty-state,
+.loading-state {
+    padding: 5rem;
+    text-align: center;
+    color: #999;
+
+    i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        display: block;
+        opacity: 0.3;
+    }
+}
+
+@keyframes fadeInSeguimiento {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -28,7 +28,7 @@ export class FormAlumno implements OnInit {
     direccion: new FormControl('', { updateOn: 'blur' }), 
     password: new FormControl('', { validators: [Validators.required, Validators.minLength(6)], updateOn: 'blur' }),
     repetirPassword: new FormControl('', { validators: [Validators.required], updateOn: 'blur' }),
-    idRol: new FormControl(2)
+    idRol: new FormControl(3)
   }, { validators: Validator.passwordMatch });
 
   ngOnInit(): void {

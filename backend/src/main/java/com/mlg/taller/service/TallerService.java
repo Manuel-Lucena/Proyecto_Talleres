@@ -121,12 +121,17 @@ public class TallerService {
      */
     @Transactional
     public void eliminar(Long id) {
-        if (!tallerRepository.existsById(id)) {
-            throw new ResourceNotFoundException("No se puede eliminar: Taller no encontrado con ID: " + id);
-        }
-        tallerRepository.deleteById(id);
-    }
+        Taller taller = tallerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se puede eliminar: Taller no encontrado con ID: " + id));
 
+        // Si el taller tiene foto, la borramos del disco (es pública -> true)
+        if (taller.getFotoRuta() != null) {
+            fileUtil.eliminar(FOLDER, taller.getFotoRuta(), true);
+        }
+
+        tallerRepository.delete(taller);
+    }
     // --- MÉTODOS PRIVADOS DE APOYO ---
 
     /**
@@ -151,7 +156,8 @@ public class TallerService {
     private void gestionarImagenTaller(Taller taller, MultipartFile archivo) {
         if (archivo != null && !archivo.isEmpty()) {
             String nombreImagen = "taller_" + taller.getId() + ".jpg";
-            fileUtil.guardar(archivo, FOLDER, nombreImagen);
+            // Añadimos 'true' porque la carátula del taller es PÚBLICA
+            fileUtil.guardar(archivo, FOLDER, nombreImagen, true);
             taller.setFotoRuta(nombreImagen);
         }
     }

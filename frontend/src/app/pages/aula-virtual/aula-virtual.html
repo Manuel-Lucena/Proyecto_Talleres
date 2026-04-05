@@ -1,0 +1,61 @@
+<app-navbar></app-navbar>
+
+<div class="aula-virtual-container">
+
+    <nav class="aula-tabs-band">
+        <div class="tabs-wrapper">
+            <a routerLink="muro" routerLinkActive="active" class="tab-btn">
+                <i class="bi bi-megaphone"></i> Muro
+            </a>
+            <a routerLink="foro" routerLinkActive="active" class="tab-btn">
+                <i class="bi bi-chat-left-dots"></i> Foro
+            </a>
+            <a routerLink="tareas" routerLinkActive="active" class="tab-btn">
+                <i class="bi bi-journal-check"></i> Tareas
+            </a>
+            <a routerLink="recursos" routerLinkActive="active" class="tab-btn">
+                <i class="bi bi-folder2-open"></i> Materiales
+            </a>
+            <a routerLink="participantes" routerLinkActive="active" class="tab-btn">
+                <i class="bi bi-people"></i> Participantes
+            </a>
+
+            <div class="admin-menu-wrapper">
+                <div class="dropdown">
+                    <button class="btn-crear" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="bi bi-plus-circle-fill"></i> Crear
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownMenuButton">
+                        <li>
+                            <a class="dropdown-item py-2" (click)="irACrear('tarea')">
+                                <i class="bi bi-journal-check text-warning me-2"></i> Nueva Tarea
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2" (click)="irACrear('material')">
+                                <i class="bi bi-file-earmark-arrow-up text-primary me-2"></i> Nuevo Material
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="aula-content">
+
+        <nav class="breadcrumb-minimal">
+            <a routerLink="/mis-talleres">Mis Talleres</a>
+            <i class="bi bi-chevron-right"></i>
+            <span class="current">{{ nombreTaller }}</span>
+        </nav>
+
+        <div class="fade-in">
+            <router-outlet></router-outlet>
+        </div>
+
+    </main>
+</div>
+
+<app-footer></app-footer>

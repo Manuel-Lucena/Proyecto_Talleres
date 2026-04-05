@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+
 /**
  * Servicio para la gestión de noticias y comunicados del centro.
  * Maneja la persistencia de datos y el ciclo de vida de las imágenes asociadas.
@@ -26,7 +27,7 @@ public class NoticiaService {
     private final NoticiaRepository noticiaRepository;
     private final NoticiaMapper noticiaMapper;
     private final FileUtil fileUtil;
-    
+
     private static final String FOLDER = "noticias";
 
     /**
@@ -43,6 +44,7 @@ public class NoticiaService {
     /**
      * Busca una noticia específica por su identificador único.
      * * @param id Identificador de la noticia.
+     * 
      * @return DTO de la noticia encontrada.
      * @throws ResourceNotFoundException si la noticia no existe.
      */
@@ -56,27 +58,29 @@ public class NoticiaService {
     /**
      * Crea una noticia y procesa su imagen asociada.
      * * @param dto Datos de la noticia a crear.
+     * 
      * @param archivo Archivo de imagen (opcional).
      * @return DTO de la noticia recién creada con su ID e imagen asignada.
      */
     @Transactional
     public NoticiaResponseDTO crear(NoticiaRequestDTO dto, MultipartFile archivo) {
         Noticia noticia = noticiaMapper.toEntity(dto);
-        
+
         if (noticia.getFechaPublicacion() == null) {
             noticia.setFechaPublicacion(LocalDate.now());
         }
 
         noticia = noticiaRepository.save(noticia);
         gestionarImagenNoticia(noticia, archivo);
-        
+
         return noticiaMapper.toResponse(noticiaRepository.save(noticia));
     }
 
     /**
      * Actualiza el contenido y/o la imagen de una noticia existente.
      * * @param id Identificador de la noticia a modificar.
-     * @param dto Nuevos datos de la noticia.
+     * 
+     * @param dto     Nuevos datos de la noticia.
      * @param archivo Nuevo archivo de imagen (opcional).
      * @return DTO de la noticia actualizada.
      * @throws ResourceNotFoundException si la noticia no existe.
@@ -95,6 +99,7 @@ public class NoticiaService {
     /**
      * Elimina una noticia del sistema y borra su imagen del almacenamiento físico.
      * * @param id Identificador de la noticia a eliminar.
+     * 
      * @throws ResourceNotFoundException si la noticia no existe.
      */
     @Transactional
@@ -103,7 +108,8 @@ public class NoticiaService {
                 .orElseThrow(() -> new ResourceNotFoundException("No existe la noticia con ID: " + id));
 
         if (noticia.getImagenUrl() != null) {
-            fileUtil.eliminar(FOLDER, noticia.getImagenUrl());
+            // 'true' para borrar de la carpeta pública
+            fileUtil.eliminar(FOLDER, noticia.getImagenUrl(), true);
         }
 
         noticiaRepository.delete(noticia);
@@ -111,13 +117,20 @@ public class NoticiaService {
 
     /**
      * Método privado de apoyo para procesar y guardar la imagen de la noticia.
-     * * @param noticia Entidad noticia a la que se le asignará el nombre del archivo.
+     * * @param noticia Entidad noticia a la que se le asignará el nombre del
+     * archivo.
+     * 
      * @param archivo Archivo MultipartFile recibido desde el controlador.
      */
     private void gestionarImagenNoticia(Noticia noticia, MultipartFile archivo) {
         if (archivo != null && !archivo.isEmpty()) {
-            String nombreImagen = "noticia_" + noticia.getId() + ".jpg";
-            fileUtil.guardar(archivo, FOLDER, nombreImagen);
+            // Si ya tenía una imagen antes, la borramos primero
+            if (noticia.getImagenUrl() != null) {
+                fileUtil.eliminar(FOLDER, noticia.getImagenUrl(), true);
+            }
+
+            String nombreImagen = "noticia_" + noticia.getId() + "_" + System.currentTimeMillis() + ".jpg";
+            fileUtil.guardar(archivo, FOLDER, nombreImagen, true);
             noticia.setImagenUrl(nombreImagen);
         }
     }

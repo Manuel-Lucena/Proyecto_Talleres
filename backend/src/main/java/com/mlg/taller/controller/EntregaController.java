@@ -14,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/entregas")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class EntregaController {
 
     private final EntregaService entregaService;
@@ -39,7 +40,12 @@ public class EntregaController {
         return ApiResponse.success(entregaService.enviar(dto), "Trabajo entregado correctamente");
     }
 
-    @PatchMapping("/{id}/calificar")
+    @PutMapping("/{id}")
+    public ApiResponse<EntregaResponseDTO> actualizar(@PathVariable Long id, @RequestBody EntregaRequestDTO dto) {
+        return ApiResponse.success(entregaService.actualizar(id, dto), "Entrega actualizada correctamente");
+    }
+
+    @PutMapping("/{id}/calificar") 
     public ApiResponse<EntregaResponseDTO> calificar(@PathVariable Long id, @RequestBody EntregaRequestDTO dto) {
         return ApiResponse.success(entregaService.calificar(id, dto), "Calificación registrada");
     }

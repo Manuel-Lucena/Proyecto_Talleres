@@ -1,0 +1,134 @@
+@use '../../../styles/variables' as v;
+@use '../../../styles/mixins' as m;
+
+.aula-virtual-container {
+    background-color: v.$color-fondo-pagina;
+    min-height: 100vh;
+    font-family: v.$fuente-lectura;
+}
+
+// === BANDA DE PESTAÑAS Y ACCIONES ===
+.aula-tabs-band {
+    background-color: v.$color-secundario-frio-2;
+    padding: 0 5%;
+
+    .tabs-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        .tab-btn {
+            padding: 1.2rem 1.5rem;
+            color: rgba(v.$color-neutro-max, 0.6);
+            font-family: v.$fuente-enfasis;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+
+            i { font-size: 1.1rem; }
+
+            &:hover {
+                color: v.$color-neutro-max;
+                background-color: rgba(v.$color-neutro-max, 0.05);
+            }
+
+            &.active {
+                color: v.$color-neutro-max;
+                border-bottom-color: v.$color-marca-principal;
+            }
+        }
+
+        // --- Botón de Crear (Añadido a la derecha) ---
+        .admin-menu-wrapper {
+            margin-left: auto;
+            padding-left: 20px;
+
+            .btn-crear {
+                background-color: v.$color-marca-principal;
+                color: white;
+                border: none;
+                padding: 0.6rem 1.2rem;
+                border-radius: 50px;
+                font-family: v.$fuente-enfasis;
+                font-weight: 700;
+                font-size: 0.85rem;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                cursor: pointer;
+
+                &:hover {
+                    transform: translateY(-2px);
+                    filter: brightness(1.1);
+                    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+                }
+            }
+
+            .dropdown-menu {
+                border: none;
+                border-radius: 12px;
+                margin-top: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                
+                .dropdown-item {
+                    padding: 0.8rem 1.2rem;
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    
+                    &:hover {
+                        background-color: #f8f9fa;
+                        color: v.$color-marca-principal;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// === CONTENIDO PRINCIPAL ===
+.aula-content {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 2.5rem 2%;
+}
+
+.breadcrumb-minimal {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+
+    a {
+        color: v.$color-marca-principal;
+        text-decoration: none;
+        font-weight: 700;
+        &:hover { text-decoration: underline; }
+    }
+
+    i { font-size: 0.6rem; color: #ccc; }
+    .current { color: v.$color-superficie-suave; }
+}
+
+// === ANIMACIÓN ===
+.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

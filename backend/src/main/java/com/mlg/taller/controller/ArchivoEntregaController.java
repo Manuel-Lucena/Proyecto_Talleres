@@ -16,9 +16,11 @@ public class ArchivoEntregaController {
 
     private final ArchivoEntregaService archivoEntregaService;
 
-    @PostMapping
-    public ApiResponse<ArchivoEntregaResponseDTO> guardar(@RequestBody ArchivoEntregaRequestDTO dto) {
-        return ApiResponse.success(archivoEntregaService.guardar(dto), "Archivo de entrega guardado");
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ApiResponse<ArchivoEntregaResponseDTO> guardar(
+            @RequestPart("datos") ArchivoEntregaRequestDTO dto,
+            @RequestPart("archivo") org.springframework.web.multipart.MultipartFile file) {
+        return ApiResponse.success(archivoEntregaService.guardar(dto, file), "Archivo de entrega guardado");
     }
 
     @GetMapping("/entrega/{idEntrega}")

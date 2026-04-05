@@ -1,0 +1,87 @@
+<div class="seguimiento-wrapper fade-in">
+  <header class="seguimiento-header">
+    <div class="header-left">
+      <button (click)="volver()" class="btn-circular">
+        <i class="bi bi-arrow-left"></i>
+      </button>
+      <div class="titulos">
+        <h1>Control de Entregas</h1>
+        <p class="subtitulo">{{ tarea?.titulo || 'Cargando...' }}</p>
+      </div>
+    </div>
+
+    <div class="header-stats" *ngIf="!cargando && filas.length > 0">
+      <div class="stat">
+        <span class="label">Total Alumnos</span>
+        <span class="valor">{{ filas.length }}</span>
+      </div>
+      <div class="stat highlight">
+        <span class="label">Entregas</span>
+        <span class="valor">{{ totalEntregados }} / {{ filas.length }}</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="card-tabla">
+    <div *ngIf="cargando" class="loading-state">
+      <div class="spinner-border text-primary mb-3"></div>
+      <p>Sincronizando entregas...</p>
+    </div>
+
+    <table class="tabla-gestion" *ngIf="!cargando && filas.length > 0">
+      <thead>
+        <tr>
+          <th>Alumno</th>
+          <th>Estado</th>
+          <th>Fecha Envío</th>
+          <th>Nota</th>
+          <th class="text-end">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let f of filas" [class.fila-pendiente]="!f.entrega">
+          <td>
+            <div class="user-info">
+              <span class="user-name">{{ f.alumno.nombre }} {{ f.alumno.apellidos }}</span>
+              <span class="user-email">{{ f.alumno.email }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="badge-status" [ngClass]="f.estado.toLowerCase()">
+              {{ f.estado }}
+            </span>
+          </td>
+          <td>
+            {{ (f.entrega?.fechaEntrega | date:'dd/MM/yyyy HH:mm') || '--/--/--' }}
+          </td>
+          <td>
+            <span class="nota-valor" [class.tiene-nota]="f.entrega?.calificacion !== null">
+              {{ f.entrega?.calificacion ?? '---' }}
+            </span>
+          </td>
+          <td class="text-end">
+            <button 
+              *ngIf="f.entrega" 
+              (click)="abrirCalificador(f)" 
+              class="btn-accion-revisar">
+              <i class="bi bi-clipboard-check"></i> Revisar
+            </button>
+            <span *ngIf="!f.entrega" class="esperando-txt">Pendiente</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!cargando && filas.length === 0" class="empty-state">
+      <i class="bi bi-person-x"></i>
+      <p>No hay alumnos inscritos en este taller.</p>
+    </div>
+  </div>
+</div>
+
+<app-form-calificar 
+  *ngIf="mostrarModalCalificar"
+  [entrega]="entregaSeleccionada"
+  (cerrar)="mostrarModalCalificar = false"
+  (guardado)="cargarDatos()">
+</app-form-calificar>

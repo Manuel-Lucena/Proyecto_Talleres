@@ -38,6 +38,7 @@ public class UsuarioService {
 
     /**
      * Autentica un usuario y genera un token de acceso.
+     * 
      * @param dto Credenciales de acceso (email y password).
      * @return AuthResponseDTO con el token JWT e información básica del perfil.
      */
@@ -51,9 +52,19 @@ public class UsuarioService {
         return mapearAuthResponse(usuario);
     }
 
+    @Transactional(readOnly = true)
+    public List<UsuarioResponseDTO> listarPorTaller(Long idTaller) {
+        List<Usuario> participantes = usuarioRepository.findAllParticipantesByTallerId(idTaller);
+        return participantes.stream()
+                .map(usuarioMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
     /**
-     * Registra un nuevo usuario, asigna su rol, cifra la contraseña y gestiona su imagen de perfil.
-     * @param dto Datos del nuevo usuario.
+     * Registra un nuevo usuario, asigna su rol, cifra la contraseña y gestiona su
+     * imagen de perfil.
+     * 
+     * @param dto     Datos del nuevo usuario.
      * @param archivo Imagen opcional de perfil.
      * @return AuthResponseDTO con token de acceso tras el registro exitoso.
      */
@@ -72,9 +83,9 @@ public class UsuarioService {
         return mapearAuthResponse(usuario);
     }
 
-
     /**
      * Busca un usuario por su ID.
+     * 
      * @param id Identificador único.
      * @return DTO del usuario encontrado.
      * @throws ResourceNotFoundException si no existe.
@@ -88,6 +99,7 @@ public class UsuarioService {
 
     /**
      * Busca un usuario por su correo electrónico.
+     * 
      * @param email Correo a buscar.
      * @return DTO del usuario encontrado.
      * @throws ResourceNotFoundException si no existe.
@@ -100,9 +112,11 @@ public class UsuarioService {
     }
 
     /**
-     * Actualiza los datos de un usuario existente, incluyendo validaciones de seguridad y gestión de archivos.
-     * @param id Identificador del usuario a modificar.
-     * @param dto Nuevos datos.
+     * Actualiza los datos de un usuario existente, incluyendo validaciones de
+     * seguridad y gestión de archivos.
+     * 
+     * @param id      Identificador del usuario a modificar.
+     * @param dto     Nuevos datos.
      * @param archivo Nueva imagen opcional.
      * @return UsuarioResponseDTO actualizado con un nuevo token JWT.
      */
@@ -157,7 +171,8 @@ public class UsuarioService {
     private void gestionarImagenPerfil(Usuario usuario, MultipartFile archivo) {
         if (archivo != null && !archivo.isEmpty()) {
             String nombreImagen = "user_" + usuario.getId() + ".jpg";
-            fileUtil.guardar(archivo, "Usuarios", nombreImagen);
+            // Añadimos 'true' porque las fotos de perfil son PÚBLICAS
+            fileUtil.guardar(archivo, "Usuarios", nombreImagen, true);
             usuario.setFotoPerfilRuta(nombreImagen);
         }
     }
@@ -166,7 +181,8 @@ public class UsuarioService {
         AuthResponseDTO response = new AuthResponseDTO();
         response.setToken(jwtService.generateToken(usuario));
         response.setNombre(usuario.getNombre());
-        if (usuario.getRol() != null) response.setRol(usuario.getRol().getNombre());
+        if (usuario.getRol() != null)
+            response.setRol(usuario.getRol().getNombre());
         return response;
     }
 
@@ -180,9 +196,14 @@ public class UsuarioService {
 
     @Transactional
     public void eliminar(Long id) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new ResourceNotFoundException("No existe el usuario con ID: " + id);
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No existe el usuario con ID: " + id));
+
+        // Si tiene foto, la borramos del disco (es público -> true)
+        if (usuario.getFotoPerfilRuta() != null) {
+            fileUtil.eliminar("Usuarios", usuario.getFotoPerfilRuta(), true);
         }
-        usuarioRepository.deleteById(id);
+
+        usuarioRepository.delete(usuario);
     }
 }

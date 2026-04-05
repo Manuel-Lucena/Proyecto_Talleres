@@ -7,5 +7,6 @@ public class ArchivoEntregaResponseDTO {
     private Long id;
     private String nombre;
     private String rutaArchivo;
+    private String extension; 
     private Long idEntrega;
 }

@@ -39,32 +39,33 @@ public class TareaService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public TareaResponseDTO obtenerPorId(Long id) {
+        return tareaRepository.findById(id)
+                .map(tareaMapper::toResponse)
+                .orElseThrow(() -> new RuntimeException("Tarea no encontrada con ID: " + id));
+    }
+
     @Transactional
     public TareaResponseDTO crear(TareaRequestDTO dto) {
-        // 1. Validar que el taller existe
         Taller taller = tallerRepository.findById(dto.getIdTaller())
                 .orElseThrow(() -> new RuntimeException("Taller no encontrado"));
 
-        // 2. Mapear DTO a Entidad y configurar valores por defecto
         Tarea tarea = tareaMapper.toEntity(dto);
         tarea.setTaller(taller);
         tarea.setFechaPublicacion(LocalDateTime.now());
         tarea.setEstado(EstadoTarea.ABIERTA);
+        // El mapper ya debería encargarse, pero nos aseguramos:
+        tarea.setExtensionesPermitidas(dto.getExtensionesPermitidas());
 
-        // 3. Guardar la tarea (necesitamos el ID generado para las asignaciones)
         Tarea tareaGuardada = tareaRepository.save(tarea);
 
-        // 4. Lógica de Asignación (Opción A)
         if (dto.getAlumnosIds() != null && !dto.getAlumnosIds().isEmpty()) {
-            // ASIGNACIÓN SELECCIONADA: Solo a los alumnos indicados en el JSON
             for (Long alumnoId : dto.getAlumnosIds()) {
                 asignarTareaAAlumno(tareaGuardada, alumnoId);
             }
         } else {
-            // ASIGNACIÓN GLOBAL: A todos los alumnos con inscripción activa en este taller
-            // El repo ya filtra por 'activa = true' gracias al @SQLRestriction de tu entidad
             List<Inscripcion> inscripcionesActivas = inscripcionRepository.findByTallerId(taller.getId());
-            
             for (Inscripcion inscripcion : inscripcionesActivas) {
                 asignarTareaAAlumno(tareaGuardada, inscripcion.getUsuario().getId());
             }
@@ -73,9 +74,25 @@ public class TareaService {
         return tareaMapper.toResponse(tareaGuardada);
     }
 
-    /**
-     * Método privado auxiliar para crear el vínculo en la tabla intermedia
-     */
+    @Transactional
+    public TareaResponseDTO actualizar(Long id, TareaRequestDTO dto) {
+        Tarea existente = tareaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tarea no encontrada"));
+
+        existente.setTitulo(dto.getTitulo());
+        existente.setDescripcion(dto.getDescripcion());
+        existente.setFechaEntrega(dto.getFechaEntrega());
+        existente.setExtensionesPermitidas(dto.getExtensionesPermitidas());
+
+        if (!existente.getTaller().getId().equals(dto.getIdTaller())) {
+            Taller nuevoTaller = tallerRepository.findById(dto.getIdTaller())
+                    .orElseThrow(() -> new RuntimeException("Taller no encontrado"));
+            existente.setTaller(nuevoTaller);
+        }
+
+        return tareaMapper.toResponse(tareaRepository.save(existente));
+    }
+
     private void asignarTareaAAlumno(Tarea tarea, Long alumnoId) {
         Usuario alumno = usuarioRepository.findById(alumnoId)
                 .orElseThrow(() -> new RuntimeException("Alumno no encontrado con ID: " + alumnoId));
@@ -93,8 +110,6 @@ public class TareaService {
         if (!tareaRepository.existsById(id)) {
             throw new RuntimeException("La tarea no existe");
         }
-        // Gracias al CascadeType.ALL en la entidad Tarea, 
-        // al borrar la tarea se borran sus registros en 'tareas_asignadas'
         tareaRepository.deleteById(id);
     }
 }

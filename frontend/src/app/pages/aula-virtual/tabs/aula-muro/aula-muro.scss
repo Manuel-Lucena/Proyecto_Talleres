@@ -1,0 +1,95 @@
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
+
+.contenedor-muro {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    background: white;
+    @include m.animacion-entrada;
+}
+
+.cuerpo-muro { width: 100%; border-top: 1px solid #eee; }
+
+.fila-actividad {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    padding: 1.8rem 5vw;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background-color: #f9f9f9;
+        box-shadow: inset 6px 0 0 v.$color-marca-principal;
+        .titulo { color: v.$color-marca-principal; }
+    }
+
+    .celda-principal {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+
+        .icono-tipo i {
+            font-size: 2rem;
+            color: v.$color-superficie-suave;
+        }
+
+        .info-texto {
+            .cabecera {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 4px;
+
+                .tipo-etiqueta {
+                    font-size: 0.65rem;
+                    font-weight: 800;
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                    background: #f0f0f0;
+                    color: #888;
+                }
+
+                .titulo {
+                    font-family: v.$fuente-enfasis;
+                    font-weight: 700;
+                    font-size: 1.1rem;
+                    color: v.$color-secundario-frio-2;
+                }
+            }
+
+            .resumen-lineal {
+                font-family: v.$fuente-lectura;
+                font-size: 0.9rem;
+                color: v.$color-superficie-suave;
+                display: block;
+                max-width: 55vw;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+    }
+
+    .celda-fecha {
+        padding: 0 3rem;
+        font-size: 0.85rem;
+        color: v.$color-superficie-suave;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .celda-accion { color: #ddd; i { font-size: 1.4rem; } }
+}
+
+// Un detalle: si es tarea, el icono puede ser de otro color sutil
+.fila-actividad.es-tarea .icono-tipo i {
+    color: v.$color-marca-principal;
+    opacity: 0.7;
+}

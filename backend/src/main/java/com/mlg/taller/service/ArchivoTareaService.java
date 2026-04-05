@@ -7,6 +7,8 @@ import com.mlg.taller.model.entities.Tarea;
 import com.mlg.taller.model.mappers.ArchivoTareaMapper;
 import com.mlg.taller.repositories.ArchivoTareaRepository;
 import com.mlg.taller.repositories.TareaRepository;
+import com.mlg.taller.util.FileUtil;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,8 +23,8 @@ public class ArchivoTareaService {
     private final ArchivoTareaRepository archivoTareaRepository;
     private final TareaRepository tareaRepository;
     private final ArchivoTareaMapper archivoTareaMapper;
+    private final FileUtil fileUtil;
 
-    // 1. GET - Listar todos (para administración)
     @Transactional(readOnly = true)
     public List<ArchivoTareaResponseDTO> listarTodos() {
         return archivoTareaRepository.findAll().stream()
@@ -30,15 +32,56 @@ public class ArchivoTareaService {
                 .collect(Collectors.toList());
     }
 
-    // 2. GET - Buscar por ID
-    @Transactional(readOnly = true)
-    public ArchivoTareaResponseDTO buscarPorId(Long id) {
-        return archivoTareaRepository.findById(id)
-                .map(archivoTareaMapper::toResponse)
-                .orElseThrow(() -> new RuntimeException("Archivo no encontrado con ID: " + id));
+    @Transactional
+    public ArchivoTareaResponseDTO guardar(ArchivoTareaRequestDTO dto,
+            org.springframework.web.multipart.MultipartFile file) {
+        Tarea tarea = tareaRepository.findById(dto.getIdTarea())
+                .orElseThrow(() -> new RuntimeException("Tarea no encontrada"));
+
+        String nombreOriginal = file.getOriginalFilename();
+        String extension = nombreOriginal.substring(nombreOriginal.lastIndexOf(".") + 1).toLowerCase();
+        String nombreFisico = System.currentTimeMillis() + "_" + nombreOriginal;
+
+        fileUtil.guardar(file, "tareas", nombreFisico, false);
+
+        ArchivoTarea archivo = archivoTareaMapper.toEntity(dto);
+        archivo.setTarea(tarea);
+        archivo.setNombre(nombreOriginal);
+        archivo.setRutaArchivo("tareas/" + nombreFisico);
+        archivo.setExtension(extension);
+
+        return archivoTareaMapper.toResponse(archivoTareaRepository.save(archivo));
     }
 
-    // 3. GET - Listar por Tarea (Lo que ya teníamos)
+    @Transactional
+    public ArchivoTareaResponseDTO actualizar(Long id, ArchivoTareaRequestDTO dto) {
+        ArchivoTarea existente = archivoTareaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Archivo no encontrado con ID: " + id));
+
+        existente.setNombre(dto.getNombre());
+        
+        if (!existente.getTarea().getId().equals(dto.getIdTarea())) {
+            Tarea nuevaTarea = tareaRepository.findById(dto.getIdTarea())
+                    .orElseThrow(() -> new RuntimeException("Tarea no encontrada"));
+            existente.setTarea(nuevaTarea);
+        }
+
+        return archivoTareaMapper.toResponse(archivoTareaRepository.save(existente));
+    }
+
+    @Transactional
+    public void eliminar(Long id) {
+        ArchivoTarea archivo = archivoTareaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Archivo no encontrado"));
+
+        String[] partes = archivo.getRutaArchivo().split("/");
+        if (partes.length == 2) {
+            fileUtil.eliminar(partes[0], partes[1], false);
+        }
+
+        archivoTareaRepository.delete(archivo);
+    }
+
     @Transactional(readOnly = true)
     public List<ArchivoTareaResponseDTO> listarPorTarea(Long idTarea) {
         return archivoTareaRepository.findByTareaId(idTarea).stream()
@@ -46,43 +89,10 @@ public class ArchivoTareaService {
                 .collect(Collectors.toList());
     }
 
-    // 4. POST - Crear / Guardar
-    @Transactional
-    public ArchivoTareaResponseDTO guardar(ArchivoTareaRequestDTO dto) {
-        Tarea tarea = tareaRepository.findById(dto.getIdTarea())
-                .orElseThrow(() -> new RuntimeException("Tarea no encontrada"));
-
-        ArchivoTarea archivo = archivoTareaMapper.toEntity(dto);
-        archivo.setTarea(tarea);
-
-        return archivoTareaMapper.toResponse(archivoTareaRepository.save(archivo));
-    }
-
-    // 5. PUT - Actualizar (Por si cambia el nombre o la ruta)
-    @Transactional
-    public ArchivoTareaResponseDTO actualizar(Long id, ArchivoTareaRequestDTO dto) {
-        ArchivoTarea existente = archivoTareaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("No se puede actualizar: Archivo no encontrado"));
-        
-        existente.setNombre(dto.getNombre());
-        existente.setRutaArchivo(dto.getRutaArchivo());
-        
-        // Si cambia de tarea, la buscamos
-        if (!existente.getTarea().getId().equals(dto.getIdTarea())) {
-            Tarea nuevaTarea = tareaRepository.findById(dto.getIdTarea())
-                    .orElseThrow(() -> new RuntimeException("Nueva tarea no encontrada"));
-            existente.setTarea(nuevaTarea);
-        }
-
-        return archivoTareaMapper.toResponse(archivoTareaRepository.save(existente));
-    }
-
-    // 6. DELETE - Eliminar
-    @Transactional
-    public void eliminar(Long id) {
-        if (!archivoTareaRepository.existsById(id)) {
-            throw new RuntimeException("No se puede eliminar: El archivo no existe");
-        }
-        archivoTareaRepository.deleteById(id);
+    @Transactional(readOnly = true)
+    public ArchivoTareaResponseDTO buscarPorId(Long id) {
+        return archivoTareaRepository.findById(id)
+                .map(archivoTareaMapper::toResponse)
+                .orElseThrow(() -> new RuntimeException("Archivo no encontrado"));
     }
 }

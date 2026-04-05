@@ -31,6 +31,12 @@ export class UsuarioService {
     return this.http.get<ApiResponse<UsuarioResponse[]>>(this.apiUrl);
   }
 
+  // En tu UsuarioService de Angular
+  // En tu UsuarioService de Angular
+  listarPorTaller(idTaller: number): Observable<ApiResponse<UsuarioResponse[]>> {
+    return this.http.get<ApiResponse<UsuarioResponse[]>>(`${this.apiUrl}/taller/${idTaller}`);
+  }
+
   // 4. OBTENER POR ID
   obtenerPorId(id: number): Observable<ApiResponse<UsuarioResponse>> {
     return this.http.get<ApiResponse<UsuarioResponse>>(`${this.apiUrl}/${id}`);
@@ -42,7 +48,7 @@ export class UsuarioService {
   }
 
   // 5. ACTUALIZAR 
-  
+
   actualizarUsuario(id: number, formData: FormData): Observable<ApiResponse<UsuarioResponse>> {
     return this.http.put<ApiResponse<UsuarioResponse>>(`${this.apiUrl}/${id}`, formData);
   }

@@ -1,0 +1,37 @@
+<div class="contenedor-recursos fade-in">
+  
+  <div class="cuerpo-recursos">
+    <div *ngIf="cargando" class="text-center p-5">
+      <div class="spinner-border text-success" role="status"></div>
+    </div>
+
+    <div class="fila-recurso" 
+         *ngFor="let m of materiales" 
+         (click)="verDetalle(m.id)">
+      
+      <div class="celda-principal">
+        <div class="icono-recurso">
+          <i class="bi bi-file-earmark-text"></i>
+        </div>
+        <div class="info-texto">
+          <span class="titulo">{{ m.titulo }}</span>
+          <span class="resumen-lineal">{{ m.contenido }}</span>
+        </div>
+      </div>
+
+      <div class="celda-fecha">
+        <i class="bi bi-calendar3"></i>
+        {{ m.fechaSubida | date:'dd MMM, yyyy' }}
+      </div>
+
+      <div class="celda-accion">
+        <i class="bi bi-chevron-right"></i>
+      </div>
+    </div>
+
+    <div class="sin-datos" *ngIf="!cargando && materiales.length === 0">
+      <i class="bi bi-folder2-open"></i>
+      <p>No hay archivos o materiales compartidos en este taller.</p>
+    </div>
+  </div>
+</div>

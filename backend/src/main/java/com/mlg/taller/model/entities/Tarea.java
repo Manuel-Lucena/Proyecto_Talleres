@@ -32,6 +32,9 @@ public class Tarea {
     @Column(name = "fecha_entrega")
     private LocalDateTime fechaEntrega;
 
+    @Column(name = "extensiones_permitidas", length = 100)
+    private String extensionesPermitidas;
+
     @Enumerated(EnumType.STRING)
     private EstadoTarea estado;
 

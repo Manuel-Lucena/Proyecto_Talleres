@@ -1,0 +1,171 @@
+<div class="pagina-detalle-wrapper">
+    <div class="contenedor-ancho fade-in">
+
+        <div class="nav-superior">
+            <button (click)='volver()' class="btn-link-volver">
+                <i class="bi bi-arrow-left-short"></i> Volver al curso
+            </button>
+
+            <button *ngIf="tipo === 'tarea' && !esNuevo && !editando && esProfesor()" (click)="irASeguimiento()"
+                class="btn-link-volver btn-seguimiento-tarea">
+                <i class="bi bi-people-fill"></i> Ver entregas y calificar
+            </button>
+
+            <button *ngIf="!esNuevo && !editando && esProfesor()" (click)="activarEdicion()"
+                class="btn-link-volver btn-editar-recurso">
+                <i class="bi bi-pencil"></i> Editar {{ tipo }}
+            </button>
+        </div>
+
+        <main class="card-tarea-principal" *ngIf="!cargando && recurso">
+
+            <header class="encabezado-tarea">
+                <div class="info-titulo">
+                    <span class="badge-categoria" [ngClass]="tipo">{{ tipo }}</span>
+                    <h1 class="titulo-extremo" *ngIf="!editando && !esNuevo">{{ recurso.titulo }}</h1>
+
+                    <div *ngIf="esNuevo || editando" [formGroup]="form" class="mt-2">
+                        <input type="text" formControlName="titulo" class="form-control-titulo-edit"
+                            [placeholder]="'Título de la ' + tipo + '...'">
+                    </div>
+                </div>
+
+                <div class="bloque-fechas-horizontal" *ngIf="!esNuevo && !editando">
+                    <div class="fecha-item">
+                        <span class="label">Publicado</span>
+                        <span class="valor">{{ (recurso.fechaPublicacion || recurso.createdAt) | date:'EEEE, d MMMM,
+                            HH:mm' }}</span>
+                    </div>
+                    <div class="fecha-item" *ngIf="tipo === 'tarea'">
+                        <span class="label">Fecha Límite</span>
+                        <span class="valor">{{ recurso.fechaEntrega | date:'EEEE, d MMMM, HH:mm' }}</span>
+                    </div>
+                </div>
+            </header>
+
+            <section class="seccion-enunciado">
+                <ng-container *ngIf="!editando">
+                    <div class="contenido-texto">
+                        {{ tipo === 'tarea' ? recurso.descripcion : recurso.contenido }}
+                    </div>
+                </ng-container>
+
+                <div *ngIf="editando" [formGroup]="form" class="form-edicion">
+                    <div class="mb-4">
+                        <label class="label-form">Descripción / Instrucciones</label>
+                        <textarea formControlName="descripcion" class="form-control-custom" rows="8"></textarea>
+                    </div>
+                    <div class="row" *ngIf="tipo === 'tarea'">
+                        <div class="col-md-6 mb-4">
+                            <label class="label-form">Fecha de entrega</label>
+                            <input type="datetime-local" formControlName="fechaEntrega" class="form-control-custom">
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label class="label-form">Extensiones permitidas</label>
+                            <input type="text" formControlName="extensionesPermitidas" class="form-control-custom">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="seccion-archivos-adjuntos"
+                    *ngIf="archivosAdjuntos.length > 0 || nuevosArchivos.length > 0 || editando">
+                    <h4 class="subtitulo-archivos">Archivos y Materiales</h4>
+                    <div class="lista-archivos">
+                        <div *ngFor="let arch of archivosAdjuntos" class="item-archivo"
+                            [ngClass]="{'modo-edit': editando}">
+                            <i class="bi bi-file-earmark-text" (click)="descargarAdjunto(arch)"></i>
+                            <div class="file-meta" (click)="descargarAdjunto(arch)">
+                                <span class="file-name">{{ arch.nombre }}</span>
+                                <span class="file-ext">Existente</span>
+                            </div>
+                            <button *ngIf="editando" class="btn-borrar-file" (click)="marcarParaEliminar(arch.id)">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </button>
+                        </div>
+                        <div *ngFor="let arch of nuevosArchivos; let i = index" class="item-archivo nuevo">
+                            <i class="bi bi-file-earmark-arrow-up"></i>
+                            <div class="file-meta">
+                                <span class="file-name">{{ arch.name }}</span>
+                                <span class="badge-nuevo">Por subir</span>
+                            </div>
+                            <button class="btn-borrar-file" (click)="quitarNuevoArchivo(i)">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div *ngIf="editando" class="zona-upload upload-pequeno mt-3">
+                        <i class="bi bi-plus-circle icono-subida"></i>
+                        <p class="m-0">Añadir más archivos...</p>
+                        <input type="file" multiple (change)="onFileChange($event)" class="input-hidden">
+                    </div>
+                </div>
+            </section>
+
+            <div class="footer-save" *ngIf="editando">
+                <button (click)="cancelar()" class="btn-cancelar">Cancelar</button>
+                <button (click)="guardarTodo()" class="btn-publicar" [disabled]="cargando">
+                    {{ esNuevo ? 'Publicar Ahora' : 'Guardar Cambios' }}
+                </button>
+            </div>
+
+            <section class="seccion-tabla-moodle" *ngIf="tipo === 'tarea' && !editando && !esProfesor()">
+                <h3 class="titulo-tabla">Estado de la entrega</h3>
+
+                <div class="wrapper-tabla">
+                    <table class="tabla-custom">
+                        <tbody>
+                            <tr>
+                                <td class="col-gris">Estado de la entrega</td>
+                                <td class="col-blanca" [ngClass]="{'status-alerta': !recurso.entregado}">
+                                    {{ recurso.entregado ? 'Enviado para calificar' : 'No se ha enviado nada para esta
+                                    tarea' }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-gris">Estado de la calificación</td>
+                                <td class="col-blanca">{{ recurso.calificacion || 'Sin calificar' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="col-gris">Tiempo restante</td>
+                                <td class="col-blanca tiempo-restante">{{ calcularTiempo(recurso.fechaEntrega) }}</td>
+                            </tr>
+                            <tr *ngIf="recurso.entregado">
+                                <td class="col-gris">Última aclaración</td>
+                                <td class="col-blanca contenido-texto-entrega">{{ entregaRealizada?.textoEntrega || 'Sin
+                                    aclaraciones' }}</td>
+                            </tr>
+                            <tr *ngIf="recurso.entregado && archivosEntregaExistentes.length > 0">
+                                <td class="col-gris">Archivos enviados</td>
+                                <td class="col-blanca">
+                                    <div class="lista-vertical-entregas">
+                                        <div *ngFor="let a of archivosEntregaExistentes" class="archivo-entregado-link"
+                                            (click)="descargarArchivoAlumno(a)">
+                                            <i class="bi bi-file-earmark-arrow-down"></i>
+                                            <span>{{ a.nombre }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="contenedor-acciones-entrega">
+                    <button (click)="abrirModalEntrega()" class="btn-entrega-alumno">
+                        <i class="bi" [ngClass]="recurso.entregado ? 'bi-pencil-square' : 'bi-plus-lg'"></i>
+                        {{ recurso.entregado ? 'Editar entrega' : 'Añadir entrega' }}
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <div *ngIf="cargando" class="loader-full">
+            <div class="spinner-border color-carga"></div>
+        </div>
+    </div>
+</div>
+
+<app-form-entrega *ngIf="mostrarModalEntrega" [recurso]="recurso" [entregaExistente]="entregaRealizada"
+    [archivosExistentes]="archivosEntregaExistentes" (cerrar)="mostrarModalEntrega = false"
+    (guardado)="onEntregaGuardada()">
+</app-form-entrega>

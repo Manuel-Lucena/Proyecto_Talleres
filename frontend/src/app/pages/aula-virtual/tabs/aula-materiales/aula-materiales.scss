@@ -1,0 +1,103 @@
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
+
+.contenedor-recursos {
+    // Forzamos a que ignore los márgenes del padre si fuera necesario
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+
+    background: white;
+    @include m.animacion-entrada;
+}
+
+.cuerpo-recursos {
+    width: 100%;
+    border-top: 1px solid #eee;
+    // ELIMINADO EL MAX-WIDTH QUE TE SOBRABA
+}
+
+.fila-recurso {
+    display: grid;
+    // La primera columna (1fr) se comerá todo el espacio blanco que ves ahora
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    padding: 1.8rem 5vw; // Usamos vw (viewport width) para que el margen crezca con la pantalla
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background-color: #f9f9f9;
+        box-shadow: inset 6px 0 0 v.$color-marca-principal;
+
+        .titulo {
+            color: v.$color-marca-principal;
+        }
+
+        .celda-accion {
+            transform: translateX(8px);
+            color: v.$color-marca-principal;
+        }
+    }
+
+    .celda-principal {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        min-width: 0; // Importante para que el truncado de texto funcione
+
+        .icono-recurso i {
+            font-size: 2rem; // Un poco más grande para llenar pantalla
+            color: v.$color-superficie-suave;
+        }
+
+        .info-texto {
+            flex: 1;
+
+            .titulo {
+                display: block;
+                font-family: v.$fuente-enfasis;
+                font-weight: 700;
+                font-size: 1.2rem;
+                color: v.$color-secundario-frio-2;
+                margin-bottom: 4px;
+            }
+
+            .resumen-lineal {
+                font-family: v.$fuente-lectura;
+                font-size: 0.95rem;
+                color: v.$color-superficie-suave;
+                // Hacemos que la descripción sea LARGA
+                display: block;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 60vw;
+            }
+        }
+    }
+
+    .celda-fecha {
+        padding: 0 3rem;
+        font-family: v.$fuente-lectura;
+        font-size: 0.9rem;
+        color: v.$color-superficie-suave;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        white-space: nowrap;
+    }
+
+    .celda-accion {
+        color: #ddd;
+        transition: all 0.3s;
+
+        i {
+            font-size: 1.4rem;
+        }
+    }
+}

@@ -28,10 +28,20 @@ public class TareaController {
         return ApiResponse.success(tareaService.listarPorTaller(idTaller), "Tareas del taller obtenidas");
     }
 
+    @GetMapping("/{id}")
+    public ApiResponse<TareaResponseDTO> obtenerPorId(@PathVariable Long id) {
+        return ApiResponse.success(tareaService.obtenerPorId(id), "Tarea obtenida con éxito");
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<TareaResponseDTO> crear(@Valid @RequestBody TareaRequestDTO dto) {
         return ApiResponse.success(tareaService.crear(dto), "Tarea creada con éxito");
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<TareaResponseDTO> actualizar(@PathVariable Long id, @Valid @RequestBody TareaRequestDTO dto) {
+        return ApiResponse.success(tareaService.actualizar(id, dto), "Tarea actualizada correctamente");
     }
 
     @DeleteMapping("/{id}")

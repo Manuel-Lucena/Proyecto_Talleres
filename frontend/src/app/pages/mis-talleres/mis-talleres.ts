@@ -66,7 +66,7 @@ export class MisTalleres implements OnInit {
   }
 
   entrarAlAula(idTaller: number): void {
-    this.router.navigate(['/mi-taller', idTaller]); 
+    this.router.navigate(['/aula-virtual', idTaller]); 
   }
 
 

@@ -14,5 +14,6 @@ public interface ArchivoEntregaMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "entrega", ignore = true)
-    ArchivoEntrega toEntity(ArchivoEntregaRequestDTO dto);
+    @Mapping(target = "extension", ignore = true) // Añadido
+    ArchivoEntrega toEntity(ArchivoEntregaRequestDTO dto); 
 }

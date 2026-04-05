@@ -1,0 +1,133 @@
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
+
+.participantes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    padding-top: 1rem;
+    
+    // Aplicamos tu mixin de animación para que la lista entre suavemente
+    @include m.animacion-entrada;
+}
+
+.rol-section {
+    .rol-title {
+        // Usamos tu fuente de énfasis de las variables
+        font-family: v.$fuente-enfasis;
+        color: v.$color-secundario-frio-2;
+        font-size: v.$tamaño-titular-md;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid v.$color-fondo-pagina;
+        padding-bottom: 0.5rem;
+    }
+
+    .header-alumnos {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.2rem;
+        
+        .count { 
+            font-size: 0.9rem; 
+            color: v.$color-superficie-suave; 
+            font-weight: 700;
+            font-family: v.$fuente-lectura;
+        }
+    }
+}
+
+// === TARJETA DE USUARIO REFINADA CON MIXINS ===
+.user-card {
+    // Aplicamos tu mixin de card elevada para sombras y hover
+    @include m.card-elevada;
+    
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1rem 1.5rem;
+    margin-bottom: 0.8rem;
+    border: 1px solid #f0f0f0; // Coincide con tu mixin base
+
+    &.teacher {
+        // Resaltado para profesor usando tu marca principal
+        border-left: 5px solid v.$color-marca-principal;
+        background: linear-gradient(to right, rgba(v.$color-marca-principal, 0.03), white);
+    }
+
+    .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%; // Mantenemos circular para perfiles
+        overflow: hidden;
+        background: v.$color-fondo-pagina;
+        flex-shrink: 0;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        &.small {
+            width: 42px;
+            height: 42px;
+        }
+    }
+
+    .info {
+        flex: 1;
+        
+        .name {
+            display: block;
+            font-family: v.$fuente-enfasis;
+            font-weight: 700;
+            color: v.$color-superficie-oscura;
+            font-size: 1rem;
+            // Usamos tu mixin para evitar que nombres larguísimos rompan la card
+            @include m.limitar-lineas(1);
+        }
+
+        .email {
+            font-family: v.$fuente-lectura;
+            font-size: 0.8rem;
+            color: v.$color-superficie-suave;
+            
+            i { 
+                color: v.$color-secundario-frio-1; 
+                margin-right: 4px;
+            }
+        }
+    }
+
+    .badge-rol {
+        font-family: v.$fuente-enfasis;
+        font-size: 0.65rem;
+        font-weight: 800;
+        padding: 4px 12px;
+        border-radius: 20px;
+        background: v.$color-fondo-pagina;
+        color: v.$color-superficie-suave;
+        text-transform: uppercase;
+
+        &.teacher-badge {
+            background: rgba(v.$color-marca-principal, 0.1);
+            color: v.$color-marca-principal;
+        }
+    }
+}
+
+// Estado de carga y vacío adaptado
+.loading-state, .empty-state-card {
+    font-family: v.$fuente-lectura;
+    color: v.$color-superficie-suave;
+    text-align: center;
+    padding: 3rem;
+    
+    i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+}

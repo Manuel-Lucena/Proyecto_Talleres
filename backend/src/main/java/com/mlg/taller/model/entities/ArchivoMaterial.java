@@ -2,25 +2,16 @@ package com.mlg.taller.model.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "ARCHIVO_MATERIAL")
 @Data
-@Builder
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class ArchivoMaterial {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_archivo")
-    private Long id;
-
-    @Column(nullable = false, length = 150)
-    private String nombre;
-
-    @Column(name = "ruta_archivo", nullable = false)
-    private String rutaArchivo;
+@SuperBuilder
+public class ArchivoMaterial extends Archivo {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_material", nullable = false)

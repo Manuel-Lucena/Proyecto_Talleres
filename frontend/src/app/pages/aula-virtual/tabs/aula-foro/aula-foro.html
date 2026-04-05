@@ -1,0 +1,55 @@
+<div class="foro-container">
+
+    <header class="foro-header">
+        <h2>Foro de Discusión</h2>
+        <p>Participa, pregunta dudas o comparte recursos con tus compañeros.</p>
+    </header>
+
+    <div class="publicar-seccion">
+        <div class="input-wrapper">
+            <textarea [(ngModel)]="nuevoMensaje" placeholder="Escribe un nuevo tema o mensaje..." rows="3">
+      </textarea>
+            <div class="footer-publicar">
+                <small>{{ nuevoMensaje.length }} caracteres</small>
+                <button (click)="enviarMensaje()" [disabled]="!nuevoMensaje.trim()">
+                    <i class="bi bi-chat-left-text"></i> Publicar en el foro
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mensajes-feed">
+        <div *ngIf="cargando" class="text-center p-5">
+            <div class="spinner-border text-success" role="status"></div>
+        </div>
+
+        <div class="mensaje-item" *ngFor="let m of mensajes">
+            <div class="mensaje-card">
+                <div class="autor-info">
+                    <div class="avatar-wrapper">
+                        <img [src]="m.idUsuario   ? '/Usuarios/user_' + m.idUsuario + '.jpg'  : '/Usuarios/Predeterminada.png'"
+                            alt="Foto de perfil">
+                    </div>
+                    <div class="meta">
+                        <span class="nombre">{{ m.nombreAutor }}</span>
+                        <span class="fecha">{{ m.fechaEnvio | date:'medium' }}</span>
+                    </div>
+                </div>
+
+                <div class="contenido">
+                    <p>{{ m.contenido }}</p>
+                </div>
+
+                <div class="interacciones">
+                    <button class="btn-interact"><i class="bi bi-reply"></i> Responder</button>
+                    <button class="btn-interact"><i class="bi bi-hand-thumbs-up"></i> Me gusta</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="empty-foro" *ngIf="!cargando && mensajes.length === 0">
+            <i class="bi bi-chat-dots"></i>
+            <p>Aún no hay hilos de conversación. ¡Inicia el primero!</p>
+        </div>
+    </div>
+</div>

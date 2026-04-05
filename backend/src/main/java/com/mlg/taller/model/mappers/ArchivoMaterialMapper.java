@@ -14,5 +14,6 @@ public interface ArchivoMaterialMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "material", ignore = true)
+    @Mapping(target = "extension", ignore = true) // Añadido
     ArchivoMaterial toEntity(ArchivoMaterialRequestDTO dto);
 }

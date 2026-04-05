@@ -28,6 +28,7 @@ public class UsuarioController {
 
     /**
      * Obtiene el listado completo de usuarios registrados.
+     * 
      * @return ApiResponse con la lista de UsuarioResponseDTO.
      */
     @GetMapping
@@ -37,7 +38,20 @@ public class UsuarioController {
     }
 
     /**
+     * Obtiene los usuarios matriculados en un taller específico.
+     * 
+     * @param idTaller ID del taller.
+     * @return ApiResponse con la lista de participantes.
+     */
+    @GetMapping("/taller/{idTaller}")
+    public ApiResponse<List<UsuarioResponseDTO>> listarPorTaller(@PathVariable Long idTaller) {
+        List<UsuarioResponseDTO> participantes = usuarioService.listarPorTaller(idTaller);
+        return ApiResponse.success(participantes, "Participantes del taller obtenidos correctamente");
+    }
+
+    /**
      * Busca un usuario específico mediante su dirección de correo electrónico.
+     * 
      * @param email Correo electrónico del usuario.
      * @return ApiResponse con los datos del usuario encontrado.
      */
@@ -48,6 +62,7 @@ public class UsuarioController {
 
     /**
      * Recupera la información detallada de un usuario por su identificador único.
+     * 
      * @param id ID primario del usuario.
      * @return ApiResponse con el DTO del usuario.
      */
@@ -58,9 +73,11 @@ public class UsuarioController {
 
     /**
      * Registra un nuevo usuario en el sistema gestionando datos y foto de perfil.
-     * @param dto Objeto con los datos de registro (Validado).
+     * 
+     * @param dto     Objeto con los datos de registro (Validado).
      * @param archivo Imagen de perfil opcional enviada como parte del formulario.
-     * @return ApiResponse con el token JWT y datos básicos tras el registro exitoso.
+     * @return ApiResponse con el token JWT y datos básicos tras el registro
+     *         exitoso.
      */
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<AuthResponseDTO> registrar(
@@ -72,6 +89,7 @@ public class UsuarioController {
 
     /**
      * Autentica a un usuario mediante sus credenciales.
+     * 
      * @param dto Objeto que contiene email y password.
      * @return ApiResponse con el token JWT generado para la sesión.
      */
@@ -84,8 +102,9 @@ public class UsuarioController {
     /**
      * Actualiza la información de un usuario existente.
      * Permite la actualización parcial de datos y el cambio de imagen de perfil.
-     * @param id ID del usuario a modificar.
-     * @param dto Datos actualizados del usuario.
+     * 
+     * @param id      ID del usuario a modificar.
+     * @param dto     Datos actualizados del usuario.
      * @param archivo Nueva imagen de perfil (opcional).
      * @return ApiResponse con los datos del usuario tras la actualización.
      */
@@ -99,6 +118,7 @@ public class UsuarioController {
 
     /**
      * Realiza el borrado lógico de un usuario en el sistema.
+     * 
      * @param id ID del usuario a desactivar.
      * @return ApiResponse indicando el éxito de la operación.
      */

@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { UsuarioService } from '../../services/Usuario.Service';
 import { TokenService } from '../../services/Token.Service';
 import { NotificacionService } from '../../services/Notificacion.Service';
-import { Validator } from '../../validators/Validator'; 
+import { Validator } from '../../validators/Validator';
 
 
 import { Navbar } from "../../components/layout/navbar/navbar";
@@ -104,14 +104,22 @@ export class Perfil implements OnInit {
     const fd = new FormData();
     const valores = this.perfilForm.getRawValue();
 
+    const ROLES_MAP: { [key: string]: number } = {
+      'ADMIN': 1,
+      'PROFESOR': 2,
+      'ALUMNO': 3
+    };
+
+    const idRol = ROLES_MAP[this.usuario?.nombreRol || 'ALUMNO'] || 3;
+
     const usuarioDTO = {
-      dni: this.usuario?.dni,
+      dni: this.usuario?.dni, 
       nombre: valores.nombre,
       apellidos: valores.apellidos,
       email: valores.email,
       telefono: valores.telefono,
       direccion: valores.direccion,
-      idRol: (this.usuario as any).idRol || 1
+      idRol: idRol
     };
 
     fd.append('usuario', new Blob([JSON.stringify(usuarioDTO)], { type: 'application/json' }));

@@ -41,10 +41,25 @@ public class EntregaService {
     }
 
     @Transactional
+    public EntregaResponseDTO actualizar(Long id, EntregaRequestDTO dto) {
+        Entrega entrega = entregaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Entrega no encontrada"));
+
+        // Solo actualizamos el texto de la entrega
+        entrega.setTextoEntrega(dto.getTextoEntrega());
+        // Opcional: actualizar la fecha a la fecha de modificación
+        // entrega.setFechaEntrega(LocalDateTime.now());
+
+        return entregaMapper.toResponse(entregaRepository.save(entrega));
+    }
+
+    @Transactional
     public EntregaResponseDTO enviar(EntregaRequestDTO dto) {
         // Verificar si ya existe una entrega del alumno para esta tarea
         entregaRepository.findByTareaIdAndAlumnoId(dto.getIdTarea(), dto.getIdUsuario())
-                .ifPresent(e -> { throw new RuntimeException("Ya has realizado una entrega para esta tarea"); });
+                .ifPresent(e -> {
+                    throw new RuntimeException("Ya has realizado una entrega para esta tarea");
+                });
 
         Tarea tarea = tareaRepository.findById(dto.getIdTarea())
                 .orElseThrow(() -> new RuntimeException("Tarea no encontrada"));
@@ -63,7 +78,7 @@ public class EntregaService {
     public EntregaResponseDTO calificar(Long id, EntregaRequestDTO dto) {
         Entrega entrega = entregaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Entrega no encontrada"));
-        
+
         entrega.setCalificacion(dto.getCalificacion());
         entrega.setComentarioProfesor(dto.getComentarioProfesor());
 

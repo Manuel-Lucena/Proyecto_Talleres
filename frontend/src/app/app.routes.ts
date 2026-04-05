@@ -6,6 +6,12 @@ import { Perfil } from './pages/perfil/perfil';
 import { TalleresExplorar } from './pages/talleres-explorar/talleres-explorar';
 import { MisTalleres } from './pages/mis-talleres/mis-talleres';
 import { Calendario } from './pages/calendario/calendario';
+import { AulaVirtual } from './pages/aula-virtual/aula-virtual';
+import { AulaMuro } from './pages/aula-virtual/tabs/aula-muro/aula-muro';
+import { AulaForo } from './pages/aula-virtual/tabs/aula-foro/aula-foro';
+import { AulaTareas } from './pages/aula-virtual/tabs/aula-tareas/aula-tareas';
+import { AulaMateriales } from './pages/aula-virtual/tabs/aula-materiales/aula-materiales';
+import { AulaParticipantes } from './pages/aula-virtual/tabs/aula-participantes/aula-participantes';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/landing', pathMatch: 'full' },
@@ -33,5 +39,29 @@ export const routes: Routes = [
     },
     { path: 'talleres-explorar', component: TalleresExplorar },
     { path: 'mis-talleres', component: MisTalleres },
-    { path: 'calendario', component: Calendario }
+    { path: 'calendario', component: Calendario },
+    {
+        path: 'aula-virtual/:id',
+        component: AulaVirtual,
+        children: [
+            { path: '', redirectTo: 'muro', pathMatch: 'full' },
+            { path: 'muro', component: AulaMuro },
+            { path: 'foro', component: AulaForo },
+            { path: 'tareas', component: AulaTareas },
+            { path: 'recursos', component: AulaMateriales },
+            { path: 'participantes', component: AulaParticipantes },
+            {
+                path: 'tareas/:idRecurso/seguimiento',
+                loadComponent: () => import('./pages/aula-virtual/tabs/aula-tarea-seguimiento/aula-tarea-seguimiento').then(m => m.AulaTareaSeguimiento)
+            },
+            {
+                path: 'detalle/:tipo/nuevo',
+                loadComponent: () => import('./pages/aula-virtual/tabs/aula-detalle/aula-detalle').then(m => m.AulaDetalle)
+            },
+            {
+                path: 'detalle/:tipo/:idRecurso',
+                loadComponent: () => import('./pages/aula-virtual/tabs/aula-detalle/aula-detalle').then(m => m.AulaDetalle)
+            }
+        ]
+    }
 ];

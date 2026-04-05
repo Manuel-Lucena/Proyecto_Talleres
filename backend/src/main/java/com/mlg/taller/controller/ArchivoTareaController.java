@@ -18,38 +18,35 @@ public class ArchivoTareaController {
 
     private final ArchivoTareaService archivoTareaService;
 
-    // 1. GET - Listar todos (Admin)
     @GetMapping
     public ApiResponse<List<ArchivoTareaResponseDTO>> listarTodos() {
         return ApiResponse.success(archivoTareaService.listarTodos(), "Listado completo de archivos obtenido");
     }
 
-    // 2. GET - Buscar por ID
     @GetMapping("/{id}")
     public ApiResponse<ArchivoTareaResponseDTO> buscarPorId(@PathVariable Long id) {
         return ApiResponse.success(archivoTareaService.buscarPorId(id), "Archivo encontrado");
     }
 
-    // 3. GET - Listar por Tarea específica
     @GetMapping("/tarea/{idTarea}")
     public ApiResponse<List<ArchivoTareaResponseDTO>> listarPorTarea(@PathVariable Long idTarea) {
         return ApiResponse.success(archivoTareaService.listarPorTarea(idTarea), "Archivos de la tarea obtenidos");
     }
 
-    // 4. POST - Guardar nuevo archivo
-    @PostMapping
+    @PostMapping(consumes = { "multipart/form-data" })
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<ArchivoTareaResponseDTO> guardar(@Valid @RequestBody ArchivoTareaRequestDTO dto) {
-        return ApiResponse.success(archivoTareaService.guardar(dto), "Archivo registrado correctamente");
+    public ApiResponse<ArchivoTareaResponseDTO> guardar(
+            @RequestPart("datos") @Valid ArchivoTareaRequestDTO dto,
+            @RequestPart("archivo") org.springframework.web.multipart.MultipartFile file) {
+        return ApiResponse.success(archivoTareaService.guardar(dto, file), "Archivo registrado correctamente");
     }
 
-    // 5. PUT - Actualizar archivo existente
     @PutMapping("/{id}")
-    public ApiResponse<ArchivoTareaResponseDTO> actualizar(@PathVariable Long id, @Valid @RequestBody ArchivoTareaRequestDTO dto) {
+    public ApiResponse<ArchivoTareaResponseDTO> actualizar(@PathVariable Long id,
+            @Valid @RequestBody ArchivoTareaRequestDTO dto) {
         return ApiResponse.success(archivoTareaService.actualizar(id, dto), "Archivo actualizado correctamente");
     }
 
-    // 6. DELETE - Eliminar archivo
     @DeleteMapping("/{id}")
     public ApiResponse<Void> eliminar(@PathVariable Long id) {
         archivoTareaService.eliminar(id);

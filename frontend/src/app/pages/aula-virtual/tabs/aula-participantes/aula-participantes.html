@@ -1,0 +1,51 @@
+<div class="participantes-container fade-in">
+
+  <section class="rol-section" *ngIf="profesores.length > 0">
+    <h3 class="rol-title">Equipo Docente</h3>
+    <div class="user-list">
+      <div class="user-card teacher" *ngFor="let prof of profesores">
+        <div class="avatar">
+          <img [src]="prof.fotoPerfilRuta || 'assets/images/default-avatar.png'" [alt]="prof.nombre">
+        </div>
+        <div class="info">
+          <span class="name">{{ prof.nombre }} {{ prof.apellidos }}</span>
+          <span class="email"><i class="bi bi-envelope"></i> {{ prof.email }}</span>
+        </div>
+        <span class="badge-rol teacher-badge">{{ prof.nombreRol }}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="rol-section">
+    <div class="header-alumnos">
+      <h3 class="rol-title">Compañeros de Clase</h3>
+      <span class="count" *ngIf="!cargando">{{ alumnos.length }} alumnos</span>
+    </div>
+
+    <div *ngIf="cargando" class="loading-state">
+      <p>Buscando participantes...</p>
+    </div>
+
+    <div class="user-list" *ngIf="!cargando">
+      <div class="user-card" *ngFor="let alumno of alumnos">
+        <div class="avatar small">
+        <img [src]="alumno.fotoPerfilRuta 
+            ? '/Usuarios/' + alumno.fotoPerfilRuta 
+            : '/Usuarios/Predeterminada.png'" alt="Foto de perfil">
+        </div>
+        <div class="info">
+          <span class="name">{{ alumno.nombre }} {{ alumno.apellidos }}</span>
+          <span class="email" *ngIf="alumno.email">{{ alumno.email }}</span>
+        </div>
+        <span class="badge-rol">ALUMNO</span>
+      </div>
+    </div>
+
+    <div class="empty-state-card" *ngIf="!cargando && alumnos.length === 0">
+      <i class="bi bi-people"></i>
+      <h3>No hay alumnos matriculados</h3>
+      <p>Parece que este taller aún está esperando a sus primeros alumnos.</p>
+    </div>
+  </section>
+
+</div>

@@ -1,0 +1,40 @@
+<div class="contenedor-tareas fade-in">
+  <div class="cuerpo-tareas">
+    
+    <div *ngIf="cargando" class="text-center p-5">
+      <div class="spinner-border text-success" role="status"></div>
+    </div>
+
+    <ng-container *ngIf="!cargando">
+      <div class="fila-tarea" 
+           *ngFor="let t of tareas" 
+           (click)="verDetalle(t.idTarea)">
+        
+        <div class="celda-principal">
+          <div class="icono-tarea">
+            <i class="bi bi-clipboard-check"></i>
+          </div>
+          <div class="info-texto">
+            <span class="titulo">{{ t.titulo }}</span>
+            <span class="resumen-lineal">{{ t.descripcion }}</span>
+          </div>
+        </div>
+
+        <div class="celda-fecha">
+          <i class="bi bi-calendar3"></i>
+          {{ t.fechaEntrega | date:'dd MMM, yyyy' }}
+        </div>
+
+        <div class="celda-accion">
+          <i class="bi bi-chevron-right"></i>
+        </div>
+      </div>
+
+      <div class="sin-datos" *ngIf="tareas.length === 0">
+        <i class="bi bi-clipboard-x"></i>
+        <p>No hay tareas pendientes en este taller.</p>
+      </div>
+    </ng-container>
+
+  </div>
+</div>

@@ -12,5 +12,7 @@ import lombok.NoArgsConstructor;
 public class ArchivoTareaResponseDTO {
     private Long id;
     private String nombre;
-    private String rutaArchivo; 
+    private String rutaArchivo;
+    private String extension; 
+    private Long idTarea;   
 }

@@ -16,9 +16,11 @@ public class ArchivoMaterialController {
 
     private final ArchivoMaterialService archivoMaterialService;
 
-    @PostMapping
-    public ApiResponse<ArchivoMaterialResponseDTO> guardar(@RequestBody ArchivoMaterialRequestDTO dto) {
-        return ApiResponse.success(archivoMaterialService.guardar(dto), "Archivo de material guardado");
+    @PostMapping(consumes = { "multipart/form-data" })
+    public ApiResponse<ArchivoMaterialResponseDTO> guardar(
+            @RequestPart("datos") ArchivoMaterialRequestDTO dto,
+            @RequestPart("archivo") org.springframework.web.multipart.MultipartFile file) {
+        return ApiResponse.success(archivoMaterialService.guardar(dto, file), "Archivo de material guardado");
     }
 
     @GetMapping("/material/{idMaterial}")
@@ -27,7 +29,9 @@ public class ArchivoMaterialController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<ArchivoMaterialResponseDTO> actualizar(@PathVariable Long id, @RequestBody ArchivoMaterialRequestDTO dto) {
+    public ApiResponse<ArchivoMaterialResponseDTO> actualizar(@PathVariable Long id,
+            @RequestBody ArchivoMaterialRequestDTO dto) {
+        // Ahora que el método existe en el Service, el error desaparece
         return ApiResponse.success(archivoMaterialService.actualizar(id, dto), "Archivo actualizado correctamente");
     }
 

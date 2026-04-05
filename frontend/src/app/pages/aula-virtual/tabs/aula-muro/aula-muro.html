@@ -1,0 +1,51 @@
+<div class="contenedor-muro fade-in">
+  <div class="cuerpo-muro">
+    
+    <div *ngIf="cargando" class="text-center p-5">
+      <div class="spinner-border text-success" role="status"></div>
+    </div>
+
+    <ng-container *ngIf="!cargando">
+      <div class="fila-actividad" 
+           *ngFor="let item of actividades" 
+           [ngClass]="{'es-tarea': item.tipo === 'TAREA'}"
+           (click)="verDetalle(item)">
+        
+        <div class="celda-principal">
+          <div class="icono-tipo">
+            <i *ngIf="item.tipo === 'MATERIAL'" class="bi bi-file-earmark-text"></i>
+            <i *ngIf="item.tipo === 'TAREA'" class="bi bi-clipboard-check"></i>
+          </div>
+
+          <div class="info-texto">
+            <div class="cabecera">
+              <span class="tipo-etiqueta" [ngClass]="item.tipo.toLowerCase()">
+                {{ item.tipo }}
+              </span>
+              <span class="titulo">{{ item.titulo }}</span>
+            </div>
+            
+            <span class="resumen-lineal">
+              {{ item.tipo === 'TAREA' ? item.descripcion : item.contenido }}
+            </span>
+          </div>
+        </div>
+
+        <div class="celda-fecha">
+          <i class="bi bi-clock-history"></i>
+          <span>{{ item.fechaMuro | date:'dd MMM, yyyy' }}</span>
+        </div>
+
+        <div class="celda-accion">
+          <i class="bi bi-chevron-right"></i>
+        </div>
+      </div>
+
+      <div class="sin-datos" *ngIf="actividades.length === 0">
+        <i class="bi bi-chat-dots"></i>
+        <p>Aún no hay actividad en este taller.</p>
+      </div>
+    </ng-container>
+
+  </div>
+</div>

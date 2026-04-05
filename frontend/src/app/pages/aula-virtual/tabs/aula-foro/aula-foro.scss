@@ -1,0 +1,169 @@
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
+
+.foro-container {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 1rem;
+    @include m.animacion-entrada;
+}
+
+.foro-header {
+    margin-bottom: 2rem;
+
+    h2 {
+        @include m.titulo-seccion(v.$color-secundario-frio-2);
+        margin-bottom: 0.5rem;
+    }
+
+    p {
+        color: v.$color-superficie-suave;
+        font-family: v.$fuente-lectura;
+    }
+}
+
+.publicar-seccion {
+    @include m.card-elevada;
+    padding: 1.5rem;
+    background: white;
+    margin-bottom: 2.5rem;
+    border: 1px solid rgba(v.$color-marca-principal, 0.2);
+
+    textarea {
+        @include m.estilo-input-base;
+        margin-bottom: 1rem;
+        font-family: v.$fuente-lectura;
+    }
+
+    .avatar-wrapper {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        overflow: hidden; // Corta la imagen en círculo
+        border: 2px solid v.$color-marca-principal;
+        flex-shrink: 0; // Evita que se aplaste
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; // Ajusta la foto sin deformarla
+        }
+    }
+
+    .footer-publicar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        button {
+            @include m.boton-primario;
+        }
+
+        small {
+            color: v.$color-superficie-suave;
+        }
+    }
+}
+
+
+.avatar-wrapper {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    overflow: hidden; // Corta la imagen en círculo
+    border: 2px solid v.$color-marca-principal;
+    flex-shrink: 0; // Evita que se aplaste
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; // Ajusta la foto sin deformarla
+    }
+}
+
+.mensaje-card {
+    @include m.card-elevada;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    background: white;
+
+    .autor-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            background: v.$color-marca-principal;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-family: v.$fuente-enfasis;
+        }
+
+        .meta {
+            display: flex;
+            flex-direction: column;
+
+            .nombre {
+                font-family: v.$fuente-enfasis;
+                font-weight: 700;
+                color: v.$color-secundario-frio-2;
+            }
+
+            .fecha {
+                font-size: 0.75rem;
+                color: v.$color-superficie-suave;
+            }
+        }
+    }
+
+    .contenido {
+        font-family: v.$fuente-lectura;
+        line-height: 1.6;
+        color: v.$color-superficie-oscura;
+        margin-bottom: 1rem;
+    }
+
+    .interacciones {
+        border-top: 1px solid v.$color-fondo-pagina;
+        padding-top: 0.8rem;
+        display: flex;
+        gap: 1.5rem;
+
+        .btn-interact {
+            background: none;
+            border: none;
+            color: v.$color-superficie-suave;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: color 0.2s;
+
+            &:hover {
+                color: v.$color-marca-principal;
+            }
+
+            i {
+                margin-right: 5px;
+            }
+        }
+    }
+}
+
+.empty-foro {
+    text-align: center;
+    padding: 4rem;
+    color: v.$color-superficie-suave;
+
+    i {
+        font-size: 4rem;
+        display: block;
+        margin-bottom: 1rem;
+        opacity: 0.2;
+    }
+}
