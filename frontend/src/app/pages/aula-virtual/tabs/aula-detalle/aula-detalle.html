@@ -33,12 +33,16 @@
                 <div class="bloque-fechas-horizontal" *ngIf="!esNuevo && !editando">
                     <div class="fecha-item">
                         <span class="label">Publicado</span>
-                        <span class="valor">{{ (recurso.fechaPublicacion || recurso.createdAt) | date:'EEEE, d MMMM,
-                            HH:mm' }}</span>
+                        <span class="valor">
+                            {{ (recurso.fechaPublicacion || recurso.createdAt) | date:"d 'de' MMMM 'de' y, HH:mm" }}
+                        </span>
                     </div>
+
                     <div class="fecha-item" *ngIf="tipo === 'tarea'">
                         <span class="label">Fecha Límite</span>
-                        <span class="valor">{{ recurso.fechaEntrega | date:'EEEE, d MMMM, HH:mm' }}</span>
+                        <span class="valor">
+                            {{ recurso.fechaEntrega | date:"d 'de' MMMM 'de' y, HH:mm" }}
+                        </span>
                     </div>
                 </div>
             </header>
@@ -62,7 +66,23 @@
                         </div>
                         <div class="col-md-6 mb-4">
                             <label class="label-form">Extensiones permitidas</label>
-                            <input type="text" formControlName="extensionesPermitidas" class="form-control-custom">
+                            <div class="dropdown-extensiones-custom">
+                                <div class="dropdown-trigger-custom"
+                                    (click)="toggleDropdownExt(); $event.stopPropagation()">
+                                    <span class="text-truncate">
+                                        {{ form.get('extensionesPermitidas')?.value || 'Seleccionar formatos...' }}
+                                    </span>
+                                    <i class="bi bi-chevron-down"></i>
+                                </div>
+                                <div class="dropdown-menu-custom" [class.show]="mostrarDropdownExt"
+                                    (click)="$event.stopPropagation()">
+                                    <label *ngFor="let ext of extensionesDisponibles" class="dropdown-item-check">
+                                        <input type="checkbox" [value]="ext.value" [checked]="estaMarcada(ext.value)"
+                                            (change)="onExtensionChange($event)">
+                                        <span>{{ ext.label }}</span>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -101,7 +121,7 @@
                 </div>
             </section>
 
-            <div class="footer-save" *ngIf="editando">
+            <div class="footer-save-central" *ngIf="editando">
                 <button (click)="cancelar()" class="btn-cancelar">Cancelar</button>
                 <button (click)="guardarTodo()" class="btn-publicar" [disabled]="cargando">
                     {{ esNuevo ? 'Publicar Ahora' : 'Guardar Cambios' }}

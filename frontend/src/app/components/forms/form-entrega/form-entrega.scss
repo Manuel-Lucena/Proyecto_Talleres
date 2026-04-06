@@ -201,28 +201,71 @@
 }
 
 // --- FOOTER ---
+// --- FOOTER CENTRADO ---
 .modal-footer {
-    padding: 1.5rem 2.5rem;
+    padding: 2rem 2.5rem;
     background: #fdfdfd;
     border-top: 1px solid #f0f0f0;
     display: flex;
-    justify-content: flex-end;
-    gap: 15px;
+    justify-content: center; // <--- Cambio clave: Centrado absoluto
+    
+    .footer-actions {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        width: 100%;
+        max-width: 400px; // Limitamos el ancho para que no se peguen a los bordes
+    }
 
     .btn-cancelar {
-        background: transparent;
+        flex: 1; // Hace que ambos botones tengan el mismo peso visual
+        background: #f5f5f5;
         border: none;
+        border-radius: 12px;
         font-weight: 700;
-        color: #888;
+        color: #666;
         cursor: pointer;
-        padding: 10px 20px;
+        padding: 14px 20px;
+        transition: all 0.3s ease;
+
+        &:hover {
+            background: #e0e0e0;
+            color: v.$color-secundario-calido-1;
+        }
     }
 
     .btn-enviar-final {
-        @include m.boton-primario; // O el estilo de tu mixin
-        padding: 12px 30px;
+        flex: 2; // El botón de acción principal es un poco más ancho
+        @include m.boton-primario; 
+        padding: 14px 30px;
         border-radius: 12px;
         font-weight: 800;
-        min-width: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 8px 15px rgba(v.$color-marca-principal, 0.2);
+
+        &:disabled {
+            filter: grayscale(1);
+            opacity: 0.6;
+            transform: none !important;
+        }
+
+        i {
+            font-size: 1.1rem;
+        }
+    }
+}
+
+// Ajuste extra para el responsive
+@media (max-width: 480px) {
+    .footer-actions {
+        flex-direction: column-reverse; // En móvil, cancelar abajo
+        gap: 10px;
+        
+        .btn-cancelar, .btn-enviar-final {
+            width: 100%;
+        }
     }
 }

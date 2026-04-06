@@ -1,6 +1,6 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
   <div class="modal-card" (click)="$event.stopPropagation()">
-    
+
     <header class="modal-header">
       <div class="header-content">
         <span class="badge-tarea">Entrega de Tarea</span>
@@ -18,17 +18,14 @@
     <div class="modal-content-body">
       <div class="seccion-input">
         <label class="label-custom">Aclaraciones o comentarios</label>
-        <textarea 
-          [(ngModel)]="textoEntrega" 
-          class="textarea-entrega" 
-          rows="3" 
+        <textarea [(ngModel)]="textoEntrega" class="textarea-entrega" rows="3"
           placeholder="Escribe aquí cualquier observación sobre tu entrega...">
         </textarea>
       </div>
 
       <div class="seccion-archivos">
         <label class="label-custom">Archivos adjuntos</label>
-        
+
         <div class="dropzone-entrega">
           <input type="file" multiple (change)="onFileChange($event)" class="input-hidden">
           <div class="dropzone-info">
@@ -56,12 +53,17 @@
     </div>
 
     <footer class="modal-footer">
-      <button class="btn-cancelar" (click)="cerrar.emit()">Cancelar</button>
-      <button (click)="enviar()" class="btn-enviar-final" [disabled]="cargando">
-        <span *ngIf="!cargando">{{ entregaExistente ? 'Guardar cambios' : 'Enviar tarea' }}</span>
-        <span *ngIf="cargando" class="spinner-border spinner-border-sm"></span>
-      </button>
+      <div class="footer-actions">
+        <button type="button" class="btn-cancelar" (click)="cerrar.emit()">
+          Cancelar
+        </button>
+        <button (click)="enviar()" class="btn-enviar-final" [disabled]="cargando">
+          <span *ngIf="!cargando">
+            {{ entregaExistente ? 'Guardar cambios' : 'Enviar tarea' }}
+          </span>
+          <span *ngIf="cargando" class="spinner-border spinner-border-sm"></span>
+        </button>
+      </div>
     </footer>
-
   </div>
 </div>

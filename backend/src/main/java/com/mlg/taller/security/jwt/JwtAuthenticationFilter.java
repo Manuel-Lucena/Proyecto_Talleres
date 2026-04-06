@@ -16,6 +16,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Filtro de seguridad que intercepta cada petición HTTP para validar el token JWT.
+ * Si el token es válido, establece la autenticación en el contexto de seguridad de Spring.
+ */
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -23,14 +27,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
+    /**
+     * Intercepta la solicitud, extrae el token de la cabecera Authorization y valida la identidad del usuario.
+     * * @param request Solicitud HTTP entrante.
+     * @param response Respuesta HTTP saliente.
+     * @param filterChain Cadena de filtros de seguridad.
+     * @throws ServletException Si ocurre un error en el servlet.
+     * @throws IOException Si ocurre un error de entrada/salida.
+     */
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-    
-        String path = request.getServletPath();
+        final String path = request.getServletPath();
 
         if (path.contains("/api/usuarios/login") || path.contains("/api/usuarios/registro")) {
             filterChain.doFilter(request, response);
@@ -41,7 +52,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwt;
         final String userEmail;
 
-        // 3. SI NO HAY CABECERA DE AUTORIZACIÓN, SEGUIMOS
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -60,17 +70,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             userDetails,
                             null,
                             userDetails.getAuthorities());
+                    
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
         } catch (Exception e) {
-            // Si el token da error (caducado, mal formado, etc.),
-            // simplemente no autenticamos al usuario, pero NO rompemos la petición.
             logger.error("Error al procesar el token JWT: " + e.getMessage());
         }
 
-        // 5. CONTINUAR CON LA CADENA DE FILTROS
         filterChain.doFilter(request, response);
     }
 }

@@ -1,3 +1,6 @@
+/**
+ * Información detallada de un taller para su visualización.
+ */
 export interface TallerResponse {
   idTaller: number;
   nombre: string;
@@ -11,6 +14,9 @@ export interface TallerResponse {
   fotoRuta?: string; 
 }
 
+/**
+ * Datos necesarios para crear o actualizar un taller en el sistema.
+ */
 export interface TallerRequest {
   nombre: string;
   descripcion: string;
@@ -19,5 +25,4 @@ export interface TallerRequest {
   fechaInicio: string;
   fechaFin: string;
   idProfesor: number;
-
 }

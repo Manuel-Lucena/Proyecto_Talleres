@@ -4,10 +4,10 @@ INSERT INTO rol (id_rol, nombre) VALUES (2, 'ALUMNO');
 
 -- 2. USUARIOS (Basado en tu log: apellidos, dni, activo e id_rol son NOT NULL)
 INSERT INTO usuario (id_usuario, nombre, apellidos, dni, email, password, activo, id_rol) 
-VALUES (1, 'Admin', 'Talleres', '12345678A', 'admin@talleres.com', '$2a$12$bpeNrUUEAlZtoHmNLhwBJOSDflb14fRy4nB3dE/yjO5chWKnjmLZ.', true, 1);
+VALUES (1, 'Admin', 'Talleres', '12345678A', 'admin@talleres.com', '$2a$12$WwG.LPs2At4WHnX8pAmf6e5EPUxyYn5WAhfwojuV1ULk.B6zoF1Hu', true, 1);
 
 INSERT INTO usuario (id_usuario, nombre, apellidos, dni, email, password, activo, id_rol) 
-VALUES (2, 'Alumno', 'Prueba', '87654321B', 'alumno@talleres.com', '$2a$12$bpeNrUUEAlZtoHmNLhwBJOSDflb14fRy4nB3dE/yjO5chWKnjmLZ.', true, 2);
+VALUES (2, 'Alumno', 'Prueba', '87654321B', 'alumno@talleres.com', '$2a$12$WwG.LPs2At4WHnX8pAmf6e5EPUxyYn5WAhfwojuV1ULk.B6zoF1Hu', true, 2);
 
 -- 3. TALLERES (id_profesor es FK a usuario 1)
 INSERT INTO taller (id_taller, nombre, descripcion, plazas_maximas, precio, activo, fecha_inicio, id_profesor) 

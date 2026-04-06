@@ -1,12 +1,14 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common'; // Importamos DatePipe
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormErrorService } from '../../../services/FormError.Service';
+import { Validator } from '../../../validators/Validator';
 
 @Component({
   selector: 'app-form-taller',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  providers: [DatePipe], // <--- Necesario para formatear fechas
+  providers: [DatePipe],
   templateUrl: './form-taller.html',
   styleUrl: './form-taller.scss'
 })
@@ -19,13 +21,16 @@ export class FormTaller implements OnInit {
   fotoPreview: string | null = null;
   archivoSeleccionado: File | null = null;
 
-  constructor(private fb: FormBuilder, private datePipe: DatePipe) {
+  constructor(
+    private fb: FormBuilder, 
+    private datePipe: DatePipe,
+    public errorService: FormErrorService
+  ) {
     this.initForm();
   }
 
   ngOnInit(): void {
     if (this.tallerParaEditar) {
-      // FORMATEO OBLIGATORIO PARA HTML5 DATE INPUT
       const fechaInicioFormateada = this.datePipe.transform(this.tallerParaEditar.fechaInicio, 'yyyy-MM-dd');
       const fechaFinFormateada = this.datePipe.transform(this.tallerParaEditar.fechaFin, 'yyyy-MM-dd');
 
@@ -37,7 +42,6 @@ export class FormTaller implements OnInit {
       });
 
       if (this.tallerParaEditar.fotoRuta) {
-        // Asegúrate de que la ruta sea accesible (ej: concatenar base URL si es necesario)
         this.fotoPreview = this.tallerParaEditar.fotoRuta;
       }
     }
@@ -46,28 +50,27 @@ export class FormTaller implements OnInit {
   private initForm() {
     this.tallerForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(5)]],
-      descripcion: ['', [Validators.required]],
+      descripcion: ['', [Validators.required, Validators.minLength(20)]],
       fechaInicio: ['', Validators.required],
       fechaFin: ['', Validators.required],
       plazasMaximas: [20, [Validators.required, Validators.min(1)]],
       precio: [0, [Validators.required, Validators.min(0)]],
       idProfesor: [1],
       nombreCompletoProfesor: ['']
+    }, { 
+      validators: [Validator.validarFechas],
+      updateOn: 'blur' 
     });
   }
 
-  // Añade este método dentro de la clase FormTaller
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
       this.archivoSeleccionado = file;
       const reader = new FileReader();
-
-      // Esto es lo que genera la miniatura que ves en la preview
       reader.onload = () => {
         this.fotoPreview = reader.result as string;
       };
-
       reader.readAsDataURL(file);
     }
   }
@@ -81,7 +84,6 @@ export class FormTaller implements OnInit {
     const formData = new FormData();
     const tallerData = { ...this.tallerForm.value };
 
-    // Si es edición, necesitamos el ID dentro del JSON para el Backend
     if (this.tallerParaEditar?.idTaller) {
       tallerData.idTaller = this.tallerParaEditar.idTaller;
     }

@@ -5,13 +5,22 @@ import { ApiResponse } from '../interfaces/ApiResponse.Interface';
 import { LoginRequest, AuthResponse } from '../interfaces/Auth.Interface';
 import { UsuarioResponse, UsuarioRequest } from '../interfaces/Usuario.Interface';
 
+/**
+ * Servicio encargado de la gestión de usuarios y autenticación.
+ * Proporciona métodos para el ciclo de vida del usuario (CRUD) y el control de sesiones.
+ */
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
   private apiUrl = 'http://localhost:8080/api/usuarios';
 
   constructor(private http: HttpClient) { }
 
-  // 1. LOGIN
+  /**
+   * Realiza la autenticación del usuario.
+   * Si el login es exitoso, almacena el token JWT en el almacenamiento local.
+   * @param credentials Objeto con email y password.
+   * @returns Observable con la respuesta de la API que contiene el token y datos de sesión.
+   */
   login(credentials: LoginRequest): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}/login`, credentials).pipe(
       tap(res => {
@@ -22,42 +31,72 @@ export class UsuarioService {
     );
   }
 
-  // 2. CREAR USUARIO (Recibe el FormData directamente del componente)
+  /**
+   * Registra un nuevo usuario en el sistema.
+   * @param formData Datos del usuario (soporta envío de archivos como fotos de perfil).
+   * @returns Observable con los datos del usuario registrado y su token inicial.
+   */
   crearUsuario(formData: FormData): Observable<ApiResponse<AuthResponse>> {
     return this.http.post<ApiResponse<AuthResponse>>(`${this.apiUrl}/register`, formData);
   }
-  // 3. LISTAR
+
+  /**
+   * Obtiene la lista completa de usuarios registrados.
+   * @returns Observable con un array de UsuarioResponse.
+   */
   listar(): Observable<ApiResponse<UsuarioResponse[]>> {
     return this.http.get<ApiResponse<UsuarioResponse[]>>(this.apiUrl);
   }
 
-  // En tu UsuarioService de Angular
-  // En tu UsuarioService de Angular
+  /**
+   * Obtiene los usuarios inscritos o relacionados con un taller específico.
+   * @param idTaller Identificador único del taller.
+   * @returns Observable con la lista de usuarios del taller.
+   */
   listarPorTaller(idTaller: number): Observable<ApiResponse<UsuarioResponse[]>> {
     return this.http.get<ApiResponse<UsuarioResponse[]>>(`${this.apiUrl}/taller/${idTaller}`);
   }
 
-  // 4. OBTENER POR ID
+  /**
+   * Busca un usuario por su identificador único.
+   * @param id ID del usuario.
+   * @returns Observable con la información detallada del usuario.
+   */
   obtenerPorId(id: number): Observable<ApiResponse<UsuarioResponse>> {
     return this.http.get<ApiResponse<UsuarioResponse>>(`${this.apiUrl}/${id}`);
   }
 
-  // OBTENER POR EMAIL
+  /**
+   * Busca un usuario a través de su dirección de correo electrónico.
+   * @param email Email del usuario a consultar.
+   * @returns Observable con la información del usuario.
+   */
   obtenerPorEmail(email: string): Observable<ApiResponse<UsuarioResponse>> {
     return this.http.get<ApiResponse<UsuarioResponse>>(`${this.apiUrl}/email/${email}`);
   }
 
-  // 5. ACTUALIZAR 
-
+  /**
+   * Actualiza los datos de un usuario existente.
+   * @param id ID del usuario a modificar.
+   * @param formData Nuevos datos del usuario (permite actualizar imagen de perfil).
+   * @returns Observable con el usuario actualizado.
+   */
   actualizarUsuario(id: number, formData: FormData): Observable<ApiResponse<UsuarioResponse>> {
     return this.http.put<ApiResponse<UsuarioResponse>>(`${this.apiUrl}/${id}`, formData);
   }
 
-  // 6. ELIMINAR
+  /**
+   * Elimina un usuario de la base de datos de forma permanente.
+   * @param id ID del usuario a eliminar.
+   * @returns Observable de confirmación de la operación.
+   */
   eliminar(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
   }
 
+  /**
+   * Cierra la sesión del usuario actual eliminando todos los datos del localStorage.
+   */
   logout(): void {
     localStorage.clear();
   }

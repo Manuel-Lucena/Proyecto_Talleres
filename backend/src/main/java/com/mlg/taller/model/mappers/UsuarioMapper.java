@@ -6,8 +6,8 @@ import com.mlg.taller.model.entities.Usuario;
 import org.mapstruct.*;
 
 /**
- * Mapper para la entidad Usuario.
- * Permite actualizaciones parciales ignorando valores nulos en el DTO.
+ * Mapper avanzado para la gestión de perfiles de usuario.
+ * Configurado para proteger datos sensibles y permitir actualizaciones parciales seguras.
  */
 @Mapper(
     componentModel = "spring", 
@@ -17,9 +17,8 @@ import org.mapstruct.*;
 public interface UsuarioMapper {
 
     /**
-     * Mapea entidad a DTO de respuesta.
-     * @param usuario Entidad persistida.
-     * @return DTO con el nombre del rol y sin datos sensibles.
+     * Genera la respuesta de perfil.
+     * @mapping token Se ignora para no exponerlo en listados generales; se gestiona en LoginService.
      */
     @Mapping(target = "idUsuario", source = "id")
     @Mapping(target = "nombreRol", source = "rol.nombre")
@@ -27,9 +26,8 @@ public interface UsuarioMapper {
     UsuarioResponseDTO toResponse(Usuario usuario);
 
     /**
-     * Convierte DTO de registro en nueva entidad.
-     * @param dto Datos de entrada.
-     * @return Entidad lista para procesar en el servicio.
+     * Mapeo para registro de nuevos usuarios.
+     * Ignora campos internos de seguridad para que el Service los establezca (ej: password hashing).
      */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "rol", ignore = true)
@@ -39,10 +37,9 @@ public interface UsuarioMapper {
     Usuario toEntity(UsuarioRequestDTO dto);
 
     /**
-     * Actualiza una entidad existente con los datos del DTO.
-     * Ignora campos de seguridad y sistema para proteger la integridad del usuario.
-     * @param dto Datos nuevos.
-     * @param usuario Entidad a modificar.
+     * Sincroniza cambios sobre un usuario existente.
+     * @note La estrategia IGNORE evita borrar datos existentes si el DTO trae nulos.
+     * @mapping password Se ignora para evitar que cambios de perfil sobrescriban el hash accidentalmente.
      */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "rol", ignore = true)

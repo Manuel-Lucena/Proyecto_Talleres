@@ -2,18 +2,28 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../interfaces/ApiResponse.Interface';
-import { ArchivoEntregaResponse } from '../interfaces/Archivo.Interface'; // Interfaz unificada
+import { ArchivoEntregaResponse } from '../interfaces/Archivo.Interface';
 
+/**
+ * Servicio encargado de gestionar los archivos que los alumnos adjuntan en sus entregas.
+ * Crucial para la recepción de trabajos prácticos y exámenes.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class ArchivoEntregaService {
 
+  /** URL base para los endpoints de la API de archivos de entrega */
   private readonly URL = 'http://localhost:8080/api/archivos-entrega';
 
   constructor(private http: HttpClient) { }
 
-  // 1. POST - Guardar el archivo que el alumno sube
+  /**
+   * Guarda un archivo físico subido por el alumno para una entrega determinada.
+   * @param idEntrega ID del registro de entrega al que pertenece el archivo.
+   * @param archivo Fichero binario (PDF, DOCX, ZIP, etc.).
+   * @returns Observable con la respuesta del servidor.
+   */
   guardar(idEntrega: number, archivo: File): Observable<ApiResponse<ArchivoEntregaResponse>> {
     const formData = new FormData();
     const dto = { idEntrega: idEntrega };
@@ -24,12 +34,20 @@ export class ArchivoEntregaService {
     return this.http.post<ApiResponse<ArchivoEntregaResponse>>(this.URL, formData);
   }
 
-  // 2. GET - Listar archivos de una entrega
+  /**
+   * Obtiene todos los archivos enviados por el alumno en una entrega específica.
+   * @param idEntrega Identificador de la entrega.
+   * @returns Observable con la colección de archivos adjuntos.
+   */
   listarPorEntrega(idEntrega: number): Observable<ApiResponse<ArchivoEntregaResponse[]>> {
     return this.http.get<ApiResponse<ArchivoEntregaResponse[]>>(`${this.URL}/entrega/${idEntrega}`);
   }
 
-  // 3. DELETE - Eliminar archivo
+  /**
+   * Elimina un archivo enviado en una entrega (permitido antes de la calificación).
+   * @param id ID del archivo a eliminar.
+   * @returns Observable de confirmación.
+   */
   eliminar(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.URL}/${id}`);
   }

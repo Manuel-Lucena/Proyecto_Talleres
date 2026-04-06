@@ -4,44 +4,58 @@ import { Observable } from 'rxjs';
 import { ApiResponse } from '../interfaces/ApiResponse.Interface';
 import { HorarioRequest, HorarioResponse } from '../interfaces/Horario.Interface';
 
+/**
+ * Servicio para la gestión de la disponibilidad temporal de los talleres.
+ * Administra los días, horas de inicio y fin para cada sesión formativa.
+ */
 @Injectable({ providedIn: 'root' })
 export class HorarioService {
+  /** URL base para los endpoints de la API de horarios */
   private apiUrl = 'http://localhost:8080/api/horarios';
 
   constructor(private http: HttpClient) {}
 
   /**
-   * Obtiene la lista completa de horarios
+   * Recupera todos los horarios configurados en la plataforma.
+   * @returns Observable con la lista global de horarios.
    */
   listar(): Observable<ApiResponse<HorarioResponse[]>> {
     return this.http.get<ApiResponse<HorarioResponse[]>>(this.apiUrl);
   }
 
   /**
-   * Obtiene los horarios específicos de un taller por su ID
-   * (Crucial para el modal de Mis Talleres)
+   * Obtiene la planificación horaria específica de un taller concreto.
+   * Este método es fundamental para mostrar la agenda en el modal de detalles del taller.
+   * @param idTaller Identificador del taller a consultar.
+   * @returns Observable con los horarios asociados a dicho taller.
    */
   listarPorTaller(idTaller: number): Observable<ApiResponse<HorarioResponse[]>> {
     return this.http.get<ApiResponse<HorarioResponse[]>>(`${this.apiUrl}/taller/${idTaller}`);
   }
 
   /**
-   * Crea un nuevo horario para un taller enviando un JSON (HorarioRequestDTO)
+   * Crea una nueva franja horaria para un taller.
+   * @param dto Objeto HorarioRequest con el día de la semana y las horas de sesión.
+   * @returns Observable con el horario registrado.
    */
   crear(dto: HorarioRequest): Observable<ApiResponse<HorarioResponse>> {
     return this.http.post<ApiResponse<HorarioResponse>>(this.apiUrl, dto);
   }
 
   /**
-   * Actualiza un horario existente.
-   * Recibe el ID y el objeto DTO empaquetado.
+   * Modifica una sesión horaria existente.
+   * @param id Identificador del horario a actualizar.
+   * @param dto Nuevos datos de programación horaria.
+   * @returns Observable con el horario modificado.
    */
   actualizar(id: number, dto: HorarioRequest): Observable<ApiResponse<HorarioResponse>> {
     return this.http.put<ApiResponse<HorarioResponse>>(`${this.apiUrl}/${id}`, dto);
   }
 
   /**
-   * Elimina un horario del sistema
+   * Elimina un registro de horario del sistema.
+   * @param id Identificador del horario a borrar.
+   * @returns Observable indicando el éxito de la operación.
    */
   eliminar(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);

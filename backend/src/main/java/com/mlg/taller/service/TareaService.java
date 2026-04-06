@@ -1,5 +1,6 @@
 package com.mlg.taller.service;
 
+import com.mlg.taller.exception.ResourceNotFoundException;
 import com.mlg.taller.model.dtos.TareaRequestDTO;
 import com.mlg.taller.model.dtos.TareaResponseDTO;
 import com.mlg.taller.model.entities.*;
@@ -14,6 +15,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio para la gestión de tareas, asignaciones y plazos de entrega.
+ */
 @Service
 @RequiredArgsConstructor
 public class TareaService {
@@ -25,41 +29,28 @@ public class TareaService {
     private final UsuarioRepository usuarioRepository;
     private final InscripcionRepository inscripcionRepository;
 
-    @Transactional(readOnly = true)
-    public List<TareaResponseDTO> listarTodas() {
-        return tareaRepository.findAll().stream()
-                .map(tareaMapper::toResponse)
-                .collect(Collectors.toList());
-    }
+    // --- MÉTODOS POST ---
 
-    @Transactional(readOnly = true)
-    public List<TareaResponseDTO> listarPorTaller(Long idTaller) {
-        return tareaRepository.findByTallerId(idTaller).stream()
-                .map(tareaMapper::toResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public TareaResponseDTO obtenerPorId(Long id) {
-        return tareaRepository.findById(id)
-                .map(tareaMapper::toResponse)
-                .orElseThrow(() -> new RuntimeException("Tarea no encontrada con ID: " + id));
-    }
-
+    /**
+     * Crea una nueva tarea y la asigna automáticamente a los alumnos correspondientes.
+     * @param dto Datos de la tarea y lista opcional de IDs de alumnos.
+     * @return Tarea creada y asignada.
+     * @throws ResourceNotFoundException Si el taller o algún alumno no existen.
+     */
     @Transactional
     public TareaResponseDTO crear(TareaRequestDTO dto) {
         Taller taller = tallerRepository.findById(dto.getIdTaller())
-                .orElseThrow(() -> new RuntimeException("Taller no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("No se puede crear la tarea: Taller no encontrado con ID: " + dto.getIdTaller()));
 
         Tarea tarea = tareaMapper.toEntity(dto);
         tarea.setTaller(taller);
         tarea.setFechaPublicacion(LocalDateTime.now());
         tarea.setEstado(EstadoTarea.ABIERTA);
-        // El mapper ya debería encargarse, pero nos aseguramos:
         tarea.setExtensionesPermitidas(dto.getExtensionesPermitidas());
 
         Tarea tareaGuardada = tareaRepository.save(tarea);
 
+        // Si se especifican alumnos, se asigna a ellos; si no, a todos los inscritos en el taller
         if (dto.getAlumnosIds() != null && !dto.getAlumnosIds().isEmpty()) {
             for (Long alumnoId : dto.getAlumnosIds()) {
                 asignarTareaAAlumno(tareaGuardada, alumnoId);
@@ -74,10 +65,57 @@ public class TareaService {
         return tareaMapper.toResponse(tareaGuardada);
     }
 
+    // --- MÉTODOS GET ---
+
+    /**
+     * Obtiene el listado completo de tareas del sistema.
+     * @return Lista de todas las tareas.
+     */
+    @Transactional(readOnly = true)
+    public List<TareaResponseDTO> listarTodas() {
+        return tareaRepository.findAll().stream()
+                .map(tareaMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Busca una tarea específica por su identificador único.
+     * @param id ID de la tarea.
+     * @return Tarea encontrada.
+     * @throws ResourceNotFoundException Si la tarea no existe.
+     */
+    @Transactional(readOnly = true)
+    public TareaResponseDTO obtenerPorId(Long id) {
+        return tareaRepository.findById(id)
+                .map(tareaMapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarea no encontrada con ID: " + id));
+    }
+
+    /**
+     * Lista todas las tareas pertenecientes a un taller específico.
+     * @param idTaller ID del taller.
+     * @return Lista de tareas del taller.
+     */
+    @Transactional(readOnly = true)
+    public List<TareaResponseDTO> listarPorTaller(Long idTaller) {
+        return tareaRepository.findByTallerId(idTaller).stream()
+                .map(tareaMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    // --- MÉTODOS PUT ---
+
+    /**
+     * Actualiza los datos de una tarea existente.
+     * @param id ID de la tarea a modificar.
+     * @param dto Nuevos datos.
+     * @return Tarea actualizada.
+     * @throws ResourceNotFoundException Si la tarea o el taller no existen.
+     */
     @Transactional
     public TareaResponseDTO actualizar(Long id, TareaRequestDTO dto) {
         Tarea existente = tareaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tarea no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Tarea no encontrada con ID: " + id));
 
         existente.setTitulo(dto.getTitulo());
         existente.setDescripcion(dto.getDescripcion());
@@ -86,16 +124,39 @@ public class TareaService {
 
         if (!existente.getTaller().getId().equals(dto.getIdTaller())) {
             Taller nuevoTaller = tallerRepository.findById(dto.getIdTaller())
-                    .orElseThrow(() -> new RuntimeException("Taller no encontrado"));
+                    .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Nuevo taller no encontrado con ID: " + dto.getIdTaller()));
             existente.setTaller(nuevoTaller);
         }
 
         return tareaMapper.toResponse(tareaRepository.save(existente));
     }
 
+    // --- MÉTODOS DELETE ---
+
+    /**
+     * Elimina una tarea y sus registros asociados.
+     * @param id ID de la tarea a borrar.
+     * @throws ResourceNotFoundException Si la tarea no existe.
+     */
+    @Transactional
+    public void eliminar(Long id) {
+        if (!tareaRepository.existsById(id)) {
+            throw new ResourceNotFoundException("No se puede eliminar: La tarea no existe con ID: " + id);
+        }
+        tareaRepository.deleteById(id);
+    }
+
+    // --- MÉTODOS PRIVADOS ---
+
+    /**
+     * Crea un registro de asignación para un alumno específico.
+     * @param tarea Tarea a asignar.
+     * @param alumnoId ID del alumno.
+     * @throws ResourceNotFoundException Si el alumno no existe.
+     */
     private void asignarTareaAAlumno(Tarea tarea, Long alumnoId) {
         Usuario alumno = usuarioRepository.findById(alumnoId)
-                .orElseThrow(() -> new RuntimeException("Alumno no encontrado con ID: " + alumnoId));
+                .orElseThrow(() -> new ResourceNotFoundException("No se pudo asignar tarea: Alumno no encontrado con ID: " + alumnoId));
 
         TareaAsignada asignacion = TareaAsignada.builder()
                 .tarea(tarea)
@@ -103,13 +164,5 @@ public class TareaService {
                 .build();
 
         tareaAsignadaRepository.save(asignacion);
-    }
-
-    @Transactional
-    public void eliminar(Long id) {
-        if (!tareaRepository.existsById(id)) {
-            throw new RuntimeException("La tarea no existe");
-        }
-        tareaRepository.deleteById(id);
     }
 }

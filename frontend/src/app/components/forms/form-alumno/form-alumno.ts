@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { UsuarioRequest } from '../../../interfaces/Usuario.Interface';
 import { Validator } from '../../../validators/Validator'; 
+import { FormErrorService } from '../../../services/FormError.Service';
 
 @Component({
   selector: 'app-form-alumno',
@@ -18,6 +19,9 @@ export class FormAlumno implements OnInit {
 
   fileSeleccionado: File | null = null;
   verPassword = false;
+
+  // Inyectamos el servicio como PUBLIC para que el HTML lo vea
+  constructor(public errorService: FormErrorService) {}
 
   form = new FormGroup({
     dni: new FormControl('', { validators: [Validators.required, Validator.dni], updateOn: 'blur' }),
@@ -38,25 +42,6 @@ export class FormAlumno implements OnInit {
       this.form.get('repetirPassword')?.clearValidators();
       this.form.updateValueAndValidity();
     }
-  }
-
-  mostrarError(controlName: string): boolean {
-    const control = this.form.get(controlName);
-    // Solo mostramos error si el usuario ha salido del campo (touched)
-    return !!(control && control.invalid && control.touched);
-  }
-
-  getErrorMessage(controlName: string): string {
-    const control = this.form.get(controlName);
-    if (!control || !control.errors) return '';
-
-    if (control.errors['required']) return 'Este campo es obligatorio';
-    if (control.errors['email']) return 'Email inválido';
-    if (control.errors['minlength']) return 'Mínimo 6 caracteres';
-    if (control.errors['invalidDni']) return 'DNI no válido';
-    if (control.errors['invalidTel']) return 'Teléfono no válido';
-    
-    return 'Campo inválido';
   }
 
   onFileSelected(event: any): void {
@@ -81,7 +66,7 @@ export class FormAlumno implements OnInit {
       telefono: rawValues.telefono!,
       direccion: rawValues.direccion!, 
       password: rawValues.password || undefined,
-      idRol: rawValues.idRol || 2
+      idRol: rawValues.idRol || 3
     };
 
     formData.append('usuario', new Blob([JSON.stringify(usuarioDTO)], { type: 'application/json' }));

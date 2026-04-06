@@ -1,5 +1,6 @@
 package com.mlg.taller.service;
 
+import com.mlg.taller.exception.ResourceNotFoundException;
 import com.mlg.taller.model.dtos.MaterialRequestDTO;
 import com.mlg.taller.model.dtos.MaterialResponseDTO;
 import com.mlg.taller.model.entities.Material;
@@ -15,6 +16,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio para la gestión de los materiales educativos asociados a los talleres.
+ */
 @Service
 @RequiredArgsConstructor
 public class MaterialService {
@@ -23,11 +27,18 @@ public class MaterialService {
     private final TallerRepository tallerRepository;
     private final MaterialMapper materialMapper;
 
-    // 1. CREATE
+    // --- MÉTODOS POST ---
+
+    /**
+     * Crea un nuevo material y lo asocia a un taller.
+     * @param dto Datos del material a crear.
+     * @return Material creado y persistido.
+     * @throws ResourceNotFoundException Si el taller asociado no existe.
+     */
     @Transactional
     public MaterialResponseDTO crear(MaterialRequestDTO dto) {
         Taller taller = tallerRepository.findById(dto.getIdTaller())
-                .orElseThrow(() -> new RuntimeException("Taller no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("No se puede crear el material: Taller no encontrado con ID: " + dto.getIdTaller()));
 
         Material material = materialMapper.toEntity(dto);
         material.setTaller(taller);
@@ -36,7 +47,12 @@ public class MaterialService {
         return materialMapper.toResponse(materialRepository.save(material));
     }
 
-    // 2. READ (Todos)
+    // --- MÉTODOS GET ---
+
+    /**
+     * Obtiene el listado completo de todos los materiales.
+     * @return Lista de materiales registrados.
+     */
     @Transactional(readOnly = true)
     public List<MaterialResponseDTO> listarTodos() {
         return materialRepository.findAll().stream()
@@ -44,15 +60,24 @@ public class MaterialService {
                 .collect(Collectors.toList());
     }
 
-    // 3. READ (Por ID)
+    /**
+     * Recupera un material específico por su identificador.
+     * @param id ID del material a buscar.
+     * @return Material encontrado.
+     * @throws ResourceNotFoundException Si el material no existe.
+     */
     @Transactional(readOnly = true)
     public MaterialResponseDTO buscarPorId(Long id) {
         return materialRepository.findById(id)
                 .map(materialMapper::toResponse)
-                .orElseThrow(() -> new RuntimeException("Material no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Material no encontrado con ID: " + id));
     }
 
-    // 4. READ (Específico por Taller)
+    /**
+     * Lista todos los materiales pertenecientes a un taller concreto.
+     * @param idTaller ID del taller a consultar.
+     * @return Lista de materiales del taller.
+     */
     @Transactional(readOnly = true)
     public List<MaterialResponseDTO> listarPorTaller(Long idTaller) {
         return materialRepository.findByTallerId(idTaller).stream()
@@ -60,30 +85,43 @@ public class MaterialService {
                 .collect(Collectors.toList());
     }
 
-    // 5. UPDATE
+    // --- MÉTODOS PUT ---
+
+    /**
+     * Actualiza el contenido de un material existente.
+     * @param id ID del material a modificar.
+     * @param dto Nuevos datos para el material.
+     * @return Material actualizado.
+     * @throws ResourceNotFoundException Si el material o el nuevo taller no existen.
+     */
     @Transactional
     public MaterialResponseDTO actualizar(Long id, MaterialRequestDTO dto) {
         Material existente = materialRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("No se puede actualizar: Material no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Material no encontrado con ID: " + id));
         
         existente.setTitulo(dto.getTitulo());
         existente.setContenido(dto.getContenido());
         
-        // Si cambia el taller, lo validamos
         if (!existente.getTaller().getId().equals(dto.getIdTaller())) {
             Taller nuevoTaller = tallerRepository.findById(dto.getIdTaller())
-                    .orElseThrow(() -> new RuntimeException("Nuevo taller no encontrado"));
+                    .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Nuevo taller no encontrado con ID: " + dto.getIdTaller()));
             existente.setTaller(nuevoTaller);
         }
 
         return materialMapper.toResponse(materialRepository.save(existente));
     }
 
-    // 6. DELETE
+    // --- MÉTODOS DELETE ---
+
+    /**
+     * Elimina un material del sistema.
+     * @param id ID del material a borrar.
+     * @throws ResourceNotFoundException Si el material no existe.
+     */
     @Transactional
     public void eliminar(Long id) {
         if (!materialRepository.existsById(id)) {
-            throw new RuntimeException("No existe el material con ID: " + id);
+            throw new ResourceNotFoundException("No se puede eliminar: El material no existe con ID: " + id);
         }
         materialRepository.deleteById(id);
     }

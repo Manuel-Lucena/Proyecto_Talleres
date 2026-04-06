@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { NoticiaResponse } from '../../../interfaces/Noticia.Interface';
-import { Subscription } from 'rxjs';
+import { FormErrorService } from '../../../services/FormError.Service';
 
 @Component({
   selector: 'app-form-noticia',
@@ -11,28 +11,31 @@ import { Subscription } from 'rxjs';
   templateUrl: './form-noticia.html',
   styleUrl: './form-noticia.scss',
 })
-export class FormNoticia implements OnInit, OnDestroy {
+export class FormNoticia implements OnInit {
   @Input() noticiaParaEditar: NoticiaResponse | null = null;
   @Output() noticiaGuardada = new EventEmitter<FormData>();
   @Output() cerrar = new EventEmitter<void>();
 
   imagenPreview: string | ArrayBuffer | null = null;
   fileSeleccionado: File | null = null;
-  private formSub: Subscription | undefined;
 
   form = new FormGroup({
-    titulo: new FormControl('', [Validators.required, Validators.minLength(5)]),
-    contenido: new FormControl('', [Validators.required]),
+    titulo: new FormControl('', { 
+      validators: [Validators.required, Validators.minLength(5)], 
+      updateOn: 'blur' 
+    }),
+    contenido: new FormControl('', { 
+      validators: [Validators.required], 
+      updateOn: 'blur' 
+    }),
   });
 
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(
+    private cdr: ChangeDetectorRef,
+    public errorService: FormErrorService // Inyectado para el HTML
+  ) { }
 
   ngOnInit(): void {
-    // Suscripción para cambios de texto
-    this.formSub = this.form.valueChanges.subscribe(() => {
-      this.cdr.detectChanges();
-    });
-
     if (this.noticiaParaEditar) {
       this.form.patchValue({
         titulo: this.noticiaParaEditar.titulo,
@@ -40,10 +43,8 @@ export class FormNoticia implements OnInit, OnDestroy {
       });
 
       if (this.noticiaParaEditar.imagenUrl) {
-        // Si están en public/noticias/, la ruta es esta:
         this.imagenPreview = `/noticias/${this.noticiaParaEditar.imagenUrl}`;
       }
-
       this.cdr.detectChanges();
     }
   }
@@ -72,7 +73,6 @@ export class FormNoticia implements OnInit, OnDestroy {
       idNoticia: this.noticiaParaEditar?.idNoticia || null,
       titulo: this.form.value.titulo,
       contenido: this.form.value.contenido,
-      // ¡AÑADE ESTA LÍNEA! Mantiene la imagen actual si no se selecciona una nueva
       imagenUrl: this.noticiaParaEditar?.imagenUrl || null
     };
 
@@ -85,12 +85,6 @@ export class FormNoticia implements OnInit, OnDestroy {
     }
 
     this.noticiaGuardada.emit(formData);
-  }
-
-  ngOnDestroy(): void {
-    if (this.formSub) {
-      this.formSub.unsubscribe();
-    }
   }
 
   cerrarModal() {

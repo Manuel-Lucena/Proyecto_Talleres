@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 /**
  * Servicio para la gestión de noticias y comunicados del centro.
- * Maneja la persistencia de datos y el ciclo de vida de las imágenes asociadas.
  */
 @Service
 @RequiredArgsConstructor
@@ -30,37 +29,13 @@ public class NoticiaService {
 
     private static final String FOLDER = "noticias";
 
-    /**
-     * Recupera todas las noticias ordenadas por fecha de publicación descendente.
-     * * @return Lista de DTOs con la información de todas las noticias.
-     */
-    @Transactional(readOnly = true)
-    public List<NoticiaResponseDTO> listarTodas() {
-        return noticiaRepository.findAllByOrderByFechaPublicacionDesc().stream()
-                .map(noticiaMapper::toResponse)
-                .collect(Collectors.toList());
-    }
+    // --- MÉTODOS POST ---
 
     /**
-     * Busca una noticia específica por su identificador único.
-     * * @param id Identificador de la noticia.
-     * 
-     * @return DTO de la noticia encontrada.
-     * @throws ResourceNotFoundException si la noticia no existe.
-     */
-    @Transactional(readOnly = true)
-    public NoticiaResponseDTO buscarPorId(Long id) {
-        return noticiaRepository.findById(id)
-                .map(noticiaMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Noticia no encontrada con ID: " + id));
-    }
-
-    /**
-     * Crea una noticia y procesa su imagen asociada.
-     * * @param dto Datos de la noticia a crear.
-     * 
-     * @param archivo Archivo de imagen (opcional).
-     * @return DTO de la noticia recién creada con su ID e imagen asignada.
+     * Crea una nueva noticia y procesa su imagen asociada si existe.
+     * @param dto Datos de la noticia a crear.
+     * @param archivo Archivo de imagen opcional.
+     * @return Noticia creada con su imagen asignada.
      */
     @Transactional
     public NoticiaResponseDTO crear(NoticiaRequestDTO dto, MultipartFile archivo) {
@@ -76,19 +51,46 @@ public class NoticiaService {
         return noticiaMapper.toResponse(noticiaRepository.save(noticia));
     }
 
+    // --- MÉTODOS GET ---
+
+    /**
+     * Recupera todas las noticias ordenadas por fecha de publicación descendente.
+     * @return Lista de todas las noticias registradas.
+     */
+    @Transactional(readOnly = true)
+    public List<NoticiaResponseDTO> listarTodas() {
+        return noticiaRepository.findAllByOrderByFechaPublicacionDesc().stream()
+                .map(noticiaMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Busca una noticia específica por su identificador único.
+     * @param id Identificador de la noticia.
+     * @return Noticia encontrada.
+     * @throws ResourceNotFoundException Si la noticia no existe.
+     */
+    @Transactional(readOnly = true)
+    public NoticiaResponseDTO buscarPorId(Long id) {
+        return noticiaRepository.findById(id)
+                .map(noticiaMapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Noticia no encontrada con ID: " + id));
+    }
+
+    // --- MÉTODOS PUT ---
+
     /**
      * Actualiza el contenido y/o la imagen de una noticia existente.
-     * * @param id Identificador de la noticia a modificar.
-     * 
-     * @param dto     Nuevos datos de la noticia.
-     * @param archivo Nuevo archivo de imagen (opcional).
-     * @return DTO de la noticia actualizada.
-     * @throws ResourceNotFoundException si la noticia no existe.
+     * @param id ID de la noticia a modificar.
+     * @param dto Nuevos datos de la noticia.
+     * @param archivo Nuevo archivo de imagen opcional.
+     * @return Noticia actualizada.
+     * @throws ResourceNotFoundException Si la noticia no existe.
      */
     @Transactional
     public NoticiaResponseDTO actualizar(Long id, NoticiaRequestDTO dto, MultipartFile archivo) {
         Noticia noticia = noticiaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Noticia no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Noticia no encontrada con ID: " + id));
 
         noticiaMapper.updateEntityFromDto(dto, noticia);
         gestionarImagenNoticia(noticia, archivo);
@@ -96,35 +98,34 @@ public class NoticiaService {
         return noticiaMapper.toResponse(noticiaRepository.save(noticia));
     }
 
+    // --- MÉTODOS DELETE ---
+
     /**
-     * Elimina una noticia del sistema y borra su imagen del almacenamiento físico.
-     * * @param id Identificador de la noticia a eliminar.
-     * 
-     * @throws ResourceNotFoundException si la noticia no existe.
+     * Elimina una noticia y su archivo de imagen físico del servidor.
+     * @param id ID de la noticia a eliminar.
+     * @throws ResourceNotFoundException Si la noticia no existe.
      */
     @Transactional
     public void eliminar(Long id) {
         Noticia noticia = noticiaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No existe la noticia con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("No se puede eliminar: Noticia no encontrada con ID: " + id));
 
         if (noticia.getImagenUrl() != null) {
-            // 'true' para borrar de la carpeta pública
             fileUtil.eliminar(FOLDER, noticia.getImagenUrl(), true);
         }
 
         noticiaRepository.delete(noticia);
     }
 
+    // --- MÉTODOS PRIVADOS ---
+
     /**
-     * Método privado de apoyo para procesar y guardar la imagen de la noticia.
-     * * @param noticia Entidad noticia a la que se le asignará el nombre del
-     * archivo.
-     * 
-     * @param archivo Archivo MultipartFile recibido desde el controlador.
+     * Procesa, guarda y vincula la imagen física con la entidad noticia.
+     * @param noticia Entidad a la que se asignará la imagen.
+     * @param archivo Archivo recibido desde el controlador.
      */
     private void gestionarImagenNoticia(Noticia noticia, MultipartFile archivo) {
         if (archivo != null && !archivo.isEmpty()) {
-            // Si ya tenía una imagen antes, la borramos primero
             if (noticia.getImagenUrl() != null) {
                 fileUtil.eliminar(FOLDER, noticia.getImagenUrl(), true);
             }

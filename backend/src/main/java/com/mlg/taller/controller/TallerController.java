@@ -19,14 +19,33 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/talleres")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class TallerController {
 
     private final TallerService tallerService;
 
+    // --- MÉTODOS POST ---
+
+    /**
+     * Registra un nuevo taller en el sistema, permitiendo adjuntar una imagen promocional.
+     * El cuerpo de la petición debe ser multipart/form-data.
+     * @param request Datos del taller en formato JSON (parte 'taller').
+     * @param archivo Imagen representativa del taller (parte 'archivo', opcional).
+     * @return        ApiResponse con el taller creado y su ruta de imagen generada.
+     */
+    @PostMapping(consumes = { "multipart/form-data" })
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<TallerResponseDTO> crear(
+            @Valid @RequestPart("taller") TallerRequestDTO request,
+            @RequestPart(value = "archivo", required = false) MultipartFile archivo) {
+        return ApiResponse.success(tallerService.crear(request, archivo), "Taller creado con éxito");
+    }
+
+    // --- MÉTODOS GET ---
+
     /**
      * Recupera el catálogo completo de talleres activos en el sistema.
-     * @return ApiResponse con una lista de {@link TallerResponseDTO} que incluye 
-     * información del profesor y plazas disponibles.
+     * @return ApiResponse con una lista de TallerResponseDTO con plazas y profesor.
      */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -37,7 +56,7 @@ public class TallerController {
     /**
      * Obtiene la información detallada de un taller específico por su ID.
      * @param id Identificador único del taller.
-     * @return ApiResponse con los datos detallados del taller solicitado.
+     * @return   ApiResponse con los datos detallados del taller solicitado.
      */
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -48,7 +67,7 @@ public class TallerController {
     /**
      * Obtiene los talleres en los que un usuario específico está inscrito.
      * @param idUsuario ID del alumno.
-     * @return Lista de talleres para la vista "Mis Talleres".
+     * @return          Lista de talleres para la vista "Mis Talleres".
      */
     @GetMapping("/usuario/{idUsuario}")
     @ResponseStatus(HttpStatus.OK)
@@ -56,28 +75,15 @@ public class TallerController {
         return ApiResponse.success(tallerService.listarTalleresPorUsuarioId(idUsuario), "Mis talleres obtenidos correctamente");
     }
 
-    /**
-     * Registra un nuevo taller en el sistema, permitiendo adjuntar una imagen promocional.
-     * El cuerpo de la petición debe ser {@code multipart/form-data}.
-     * * @param request Datos del taller en formato JSON (parte 'taller').
-     * @param archivo Imagen representativa del taller (parte 'archivo', opcional).
-     * @return ApiResponse con el taller creado y su ruta de imagen generada.
-     */
-    @PostMapping(consumes = { "multipart/form-data" })
-    @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<TallerResponseDTO> crear(
-            @Valid @RequestPart("taller") TallerRequestDTO request,
-            @RequestPart(value = "archivo", required = false) MultipartFile archivo) {
-        return ApiResponse.success(tallerService.crear(request, archivo), "Taller creado con éxito");
-    }
+    // --- MÉTODOS PUT ---
 
     /**
      * Actualiza la información y/o la imagen de un taller existente.
      * Si no se proporciona un nuevo archivo, se preserva la imagen anterior.
-     * * @param id Identificador del taller a modificar.
+     * @param id      Identificador del taller a modificar.
      * @param request Nuevos datos para el taller (parte 'taller').
      * @param archivo Nueva imagen para el taller (parte 'archivo', opcional).
-     * @return ApiResponse con el taller actualizado.
+     * @return        ApiResponse con el taller actualizado.
      */
     @PutMapping(value = "/{id}", consumes = { "multipart/form-data" })
     @ResponseStatus(HttpStatus.OK)
@@ -88,11 +94,12 @@ public class TallerController {
         return ApiResponse.success(tallerService.actualizar(id, request, archivo), "Taller actualizado correctamente");
     }
 
+    // --- MÉTODOS DELETE ---
+
     /**
-     * Realiza la eliminación de un taller. 
-     * Dependiendo de la lógica del servicio, puede ser un borrado físico o lógico.
+     * Realiza la eliminación de un taller del sistema. 
      * @param id Identificador del taller a eliminar.
-     * @return ApiResponse confirmando la eliminación.
+     * @return   ApiResponse confirmando la eliminación.
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)

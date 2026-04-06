@@ -9,33 +9,72 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controlador para la gestión de horarios de los talleres.
+ * Permite definir las franjas horarias de las sesiones, consultarlas por taller
+ * y realizar modificaciones o eliminaciones de los turnos establecidos.
+ */
 @RestController
 @RequestMapping("/api/horarios")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class HorarioController {
 
     private final HorarioService horarioService;
 
+    // --- MÉTODOS POST ---
+
+    /**
+     * Registra un nuevo horario en el sistema.
+     * @param dto Datos del horario a crear (días, horas, taller asociado).
+     * @return    ApiResponse con el horario creado y mensaje de confirmación.
+     */
     @PostMapping
     public ApiResponse<HorarioResponseDTO> crear(@RequestBody HorarioRequestDTO dto) {
         return ApiResponse.success(horarioService.crear(dto), "Horario creado");
     }
 
+    // --- MÉTODOS GET ---
+
+    /**
+     * Obtiene el listado completo de todos los horarios registrados en el sistema.
+     * @return ApiResponse con la lista global de horarios.
+     */
     @GetMapping
     public ApiResponse<List<HorarioResponseDTO>> listarTodos() {
         return ApiResponse.success(horarioService.listarTodos(), "Todos los horarios obtenidos");
     }
 
+    /**
+     * Recupera los horarios específicos vinculados a un taller concreto.
+     * @param idTaller Identificador único del taller.
+     * @return         ApiResponse con la lista de horarios del taller solicitado.
+     */
     @GetMapping("/taller/{idTaller}")
     public ApiResponse<List<HorarioResponseDTO>> listarPorTaller(@PathVariable Long idTaller) {
         return ApiResponse.success(horarioService.listarPorTaller(idTaller), "Horarios del taller obtenidos");
     }
 
+    // --- MÉTODOS PUT ---
+
+    /**
+     * Actualiza la información de un horario existente.
+     * @param id  Identificador del horario a modificar.
+     * @param dto Nuevos datos para el horario.
+     * @return    ApiResponse con el objeto HorarioResponseDTO actualizado.
+     */
     @PutMapping("/{id}")
     public ApiResponse<HorarioResponseDTO> actualizar(@PathVariable Long id, @RequestBody HorarioRequestDTO dto) {
         return ApiResponse.success(horarioService.actualizar(id, dto), "Horario actualizado");
     }
 
+    // --- MÉTODOS DELETE ---
+
+    /**
+     * Elimina de forma definitiva un registro de horario.
+     * @param id Identificador único del horario a suprimir.
+     * @return   ApiResponse confirmando la eliminación.
+     */
     @DeleteMapping("/{id}")
     public ApiResponse<Void> eliminar(@PathVariable Long id) {
         horarioService.eliminar(id);

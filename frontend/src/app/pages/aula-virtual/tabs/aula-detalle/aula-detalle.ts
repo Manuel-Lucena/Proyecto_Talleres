@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -19,7 +19,7 @@ import { FormEntrega } from '../../../../components/forms/form-entrega/form-entr
 @Component({
   selector: 'app-aula-detalle',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, FormEntrega], // Añadido FormEntrega aquí
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, FormEntrega],
   templateUrl: './aula-detalle.html',
   styleUrl: './aula-detalle.scss',
 })
@@ -31,6 +31,9 @@ export class AulaDetalle implements OnInit {
 
   // Control del Modal Manual
   mostrarModalEntrega: boolean = false;
+  
+  // Control del Desplegable de Extensiones
+  mostrarDropdownExt: boolean = false;
 
   // Recurso (Material/Tarea Enunciado)
   archivosAdjuntos: any[] = [];
@@ -45,6 +48,14 @@ export class AulaDetalle implements OnInit {
   editando: boolean = false;
   form: FormGroup;
 
+  extensionesDisponibles = [
+    { label: 'Documentos PDF (.pdf)', value: '.pdf' },
+    { label: 'Microsoft Word (.doc, .docx)', value: '.doc, .docx' },
+    { label: 'Hojas de Excel (.xlsx)', value: '.xlsx' },
+    { label: 'Archivos ZIP/RAR (.zip, .rar)', value: '.zip, .rar' },
+    { label: 'Imágenes (.jpg, .png)', value: '.jpg, .png' }
+  ];
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -58,14 +69,22 @@ export class AulaDetalle implements OnInit {
     public tokenService: TokenService,
     private notificacionService: NotificacionService,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private eRef: ElementRef
   ) {
     this.form = this.fb.group({
       titulo: ['', Validators.required],
       descripcion: ['', Validators.required],
       fechaEntrega: [''],
-      extensionesPermitidas: ['.pdf, .doc, .docx, .zip']
+      extensionesPermitidas: ['.pdf, .doc, .docx']
     });
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickOut(event: any) {
+    if (!this.eRef.nativeElement.contains(event.target)) {
+      this.mostrarDropdownExt = false;
+    }
   }
 
   ngOnInit() {
@@ -136,12 +155,33 @@ export class AulaDetalle implements OnInit {
     });
   }
 
-  // --- LÓGICA DEL MODAL MANUAL ---
+  toggleDropdownExt() {
+    this.mostrarDropdownExt = !this.mostrarDropdownExt;
+  }
+
+  onExtensionChange(event: any) {
+    const value = event.target.value;
+    let seleccionadas = this.form.get('extensionesPermitidas')?.value 
+      ? this.form.get('extensionesPermitidas')?.value.split(',').map((s: string) => s.trim()).filter((s: string) => s !== "") 
+      : [];
+
+    if (event.target.checked) {
+      if (!seleccionadas.includes(value)) seleccionadas.push(value);
+    } else {
+      seleccionadas = seleccionadas.filter((ext: string) => ext !== value);
+    }
+    this.form.patchValue({ extensionesPermitidas: seleccionadas.join(', ') });
+  }
+
+  estaMarcada(value: string): boolean {
+    const current = this.form.get('extensionesPermitidas')?.value || '';
+    return current.includes(value);
+  }
+
   abrirModalEntrega() {
     this.mostrarModalEntrega = true;
   }
 
-  // Se ejecuta cuando el modal nos avisa que terminó de guardar
   onEntregaGuardada() {
     this.notificacionService.mostrar({
       titulo: '¡Hecho!',
@@ -151,7 +191,6 @@ export class AulaDetalle implements OnInit {
     this.cargarDatos(this.recurso.idTarea || this.recurso.id);
   }
 
-  // --- UTILIDADES ---
   esProfesor(): boolean {
     const rol = this.tokenService.getRol();
     return rol === 'PROFESOR' || rol === 'ADMIN';
@@ -163,7 +202,7 @@ export class AulaDetalle implements OnInit {
       titulo: this.recurso.titulo,
       descripcion: this.tipo === 'tarea' ? this.recurso.descripcion : this.recurso.contenido,
       fechaEntrega: this.recurso.fechaEntrega ? this.recurso.fechaEntrega.substring(0, 16) : '',
-      extensionesPermitidas: this.recurso.extensionesPermitidas
+      extensionesPermitidas: this.recurso.extensionesPermitidas || '.pdf, .doc, .docx'
     });
   }
 
@@ -249,11 +288,7 @@ export class AulaDetalle implements OnInit {
   }
 
   irASeguimiento() {
-    // El ID puede venir como id o idTarea según tu modelo
     const idTarea = this.recurso.idTarea || this.recurso.id;
-
-    // Navegamos a la ruta que definimos antes en app.routes.ts
-    // Esto llevará al profesor a: /aula-virtual/5/tareas/12/seguimiento
     this.router.navigate(['/aula-virtual', this.idTaller, 'tareas', idTarea, 'seguimiento']);
   }
 

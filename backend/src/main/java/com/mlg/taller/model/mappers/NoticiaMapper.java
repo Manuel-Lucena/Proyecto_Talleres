@@ -6,28 +6,22 @@ import com.mlg.taller.model.entities.Noticia;
 import org.mapstruct.*;
 
 /**
- * Mapper para la gestión de noticias y novedades.
+ * Mapper para la gestión de noticias y novedades del tablón general.
  */
 @Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
 public interface NoticiaMapper {
 
-    /**
-     * Convierte la entidad Noticia en un DTO de salida.
-     */
     @Mapping(target = "idNoticia", source = "id")
     NoticiaResponseDTO toResponse(Noticia noticia);
 
-    /**
-     * Crea una nueva entidad Noticia. 
-     * La fecha de publicación se asigna manualmente en el servicio.
-     */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "fechaPublicacion", ignore = true)
     Noticia toEntity(NoticiaRequestDTO dto);
 
     /**
-     * Actualiza una noticia existente.
-     * @param noticia Entidad recuperada de la BD que será modificada.
+     * Actualiza una instancia de Noticia ya existente con los datos del DTO.
+     * Útil para métodos HTTP PUT/PATCH.
+     * @param noticia La entidad gestionada por JPA que recibirá los cambios.
      */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "fechaPublicacion", ignore = true)

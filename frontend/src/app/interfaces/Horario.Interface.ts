@@ -1,3 +1,6 @@
+/**
+ * Datos requeridos para programar una sesión horaria.
+ */
 export interface HorarioRequest {
     idTaller: number;
     diaSemana: string;
@@ -5,6 +8,9 @@ export interface HorarioRequest {
     horaFin: string;
 }
 
+/**
+ * Información completa del horario de un taller.
+ */
 export interface HorarioResponse {
     idHorario: number;
     idTaller: number;

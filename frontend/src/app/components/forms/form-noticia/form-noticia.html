@@ -8,18 +8,37 @@
         <h4 class="titulo-formulario">{{ noticiaParaEditar ? 'Editar' : 'Nueva' }} Noticia</h4>
         
         <form [formGroup]="form" class="form-flex" (submit)="$event.preventDefault()">
+          
           <div class="campo-formulario">
             <label>TÍTULO DE LA NOTICIA</label>
-            <input type="text" formControlName="titulo" class="input-personalizado" placeholder="Ej: Gran apertura...">
+            <input type="text" 
+                   formControlName="titulo" 
+                   class="input-personalizado" 
+                   [class.is-invalid]="errorService.mostrarError(form, 'titulo')"
+                   placeholder="Ej: Gran apertura...">
+            <div class="error-container">
+              @if (errorService.mostrarError(form, 'titulo')) { 
+                <span class="error-message">{{ errorService.getErrorMessage(form, 'titulo') }}</span> 
+              }
+            </div>
           </div>
           
           <div class="campo-formulario">
             <label>CONTENIDO</label>
-            <textarea formControlName="contenido" class="input-personalizado area-texto" rows="9" placeholder="Escribe aquí el cuerpo de la noticia..."></textarea>
+            <textarea formControlName="contenido" 
+                      class="input-personalizado area-texto" 
+                      [class.is-invalid]="errorService.mostrarError(form, 'contenido')"
+                      rows="9" 
+                      placeholder="Escribe aquí el cuerpo de la noticia..."></textarea>
+            <div class="error-container">
+              @if (errorService.mostrarError(form, 'contenido')) { 
+                <span class="error-message">{{ errorService.getErrorMessage(form, 'contenido') }}</span> 
+              }
+            </div>
           </div>
           
           <div class="zona-subida" (click)="fileInput.click()">
-            <input type="file" #fileInput (change)="onFileSelected($event)" hidden>
+            <input type="file" #fileInput (change)="onFileSelected($event)" hidden accept="image/*">
             <i class="bi bi-image me-2"></i> 
             {{ fileSeleccionado ? fileSeleccionado.name : 'Cambiar imagen destacada' }}
           </div>
@@ -42,7 +61,10 @@
         </div>
 
         <div class="acciones-finales">
-          <button type="button" class="btn-guardar-noticia" [disabled]="form.invalid" (click)="enviar()">
+          <button type="button" 
+                  class="btn-guardar-noticia" 
+                  [disabled]="form.invalid" 
+                  (click)="enviar()">
             <i class="bi bi-check-circle-fill me-2"></i>
             {{ noticiaParaEditar ? 'Guardar Cambios' : 'Publicar Ahora' }}
           </button>

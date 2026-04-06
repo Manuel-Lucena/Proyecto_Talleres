@@ -2,18 +2,28 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../interfaces/ApiResponse.Interface'; 
-import { ArchivoMaterialResponse } from '../interfaces/Archivo.Interface'; // Interfaz unificada
+import { ArchivoMaterialResponse } from '../interfaces/Archivo.Interface';
 
+/**
+ * Servicio encargado de la gestión de archivos adjuntos a los materiales didácticos.
+ * Permite subir y organizar recursos teóricos para los talleres.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class ArchivoMaterialService {
 
+  /** URL base para los endpoints de la API de archivos de material */
   private readonly URL = 'http://localhost:8080/api/archivos-material';
 
   constructor(private http: HttpClient) { }
 
-  // 1. POST - Guardar nuevo archivo de material
+  /**
+   * Sube un archivo físico y lo vincula a un recurso de material.
+   * @param idMaterial ID del material de apoyo asociado.
+   * @param archivo El fichero binario que se desea subir.
+   * @returns Observable con la respuesta de la API y los metadatos del archivo guardado.
+   */
   guardar(idMaterial: number, archivo: File): Observable<ApiResponse<ArchivoMaterialResponse>> {
     const formData = new FormData();
     const dto = { idMaterial: idMaterial };
@@ -24,12 +34,20 @@ export class ArchivoMaterialService {
     return this.http.post<ApiResponse<ArchivoMaterialResponse>>(this.URL, formData);
   }
 
-  // 2. GET - Listar por Material
+  /**
+   * Recupera el listado de archivos vinculados a un material específico.
+   * @param idMaterial Identificador del material de apoyo.
+   * @returns Observable con la lista de archivos asociados.
+   */
   listarPorMaterial(idMaterial: number): Observable<ApiResponse<ArchivoMaterialResponse[]>> {
     return this.http.get<ApiResponse<ArchivoMaterialResponse[]>>(`${this.URL}/material/${idMaterial}`);
   }
 
-  // 3. DELETE - Borrar el archivo
+  /**
+   * Elimina un archivo de material del sistema (base de datos y almacenamiento).
+   * @param id Identificador único del archivo a borrar.
+   * @returns Observable de confirmación.
+   */
   eliminar(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.URL}/${id}`);
   }

@@ -5,16 +5,16 @@ import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Entidad de Usuario con soporte nativo para Spring Security.
+ * Implementa {@link UserDetails} para gestionar la autenticación y autorización 
+ * directamente sobre la tabla de la base de datos.
+ */
 @Entity
 @Table(name = "USUARIO")
 @SQLDelete(sql = "UPDATE usuario SET activo = false WHERE id_usuario = ?")
@@ -30,6 +30,7 @@ public class Usuario implements UserDetails {
     @Column(name = "id_usuario")
     private Long id;
 
+    /** Documento Nacional de Identidad o NIE. Único. */
     @Column(nullable = false, unique = true, length = 20)
     private String dni;
 
@@ -39,9 +40,11 @@ public class Usuario implements UserDetails {
     @Column(nullable = false, length = 150)
     private String apellidos;
 
+    /** Correo electrónico que actúa como 'username' en el sistema de login. */
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 
+    /** Hash de la contraseña (normalmente procesado con BCrypt). */
     @Column(nullable = false)
     private String password;
 
@@ -51,24 +54,29 @@ public class Usuario implements UserDetails {
     @Column(length = 20)
     private String telefono;
 
+    /** * Rol del usuario. Se carga de forma ANSIOSA (EAGER) 
+     * porque es necesario para casi todas las validaciones de seguridad.
+     */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_rol", nullable = false)
     private Rol rol;
 
+    /** Ruta del avatar o imagen de perfil. */
     @Column(name = "foto_perfil_ruta")
     private String fotoPerfilRuta;
 
+    /** Estado de cuenta (Soft Delete). Si es false, el login fallará. */
     @Builder.Default
     @Column(nullable = false)
     private boolean activo = true;
 
     // ==============================================================
-    // MÉTODOS DE USERDETAILS (Para Spring Security / JWT)
+    // IMPLEMENTACIÓN DE USERDETAILS
     // ==============================================================
 
+    /** Convierte el Rol de la entidad en una autoridad reconocible por Spring Security. */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Retornamos el rol. Importante: Spring suele esperar "ROLE_NOMBRE"
         return List.of(new SimpleGrantedAuthority(rol.getNombre()));
     }
 
@@ -78,20 +86,15 @@ public class Usuario implements UserDetails {
     }
 
     @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+    public boolean isAccountNonExpired() { return true; }
 
     @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+    public boolean isAccountNonLocked() { return true; }
 
     @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+    public boolean isCredentialsNonExpired() { return true; }
 
+    /** El acceso depende del estado 'activo' (Soft Delete). */
     @Override
     public boolean isEnabled() {
         return this.activo;

@@ -19,8 +19,6 @@ import java.util.stream.Collectors;
 
 /**
  * Servicio para la gestión de talleres y cursos.
- * Controla la asignación de profesores y el almacenamiento de imágenes
- * descriptivas.
  */
 @Service
 @RequiredArgsConstructor
@@ -33,13 +31,14 @@ public class TallerService {
 
     private static final String FOLDER = "talleres";
 
+    // --- MÉTODOS POST ---
+
     /**
      * Crea un nuevo taller asociándolo a un profesor y procesando su imagen.
-     * * @param dto Datos del taller a crear (incluye ID del profesor).
-     * 
+     * @param dto Datos del taller a crear.
      * @param archivo Imagen opcional para el taller.
-     * @return DTO con la información del taller persistido.
-     * @throws ResourceNotFoundException si el profesor indicado no existe.
+     * @return Taller persistido.
+     * @throws ResourceNotFoundException Si el profesor indicado no existe.
      */
     @Transactional
     public TallerResponseDTO crear(TallerRequestDTO dto, MultipartFile archivo) {
@@ -52,23 +51,11 @@ public class TallerService {
         return tallerMapper.toResponse(tallerRepository.save(taller));
     }
 
-    /**
-     * Busca un taller por su identificador.
-     * * @param id Identificador único del taller.
-     * 
-     * @return DTO del taller encontrado.
-     * @throws ResourceNotFoundException si no existe el taller.
-     */
-    @Transactional(readOnly = true)
-    public TallerResponseDTO buscarPorId(Long id) {
-        return tallerRepository.findById(id)
-                .map(tallerMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Taller no encontrado con ID: " + id));
-    }
+    // --- MÉTODOS GET ---
 
     /**
      * Lista todos los talleres registrados en el sistema.
-     * * @return Lista de talleres en formato DTO.
+     * @return Lista de todos los talleres.
      */
     @Transactional(readOnly = true)
     public List<TallerResponseDTO> listarTodos() {
@@ -78,14 +65,39 @@ public class TallerService {
     }
 
     /**
+     * Busca un taller por su identificador único.
+     * @param id Identificador del taller.
+     * @return Taller encontrado.
+     * @throws ResourceNotFoundException Si el taller no existe.
+     */
+    @Transactional(readOnly = true)
+    public TallerResponseDTO buscarPorId(Long id) {
+        return tallerRepository.findById(id)
+                .map(tallerMapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Taller no encontrado con ID: " + id));
+    }
+
+    /**
+     * Lista los talleres en los que participa un usuario específico.
+     * @param idUsuario ID del usuario.
+     * @return Lista de talleres asociados.
+     */
+    @Transactional(readOnly = true)
+    public List<TallerResponseDTO> listarTalleresPorUsuarioId(Long idUsuario) {
+        return tallerRepository.findTalleresByUsuarioId(idUsuario).stream()
+                .map(tallerMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    // --- MÉTODOS PUT ---
+
+    /**
      * Actualiza la información de un taller existente.
-     * * @param id ID del taller a modificar.
-     * 
-     * @param dto     Nuevos datos.
+     * @param id ID del taller a modificar.
+     * @param dto Nuevos datos del taller.
      * @param archivo Nueva imagen opcional.
-     * @return DTO del taller actualizado.
-     * @throws ResourceNotFoundException si el taller o el nuevo profesor no
-     *                                   existen.
+     * @return Taller actualizado.
+     * @throws ResourceNotFoundException Si el taller o el nuevo profesor no existen.
      */
     @Transactional
     public TallerResponseDTO actualizar(Long id, TallerRequestDTO dto, MultipartFile archivo) {
@@ -105,58 +117,46 @@ public class TallerService {
         return tallerMapper.toResponse(tallerRepository.save(taller));
     }
 
-    @Transactional(readOnly = true)
-    public List<TallerResponseDTO> listarTalleresPorUsuarioId(Long idUsuario) {
-        List<Taller> entidades = tallerRepository.findTalleresByUsuarioId(idUsuario);
-        return entidades.stream()
-                .map(tallerMapper::toResponse) // Usamos tu mapper de siempre
-                .collect(Collectors.toList());
-    }
+    // --- MÉTODOS DELETE ---
 
     /**
-     * Elimina un taller del sistema.
-     * * @param id ID del taller a borrar.
-     * 
-     * @throws ResourceNotFoundException si el taller no existe.
+     * Elimina un taller del sistema y su imagen asociada.
+     * @param id ID del taller a borrar.
+     * @throws ResourceNotFoundException Si el taller no existe.
      */
     @Transactional
     public void eliminar(Long id) {
         Taller taller = tallerRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "No se puede eliminar: Taller no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("No se puede eliminar: Taller no encontrado con ID: " + id));
 
-        // Si el taller tiene foto, la borramos del disco (es pública -> true)
         if (taller.getFotoRuta() != null) {
             fileUtil.eliminar(FOLDER, taller.getFotoRuta(), true);
         }
 
         tallerRepository.delete(taller);
     }
-    // --- MÉTODOS PRIVADOS DE APOYO ---
+
+    // --- MÉTODOS PRIVADOS ---
 
     /**
-     * Busca un usuario con rol de profesor en la base de datos.
-     * * @param idProfesor Identificador del usuario.
-     * 
-     * @return Entidad Usuario encontrada.
-     * @throws ResourceNotFoundException si el profesor no existe.
+     * Busca un usuario con rol de profesor.
+     * @param idProfesor ID del usuario profesor.
+     * @return Usuario encontrado.
+     * @throws ResourceNotFoundException Si el profesor no existe.
      */
     private Usuario obtenerProfesor(Long idProfesor) {
         return usuarioRepository.findById(idProfesor)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("El profesor asignado (ID: " + idProfesor + ") no existe"));
+                .orElseThrow(() -> new ResourceNotFoundException("El profesor asignado (ID: " + idProfesor + ") no existe"));
     }
 
     /**
-     * Procesa y guarda físicamente la imagen del taller si se proporciona.
-     * * @param taller Entidad taller que recibirá la ruta de la foto.
-     * 
-     * @param archivo Archivo MultipartFile recibido.
+     * Procesa y guarda físicamente la imagen del taller.
+     * @param taller Entidad taller que recibirá la ruta.
+     * @param archivo Archivo de imagen recibido.
      */
     private void gestionarImagenTaller(Taller taller, MultipartFile archivo) {
         if (archivo != null && !archivo.isEmpty()) {
             String nombreImagen = "taller_" + taller.getId() + ".jpg";
-            // Añadimos 'true' porque la carátula del taller es PÚBLICA
             fileUtil.guardar(archivo, FOLDER, nombreImagen, true);
             taller.setFotoRuta(nombreImagen);
         }

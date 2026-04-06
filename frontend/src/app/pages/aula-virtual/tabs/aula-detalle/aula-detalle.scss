@@ -358,3 +358,65 @@
 .color-carga {
   color: v.$color-marca-principal;
 }
+
+/* --- NUEVAS REGLAS PARA DESPLEGABLE Y CENTRADO --- */
+
+.footer-save-central {
+  display: flex;
+  justify-content: center; // Centra los botones
+  gap: 1.5rem;
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e4e6eb;
+}
+
+.dropdown-extensiones-custom {
+  position: relative;
+  width: 100%;
+
+  .dropdown-trigger-custom {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+    min-height: 48px;
+
+    &:hover { border-color: v.$color-marca-principal; }
+    .text-truncate { max-width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  }
+
+  .dropdown-menu-custom {
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: none;
+    padding: 10px;
+    max-height: 250px;
+    overflow-y: auto;
+    @include m.animacion-entrada;
+
+    &.show { display: block; }
+
+    .dropdown-item-check {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 6px;
+      &:hover { background: #f0f2f5; }
+      
+      input[type="checkbox"] { width: 17px; height: 17px; cursor: pointer; accent-color: v.$color-marca-principal; }
+      span { font-size: 0.9rem; color: #1c1e21; font-weight: 500; }
+    }
+  }
+}

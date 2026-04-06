@@ -10,11 +10,10 @@
     pointer-events: none; 
 }
 
-// 1. OVERLAY (Ajustado a la opacidad de la guía)
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(v.$color-neutro-min, 0.5); // Usando variable neutra
+    background: rgba(v.$color-neutro-min, 0.5);
     backdrop-filter: blur(4px);
     z-index: 999999;
     display: flex;
@@ -25,9 +24,8 @@
     @include m.animacion-entrada;
 }
 
-// 2. CUERPO DEL MODAL
 .modal-body {
-    @include f.estilo-contenedor-formulario; // Mantiene tu cabecera con línea verde
+    @include f.estilo-contenedor-formulario;
     width: 100%;
     max-width: 1100px;
     max-height: 90vh; 
@@ -35,14 +33,11 @@
     flex-direction: column;
     position: relative;
     background: v.$color-neutro-max;
-    box-shadow: v.$sombra-nivel-3; // Sombra intensa de la guía para modales
+    box-shadow: v.$sombra-nivel-3;
 
-    &:hover {
-        transform: none !important; // Evita el salto del mixin de tarjetas
-    }
+    &:hover { transform: none !important; }
 }
 
-// 3. EL GRID (Mantenemos tu lógica de scroll interno)
 .noticia-grid-container {
     display: grid;
     grid-template-columns: 1.2fr 0.8fr;
@@ -51,35 +46,46 @@
     overflow-y: auto; 
     padding: 10px;
 
-    &::-webkit-scrollbar {
-        width: 8px;
-    }
-
+    &::-webkit-scrollbar { width: 8px; }
     &::-webkit-scrollbar-thumb {
-        background: v.$color-marca-principal; // Scroll personalizado con color marca
+        background: v.$color-marca-principal;
         border-radius: 4px;
-        opacity: 0.3;
     }
 
-    @media (max-width: 900px) {
-        grid-template-columns: 1fr;
+    @media (max-width: 900px) { grid-template-columns: 1fr; }
+}
+
+.campo-formulario {
+    display: flex;
+    flex-direction: column;
+    
+    .input-personalizado.is-invalid {
+        border-color: v.$color-secundario-calido-1 !important;
+        background-color: rgba(v.$color-secundario-calido-1, 0.02);
     }
 }
 
-// 4. COLUMNA IZQUIERDA (Formulario)
+.error-container {
+    min-height: 18px;
+    margin-top: 4px;
+    .error-message {
+        color: v.$color-secundario-calido-1;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+}
+
 .noticia-form-col {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    min-width: 0;
 
     .form-flex {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 10px; // Reducido un poco para acomodar el error-container
     }
 
-    // Usamos el estilo de input base de tu archivo global
     textarea.input-personalizado {
         @include f.estilo-input-base;
         height: 250px; 
@@ -87,14 +93,13 @@
     }
 }
 
-// 5. ZONA DE SUBIDA (Usamos tu clase global corregida)
 .zona-subida {
-    @extend .zona-subida; // Hereda el diseño del archivo que me pasaste en imagen
+    @extend .zona-subida;
     width: 100%;
     margin: 10px 0;
+    cursor: pointer;
 }
 
-// 6. COLUMNA DERECHA (Preview Sticky)
 .noticia-preview-col {
     display: flex;
     flex-direction: column;
@@ -112,7 +117,7 @@
 }
 
 .vista-previa-tarjeta {
-    @include m.card-elevada; // Aplicamos la elevación de la guía
+    @include m.card-elevada;
     background: v.$color-neutro-max;
     border-radius: v.$radio-curvatura;
     overflow: hidden;
@@ -120,25 +125,15 @@
     .img-contenedor {
         height: 200px;
         background: v.$color-fondo-pagina;
-
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        img { width: 100%; height: 100%; object-fit: cover; }
     }
 
-    .p-3 {
-        padding: 1.5rem;
-    }
-
+    .p-3 { padding: 1.5rem; }
     .preview-title {
         font-family: v.$fuente-enfasis;
         font-weight: 800;
         color: v.$color-secundario-frio-2;
-        font-size: 1.2rem;
     }
-
     .preview-text {
         font-family: v.$fuente-lectura;
         color: #666;
@@ -146,7 +141,6 @@
     }
 }
 
-// 7. ACCIONES
 .acciones-finales {
     margin-top: auto; 
     padding-top: 20px;
@@ -155,10 +149,10 @@
         @include m.boton-primario;
         width: 100%;
         padding: 18px;
-        font-family: v.$fuente-enfasis;
-        font-weight: 800;
-
-        &:hover {
+        
+        &:disabled {
+            background-color: #ccc !important;
+            cursor: not-allowed;
             transform: none !important;
         }
     }
@@ -174,9 +168,5 @@
     background: none;
     border: none;
     cursor: pointer;
-    transition: color 0.3s ease;
-
-    &:hover {
-        color: v.$color-marca-principal;
-    }
+    &:hover { color: v.$color-marca-principal; }
 }

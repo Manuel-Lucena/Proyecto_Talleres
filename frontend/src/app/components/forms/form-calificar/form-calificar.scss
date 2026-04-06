@@ -18,25 +18,29 @@
 }
 
 .modal-content-custom {
-    @extend .contenedor-formulario; // Heredamos TODO tu estilo de formularios de una
+    // Si da error aquí también, usa: background: white; border-radius: 15px; etc.
+    @extend .contenedor-formulario !optional;
     width: 100%;
-    max-width: 600px;
-    padding: 2rem; // Sobreescribimos el padding para que no sea tan gigante
+    max-width: 700px;
+    padding: 2.5rem;
     position: relative;
+    background: white;
 
     header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 1.5rem;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 1rem;
 
         h2 {
             margin: 0;
-            border: none;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
+            color: $color-secundario-frio-2;
+            font-weight: 800;
         }
 
-        // Limpiamos el h2 para el modal
         .btn-close-modal {
             background: none;
             border: none;
@@ -50,67 +54,174 @@
             }
         }
     }
+}
 
-    .info-entrega,
-    .archivos-alumno {
-        margin-bottom: 1rem;
+.info-entrega {
+    margin-bottom: 1.5rem;
 
-        label {
-            @extend label;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        // Usamos el estilo de tu label
-        .texto-alumno {
-            background: #f9f9f9;
-            padding: 1rem;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            color: #666;
-            border: 1px solid #eee;
-        }
+    label {
+        font-weight: 700;
+        color: $color-marca-principal;
+        display: block;
+        margin-bottom: 8px;
     }
 
-    .chip-file {
-        display: inline-flex;
+    .texto-alumno {
+        background: #f8f9fa;
+        padding: 1.2rem;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        color: #555;
+        border: 1px solid #eee;
+    }
+}
+
+// --- ARCHIVOS EN FILA ENTERA (Como pediste) ---
+.archivos-alumno {
+    margin-bottom: 1.5rem;
+
+    label {
+        font-weight: 700;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .lista-archivos-enteros {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .item-archivo-completo {
+        display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 5px 12px;
+        padding: 12px 18px;
         background: white;
-        border: 1px solid $color-marca-principal;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        color: $color-marca-principal;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
         cursor: pointer;
-        font-weight: 600;
-        margin-top: 5px;
+        transition: all 0.2s ease;
+
+        i {
+            font-size: 1.6rem;
+            color: $color-marca-principal;
+            margin-right: 15px;
+        }
+
+        .info-archivo {
+            display: flex;
+            flex-direction: column;
+
+            .nombre-archivo {
+                font-weight: 600;
+                font-size: 0.9rem;
+                color: #333;
+            }
+
+            .hint-descarga {
+                font-size: 0.75rem;
+                color: #999;
+            }
+        }
 
         &:hover {
-            background: $color-marca-principal;
-            color: white;
+            border-color: $color-marca-principal;
+            background: rgba($color-marca-principal, 0.03);
+            transform: translateX(5px);
+        }
+    }
+}
+
+// --- FORMULARIO Y ERRORES ---
+.fila-formulario {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+
+    @media (max-width: 600px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.campo-formulario {
+    display: flex;
+    flex-direction: column;
+
+    label {
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    // Cambiamos @extend por clases manuales para evitar el error de "not found"
+    input,
+    textarea {
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        outline: none;
+        font-family: inherit;
+
+        &.is-invalid {
+            border-color: $color-secundario-calido-1 !important;
+            background-color: rgba($color-secundario-calido-1, 0.02);
         }
     }
 
-    footer {
-        margin-top: 2rem;
-        display: flex;
-        justify-content: flex-end;
-        gap: 1rem;
+    .error-container {
+        min-height: 20px;
+        margin-top: 4px;
 
-        .btn-secondary {
-            background: none;
-            border: none;
-            color: #999;
+        .error-message {
+            color: $color-secundario-calido-1;
+            font-size: 0.75rem;
             font-weight: 700;
-            cursor: pointer;
+        }
+    }
+}
+
+footer {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center; // <--- ESTO centra los botones
+    gap: 1.5rem; // Un poco más de espacio entre ellos
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+
+    .btn-secondary {
+        background: #f0f0f0;
+        border: none;
+        padding: 12px 30px; // Aumentamos padding para que tengan cuerpo
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        color: #666;
+        transition: background 0.2s;
+
+        &:hover {
+            background: #e5e5e5;
+        }
+    }
+
+    .btn-primary {
+        @extend .btn-guardar;
+        background-color: $color-marca-principal;
+        color: white;
+        border: none;
+        padding: 12px 30px; // Mismo padding que el cancelar
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        min-width: 180px; // Para que el botón de guardar destaque un poco
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(1);
         }
 
-        .btn-primary {
-            @extend .btn-guardar;
-            margin: 0;
+        &:hover:not(:disabled) {
+            filter: brightness(1.1);
         }
-
-        // Heredamos tu botón de guardar
     }
 }

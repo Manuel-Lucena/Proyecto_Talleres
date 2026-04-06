@@ -17,9 +17,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.Path;
 
+/**
+ * Controlador encargado de la gestión de descargas de archivos del sistema.
+ * Proporciona endpoints para obtener recursos de materiales, tareas y entregas
+ * de forma segura desde el almacenamiento del servidor.
+ */
 @RestController
 @RequestMapping("/api/descargas")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class ArchivoDescargaController {
 
     private final FileUtil fileUtil;
@@ -27,28 +33,50 @@ public class ArchivoDescargaController {
     private final ArchivoTareaService archivoTareaService;
     private final ArchivoEntregaService archivoEntregaService;
 
+    // --- MÉTODOS GET ---
+
+    /**
+     * Gestiona la descarga de un archivo de material didáctico.
+     * @param id Identificador único del registro de archivo de material.
+     * @return   ResponseEntity con el recurso binario del archivo.
+     */
     @GetMapping("/material/{id}")
     public ResponseEntity<Resource> descargarMaterial(@PathVariable Long id) {
         var dto = archivoMaterialService.buscarPorId(id);
         return servirArchivo(dto.getRutaArchivo(), dto.getNombre());
     }
 
+    /**
+     * Gestiona la descarga de un archivo adjunto a una tarea.
+     * @param id Identificador único del registro de archivo de tarea.
+     * @return   ResponseEntity con el recurso binario del archivo.
+     */
     @GetMapping("/tarea/{id}")
     public ResponseEntity<Resource> descargarTarea(@PathVariable Long id) {
         var dto = archivoTareaService.buscarPorId(id);
         return servirArchivo(dto.getRutaArchivo(), dto.getNombre());
     }
 
+    /**
+     * Gestiona la descarga de un archivo entregado por un alumno.
+     * @param id Identificador único del registro de archivo de entrega.
+     * @return   ResponseEntity con el recurso binario del archivo.
+     */
     @GetMapping("/entrega/{id}")
     public ResponseEntity<Resource> descargarEntrega(@PathVariable Long id) {
         var dto = archivoEntregaService.buscarPorId(id); 
         return servirArchivo(dto.getRutaArchivo(), dto.getNombre());
     }
 
+    // --- MÉTODOS PRIVADOS DE SOPORTE ---
+
     /**
-     * @SneakyThrows es una anotación de Lombok que "engaña" al compilador 
-     * para no escribir el try-catch de la MalformedURLException.
-     * Si ocurre, llegará al handleGlobal de tu ExceptionHandler.
+     * Método interno para transformar una ruta de base de datos en un recurso descargable.
+     * @param rutaBd         Ruta almacenada en BD (formato "carpeta/nombre_sistema").
+     * @param nombreOriginal Nombre con el que el usuario verá el archivo al descargar.
+     * @return               ResponseEntity configurado para descarga de archivos (OCTET_STREAM).
+     * @throws BadRequestException       Si el formato de la ruta en BD es inválido.
+     * @throws ResourceNotFoundException Si el archivo no existe físicamente o no se puede leer.
      */
     @SneakyThrows
     private ResponseEntity<Resource> servirArchivo(String rutaBd, String nombreOriginal) {
@@ -61,7 +89,7 @@ public class ArchivoDescargaController {
         Path path = fileUtil.getRutaProtegida(partes[0], partes[1]);
         Resource recurso = new UrlResource(path.toUri());
 
-        // Si el archivo no existe físicamente, lanzamos TU excepción 404
+        // Verificación de integridad física del recurso
         if (!recurso.exists() || !recurso.isReadable()) {
             throw new ResourceNotFoundException("El archivo '" + nombreOriginal + "' no existe en el servidor");
         }

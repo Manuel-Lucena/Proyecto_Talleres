@@ -1,3 +1,6 @@
+/**
+ * Datos requeridos para crear una nueva actividad evaluable.
+ */
 export interface TareaRequest {
     titulo: string;
     descripcion: string;
@@ -7,6 +10,9 @@ export interface TareaRequest {
     alumnosIds?: number[];
 }
 
+/**
+ * Información detallada de la tarea devuelta por el servidor.
+ */
 export interface TareaResponse {
     idTarea: number;
     titulo: string;

@@ -1,13 +1,27 @@
 import { Injectable } from '@angular/core';
 import { jwtDecode } from 'jwt-decode';
 
+/**
+ * Servicio encargado de la gestión y decodificación del token JWT.
+ * Proporciona información sobre la sesión actual del usuario extrayendo
+ * los datos del almacenamiento local (localStorage).
+ */
 @Injectable({ providedIn: 'root' })
 export class TokenService {
 
+  /**
+   * Obtiene el token crudo almacenado en el navegador.
+   * @private
+   * @returns El string del token o null si no existe.
+   */
   private get getTokenFromStorage(): string | null {
     return localStorage.getItem('token');
   }
 
+  /**
+   * Decodifica el token JWT para extraer el payload.
+   * @returns Un objeto con los claims del token o null si el token es inválido o no existe.
+   */
   decode(): any {
     const token = this.getTokenFromStorage;
     if (!token) return null;
@@ -19,28 +33,49 @@ export class TokenService {
     }
   }
 
+  /**
+   * Extrae el identificador único del usuario del token decodificado.
+   * @returns ID del usuario o null.
+   */
   getId(): number | null {
     const decoded = this.decode();
     return decoded?.id || null;
   }
 
-
+  /**
+   * Extrae el correo electrónico (subject) del token decodificado.
+   * @returns Email del usuario o null.
+   */
   getEmail(): string | null {
     const decoded = this.decode();
     return decoded?.sub || null;
   }
 
+  /**
+   * Obtiene el rol asignado al usuario desde el token.
+   * Soporta las claves 'role' o 'rol' para mayor compatibilidad con el backend.
+   * @returns Nombre del rol (ej: 'ADMIN', 'PROFESOR', 'ALUMNO') o null.
+   */
   getRol(): string | null {
     const decoded = this.decode();
     return decoded?.role || decoded?.rol || null; 
   }
 
+  /**
+   * Verifica si el usuario está autenticado y si su sesión sigue siendo válida.
+   * Compara la fecha de expiración del token (exp) con la hora actual del sistema.
+   * @returns true si el token existe y no ha expirado, false en caso contrario.
+   */
   isLogged(): boolean {
     const dec = this.decode();
     if (!dec) return false;
+    // Multiplicamos por 1000 porque 'exp' está en segundos y Date.now() en milisegundos
     return (dec.exp * 1000) > Date.now();
   }
 
+  /**
+   * Elimina el token del almacenamiento local, cerrando efectivamente la sesión.
+   */
   logOut(): void {
     localStorage.removeItem('token');
   }

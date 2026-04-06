@@ -10,6 +10,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import java.time.LocalDateTime;
 
+/**
+ * Mapper para el proceso de matriculación de alumnos.
+ * Centraliza la lógica de inicialización de pagos y fechas de inscripción.
+ */
 @Mapper(componentModel = "spring", imports = {LocalDateTime.class, EstadoPago.class})
 public interface InscripcionMapper {
 
@@ -18,12 +22,17 @@ public interface InscripcionMapper {
     @Mapping(target = "nombreTaller", source = "taller.nombre")
     InscripcionResponseDTO toResponse(Inscripcion ins);
 
+    /**
+     * Crea una entidad Inscripcion combinando datos de tres fuentes.
+     * @mapping activa Inicializa por defecto a true (Soft Delete).
+     * @mapping estadoPago Asigna automáticamente el estado PAGADO tras la confirmación.
+     * @mapping fechaInscripcion/fechaPago Genera la marca de tiempo actual.
+     */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "activa", constant = "true")
     @Mapping(target = "estadoPago", expression = "java(EstadoPago.PAGADO)")
     @Mapping(target = "fechaInscripcion", expression = "java(LocalDateTime.now())")
     @Mapping(target = "fechaPago", expression = "java(LocalDateTime.now())")
-    // Mapeamos los objetos que pasaremos como parámetros extras
     @Mapping(target = "usuario", source = "usuario")
     @Mapping(target = "taller", source = "taller")
     Inscripcion toEntity(InscripcionRequestDTO dto, Usuario usuario, Taller taller);

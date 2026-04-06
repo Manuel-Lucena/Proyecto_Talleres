@@ -1,5 +1,6 @@
-// Usuario.Interface.ts
-
+/**
+ * Perfil completo de usuario devuelto por el servidor tras login o consulta.
+ */
 export interface UsuarioResponse {
   idUsuario: number;
   dni: string;
@@ -14,6 +15,9 @@ export interface UsuarioResponse {
   token?: string;
 }
 
+/**
+ * Datos necesarios para el registro o edición de un usuario.
+ */
 export interface UsuarioRequest {
   dni: string;
   nombre: string;

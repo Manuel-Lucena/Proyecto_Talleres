@@ -1,5 +1,5 @@
-<div class="modal-overlay">
-  <div class="modal-content-custom">
+<div class="modal-overlay" (click)="cerrar.emit()">
+  <div class="modal-content-custom" (click)="$event.stopPropagation()">
     <header>
       <h2>Calificar Entrega</h2>
       <button (click)="cerrar.emit()" class="btn-close-modal">×</button>
@@ -13,21 +13,38 @@
 
       <div class="archivos-alumno" *ngIf="archivosAlumno.length > 0">
         <label>Archivos adjuntos:</label>
-        <div class="lista-mini">
-          <div *ngFor="let a of archivosAlumno" (click)="descargarArchivo(a)" class="chip-file">
-            <i class="bi bi-download"></i> {{ a.nombre }}
+        <div class="lista-archivos-enteros">
+          <div *ngFor="let a of archivosAlumno" (click)="descargarArchivo(a)" class="item-archivo-completo">
+            <i class="bi bi-file-earmark-arrow-down"></i>
+            <div class="info">
+              <span class="nombre">{{ a.nombre }}</span>
+              <span class="sub">Click para descargar</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <form [formGroup]="form" class="mt-4">
-        <div class="mb-3">
-          <label class="form-label">Nota (0 - 10)</label>
-          <input type="number" formControlName="calificacion" class="form-control">
+      <form [formGroup]="form" (submit)="$event.preventDefault()" class="mt-4">
+        <div class="fila-formulario">
+          <div class="campo-formulario">
+            <label>Nota (0 - 10)</label>
+            <input type="number" formControlName="calificacion" class="input-personalizado"
+              [class.is-invalid]="errorService.mostrarError(form, 'calificacion')">
+            
+            <div class="error-container">
+              @if (errorService.mostrarError(form, 'calificacion')) { 
+                <span class="error-message">{{ errorService.getErrorMessage(form, 'calificacion') }}</span> 
+              }
+            </div>
+          </div>
         </div>
-        <div class="mb-3">
-          <label class="form-label">Feedback / Comentario</label>
-          <textarea formControlName="comentarioProfesor" class="form-control" rows="4"></textarea>
+
+        <div class="fila-formulario">
+          <div class="campo-formulario">
+            <label>Feedback / Comentario</label>
+            <textarea formControlName="comentarioProfesor" class="input-personalizado" rows="3"></textarea>
+            <div class="error-container"></div>
+          </div>
         </div>
       </form>
     </main>

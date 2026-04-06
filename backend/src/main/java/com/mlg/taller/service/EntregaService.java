@@ -1,5 +1,8 @@
 package com.mlg.taller.service;
 
+import com.mlg.taller.exception.BadRequestException;
+import com.mlg.taller.exception.DuplicateResourceException;
+import com.mlg.taller.exception.ResourceNotFoundException;
 import com.mlg.taller.model.dtos.EntregaRequestDTO;
 import com.mlg.taller.model.dtos.EntregaResponseDTO;
 import com.mlg.taller.model.entities.Entrega;
@@ -17,6 +20,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio para la gestión de entregas de tareas.
+ */
 @Service
 @RequiredArgsConstructor
 public class EntregaService {
@@ -26,45 +32,27 @@ public class EntregaService {
     private final UsuarioRepository usuarioRepository;
     private final EntregaMapper entregaMapper;
 
-    @Transactional(readOnly = true)
-    public List<EntregaResponseDTO> listarTodas() {
-        return entregaRepository.findAll().stream()
-                .map(entregaMapper::toResponse)
-                .collect(Collectors.toList());
-    }
+    // --- MÉTODOS POST ---
 
-    @Transactional(readOnly = true)
-    public EntregaResponseDTO buscarPorId(Long id) {
-        return entregaRepository.findById(id)
-                .map(entregaMapper::toResponse)
-                .orElseThrow(() -> new RuntimeException("Entrega no encontrada"));
-    }
-
-    @Transactional
-    public EntregaResponseDTO actualizar(Long id, EntregaRequestDTO dto) {
-        Entrega entrega = entregaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Entrega no encontrada"));
-
-        // Solo actualizamos el texto de la entrega
-        entrega.setTextoEntrega(dto.getTextoEntrega());
-        // Opcional: actualizar la fecha a la fecha de modificación
-        // entrega.setFechaEntrega(LocalDateTime.now());
-
-        return entregaMapper.toResponse(entregaRepository.save(entrega));
-    }
-
+    /**
+     * Registra una nueva entrega de tarea por parte de un alumno.
+     * @param dto Datos del envío.
+     * @return DTO de la entrega creada.
+     * @throws DuplicateResourceException Si el alumno ya entregó esta tarea previamente.
+     * @throws ResourceNotFoundException Si la tarea o el alumno no existen.
+     */
     @Transactional
     public EntregaResponseDTO enviar(EntregaRequestDTO dto) {
-        // Verificar si ya existe una entrega del alumno para esta tarea
         entregaRepository.findByTareaIdAndAlumnoId(dto.getIdTarea(), dto.getIdUsuario())
                 .ifPresent(e -> {
-                    throw new RuntimeException("Ya has realizado una entrega para esta tarea");
+                    throw new DuplicateResourceException("Ya existe una entrega registrada para este alumno en esta tarea");
                 });
 
         Tarea tarea = tareaRepository.findById(dto.getIdTarea())
-                .orElseThrow(() -> new RuntimeException("Tarea no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Tarea no encontrada con ID: " + dto.getIdTarea()));
+        
         Usuario alumno = usuarioRepository.findById(dto.getIdUsuario())
-                .orElseThrow(() -> new RuntimeException("Alumno no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + dto.getIdUsuario()));
 
         Entrega entrega = entregaMapper.toEntity(dto);
         entrega.setTarea(tarea);
@@ -74,10 +62,79 @@ public class EntregaService {
         return entregaMapper.toResponse(entregaRepository.save(entrega));
     }
 
+    // --- MÉTODOS GET ---
+
+    /**
+     * Obtiene el listado completo de entregas del sistema.
+     * @return Lista de todas las entregas.
+     */
+    @Transactional(readOnly = true)
+    public List<EntregaResponseDTO> listarTodas() {
+        return entregaRepository.findAll().stream()
+                .map(entregaMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Recupera una entrega por su identificador único.
+     * @param id Identificador de la entrega.
+     * @return DTO de la entrega encontrada.
+     * @throws ResourceNotFoundException Si el ID no existe.
+     */
+    @Transactional(readOnly = true)
+    public EntregaResponseDTO buscarPorId(Long id) {
+        return entregaRepository.findById(id)
+                .map(entregaMapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontró la entrega con ID: " + id));
+    }
+
+    /**
+     * Lista las entregas asociadas a una tarea específica.
+     * @param idTarea ID de la tarea a consultar.
+     * @return Lista de entregas para dicha tarea.
+     */
+    @Transactional(readOnly = true)
+    public List<EntregaResponseDTO> listarPorTarea(Long idTarea) {
+        return entregaRepository.findByTareaId(idTarea).stream()
+                .map(entregaMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    // --- MÉTODOS PUT ---
+
+    /**
+     * Actualiza el contenido textual de una entrega existente (edición del alumno).
+     * @param id ID de la entrega.
+     * @param dto Nuevos datos.
+     * @return DTO actualizado.
+     * @throws ResourceNotFoundException Si la entrega no existe.
+     */
+    @Transactional
+    public EntregaResponseDTO actualizar(Long id, EntregaRequestDTO dto) {
+        Entrega entrega = entregaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Entrega no encontrada para actualizar"));
+
+        entrega.setTextoEntrega(dto.getTextoEntrega());
+
+        return entregaMapper.toResponse(entregaRepository.save(entrega));
+    }
+
+    /**
+     * Asigna una nota y comentarios a una entrega (acción del profesor).
+     * @param id ID de la entrega a calificar.
+     * @param dto Datos de la calificación.
+     * @return Entrega calificada.
+     * @throws ResourceNotFoundException Si la entrega no existe.
+     * @throws BadRequestException Si la calificación no es válida.
+     */
     @Transactional
     public EntregaResponseDTO calificar(Long id, EntregaRequestDTO dto) {
         Entrega entrega = entregaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Entrega no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("No se puede calificar una entrega inexistente"));
+
+        if (dto.getCalificacion() < 0 || dto.getCalificacion() > 10) {
+            throw new BadRequestException("La calificación debe estar entre 0 y 10");
+        }
 
         entrega.setCalificacion(dto.getCalificacion());
         entrega.setComentarioProfesor(dto.getComentarioProfesor());
@@ -85,18 +142,18 @@ public class EntregaService {
         return entregaMapper.toResponse(entregaRepository.save(entrega));
     }
 
+    // --- MÉTODOS DELETE ---
+
+    /**
+     * Elimina permanentemente una entrega del sistema.
+     * @param id ID de la entrega.
+     * @throws ResourceNotFoundException Si la entrega no existe.
+     */
     @Transactional
     public void eliminar(Long id) {
         if (!entregaRepository.existsById(id)) {
-            throw new RuntimeException("La entrega no existe");
+            throw new ResourceNotFoundException("No se puede eliminar: la entrega no existe con ID: " + id);
         }
         entregaRepository.deleteById(id);
-    }
-
-    @Transactional(readOnly = true)
-    public List<EntregaResponseDTO> listarPorTarea(Long idTarea) {
-        return entregaRepository.findByTareaId(idTarea).stream()
-                .map(entregaMapper::toResponse)
-                .collect(Collectors.toList());
     }
 }
