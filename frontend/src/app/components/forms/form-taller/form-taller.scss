@@ -21,8 +21,8 @@
     max-height: 95vh;
     border-radius: 8px;
     position: relative;
-    overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    overflow: visible;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 
     .cabecera-modal {
         padding: 20px 40px;
@@ -46,7 +46,7 @@
     display: grid;
     grid-template-columns: 1fr 340px;
     max-height: 80vh;
-    overflow-y: auto;
+    overflow: visible;
 }
 
 .noticia-form-col {
@@ -54,6 +54,8 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
+    overflow-y: auto;
+    max-height: 70vh;
 }
 
 .noticia-preview-col {
@@ -75,7 +77,10 @@
 .fila-formulario {
     display: flex;
     gap: 20px;
-    .campo-formulario { flex: 1; }
+
+    .campo-formulario {
+        flex: 1;
+    }
 }
 
 .campo-formulario {
@@ -90,19 +95,69 @@
         text-transform: uppercase;
     }
 
-    input, textarea {
+    input,
+    textarea {
         @include f.estilo-input-base;
         padding: 10px;
         font-size: 0.9rem;
-        &.is-invalid { border-color: v.$color-secundario-calido-1; }
+
+        &.is-invalid {
+            border-color: v.$color-secundario-calido-1;
+        }
     }
 
-    textarea { height: 80px; resize: none; }
+    textarea {
+        height: 80px;
+        resize: none;
+    }
+}
+
+.custom-ng-select {
+    ::ng-deep .ng-select-container {
+        @include f.estilo-input-base;
+        min-height: 42px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        padding: 0 8px;
+        display: flex;
+        align-items: center;
+
+        &:after {
+            border-top: none;
+        }
+    }
+
+    ::ng-deep .ng-dropdown-panel {
+        z-index: 10001;
+        border: 1px solid v.$color-marca-principal;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border-radius: 6px;
+        background: white;
+    }
+
+    .option-prof {
+        line-height: 1.2;
+
+        span {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .text-muted {
+            font-size: 0.75rem;
+            color: #888;
+        }
+    }
 }
 
 .error-container {
     min-height: 15px;
-    .error-message { color: v.$color-secundario-calido-1; font-size: 0.7rem; font-weight: 600; }
+
+    .error-message {
+        color: v.$color-secundario-calido-1;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
 }
 
 .vista-previa-tarjeta {
@@ -110,18 +165,38 @@
     border-radius: 8px;
     border: 1px solid #eee;
     overflow: hidden;
-    
+
     .img-contenedor {
         height: 150px;
         background: #eee;
-        img { width: 100%; height: 100%; object-fit: cover; }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
     }
 
     .p-3-preview {
         padding: 15px;
-        .preview-title { font-size: 1.1rem; font-family: v.$fuente-enfasis; margin: 8px 0; }
-        .preview-date { color: v.$color-marca-principal; font-weight: 700; font-size: 0.8rem; }
-        .preview-text { font-size: 0.8rem; color: #666; @include m.limitar-lineas(3); }
+
+        .preview-title {
+            font-size: 1.1rem;
+            font-family: v.$fuente-enfasis;
+            margin: 8px 0;
+        }
+
+        .preview-date {
+            color: v.$color-marca-principal;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .preview-text {
+            font-size: 0.8rem;
+            color: #666;
+            @include m.limitar-lineas(3);
+        }
     }
 
     .preview-footer-card {
@@ -138,7 +213,10 @@
             gap: 5px;
             font-size: 0.8rem;
             color: #777;
-            i { color: v.$color-marca-principal; }
+
+            i {
+                color: v.$color-marca-principal;
+            }
         }
 
         .precio-item {
@@ -151,17 +229,30 @@
 
 .acciones-finales {
     margin-top: auto;
+
     button {
         @include m.boton-primario;
         width: 100%;
         padding: 12px;
-        &:disabled { filter: grayscale(1); opacity: 0.5; transform: none !important; }
+
+        &:disabled {
+            filter: grayscale(1);
+            opacity: 0.5;
+            transform: none !important;
+        }
     }
 }
 
 .btn-close {
-    background: none; border: none; font-size: 1.5rem; color: #ccc; cursor: pointer;
-    &:hover { color: v.$color-secundario-calido-1; }
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #ccc;
+    cursor: pointer;
+
+    &:hover {
+        color: v.$color-secundario-calido-1;
+    }
 }
 
 .zona-subida {
@@ -172,6 +263,15 @@
     cursor: pointer;
     font-size: 0.8rem;
     color: #777;
-    i { font-size: 1.1rem; display: block; }
-    &.archivo-listo { border-color: v.$color-marca-principal; color: v.$color-marca-principal; border-style: solid; }
+
+    i {
+        font-size: 1.1rem;
+        display: block;
+    }
+
+    &.archivo-listo {
+        border-color: v.$color-marca-principal;
+        color: v.$color-marca-principal;
+        border-style: solid;
+    }
 }

@@ -7,8 +7,8 @@
       <div class="sticky-content">
         <div class="profile-avatar">
           <img [src]="usuario.fotoPerfilRuta 
-            ? '/Usuarios/' + usuario.fotoPerfilRuta 
-            : '/Usuarios/Predeterminada.png'" alt="Foto de perfil">
+            ? '/usuarios/' + usuario.fotoPerfilRuta 
+            : '/usuarios/Predeterminada.png'" alt="Foto de perfil">
           <label for="f-up" class="cam-btn"><i class="bi bi-camera-fill"></i></label>
           <input type="file" id="f-up" hidden (change)="onFileSelected($event)">
         </div>

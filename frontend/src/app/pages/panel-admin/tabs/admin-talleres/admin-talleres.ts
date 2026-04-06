@@ -2,11 +2,14 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TallerService } from '../../../../services/Taller.Service';
+import { UsuarioService } from '../../../../services/Usuario.Service'; // <-- AÑADIDO
 import { NotificacionService } from '../../../../services/Notificacion.Service';
 import { TallerResponse } from '../../../../interfaces/Taller.Interface';
+import { UsuarioResponse } from '../../../../interfaces/Usuario.Interface'; // <-- AÑADIDO
 import { FormTaller } from '../../../../components/forms/form-taller/form-taller';
 import { Confirmacion } from "../../../../components/dialogs/confirmacion/confirmacion";
 import { Notificacion } from "../../../../components/dialogs/mensaje/notificacion";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin-talleres',
@@ -17,18 +20,22 @@ import { Notificacion } from "../../../../components/dialogs/mensaje/notificacio
 })
 export class AdminTalleres implements OnInit {
   talleres: TallerResponse[] = [];
+  profesores: UsuarioResponse[] = []; // <-- Variable para almacenar los profesores
   busqueda: string = '';
   mostrarModal: boolean = false;
   tallerSeleccionado: TallerResponse | null = null;
 
   constructor(
     private tallerService: TallerService,
+    private usuarioService: UsuarioService, // <-- Inyectamos el servicio de usuarios
     private notificacionService: NotificacionService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
     this.cargarTalleres();
+    this.cargarProfesores(); // <-- Los cargamos al iniciar
   }
 
   cargarTalleres(): void {
@@ -38,6 +45,17 @@ export class AdminTalleres implements OnInit {
         this.cdr.detectChanges();
       },
       error: () => this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'No se pudieron cargar los talleres', tipo: 'error' })
+    });
+  }
+
+  // MÉTODO NUEVO: Carga solo usuarios con rol de Profesor (ID: 2)
+  cargarProfesores(): void {
+    this.usuarioService.listarPorRol(2).subscribe({
+      next: (res) => {
+        this.profesores = res.data; // Extraemos el array de la respuesta
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error al cargar profesores:', err)
     });
   }
 
@@ -51,32 +69,39 @@ export class AdminTalleres implements OnInit {
   abrirCrear() {
     this.tallerSeleccionado = null;
     this.mostrarModal = true;
-    console.log('Modal abierto (Crear):', this.mostrarModal);
     this.cdr.detectChanges();
   }
 
   abrirEditar(t: TallerResponse) {
     this.tallerSeleccionado = JSON.parse(JSON.stringify(t));
     this.mostrarModal = true;
-    console.log('Modal abierto (Editar):', this.mostrarModal);
     this.cdr.detectChanges();
   }
 
   ejecutarGuardado(fd: FormData): void {
-    const operacion = this.tallerSeleccionado 
-      ? this.tallerService.actualizar(this.tallerSeleccionado.idTaller, fd)
-      : this.tallerService.crear(fd);
-
-    operacion.subscribe({
-      next: (res) => {
-        this.notificacionService.mostrar({ titulo: 'Éxito', mensaje: res.mensaje || 'Operación exitosa', tipo: 'exito' });
-        this.mostrarModal = false;
-        this.cargarTalleres();
-      },
-      error: () => this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'Error en el servidor', tipo: 'error' })
-    });
+    // Si tenemos tallerSeleccionado, es una actualización
+    if (this.tallerSeleccionado) {
+      const id = this.tallerSeleccionado.idTaller;
+      this.tallerService.actualizar(id, fd).subscribe({
+        next: (res) => {
+          this.notificacionService.mostrar({ titulo: 'Éxito', mensaje: 'Taller actualizado', tipo: 'exito' });
+          this.mostrarModal = false;
+          this.cargarTalleres(); // Recargamos la lista
+        },
+        error: (err) => console.error('Error al actualizar:', err)
+      });
+    } else {
+      // Es una creación
+      this.tallerService.crear(fd).subscribe({
+        next: (res) => {
+          this.notificacionService.mostrar({ titulo: 'Éxito', mensaje: 'Taller creado', tipo: 'exito' });
+          this.mostrarModal = false;
+          this.cargarTalleres();
+        },
+        error: (err) => console.error('Error al crear:', err)
+      });
+    }
   }
-
   eliminarTaller(id: number) {
     this.notificacionService.confirmar({
       titulo: '¿Eliminar taller?',
@@ -93,5 +118,10 @@ export class AdminTalleres implements OnInit {
         });
       }
     });
+  }
+
+
+  verHorario(id: number) {
+    this.router.navigate(['/panel-admin/talleres', id, 'horario']);
   }
 }

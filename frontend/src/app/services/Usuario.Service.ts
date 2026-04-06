@@ -48,6 +48,17 @@ export class UsuarioService {
     return this.http.get<ApiResponse<UsuarioResponse[]>>(this.apiUrl);
   }
 
+
+  /**
+     * Obtiene una lista de usuarios filtrados por su identificador de rol.
+     * @param idRol ID del rol por el cual filtrar.
+     * @returns Observable con la respuesta de la API que contiene el array de usuarios.
+     */
+  listarPorRol(idRol: number): Observable<ApiResponse<UsuarioResponse[]>> {
+    return this.http.get<ApiResponse<UsuarioResponse[]>>(`${this.apiUrl}/rol/${idRol}`);
+  }
+
+
   /**
    * Obtiene los usuarios inscritos o relacionados con un taller específico.
    * @param idTaller Identificador único del taller.

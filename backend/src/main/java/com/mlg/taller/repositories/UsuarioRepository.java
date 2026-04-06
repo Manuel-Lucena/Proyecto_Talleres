@@ -15,7 +15,9 @@ import java.util.Optional;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     /**
-     * Obtiene todos los usuarios involucrados en un taller (Profesor + Alumnos matriculados).
+     * Obtiene todos los usuarios involucrados en un taller (Profesor + Alumnos
+     * matriculados).
+     * 
      * @param idTaller Identificador del taller.
      * @return Lista unificada de participantes sin duplicados.
      */
@@ -31,7 +33,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     List<Usuario> findAllParticipantesByTallerId(@Param("idTaller") Long idTaller);
 
     /**
-     * Busca un usuario por su dirección de correo electrónico (clave para seguridad).
+     * Busca un usuario por su dirección de correo electrónico (clave para
+     * seguridad).
+     * 
      * @param email Correo del usuario.
      * @return Un {@link Optional} con el usuario o vacío si no se encuentra.
      */
@@ -39,6 +43,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     /**
      * Verifica la existencia de un email en el sistema.
+     * 
      * @param email Correo a comprobar.
      * @return true si ya está registrado.
      */
@@ -46,8 +51,17 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     /**
      * Verifica la existencia de un DNI/NIE en el sistema.
+     * 
      * @param dni Documento de identidad a comprobar.
      * @return true si ya existe en la base de datos.
      */
     boolean existsByDni(String dni);
+
+    /**
+     * Obtiene una lista de usuarios filtrados por su rol.
+     * 
+     * @param idRol Identificador del rol (1: Admin, 2: Profesor, 3: Alumno).
+     * @return Lista de usuarios que pertenecen al rol especificado.
+     */
+    List<Usuario> findByRolId(Long idRol);
 }

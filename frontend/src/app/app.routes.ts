@@ -28,6 +28,10 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/panel-admin/tabs/admin-talleres/admin-talleres').then(m => m.AdminTalleres)
             },
             {
+                path: 'talleres/:id/horario',
+                loadComponent: () => import('./pages/panel-admin/tabs/admin-horarios/admin-horarios').then(m => m.AdminHorarios)
+            },
+            {
                 path: 'usuarios',
                 loadComponent: () => import('./pages/panel-admin/tabs/admin-usuarios/admin-usuarios').then(m => m.AdminUsuarios)
             },

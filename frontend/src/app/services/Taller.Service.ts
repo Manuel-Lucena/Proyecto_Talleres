@@ -59,7 +59,7 @@ export class TallerService {
    * @returns Observable con el taller actualizado.
    */
   actualizar(id: number, formData: FormData): Observable<ApiResponse<TallerResponse>> {
-    return this.http.put<ApiResponse<TallerResponse>>(`${this.apiUrl}/${id.toString()}`, formData);
+    return this.http.put<ApiResponse<TallerResponse>>(`${this.apiUrl}/${id}`, formData);
   }
 
   /**

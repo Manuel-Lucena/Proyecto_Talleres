@@ -1,0 +1,36 @@
+<div class="admin-wrapper">
+    <header class="admin-header">
+        <div class="d-flex align-items-center">
+            <button class="btn-back" routerLink="/panel-admin/talleres" title="Volver a talleres">
+                <i class="bi bi-arrow-left"></i>
+            </button>
+            <div class="title-group ms-3">
+                <h1 class="txt-h1">Horario del Taller</h1>
+                <p class="txt-bajada">Configura los días y horas de las sesiones presenciales</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="schedule-grid mt-4">
+        @for (dia of diasSemana; track dia) {
+        <div class="day-column">
+            <div class="day-header">
+                <span>{{ dia }}</span>
+            </div>
+
+            <div class="day-content">
+                <div class="session-card">
+                    <div class="session-time">17:00 - 19:00</div>
+                    <div class="session-location">Aula Magna</div>
+                    <button class="btn-delete-session">&times;</button>
+                </div>
+
+                <button class="btn-add-slot" (click)="abrirModalSesion(dia)">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>Añadir</span>
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+</div>

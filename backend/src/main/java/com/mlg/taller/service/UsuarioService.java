@@ -41,6 +41,7 @@ public class UsuarioService {
 
     /**
      * Autentica un usuario y genera un token de acceso JWT.
+     * 
      * @param dto Credenciales de acceso (email y password).
      * @return Respuesta con el token e información de perfil.
      * @throws ResourceNotFoundException Si el email no existe.
@@ -56,8 +57,10 @@ public class UsuarioService {
     }
 
     /**
-     * Registra un nuevo usuario en el sistema con cifrado de contraseña y gestión de imagen.
-     * @param dto Datos del nuevo usuario.
+     * Registra un nuevo usuario en el sistema con cifrado de contraseña y gestión
+     * de imagen.
+     * 
+     * @param dto     Datos del nuevo usuario.
      * @param archivo Imagen opcional de perfil.
      * @return Respuesta con token de acceso tras registro exitoso.
      * @throws DuplicateResourceException Si el email ya está en uso.
@@ -81,6 +84,7 @@ public class UsuarioService {
 
     /**
      * Obtiene el listado de todos los usuarios registrados.
+     * 
      * @return Lista de usuarios.
      */
     @Transactional(readOnly = true)
@@ -92,6 +96,7 @@ public class UsuarioService {
 
     /**
      * Busca un usuario específico por su identificador.
+     * 
      * @param id Identificador único.
      * @return Usuario encontrado.
      * @throws ResourceNotFoundException Si el ID no existe.
@@ -105,6 +110,7 @@ public class UsuarioService {
 
     /**
      * Busca un usuario por su dirección de correo electrónico.
+     * 
      * @param email Correo a buscar.
      * @return Usuario encontrado.
      * @throws ResourceNotFoundException Si el email no existe.
@@ -118,6 +124,7 @@ public class UsuarioService {
 
     /**
      * Lista todos los participantes inscritos en un taller concreto.
+     * 
      * @param idTaller ID del taller.
      * @return Lista de alumnos participantes.
      */
@@ -128,12 +135,27 @@ public class UsuarioService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene el listado de usuarios que pertenecen a un rol específico.
+     * 
+     * @param idRol ID del rol (Ej: 2 para Profesores).
+     * @return Lista de usuarios mapeados a DTO.
+     */
+    @Transactional(readOnly = true)
+    public List<UsuarioResponseDTO> listarPorRol(Long idRol) {
+        return usuarioRepository.findByRolId(idRol).stream()
+                .map(usuarioMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
     // --- MÉTODOS PUT ---
 
     /**
-     * Actualiza el perfil de un usuario, validando cambios en datos únicos y regenerando el token.
-     * @param id ID del usuario a modificar.
-     * @param dto Nuevos datos.
+     * Actualiza el perfil de un usuario, validando cambios en datos únicos y
+     * regenerando el token.
+     * 
+     * @param id      ID del usuario a modificar.
+     * @param dto     Nuevos datos.
      * @param archivo Nueva imagen opcional.
      * @return Usuario actualizado con nuevo token JWT.
      * @throws ResourceNotFoundException Si el usuario no existe.
@@ -166,13 +188,15 @@ public class UsuarioService {
 
     /**
      * Elimina un usuario y su imagen de perfil del almacenamiento.
+     * 
      * @param id ID del usuario a borrar.
      * @throws ResourceNotFoundException Si el usuario no existe.
      */
     @Transactional
     public void eliminar(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede eliminar: Usuario no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se puede eliminar: Usuario no encontrado con ID: " + id));
 
         if (usuario.getFotoPerfilRuta() != null) {
             fileUtil.eliminar(FOLDER, usuario.getFotoPerfilRuta(), true);

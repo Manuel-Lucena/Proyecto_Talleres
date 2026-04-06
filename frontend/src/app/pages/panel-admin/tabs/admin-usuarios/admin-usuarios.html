@@ -20,7 +20,7 @@
       <select [(ngModel)]="filtroRol" class="select-aula">
         <option value="">Todos los roles</option>
         <option value="ADMIN">Administrador</option>
-        <option value="PROFE">Profesor</option>
+        <option value="PROFESOR">Profesor</option>
         <option value="ALUMNO">Alumno</option>
       </select>
     </div>
@@ -39,44 +39,48 @@
       </thead>
       <tbody>
         @for (u of usuariosFiltrados; track u.idUsuario) {
-          <tr>
-            <td class="col-user">
-              <div class="user-item">
-                <div class="avatar-frame">
-                  <img [src]="u.fotoPerfilRuta || 'assets/default-avatar.png'" alt="User">
-                </div>
-                <div class="user-meta">
-                  <span class="u-name">{{ u.nombre }} {{ u.apellidos }}</span>
-                  <span class="u-email">{{ u.email }}</span>
-                </div>
+        <tr>
+          <td class="col-user">
+            <div class="user-item">
+              <div class="avatar-frame">
+                <img [src]="u.fotoPerfilRuta ? '/usuarios/' + u.fotoPerfilRuta : '/usuarios/Predeterminada.png'"
+                  alt="User" (error)="u.fotoPerfilRuta = ''">
               </div>
-            </td>
-            <td><span class="u-dni">{{ u.dni }}</span></td>
-            <td>
-              <div class="contact-vertical">
-                <div class="contact-row">
-                  <i class="bi bi-telephone"></i>
-                  <span>{{ u.telefono || '---' }}</span>
-                </div>
-                <div class="contact-row mt-1">
-                  <i class="bi bi-geo-alt"></i>
-                  <span class="u-dir">{{ u.direccion || '---' }}</span>
-                </div>
+              <div class="user-meta">
+                <span class="u-name">{{ u.nombre }} {{ u.apellidos }}</span>
+                <span class="u-email">{{ u.email }}</span>
               </div>
-            </td>
-            <td>
-              <span class="badge-rol" [ngClass]="u.nombreRol.toLowerCase()">{{ u.nombreRol }}</span>
-            </td>
-            <td class="text-right">
-              <div class="actions-group">
-                <button class="btn-tool status" (click)="toggleEstado(u)" [class.active]="u.activo" title="Cambiar estado">
-                  <i class="bi" [class]="u.activo ? 'bi-shield-check' : 'bi-shield-slash'"></i>
-                </button>
-                <button class="btn-tool edit" (click)="abrirEditar(u)" title="Editar"><i class="bi bi-pencil-square"></i></button>
-                <button class="btn-tool delete" (click)="eliminarUsuario(u.idUsuario)" title="Eliminar"><i class="bi bi-trash3"></i></button>
+            </div>
+          </td>
+          <td><span class="u-dni">{{ u.dni }}</span></td>
+          <td>
+            <div class="contact-vertical">
+              <div class="contact-row">
+                <i class="bi bi-telephone"></i>
+                <span>{{ u.telefono || '---' }}</span>
               </div>
-            </td>
-          </tr>
+              <div class="contact-row mt-1">
+                <i class="bi bi-geo-alt"></i>
+                <span class="u-dir">{{ u.direccion || '---' }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="badge-rol" [ngClass]="u.nombreRol.toLowerCase()">{{ u.nombreRol }}</span>
+          </td>
+          <td class="text-right">
+            <div class="actions-group">
+              <button class="btn-tool status" (click)="toggleEstado(u)" [class.active]="u.activo"
+                title="Cambiar estado">
+                <i class="bi" [class]="u.activo ? 'bi-shield-check' : 'bi-shield-slash'"></i>
+              </button>
+              <button class="btn-tool edit" (click)="abrirEditar(u)" title="Editar"><i
+                  class="bi bi-pencil-square"></i></button>
+              <button class="btn-tool delete" (click)="eliminarUsuario(u.idUsuario)" title="Eliminar"><i
+                  class="bi bi-trash3"></i></button>
+            </div>
+          </td>
+        </tr>
         }
       </tbody>
     </table>
@@ -84,11 +88,9 @@
 </div>
 
 @if (mostrarModal) {
-  <app-form-alumno 
-    [usuarioParaEditar]="usuarioSeleccionado" 
-    (cerrar)="mostrarModal = false" 
-    (usuarioGuardado)="ejecutarGuardado($event)">
-  </app-form-alumno>
+<app-form-alumno [usuarioParaEditar]="usuarioSeleccionado" (cerrar)="mostrarModal = false"
+  (usuarioGuardado)="ejecutarGuardado($event)">
+</app-form-alumno>
 }
 
 <app-confirmacion></app-confirmacion>

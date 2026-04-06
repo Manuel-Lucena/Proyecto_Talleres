@@ -32,52 +32,55 @@
         </thead>
         <tbody>
           @for (t of talleresFiltrados; track t.idTaller) {
-            <tr>
-              <td class="col-main">
-                <div class="workshop-item">
-                  <div class="img-frame">
-                    <img [src]="t.fotoRuta ? '/talleres/' + t.fotoRuta : 'assets/default-taller.png'" alt="Taller">
-                  </div>
-                  <div class="workshop-info">
-                    <span class="t-name">{{ t.nombre }}</span>
-                    <p class="t-desc">{{ t.descripcion }}</p>
-                  </div>
+          <tr>
+            <td class="col-main">
+              <div class="workshop-item">
+                <div class="img-frame">
+                  <img [src]="t.fotoRuta ? '/talleres/' + t.fotoRuta : 'assets/default-taller.png'" alt="Taller">
                 </div>
-              </td>
-              <td>
-                <div class="prof-tag">
-                  <i class="bi bi-person-badge"></i>
-                  <span>{{ t.nombreCompletoProfesor }}</span>
+                <div class="workshop-info">
+                  <span class="t-name">{{ t.nombre }}</span>
+                  <p class="t-desc">{{ t.descripcion }}</p>
                 </div>
-              </td>
-              <td>
-                <div class="date-stack">
-                  <span class="d-range">{{ t.fechaInicio | date:'dd/MM' }} - {{ t.fechaFin | date:'dd/MM' }}</span>
-                  <span class="d-year">{{ t.fechaInicio | date:'yyyy' }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="prof-tag">
+                <i class="bi bi-person-badge"></i>
+                <span>{{ t.nombreCompletoProfesor }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="date-stack">
+                <span class="d-range">{{ t.fechaInicio | date:'dd/MM' }} - {{ t.fechaFin | date:'dd/MM' }}</span>
+                <span class="d-year">{{ t.fechaInicio | date:'yyyy' }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="plazas-box">
+                <span class="p-count">{{ t.plazasDisponibles }}/{{ t.plazasMaximas }}</span>
+                <div class="p-bar">
+                  <div class="p-fill" [style.width.%]="(t.plazasDisponibles / t.plazasMaximas) * 100"></div>
                 </div>
-              </td>
-              <td>
-                <div class="plazas-box">
-                  <span class="p-count">{{ t.plazasDisponibles }}/{{ t.plazasMaximas }}</span>
-                  <div class="p-bar">
-                    <div class="p-fill" [style.width.%]="(t.plazasDisponibles / t.plazasMaximas) * 100"></div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <span class="price-tag">{{ t.precio | currency:'EUR' }}</span>
-              </td>
-              <td class="text-right">
-                <div class="actions-group">
-                  <button class="btn-tool edit" (click)="abrirEditar(t)" title="Editar">
-                    <i class="bi bi-pencil-square"></i>
-                  </button>
-                  <button class="btn-tool delete" (click)="eliminarTaller(t.idTaller)" title="Eliminar">
-                    <i class="bi bi-trash3"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
+              </div>
+            </td>
+            <td>
+              <span class="price-tag">{{ t.precio | currency:'EUR' }}</span>
+            </td>
+            <td class="text-right">
+              <div class="actions-group">
+                <button class="btn-tool schedule" (click)="verHorario(t.idTaller)" title="Gestionar Horario">
+                  <i class="bi bi-calendar3"></i>
+                </button>
+                <button class="btn-tool edit" (click)="abrirEditar(t)" title="Editar">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+                <button class="btn-tool delete" (click)="eliminarTaller(t.idTaller)" title="Eliminar">
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
           }
         </tbody>
       </table>
@@ -86,11 +89,9 @@
 </div>
 
 @if (mostrarModal) {
-  <app-form-taller 
-    [tallerParaEditar]="tallerSeleccionado" 
-    (cerrar)="mostrarModal = false" 
-    (guardado)="ejecutarGuardado($event)">
-  </app-form-taller>
+<app-form-taller [tallerParaEditar]="tallerSeleccionado" [profesores]="profesores" (cerrar)="mostrarModal = false"
+  (guardado)="ejecutarGuardado($event)">
+</app-form-taller>
 }
 
 <app-confirmacion></app-confirmacion>

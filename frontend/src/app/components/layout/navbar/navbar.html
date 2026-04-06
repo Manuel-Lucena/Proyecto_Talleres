@@ -53,9 +53,9 @@
               <span class="user-display-name">{{ usuarioData?.nombre }}</span>
               <div class="avatar-box">
                 @if (usuarioData && usuarioData.fotoPerfilRuta) {
-                <img [src]="'/Usuarios/' + usuarioData.fotoPerfilRuta" alt="User">
+                <img [src]="'/usuarios/' + usuarioData.fotoPerfilRuta" alt="User">
                 } @else {
-                <img src="/Usuarios/Predeterminada.png" alt="User">
+                <img src="/usuarios/Predeterminada.png" alt="User">
                 }
               </div>
               <i class="bi bi-chevron-down arrow" [class.open]="mostrarDropdown"></i>
