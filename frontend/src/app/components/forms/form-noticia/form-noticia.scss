@@ -35,7 +35,7 @@
     background: v.$color-neutro-max;
     box-shadow: v.$sombra-nivel-3;
 
-    &:hover { transform: none !important; }
+    &:hover { transform: none; }
 }
 
 .noticia-grid-container {
@@ -151,9 +151,9 @@
         padding: 18px;
         
         &:disabled {
-            background-color: #ccc !important;
+            background-color: #ccc;
             cursor: not-allowed;
-            transform: none !important;
+            transform: none;
         }
     }
 }

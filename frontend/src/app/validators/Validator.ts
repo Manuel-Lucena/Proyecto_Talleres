@@ -29,8 +29,12 @@ export class Validator {
     const inicio = control.get('fechaInicio')?.value;
     const fin = control.get('fechaFin')?.value;
 
-    if (inicio && fin && new Date(inicio) > new Date(fin)) {
-      return { fechaInvalida: true }; // Esta es la clave que busca el HTML
+    if (inicio && fin) {
+      // Si los strings son horas (ej: "10:00"), se pueden comparar alfabéticamente
+      // Si son fechas, la comparación sigue siendo válida.
+      if (inicio >= fin) {
+        return { fechaInvalida: true };
+      }
     }
     return null;
   }

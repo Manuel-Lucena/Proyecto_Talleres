@@ -32,7 +32,9 @@ public class TareaService {
     // --- MÉTODOS POST ---
 
     /**
-     * Crea una nueva tarea y la asigna automáticamente a los alumnos correspondientes.
+     * Crea una nueva tarea y la asigna automáticamente a los alumnos
+     * correspondientes.
+     * 
      * @param dto Datos de la tarea y lista opcional de IDs de alumnos.
      * @return Tarea creada y asignada.
      * @throws ResourceNotFoundException Si el taller o algún alumno no existen.
@@ -40,7 +42,8 @@ public class TareaService {
     @Transactional
     public TareaResponseDTO crear(TareaRequestDTO dto) {
         Taller taller = tallerRepository.findById(dto.getIdTaller())
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede crear la tarea: Taller no encontrado con ID: " + dto.getIdTaller()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se puede crear la tarea: Taller no encontrado con ID: " + dto.getIdTaller()));
 
         Tarea tarea = tareaMapper.toEntity(dto);
         tarea.setTaller(taller);
@@ -50,7 +53,8 @@ public class TareaService {
 
         Tarea tareaGuardada = tareaRepository.save(tarea);
 
-        // Si se especifican alumnos, se asigna a ellos; si no, a todos los inscritos en el taller
+        // Si se especifican alumnos, se asigna a ellos; si no, a todos los inscritos en
+        // el taller
         if (dto.getAlumnosIds() != null && !dto.getAlumnosIds().isEmpty()) {
             for (Long alumnoId : dto.getAlumnosIds()) {
                 asignarTareaAAlumno(tareaGuardada, alumnoId);
@@ -69,6 +73,7 @@ public class TareaService {
 
     /**
      * Obtiene el listado completo de tareas del sistema.
+     * 
      * @return Lista de todas las tareas.
      */
     @Transactional(readOnly = true)
@@ -79,7 +84,21 @@ public class TareaService {
     }
 
     /**
+     * Lista solo las tareas de un taller que tienen visible = true.
+     * * @param idTaller ID del taller.
+     * 
+     * @return Lista de tareas visibles.
+     */
+    @Transactional(readOnly = true)
+    public List<TareaResponseDTO> listarVisibles(Long idTaller) {
+        return tareaRepository.findByTallerIdAndVisibleTrue(idTaller).stream()
+                .map(tareaMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Busca una tarea específica por su identificador único.
+     * 
      * @param id ID de la tarea.
      * @return Tarea encontrada.
      * @throws ResourceNotFoundException Si la tarea no existe.
@@ -93,6 +112,7 @@ public class TareaService {
 
     /**
      * Lista todas las tareas pertenecientes a un taller específico.
+     * 
      * @param idTaller ID del taller.
      * @return Lista de tareas del taller.
      */
@@ -107,7 +127,8 @@ public class TareaService {
 
     /**
      * Actualiza los datos de una tarea existente.
-     * @param id ID de la tarea a modificar.
+     * 
+     * @param id  ID de la tarea a modificar.
      * @param dto Nuevos datos.
      * @return Tarea actualizada.
      * @throws ResourceNotFoundException Si la tarea o el taller no existen.
@@ -115,7 +136,8 @@ public class TareaService {
     @Transactional
     public TareaResponseDTO actualizar(Long id, TareaRequestDTO dto) {
         Tarea existente = tareaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Tarea no encontrada con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se puede actualizar: Tarea no encontrada con ID: " + id));
 
         existente.setTitulo(dto.getTitulo());
         existente.setDescripcion(dto.getDescripcion());
@@ -124,17 +146,38 @@ public class TareaService {
 
         if (!existente.getTaller().getId().equals(dto.getIdTaller())) {
             Taller nuevoTaller = tallerRepository.findById(dto.getIdTaller())
-                    .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Nuevo taller no encontrado con ID: " + dto.getIdTaller()));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "No se puede actualizar: Nuevo taller no encontrado con ID: " + dto.getIdTaller()));
             existente.setTaller(nuevoTaller);
         }
 
         return tareaMapper.toResponse(tareaRepository.save(existente));
     }
 
+    /**
+     * Alterna el estado de visibilidad de una tarea.
+     * Permite al profesor gestionar cuándo los alumnos pueden empezar a ver la
+     * actividad.
+     * * @param id ID de la tarea a modificar.
+     * 
+     * @return Tarea con el nuevo estado de visibilidad.
+     * @throws ResourceNotFoundException Si la tarea no existe.
+     */
+    @Transactional
+    public TareaResponseDTO cambiarVisibilidad(Long id) {
+        Tarea tarea = tareaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se puede cambiar visibilidad: Tarea no encontrada con ID: " + id));
+
+        tarea.setVisible(!tarea.isVisible());
+        return tareaMapper.toResponse(tareaRepository.save(tarea));
+    }
+
     // --- MÉTODOS DELETE ---
 
     /**
      * Elimina una tarea y sus registros asociados.
+     * 
      * @param id ID de la tarea a borrar.
      * @throws ResourceNotFoundException Si la tarea no existe.
      */
@@ -150,13 +193,15 @@ public class TareaService {
 
     /**
      * Crea un registro de asignación para un alumno específico.
-     * @param tarea Tarea a asignar.
+     * 
+     * @param tarea    Tarea a asignar.
      * @param alumnoId ID del alumno.
      * @throws ResourceNotFoundException Si el alumno no existe.
      */
     private void asignarTareaAAlumno(Tarea tarea, Long alumnoId) {
         Usuario alumno = usuarioRepository.findById(alumnoId)
-                .orElseThrow(() -> new ResourceNotFoundException("No se pudo asignar tarea: Alumno no encontrado con ID: " + alumnoId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se pudo asignar tarea: Alumno no encontrado con ID: " + alumnoId));
 
         TareaAsignada asignacion = TareaAsignada.builder()
                 .tarea(tarea)

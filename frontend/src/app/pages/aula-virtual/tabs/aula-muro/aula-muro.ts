@@ -2,8 +2,10 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TareaService } from '../../../../services/Tarea.Service';
 import { MaterialService } from '../../../../services/Material.Service'; 
+import { TokenService } from '../../../../services/Token.Service'; // <--- Importamos tu servicio
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs'; 
+
 @Component({
   selector: 'app-aula-muro',
   standalone: true,
@@ -14,16 +16,22 @@ import { forkJoin } from 'rxjs';
 export class AulaMuro implements OnInit {
   actividades: any[] = [];
   cargando: boolean = true;
+  esProfesor: boolean = false; 
 
   constructor(
     private tareaService: TareaService,
     private materialService: MaterialService,
+    private tokenService: TokenService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private router: Router
   ) { }
 
   ngOnInit(): void {
+    // Comprobamos el rol real desde el JWT
+    const rol = this.tokenService.getRol();
+    this.esProfesor = (rol === 'PROFESOR' || rol === 'ADMIN');
+
     const idTaller = this.route.parent?.snapshot.paramMap.get('id');
     if (idTaller) {
       this.cargarMuro(Number(idTaller));
@@ -33,17 +41,35 @@ export class AulaMuro implements OnInit {
   cargarMuro(id: number): void {
     this.cargando = true;
 
-    // Lanzamos las dos llamadas en paralelo
+    // Ahora sí, elegimos el endpoint basándonos en la realidad del Token
+    const tareasObs = this.esProfesor 
+      ? this.tareaService.listarPorTaller(id) 
+      : this.tareaService.listarVisibles(id);
+
+    const materialesObs = this.esProfesor 
+      ? this.materialService.listarPorTaller(id) 
+      : this.materialService.listarVisibles(id);
+
     forkJoin({
-      tareas: this.tareaService.listarPorTaller(id),
-      materiales: this.materialService.listarPorTaller(id) // Ajusta según tu método
+      tareas: tareasObs,
+      materiales: materialesObs
     }).subscribe({
       next: (res) => {
-        // Marcamos cada uno para saber qué es en el HTML
-        const tareasMapped = res.tareas.data.map(t => ({ ...t, tipo: 'TAREA', fechaMuro: new Date(t.fechaPublicacion || t.fechaEntrega) }));
-        const materialesMapped = res.materiales.data.map(m => ({ ...m, tipo: 'MATERIAL', fechaMuro: new Date(m.fechaSubida) }));
+        // Mapeo de TAREAS
+        const tareasMapped = res.tareas.data.map(t => ({ 
+          ...t, 
+          tipo: 'TAREA', 
+          fechaMuro: new Date(t.fechaPublicacion || (t as any).createdAt || new Date()) 
+        }));
 
-        // Mezclamos y ordenamos por fecha (más reciente primero)
+        // Mapeo de MATERIALES
+        const materialesMapped = res.materiales.data.map(m => ({ 
+          ...m, 
+          tipo: 'MATERIAL', 
+          fechaMuro: new Date((m as any).fechaSubida || (m as any).createdAt || new Date()) 
+        }));
+
+        // Mezcla y ordenación
         this.actividades = [...tareasMapped, ...materialesMapped].sort((a, b) =>
           b.fechaMuro.getTime() - a.fechaMuro.getTime()
         );
@@ -52,7 +78,7 @@ export class AulaMuro implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error en el muro', err);
+        console.error('Error al cargar el muro:', err);
         this.cargando = false;
         this.cdr.detectChanges();
       }
@@ -61,7 +87,6 @@ export class AulaMuro implements OnInit {
 
   verDetalle(item: any): void {
     const idRecurso = item.tipo === 'TAREA' ? item.idTarea : item.id;
-
     const tipoUrl = item.tipo.toLowerCase();
 
     this.router.navigate(['../detalle', tipoUrl, idRecurso], {

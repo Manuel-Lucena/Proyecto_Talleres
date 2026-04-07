@@ -19,11 +19,16 @@
             </div>
 
             <div class="day-content">
+                @for (sesion of getSesionesPorDia(dia); track sesion.idHorario) {
                 <div class="session-card">
-                    <div class="session-time">17:00 - 19:00</div>
-                    <div class="session-location">Aula Magna</div>
-                    <button class="btn-delete-session">&times;</button>
+                    <div class="session-time">
+                        {{ sesion.horaInicio.slice(0, 5) }} - {{ sesion.horaFin.slice(0, 5) }}
+                    </div>
+                    <button class="btn-delete-session" (click)="eliminarSesion(sesion.idHorario)">
+                        &times;
+                    </button>
                 </div>
+                }
 
                 <button class="btn-add-slot" (click)="abrirModalSesion(dia)">
                     <i class="bi bi-plus-circle"></i>
@@ -34,3 +39,12 @@
         }
     </div>
 </div>
+
+@if (mostrarModal) {
+<app-form-horario [tallerId]="tallerId" [diaPreseleccionado]="diaSeleccionado" (cerrar)="mostrarModal = false"
+    (guardado)="ejecutarGuardado($event)">
+</app-form-horario>
+}
+
+<app-confirmacion></app-confirmacion>
+<app-modal-notificacion></app-modal-notificacion>

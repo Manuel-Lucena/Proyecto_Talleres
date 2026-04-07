@@ -25,6 +25,15 @@ export class TareaService {
   }
 
   /**
+   * Recupera solo las tareas que el profesor ha marcado como visibles.
+   * @param idTaller Identificador del taller.
+   * @returns Observable con la lista de tareas visibles.
+   */
+  listarVisibles(idTaller: number): Observable<ApiResponse<TareaResponse[]>> {
+    return this.http.get<ApiResponse<TareaResponse[]>>(`${this.apiUrl}/taller/${idTaller}/visibles`);
+  }
+
+  /**
    * Obtiene la información detallada de una tarea específica por su ID.
    * @param id Identificador único de la tarea.
    * @returns Observable con los datos de la tarea solicitada.
@@ -50,6 +59,16 @@ export class TareaService {
    */
   actualizar(id: number, tarea: TareaRequest): Observable<ApiResponse<TareaResponse>> {
     return this.http.put<ApiResponse<TareaResponse>>(`${this.apiUrl}/${id}`, tarea);
+  }
+
+
+  /**
+ * Cambia el estado de visibilidad de una tarea (público/privado).
+ * @param id Identificador de la tarea.
+ * @returns Observable con la tarea actualizada.
+ */
+  cambiarVisibilidad(id: number): Observable<ApiResponse<TareaResponse>> {
+    return this.http.put<ApiResponse<TareaResponse>>(`${this.apiUrl}/${id}/visibilidad`, {});
   }
 
   /**

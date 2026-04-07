@@ -17,7 +17,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Servicio para la gestión de los materiales educativos asociados a los talleres.
+ * Servicio para la gestión de los materiales educativos asociados a los
+ * talleres.
  */
 @Service
 @RequiredArgsConstructor
@@ -31,6 +32,7 @@ public class MaterialService {
 
     /**
      * Crea un nuevo material y lo asocia a un taller.
+     * 
      * @param dto Datos del material a crear.
      * @return Material creado y persistido.
      * @throws ResourceNotFoundException Si el taller asociado no existe.
@@ -38,7 +40,8 @@ public class MaterialService {
     @Transactional
     public MaterialResponseDTO crear(MaterialRequestDTO dto) {
         Taller taller = tallerRepository.findById(dto.getIdTaller())
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede crear el material: Taller no encontrado con ID: " + dto.getIdTaller()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se puede crear el material: Taller no encontrado con ID: " + dto.getIdTaller()));
 
         Material material = materialMapper.toEntity(dto);
         material.setTaller(taller);
@@ -51,6 +54,7 @@ public class MaterialService {
 
     /**
      * Obtiene el listado completo de todos los materiales.
+     * 
      * @return Lista de materiales registrados.
      */
     @Transactional(readOnly = true)
@@ -61,7 +65,20 @@ public class MaterialService {
     }
 
     /**
+     * Lista solo los materiales de un taller que tienen visible = true.
+     * * @param idTaller ID del taller.
+     * @return Lista de materiales visibles.
+     */
+    @Transactional(readOnly = true)
+    public List<MaterialResponseDTO> listarVisibles(Long idTaller) {
+        return materialRepository.findByTallerIdAndVisibleTrue(idTaller).stream()
+                .map(materialMapper::toResponse) 
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Recupera un material específico por su identificador.
+     * 
      * @param id ID del material a buscar.
      * @return Material encontrado.
      * @throws ResourceNotFoundException Si el material no existe.
@@ -75,6 +92,7 @@ public class MaterialService {
 
     /**
      * Lista todos los materiales pertenecientes a un taller concreto.
+     * 
      * @param idTaller ID del taller a consultar.
      * @return Lista de materiales del taller.
      */
@@ -89,32 +107,55 @@ public class MaterialService {
 
     /**
      * Actualiza el contenido de un material existente.
-     * @param id ID del material a modificar.
+     * 
+     * @param id  ID del material a modificar.
      * @param dto Nuevos datos para el material.
      * @return Material actualizado.
-     * @throws ResourceNotFoundException Si el material o el nuevo taller no existen.
+     * @throws ResourceNotFoundException Si el material o el nuevo taller no
+     *                                   existen.
      */
     @Transactional
     public MaterialResponseDTO actualizar(Long id, MaterialRequestDTO dto) {
         Material existente = materialRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Material no encontrado con ID: " + id));
-        
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se puede actualizar: Material no encontrado con ID: " + id));
+
         existente.setTitulo(dto.getTitulo());
         existente.setContenido(dto.getContenido());
-        
+
         if (!existente.getTaller().getId().equals(dto.getIdTaller())) {
             Taller nuevoTaller = tallerRepository.findById(dto.getIdTaller())
-                    .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Nuevo taller no encontrado con ID: " + dto.getIdTaller()));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "No se puede actualizar: Nuevo taller no encontrado con ID: " + dto.getIdTaller()));
             existente.setTaller(nuevoTaller);
         }
 
         return materialMapper.toResponse(materialRepository.save(existente));
     }
 
+    /**
+     * Alterna el estado de visibilidad de un material.
+     * Permite a los profesores ocultar o mostrar recursos de forma dinámica
+     * * @param id ID del material a modificar.
+     * 
+     * @return Material con el nuevo estado de visibilidad persistido.
+     * @throws ResourceNotFoundException Si el material no existe.
+     */
+    @Transactional
+    public MaterialResponseDTO cambiarVisibilidad(Long id) {
+        Material material = materialRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se puede cambiar visibilidad: Material no encontrado con ID: " + id));
+
+        material.setVisible(!material.isVisible());
+        return materialMapper.toResponse(materialRepository.save(material));
+    }
+
     // --- MÉTODOS DELETE ---
 
     /**
      * Elimina un material del sistema.
+     * 
      * @param id ID del material a borrar.
      * @throws ResourceNotFoundException Si el material no existe.
      */

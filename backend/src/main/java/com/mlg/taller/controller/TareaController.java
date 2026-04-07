@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * Controlador REST para la gestión de tareas dentro de los talleres.
- * Permite a los instructores asignar actividades, definir fechas de entrega 
+ * Permite a los instructores asignar actividades, definir fechas de entrega
  * y organizar el flujo evaluativo de cada taller.
  */
 @RestController
@@ -28,8 +28,9 @@ public class TareaController {
 
     /**
      * Crea una nueva tarea vinculada a un taller específico.
+     * 
      * @param dto Datos de la tarea (título, descripción, fecha límite, taller ID).
-     * @return    ApiResponse con la tarea creada y estado HTTP 201.
+     * @return ApiResponse con la tarea creada y estado HTTP 201.
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -41,6 +42,7 @@ public class TareaController {
 
     /**
      * Recupera el listado global de todas las tareas registradas.
+     * 
      * @return ApiResponse con la lista completa de tareas.
      */
     @GetMapping
@@ -50,8 +52,9 @@ public class TareaController {
 
     /**
      * Obtiene todas las tareas pertenecientes a un taller concreto.
+     * 
      * @param idTaller Identificador único del taller.
-     * @return         ApiResponse con la lista de tareas de dicho taller.
+     * @return ApiResponse con la lista de tareas de dicho taller.
      */
     @GetMapping("/taller/{idTaller}")
     public ApiResponse<List<TareaResponseDTO>> listarPorTaller(@PathVariable Long idTaller) {
@@ -59,9 +62,21 @@ public class TareaController {
     }
 
     /**
+     * [ALUMNO] Obtiene solo las tareas que tienen el flag de visibilidad activo.
+     * * @param idTaller Identificador del taller.
+     * 
+     * @return ApiResponse con la lista de tareas visibles.
+     */
+    @GetMapping("/taller/{idTaller}/visibles")
+    public ApiResponse<List<TareaResponseDTO>> listarVisiblesParaAlumno(@PathVariable Long idTaller) {
+        return ApiResponse.success(tareaService.listarVisibles(idTaller), "Tareas visibles obtenidas con éxito");
+    }
+
+    /**
      * Busca la información detallada de una tarea por su identificador.
+     * 
      * @param id Identificador único de la tarea.
-     * @return   ApiResponse con la tarea encontrada.
+     * @return ApiResponse con la tarea encontrada.
      */
     @GetMapping("/{id}")
     public ApiResponse<TareaResponseDTO> obtenerPorId(@PathVariable Long id) {
@@ -72,21 +87,34 @@ public class TareaController {
 
     /**
      * Actualiza la información de una tarea existente.
+     * 
      * @param id  Identificador de la tarea a modificar.
      * @param dto Nuevos datos para la tarea (validado mediante @Valid).
-     * @return    ApiResponse con la tarea actualizada.
+     * @return ApiResponse con la tarea actualizada.
      */
     @PutMapping("/{id}")
     public ApiResponse<TareaResponseDTO> actualizar(@PathVariable Long id, @Valid @RequestBody TareaRequestDTO dto) {
         return ApiResponse.success(tareaService.actualizar(id, dto), "Tarea actualizada correctamente");
     }
 
+    /**
+     * Alterna el estado de visibilidad de una tarea.
+     * 
+     * @param id Identificador de la tarea.
+     * @return ApiResponse con la tarea actualizada.
+     */
+    @PutMapping("/{id}/visibilidad")
+    public ApiResponse<TareaResponseDTO> cambiarVisibilidad(@PathVariable Long id) {
+        return ApiResponse.success(tareaService.cambiarVisibilidad(id), "Visibilidad de la tarea actualizada");
+    }
+
     // --- MÉTODOS DELETE ---
 
     /**
      * Elimina una tarea del sistema.
+     * 
      * @param id Identificador único de la tarea a suprimir.
-     * @return   ApiResponse confirmando la eliminación.
+     * @return ApiResponse confirmando la eliminación.
      */
     @DeleteMapping("/{id}")
     public ApiResponse<Void> eliminar(@PathVariable Long id) {

@@ -21,8 +21,19 @@
 
             <header class="encabezado-tarea">
                 <div class="info-titulo">
-                    <span class="badge-categoria" [ngClass]="tipo">{{ tipo }}</span>
-                    <h1 class="titulo-extremo" *ngIf="!editando && !esNuevo">{{ recurso.titulo }}</h1>
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <span class="badge-categoria" [ngClass]="tipo">{{ tipo }}</span>
+
+                        <button *ngIf="esProfesor() && !esNuevo" (click)="toggleVisibilidadRapida()"
+                            class="btn-ojo-minimal" [class.is-hidden]="!recurso.visible"
+                            [title]="recurso.visible ? 'Ocultar' : 'Mostrar'">
+                            <i class="bi" [ngClass]="recurso.visible ? 'bi-eye-fill' : 'bi-eye-slash'"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="titulo-extremo" *ngIf="!editando && !esNuevo" [class.oculto]="!recurso.visible">
+                        {{ recurso.titulo }}
+                    </h1>
 
                     <div *ngIf="esNuevo || editando" [formGroup]="form" class="mt-2">
                         <input type="text" formControlName="titulo" class="form-control-titulo-edit"

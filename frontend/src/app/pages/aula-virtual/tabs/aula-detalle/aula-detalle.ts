@@ -31,7 +31,7 @@ export class AulaDetalle implements OnInit {
 
   // Control del Modal Manual
   mostrarModalEntrega: boolean = false;
-  
+
   // Control del Desplegable de Extensiones
   mostrarDropdownExt: boolean = false;
 
@@ -161,8 +161,8 @@ export class AulaDetalle implements OnInit {
 
   onExtensionChange(event: any) {
     const value = event.target.value;
-    let seleccionadas = this.form.get('extensionesPermitidas')?.value 
-      ? this.form.get('extensionesPermitidas')?.value.split(',').map((s: string) => s.trim()).filter((s: string) => s !== "") 
+    let seleccionadas = this.form.get('extensionesPermitidas')?.value
+      ? this.form.get('extensionesPermitidas')?.value.split(',').map((s: string) => s.trim()).filter((s: string) => s !== "")
       : [];
 
     if (event.target.checked) {
@@ -244,6 +244,26 @@ export class AulaDetalle implements OnInit {
         this.finalizarGuardado(idActual);
       },
       error: () => this.cargando = false
+    });
+  }
+
+  toggleVisibilidadRapida() {
+    const id = this.recurso.idTarea || this.recurso.id;
+    const service: any = this.tipo === 'tarea' ? this.tareaService : this.materialService;
+
+    if (!id) return;
+
+    service.cambiarVisibilidad(id).subscribe({
+      next: (resp: any) => {
+        // Actualizamos el estado local
+        this.recurso.visible = resp.data.visible;
+
+        // Forzamos la detección de cambios para que el ojo se tache/destache
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error("Error al cambiar visibilidad", err);
+      }
     });
   }
 

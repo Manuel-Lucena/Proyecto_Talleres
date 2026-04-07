@@ -13,8 +13,11 @@ public class MaterialRequestDTO {
     private String titulo;
 
     /** Cuerpo del material, descripción o enlaces externos. */
-    private String contenido; 
+    private String contenido;
 
     /** Identificador del taller al que se adjunta este material. */
     private Long idTaller;
+
+    /** Define si el material se publica como visible u oculto inicialmente. */
+    private boolean visible = true;
 }

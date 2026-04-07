@@ -26,12 +26,17 @@ public class Material {
     private String titulo;
 
     /** Contenido descriptivo o texto del material en formato enriquecido. */
-    @Column(columnDefinition = "TEXT") 
+    @Column(columnDefinition = "TEXT")
     private String contenido;
 
     /** Fecha y hora en la que el material fue puesto a disposición. */
     @Column(name = "fecha_subida")
     private LocalDateTime fechaSubida;
+
+    /** Indica si el material es visible para los alumnos */
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean visible = true;
 
     /** Taller bajo el cual se clasifica este material. */
     @ManyToOne(fetch = FetchType.LAZY)

@@ -25,10 +25,15 @@ public class TareaRequestDTO {
     /** Fecha límite para que los alumnos realicen la entrega. */
     private LocalDateTime fechaEntrega;
 
-    /** * Filtro de archivos. 
+    /**
+     * * Filtro de archivos.
+     * 
      * @example ".pdf, .docx, .zip"
      */
-    private String extensionesPermitidas; 
+    private String extensionesPermitidas;
+
+    /** Define si la tarea se crea como visible u oculta. */
+    private boolean visible = true;
 
     /** Listado de IDs de alumnos asignados específicamente a esta tarea. */
     private List<Long> alumnosIds;

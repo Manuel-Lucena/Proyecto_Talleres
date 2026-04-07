@@ -29,10 +29,15 @@ public class TareaResponseDTO {
     /** Tipos de archivos aceptados. */
     private String extensionesPermitidas;
 
-    /** * Estado de la tarea para el usuario actual. 
+    /**
+     * * Estado de la tarea para el usuario actual.
+     * 
      * @example 'PENDIENTE', 'ENTREGADA', 'CALIFICADA'.
      */
     private String estado;
+
+    /** Estado de visibilidad de la tarea para el alumnado asignado. */
+    private boolean visible;
 
     /** ID del taller. */
     private Long idTaller;

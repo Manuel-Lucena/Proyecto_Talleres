@@ -5,6 +5,7 @@ export interface MaterialRequest {
     titulo: string;
     contenido: string;
     idTaller: number;
+    visible: boolean;
 }
 
 /**
@@ -16,4 +17,5 @@ export interface MaterialResponse {
     contenido: string;
     fechaSubida: string;
     idTaller: number;
+    visible: boolean;
 }

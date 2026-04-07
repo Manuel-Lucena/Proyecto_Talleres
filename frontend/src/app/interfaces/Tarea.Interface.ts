@@ -6,6 +6,7 @@ export interface TareaRequest {
     descripcion: string;
     idTaller: number;
     fechaEntrega: Date | string;
+    visible: boolean; 
     extensionesPermitidas?: string; 
     alumnosIds?: number[];
 }
@@ -22,6 +23,7 @@ export interface TareaResponse {
     estado: string;
     idTaller: number;
     nombreTaller: string;
+    visible: boolean; 
     extensionesPermitidas: string; 
     alumnosAsignadosIds: number[];
 }

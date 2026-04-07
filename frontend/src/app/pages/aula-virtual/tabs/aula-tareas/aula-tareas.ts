@@ -1,7 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // 1. Importar ChangeDetectorRef
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TareaService } from '../../../../services/Tarea.Service';
 import { TareaResponse } from '../../../../interfaces/Tarea.Interface';
+import { TokenService } from '../../../../services/Token.Service'; // Importante
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -14,15 +15,21 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class AulaTareas implements OnInit {
   tareas: TareaResponse[] = [];
   cargando: boolean = true;
+  esProfesor: boolean = false;
 
   constructor(
     private tareaService: TareaService,
+    private tokenService: TokenService, // Inyectamos el servicio de tokens
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private router: Router
   ) { }
 
   ngOnInit(): void {
+    // Detectamos el rol
+    const rol = this.tokenService.getRol();
+    this.esProfesor = (rol === 'PROFESOR' || rol === 'ADMIN');
+
     const idTaller = this.route.parent?.snapshot.paramMap.get('id');
     if (idTaller) {
       this.listarTareas(Number(idTaller));
@@ -31,24 +38,28 @@ export class AulaTareas implements OnInit {
 
   listarTareas(id: number): void {
     this.cargando = true;
-    this.tareaService.listarPorTaller(id).subscribe({
+
+    // Si es profesor traemos todas, si es alumno solo las visibles
+    const obs = this.esProfesor 
+      ? this.tareaService.listarPorTaller(id) 
+      : this.tareaService.listarVisibles(id);
+
+    obs.subscribe({
       next: (res) => {
         this.tareas = res.data;
         this.cargando = false;
-
-        // 3. Forzar el refresco de la UI
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error al cargar tareas', err);
         this.cargando = false;
-        this.cdr.detectChanges(); // También en el error para ocultar el spinner
+        this.cdr.detectChanges();
       }
     });
   }
 
-  verDetalle(idMaterial: number) {
-    this.router.navigate(['../detalle', 'tarea', idMaterial], {
+  verDetalle(idTarea: number) {
+    this.router.navigate(['../detalle', 'tarea', idTarea], {
       relativeTo: this.route
     });
   }

@@ -5,7 +5,8 @@ import java.time.LocalDateTime;
 
 /**
  * DTO para la respuesta detallada de un material.
- * Proporciona metadatos como la fecha de subida para organizar el tablón de recursos.
+ * Proporciona metadatos como la fecha de subida para organizar el tablón de
+ * recursos.
  */
 @Data
 public class MaterialResponseDTO {
@@ -18,6 +19,9 @@ public class MaterialResponseDTO {
 
     /** Contenido detallado del material. */
     private String contenido;
+
+    /** Estado de visibilidad del recurso para el alumnado. */
+    private boolean visible;
 
     /** Marca de tiempo de la creación del recurso. */
     private LocalDateTime fechaSubida;

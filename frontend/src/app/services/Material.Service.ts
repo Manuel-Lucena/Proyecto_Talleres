@@ -25,6 +25,15 @@ export class MaterialService {
   }
 
   /**
+   * Lista solo los materiales que el profesor ha decidido publicar.
+   * @param idTaller ID del taller seleccionado.
+   * @returns Observable con la colección de materiales visibles.
+   */
+  listarVisibles(idTaller: number): Observable<ApiResponse<MaterialResponse[]>> {
+    return this.http.get<ApiResponse<MaterialResponse[]>>(`${this.apiUrl}/taller/${idTaller}/visibles`);
+  }
+
+  /**
    * Recupera la información detallada de un material educativo por su ID.
    * @param id Identificador del material.
    * @returns Observable con los detalles del material.
@@ -50,6 +59,15 @@ export class MaterialService {
    */
   actualizar(id: number, material: MaterialRequest): Observable<ApiResponse<MaterialResponse>> {
     return this.http.put<ApiResponse<MaterialResponse>>(`${this.apiUrl}/${id}`, material);
+  }
+
+  /**
+ * Alterna la visibilidad de un material didáctico.
+ * @param id Identificador del material.
+ * @returns Observable con el material actualizado.
+ */
+  cambiarVisibilidad(id: number): Observable<ApiResponse<MaterialResponse>> {
+    return this.http.put<ApiResponse<MaterialResponse>>(`${this.apiUrl}/${id}/visibilidad`, {});
   }
 
   /**

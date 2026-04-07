@@ -48,12 +48,19 @@ public class Tarea {
     @Enumerated(EnumType.STRING)
     private EstadoTarea estado;
 
+    /** Indica si la tarea es visible para los alumnos asignados. */
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean visible = true;
+
     /** Taller al que pertenece la actividad. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_taller", nullable = false)
     private Taller taller;
 
-    /** Documentos adjuntos (enunciados o plantillas) proporcionados por el profesor. */
+    /**
+     * Documentos adjuntos (enunciados o plantillas) proporcionados por el profesor.
+     */
     @OneToMany(mappedBy = "tarea", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ArchivoTarea> archivos = new ArrayList<>();

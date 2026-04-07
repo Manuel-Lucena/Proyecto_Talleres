@@ -124,20 +124,9 @@
         font-size: 0.9rem;
         color: $color-secundario-frio-2;
         display: block;
-        margin-bottom: 4px;
     }
 
-    .session-location {
-        font-size: 0.75rem;
-        color: $color-superficie-suave;
-        display: flex;
-        align-items: center;
-        gap: 4px;
 
-        i {
-            color: $color-marca-principal;
-        }
-    }
 
     .btn-delete-session {
         position: absolute;
