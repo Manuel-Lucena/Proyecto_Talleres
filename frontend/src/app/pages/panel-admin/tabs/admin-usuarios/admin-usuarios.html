@@ -70,6 +70,10 @@
           </td>
           <td class="text-right">
             <div class="actions-group">
+
+              <button class="btn-tool info" (click)="verInscripciones(u.idUsuario)" title="Ver Talleres Inscritos">
+                <i class="bi bi-journal-check"></i>
+              </button>
               <button class="btn-tool status" (click)="toggleEstado(u)" [class.active]="u.activo"
                 title="Cambiar estado">
                 <i class="bi" [class]="u.activo ? 'bi-shield-check' : 'bi-shield-slash'"></i>

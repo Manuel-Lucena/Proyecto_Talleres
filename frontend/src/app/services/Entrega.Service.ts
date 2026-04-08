@@ -10,7 +10,7 @@ import { EntregaRequest, EntregaResponse } from '../interfaces/Entrega.Interface
  */
 @Injectable({ providedIn: 'root' })
 export class EntregaService {
-    /** URL base para los endpoints de la API de entregas */
+
     private apiUrl = 'http://localhost:8080/api/entregas';
 
     constructor(private http: HttpClient) { }

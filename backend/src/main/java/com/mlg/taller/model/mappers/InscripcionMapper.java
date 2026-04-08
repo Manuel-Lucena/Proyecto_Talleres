@@ -14,18 +14,21 @@ import java.time.LocalDateTime;
  * Mapper para el proceso de matriculación de alumnos.
  * Centraliza la lógica de inicialización de pagos y fechas de inscripción.
  */
-@Mapper(componentModel = "spring", imports = {LocalDateTime.class, EstadoPago.class})
+@Mapper(componentModel = "spring", imports = { LocalDateTime.class, EstadoPago.class })
 public interface InscripcionMapper {
 
     @Mapping(target = "idInscripcion", source = "id")
     @Mapping(target = "nombreUsuario", expression = "java(ins.getUsuario().getNombre() + \" \" + ins.getUsuario().getApellidos())")
+    @Mapping(target = "emailUsuario", source = "usuario.email")
     @Mapping(target = "nombreTaller", source = "taller.nombre")
     InscripcionResponseDTO toResponse(Inscripcion ins);
 
     /**
      * Crea una entidad Inscripcion combinando datos de tres fuentes.
+     * 
      * @mapping activa Inicializa por defecto a true (Soft Delete).
-     * @mapping estadoPago Asigna automáticamente el estado PAGADO tras la confirmación.
+     * @mapping estadoPago Asigna automáticamente el estado PAGADO tras la
+     *          confirmación.
      * @mapping fechaInscripcion/fechaPago Genera la marca de tiempo actual.
      */
     @Mapping(target = "id", ignore = true)

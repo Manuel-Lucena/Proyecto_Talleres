@@ -7,11 +7,14 @@ import com.mlg.taller.model.entities.*;
 import com.mlg.taller.model.enums.EstadoTarea;
 import com.mlg.taller.model.mappers.TareaMapper;
 import com.mlg.taller.repositories.*;
+import com.mlg.taller.util.FileUtil;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +31,7 @@ public class TareaService {
     private final TareaAsignadaRepository tareaAsignadaRepository;
     private final UsuarioRepository usuarioRepository;
     private final InscripcionRepository inscripcionRepository;
+    private final FileUtil fileUtil;
 
     // --- MÉTODOS POST ---
 
@@ -84,16 +88,17 @@ public class TareaService {
     }
 
     /**
-     * Lista solo las tareas de un taller que tienen visible = true.
+     * Lista solo las tareas de un taller que tienen visible = true
+     * y estan asignadas al alumno.
      * * @param idTaller ID del taller.
      * 
      * @return Lista de tareas visibles.
      */
     @Transactional(readOnly = true)
-    public List<TareaResponseDTO> listarVisibles(Long idTaller) {
-        return tareaRepository.findByTallerIdAndVisibleTrue(idTaller).stream()
+    public List<TareaResponseDTO> listarVisibles(Long idTaller, Long idAlumno) {
+        return tareaRepository.findVisiblesParaAlumno(idTaller, idAlumno).stream()
                 .map(tareaMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -104,6 +109,7 @@ public class TareaService {
      * @throws ResourceNotFoundException Si la tarea no existe.
      */
     @Transactional(readOnly = true)
+
     public TareaResponseDTO obtenerPorId(Long id) {
         return tareaRepository.findById(id)
                 .map(tareaMapper::toResponse)
@@ -183,10 +189,17 @@ public class TareaService {
      */
     @Transactional
     public void eliminar(Long id) {
-        if (!tareaRepository.existsById(id)) {
-            throw new ResourceNotFoundException("No se puede eliminar: La tarea no existe con ID: " + id);
-        }
-        tareaRepository.deleteById(id);
+        Tarea tarea = tareaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarea no encontrada"));
+
+        List<String> paraBorrar = new ArrayList<>();
+        tarea.getArchivos().forEach(a -> paraBorrar.add(a.getNombre()));
+        tarea.getEntregas().forEach(e -> e.getArchivos().forEach(ae -> paraBorrar.add(ae.getNombre())));
+
+        tareaRepository.delete(tarea);
+
+        paraBorrar.forEach(nom -> fileUtil.eliminar("tareas", nom, false));
+        paraBorrar.forEach(nom -> fileUtil.eliminar("entregas", nom, false));
     }
 
     // --- MÉTODOS PRIVADOS ---

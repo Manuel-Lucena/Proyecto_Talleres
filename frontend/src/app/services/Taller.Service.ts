@@ -11,7 +11,6 @@ import { TallerResponse } from '../interfaces/Taller.Interface';
  */
 @Injectable({ providedIn: 'root' })
 export class TallerService {
-  /** URL base para los endpoints de la API de talleres */
   private apiUrl = 'http://localhost:8080/api/talleres';
 
   constructor(private http: HttpClient) { }

@@ -28,12 +28,12 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownMenuButton">
                         <li>
-                            <a class="dropdown-item py-2" (click)="irACrear('tarea')">
+                            <a class="dropdown-item py-2" (click)="irACrear('tarea')" style="cursor: pointer;">
                                 <i class="bi bi-journal-check text-warning me-2"></i> Nueva Tarea
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item py-2" (click)="irACrear('material')">
+                            <a class="dropdown-item py-2" (click)="irACrear('material')" style="cursor: pointer;">
                                 <i class="bi bi-file-earmark-arrow-up text-primary me-2"></i> Nuevo Material
                             </a>
                         </li>
@@ -47,8 +47,21 @@
 
         <nav class="breadcrumb-minimal">
             <a routerLink="/mis-talleres">Mis Talleres</a>
+
             <i class="bi bi-chevron-right"></i>
-            <span class="current">{{ nombreTaller }}</span>
+            <a [routerLink]="['/aula-virtual', idTaller, 'muro']">{{ nombreTaller }}</a>
+
+            <ng-container *ngIf="seccionActual">
+                <i class="bi bi-chevron-right"></i>
+                <a *ngIf="recursoNombre" [routerLink]="['/aula-virtual', idTaller, seccionEnlace]">{{ seccionActual
+                    }}</a>
+                <span *ngIf="!recursoNombre" class="current">{{ seccionActual }}</span>
+            </ng-container>
+
+            <ng-container *ngIf="recursoNombre">
+                <i class="bi bi-chevron-right"></i>
+                <span class="current">{{ recursoNombre }}</span>
+            </ng-container>
         </nav>
 
         <div class="fade-in">

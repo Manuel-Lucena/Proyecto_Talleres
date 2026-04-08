@@ -28,8 +28,8 @@ export class MisTalleres implements OnInit {
     private tallerService: TallerService,
     private tokenService: TokenService,
     private router: Router,
-    private cdr: ChangeDetectorRef 
-  ) {}
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     const idUsuario = this.tokenService.getId();
@@ -58,18 +58,25 @@ export class MisTalleres implements OnInit {
   }
 
   // Función para abrir el modal pasando los datos del taller clickeado
-  verHorario(item: TallerResponse): void { 
+  verHorario(item: TallerResponse): void {
     this.idTallerSeleccionado = item.idTaller;
     this.nombreTallerSeleccionado = item.nombre;
     this.mostrarModalHorario = true;
-    this.cdr.detectChanges(); 
+    this.cdr.detectChanges();
   }
 
   entrarAlAula(idTaller: number): void {
-    this.router.navigate(['/aula-virtual', idTaller]); 
+    this.router.navigate(['/aula-virtual', idTaller]);
   }
 
 
-  verTareas(idTaller: number): void { console.log("Ver tareas de:", idTaller); }
-  verRecursos(idTaller: number): void { console.log("Ver recursos de:", idTaller); }
+
+  verTareas(idTaller: number): void {
+    this.router.navigate(['/aula-virtual', idTaller, 'tareas']);
+  }
+
+
+  verRecursos(idTaller: number): void {
+    this.router.navigate(['/aula-virtual', idTaller, 'recursos']);
+  }
 }

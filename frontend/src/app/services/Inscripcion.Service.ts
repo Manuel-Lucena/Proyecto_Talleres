@@ -24,8 +24,26 @@ export class InscripcionService {
   }
 
   /**
+   * Obtiene las inscripciones de un taller específico (Lista de clase).
+   * @param idTaller Identificador del taller.
+   * @returns Observable con los alumnos inscritos en ese taller.
+   */
+  listarPorTaller(idTaller: number): Observable<ApiResponse<InscripcionResponse[]>> {
+    return this.http.get<ApiResponse<InscripcionResponse[]>>(`${this.apiUrl}/taller/${idTaller}`);
+  }
+
+  /**
+   * Obtiene todos los talleres en los que está inscrito un usuario (Expediente del alumno).
+   * @param idUsuario Identificador del usuario.
+   * @returns Observable con los talleres asociados a ese usuario.
+   */
+  listarPorUsuario(idUsuario: number): Observable<ApiResponse<InscripcionResponse[]>> {
+    return this.http.get<ApiResponse<InscripcionResponse[]>>(`${this.apiUrl}/usuario/${idUsuario}`);
+  }
+
+  /**
    * Registra una nueva inscripción vinculando a un usuario con un taller.
-   * @param datos Objeto con los IDs del usuario, taller y fecha de inscripción.
+   * @param datos Objeto con los IDs del usuario, taller y datos del pago.
    * @returns Observable con la inscripción confirmada.
    */
   inscribir(datos: InscripcionRequest): Observable<ApiResponse<InscripcionResponse>> {
@@ -43,11 +61,20 @@ export class InscripcionService {
   }
 
   /**
-   * Elimina o cancela una inscripción en el sistema.
+   * Cambia el estado de activación de una inscripción (Pausar/Reactivar).
+   * @param id Identificador de la inscripción.
+   * @returns Observable con la inscripción modificada.
+   */
+  cambiarEstado(id: number): Observable<ApiResponse<InscripcionResponse>> {
+    return this.http.put<ApiResponse<InscripcionResponse>>(`${this.apiUrl}/${id}/estado`, {});
+  }
+
+  /**
+   * Elimina o cancela una inscripción en el sistema de forma permanente.
    * @param id Identificador de la inscripción a eliminar.
    * @returns Observable de confirmación.
    */
   eliminar(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
-  }
+  } 
 }

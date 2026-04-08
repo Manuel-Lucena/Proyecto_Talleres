@@ -3,11 +3,14 @@ package com.mlg.taller.service;
 import com.mlg.taller.exception.ResourceNotFoundException;
 import com.mlg.taller.model.dtos.MaterialRequestDTO;
 import com.mlg.taller.model.dtos.MaterialResponseDTO;
+import com.mlg.taller.model.entities.ArchivoMaterial;
 import com.mlg.taller.model.entities.Material;
 import com.mlg.taller.model.entities.Taller;
 import com.mlg.taller.model.mappers.MaterialMapper;
 import com.mlg.taller.repositories.MaterialRepository;
 import com.mlg.taller.repositories.TallerRepository;
+import com.mlg.taller.util.FileUtil;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +30,7 @@ public class MaterialService {
     private final MaterialRepository materialRepository;
     private final TallerRepository tallerRepository;
     private final MaterialMapper materialMapper;
+    private final FileUtil fileUtil;
 
     // --- MÉTODOS POST ---
 
@@ -67,12 +71,13 @@ public class MaterialService {
     /**
      * Lista solo los materiales de un taller que tienen visible = true.
      * * @param idTaller ID del taller.
+     * 
      * @return Lista de materiales visibles.
      */
     @Transactional(readOnly = true)
     public List<MaterialResponseDTO> listarVisibles(Long idTaller) {
         return materialRepository.findByTallerIdAndVisibleTrue(idTaller).stream()
-                .map(materialMapper::toResponse) 
+                .map(materialMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
@@ -159,11 +164,19 @@ public class MaterialService {
      * @param id ID del material a borrar.
      * @throws ResourceNotFoundException Si el material no existe.
      */
+
     @Transactional
     public void eliminar(Long id) {
-        if (!materialRepository.existsById(id)) {
-            throw new ResourceNotFoundException("No se puede eliminar: El material no existe con ID: " + id);
-        }
-        materialRepository.deleteById(id);
+        Material material = materialRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Material no encontrado"));
+
+        List<String> nombresArchivos = material.getArchivos().stream()
+                .map(ArchivoMaterial::getNombre)
+                .toList();
+
+        
+        materialRepository.delete(material);
+
+        nombresArchivos.forEach(nombre -> fileUtil.eliminar("materiales", nombre, false));
     }
 }

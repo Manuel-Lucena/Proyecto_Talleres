@@ -39,10 +39,12 @@ export class AulaTareas implements OnInit {
   listarTareas(id: number): void {
     this.cargando = true;
 
+    const idAlumno = this.tokenService.getId();
+
     // Si es profesor traemos todas, si es alumno solo las visibles
-    const obs = this.esProfesor 
-      ? this.tareaService.listarPorTaller(id) 
-      : this.tareaService.listarVisibles(id);
+    const obs = this.esProfesor
+      ? this.tareaService.listarPorTaller(id)
+      : this.tareaService.listarVisibles(id, idAlumno!);
 
     obs.subscribe({
       next: (res) => {

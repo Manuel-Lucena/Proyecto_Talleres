@@ -1,10 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TareaService } from '../../../../services/Tarea.Service';
-import { MaterialService } from '../../../../services/Material.Service'; 
+import { MaterialService } from '../../../../services/Material.Service';
 import { TokenService } from '../../../../services/Token.Service'; // <--- Importamos tu servicio
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin } from 'rxjs'; 
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-aula-muro',
@@ -16,7 +16,7 @@ import { forkJoin } from 'rxjs';
 export class AulaMuro implements OnInit {
   actividades: any[] = [];
   cargando: boolean = true;
-  esProfesor: boolean = false; 
+  esProfesor: boolean = false;
 
   constructor(
     private tareaService: TareaService,
@@ -38,17 +38,17 @@ export class AulaMuro implements OnInit {
     }
   }
 
-  cargarMuro(id: number): void {
+  cargarMuro(idTaller: number): void {
     this.cargando = true;
+    const idAlumno = this.tokenService.getId();
+   
+    const tareasObs = this.esProfesor
+      ? this.tareaService.listarPorTaller(idTaller)
+      : this.tareaService.listarVisibles(idTaller, idAlumno!);
 
-    // Ahora sí, elegimos el endpoint basándonos en la realidad del Token
-    const tareasObs = this.esProfesor 
-      ? this.tareaService.listarPorTaller(id) 
-      : this.tareaService.listarVisibles(id);
-
-    const materialesObs = this.esProfesor 
-      ? this.materialService.listarPorTaller(id) 
-      : this.materialService.listarVisibles(id);
+    const materialesObs = this.esProfesor
+      ? this.materialService.listarPorTaller(idTaller)
+      : this.materialService.listarVisibles(idTaller);
 
     forkJoin({
       tareas: tareasObs,
@@ -56,17 +56,17 @@ export class AulaMuro implements OnInit {
     }).subscribe({
       next: (res) => {
         // Mapeo de TAREAS
-        const tareasMapped = res.tareas.data.map(t => ({ 
-          ...t, 
-          tipo: 'TAREA', 
-          fechaMuro: new Date(t.fechaPublicacion || (t as any).createdAt || new Date()) 
+        const tareasMapped = res.tareas.data.map(t => ({
+          ...t,
+          tipo: 'TAREA',
+          fechaMuro: new Date(t.fechaPublicacion || (t as any).createdAt || new Date())
         }));
 
         // Mapeo de MATERIALES
-        const materialesMapped = res.materiales.data.map(m => ({ 
-          ...m, 
-          tipo: 'MATERIAL', 
-          fechaMuro: new Date((m as any).fechaSubida || (m as any).createdAt || new Date()) 
+        const materialesMapped = res.materiales.data.map(m => ({
+          ...m,
+          tipo: 'MATERIAL',
+          fechaMuro: new Date((m as any).fechaSubida || (m as any).createdAt || new Date())
         }));
 
         // Mezcla y ordenación

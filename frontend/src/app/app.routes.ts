@@ -22,10 +22,18 @@ export const routes: Routes = [
         path: 'panel-admin',
         component: PanelAdmin,
         children: [
-            { path: '', redirectTo: 'talleres', pathMatch: 'full' }, // Al entrar al panel, vemos talleres por defecto
+            { path: '', redirectTo: 'talleres', pathMatch: 'full' }, 
             {
                 path: 'talleres',
                 loadComponent: () => import('./pages/panel-admin/tabs/admin-talleres/admin-talleres').then(m => m.AdminTalleres)
+            },
+            {
+                path: 'talleres/:idTaller/inscripciones', 
+                loadComponent: () => import('./pages/panel-admin/tabs/admin-inscripciones/admin-inscripciones').then(m => m.AdminInscripciones)
+            },
+            {
+                path: 'usuarios/:idUsuario/inscripciones', 
+                loadComponent: () => import('./pages/panel-admin/tabs/admin-inscripciones/admin-inscripciones').then(m => m.AdminInscripciones)
             },
             {
                 path: 'talleres/:id/horario',
@@ -49,21 +57,24 @@ export const routes: Routes = [
         component: AulaVirtual,
         children: [
             { path: '', redirectTo: 'muro', pathMatch: 'full' },
-            { path: 'muro', component: AulaMuro },
-            { path: 'foro', component: AulaForo },
-            { path: 'tareas', component: AulaTareas },
-            { path: 'recursos', component: AulaMateriales },
-            { path: 'participantes', component: AulaParticipantes },
+            { path: 'muro', component: AulaMuro, data: { breadcrumb: 'Muro' } },
+            { path: 'foro', component: AulaForo, data: { breadcrumb: 'Foro' } },
+            { path: 'tareas', component: AulaTareas, data: { breadcrumb: 'Tareas' } },
+            { path: 'recursos', component: AulaMateriales, data: { breadcrumb: 'Materiales' } },
+            { path: 'participantes', component: AulaParticipantes, data: { breadcrumb: 'Participantes' } },
             {
                 path: 'tareas/:idRecurso/seguimiento',
+                data: { breadcrumb: 'Seguimiento' },
                 loadComponent: () => import('./pages/aula-virtual/tabs/aula-tarea-seguimiento/aula-tarea-seguimiento').then(m => m.AulaTareaSeguimiento)
             },
             {
                 path: 'detalle/:tipo/nuevo',
+                data: { breadcrumb: 'Nuevo' },
                 loadComponent: () => import('./pages/aula-virtual/tabs/aula-detalle/aula-detalle').then(m => m.AulaDetalle)
             },
             {
                 path: 'detalle/:tipo/:idRecurso',
+                data: { breadcrumb: '' },
                 loadComponent: () => import('./pages/aula-virtual/tabs/aula-detalle/aula-detalle').then(m => m.AulaDetalle)
             }
         ]

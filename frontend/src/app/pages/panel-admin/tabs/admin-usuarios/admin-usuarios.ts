@@ -7,6 +7,7 @@ import { UsuarioResponse } from '../../../../interfaces/Usuario.Interface';
 import { FormAlumno } from '../../../../components/forms/form-alumno/form-alumno';
 import { Confirmacion } from "../../../../components/dialogs/confirmacion/confirmacion";
 import { Notificacion } from "../../../../components/dialogs/mensaje/notificacion";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin-usuarios',
@@ -25,6 +26,7 @@ export class AdminUsuarios implements OnInit {
   constructor(
     private usuarioService: UsuarioService,
     private notificacionService: NotificacionService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -103,7 +105,7 @@ export class AdminUsuarios implements OnInit {
           telefono: u.telefono,
           direccion: u.direccion,
           idRol: (u as any).idRol || (u.nombreRol === 'ADMIN' ? 1 : 3),
-          activo: !u.activo 
+          activo: !u.activo
         };
         fd.append('usuario', new Blob([JSON.stringify(usuarioDTO)], { type: 'application/json' }));
 
@@ -137,5 +139,9 @@ export class AdminUsuarios implements OnInit {
         });
       }
     });
+  }
+
+  verInscripciones(idUsuario: number) {
+    this.router.navigate(['/panel-admin/usuarios', idUsuario, 'inscripciones']);
   }
 }

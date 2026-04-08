@@ -33,6 +33,7 @@ public class InscripcionService {
 
     /**
      * Registra una nueva inscripción de un usuario en un taller.
+     * 
      * @param dto Datos de la inscripción.
      * @return Inscripción guardada.
      * @throws ResourceNotFoundException Si el usuario o el taller no existen.
@@ -40,8 +41,9 @@ public class InscripcionService {
     @Transactional
     public InscripcionResponseDTO inscribir(InscripcionRequestDTO dto) {
         Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + dto.getIdUsuario()));
-        
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Usuario no encontrado con ID: " + dto.getIdUsuario()));
+
         Taller taller = tallerRepository.findById(dto.getIdTaller())
                 .orElseThrow(() -> new ResourceNotFoundException("Taller no encontrado con ID: " + dto.getIdTaller()));
 
@@ -53,6 +55,7 @@ public class InscripcionService {
 
     /**
      * Obtiene el listado completo de inscripciones.
+     * 
      * @return Lista de todas las inscripciones.
      */
     @Transactional(readOnly = true)
@@ -63,7 +66,24 @@ public class InscripcionService {
     }
 
     /**
+     * Obtiene el listado de alumnos matriculados en un taller específico.
+     * Este método permite al administrador consultar la "Lista de Clase" de
+     * cualquier actividad.
+     * * @param idTaller Identificador único del taller a consultar.
+     * 
+     * @return Lista de DTOs con la información de los alumnos y sus estados de
+     *         inscripción.
+     */
+    @Transactional(readOnly = true)
+    public List<InscripcionResponseDTO> listarPorTaller(Long idTaller) {
+        return inscripcionRepository.findByTallerId(idTaller).stream()
+                .map(inscripcionMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Recupera una inscripción por su identificador único.
+     * 
      * @param id Identificador de la inscripción.
      * @return Inscripción encontrada.
      * @throws ResourceNotFoundException Si la inscripción no existe.
@@ -77,6 +97,7 @@ public class InscripcionService {
 
     /**
      * Lista todas las inscripciones asociadas a un usuario concreto.
+     * 
      * @param idUsuario ID del usuario.
      * @return Lista de sus inscripciones.
      */
@@ -91,7 +112,8 @@ public class InscripcionService {
 
     /**
      * Actualiza los datos de una inscripción existente.
-     * @param id ID de la inscripción a modificar.
+     * 
+     * @param id  ID de la inscripción a modificar.
      * @param dto Nuevos datos.
      * @return Inscripción actualizada.
      * @throws ResourceNotFoundException Si la inscripción no existe.
@@ -99,7 +121,8 @@ public class InscripcionService {
     @Transactional
     public InscripcionResponseDTO actualizar(Long id, InscripcionRequestDTO dto) {
         Inscripcion existente = inscripcionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No existe la inscripción para actualizar con ID: " + id));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("No existe la inscripción para actualizar con ID: " + id));
 
         existente.setMontoPagado(dto.getMontoPagado());
         existente.setOrderId(dto.getOrderId());
@@ -107,18 +130,41 @@ public class InscripcionService {
         return inscripcionMapper.toResponse(inscripcionRepository.save(existente));
     }
 
+    /**
+     * Alterna el estado de activación de una inscripción (Toggle).
+     * Permite al administrador suspender o reactivar el acceso de un alumno a un
+     * taller
+     * de forma manual, sin necesidad de eliminar el registro de la base de datos.
+     * * @param id Identificador único de la inscripción a modificar.
+     * 
+     * @return DTO con la información actualizada, reflejando el nuevo estado de la
+     *         propiedad 'activa'.
+     * @throws ResourceNotFoundException Si no se encuentra una inscripción con el
+     *                                   ID proporcionado.
+     */
+    @Transactional
+    public InscripcionResponseDTO cambiarEstado(Long id) {
+        Inscripcion inscripcion = inscripcionRepository.findByIdIncludingInactive(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Inscripcion no encontrada con ID: " + id));
+
+        inscripcion.setActiva(!inscripcion.isActiva());
+
+        return inscripcionMapper.toResponse(inscripcionRepository.save(inscripcion));
+    }
+
     // --- MÉTODOS DELETE ---
 
     /**
      * Elimina permanentemente una inscripción del sistema.
+     * 
      * @param id ID de la inscripción a borrar.
      * @throws ResourceNotFoundException Si la inscripción no existe.
      */
     @Transactional
     public void eliminar(Long id) {
-        if (!inscripcionRepository.existsById(id)) {
-            throw new ResourceNotFoundException("No se pudo eliminar: ID " + id + " no encontrado");
-        }
-        inscripcionRepository.deleteById(id);
+        Inscripcion inscripcion = inscripcionRepository.findByIdIncludingInactive(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No se pudo eliminar: ID " + id + " no encontrado"));
+
+        inscripcionRepository.delete(inscripcion);
     }
 }

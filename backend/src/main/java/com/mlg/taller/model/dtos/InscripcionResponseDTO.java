@@ -16,6 +16,9 @@ public class InscripcionResponseDTO {
     /** Nombre completo del alumno inscrito. */
     private String nombreUsuario;
 
+    /** Email del alumno inscrito */
+    private String emailUsuario;
+
     /** Nombre del taller matriculado. */
     private String nombreTaller;
 
@@ -30,4 +33,7 @@ public class InscripcionResponseDTO {
 
     /** Referencia externa de la pasarela de pagos. */
     private String orderId;
+
+    /** Estado para indicar si el alumno ha sido dado de baja */
+    private boolean activa;
 }

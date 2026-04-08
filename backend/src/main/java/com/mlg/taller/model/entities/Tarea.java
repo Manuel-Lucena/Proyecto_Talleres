@@ -65,6 +65,13 @@ public class Tarea {
     @Builder.Default
     private List<ArchivoTarea> archivos = new ArrayList<>();
 
+    /**
+     * Entregas de los alumnos relacionados a la tarea.
+     */
+    @OneToMany(mappedBy = "tarea", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Entrega> entregas = new ArrayList<>();
+
     /** Relación de alumnos que tienen la obligación de entregar esta tarea. */
     @OneToMany(mappedBy = "tarea", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

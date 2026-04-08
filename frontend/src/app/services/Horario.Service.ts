@@ -10,7 +10,7 @@ import { HorarioRequest, HorarioResponse } from '../interfaces/Horario.Interface
  */
 @Injectable({ providedIn: 'root' })
 export class HorarioService {
-  /** URL base para los endpoints de la API de horarios */
+
   private apiUrl = 'http://localhost:8080/api/horarios';
 
   constructor(private http: HttpClient) {}

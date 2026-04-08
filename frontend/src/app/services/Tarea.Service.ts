@@ -25,12 +25,12 @@ export class TareaService {
   }
 
   /**
-   * Recupera solo las tareas que el profesor ha marcado como visibles.
-   * @param idTaller Identificador del taller.
-   * @returns Observable con la lista de tareas visibles.
-   */
-  listarVisibles(idTaller: number): Observable<ApiResponse<TareaResponse[]>> {
-    return this.http.get<ApiResponse<TareaResponse[]>>(`${this.apiUrl}/taller/${idTaller}/visibles`);
+     * Recupera las tareas asignadas individualmente según el nivel.
+     * @param idTaller Identificador del taller.
+     * @param idAlumno ID del alumno para filtrar por asignación.
+     */
+  listarVisibles(idTaller: number, idAlumno: number): Observable<ApiResponse<TareaResponse[]>> {
+    return this.http.get<ApiResponse<TareaResponse[]>>(`${this.apiUrl}/taller/${idTaller}/visibles/${idAlumno}`);
   }
 
   /**

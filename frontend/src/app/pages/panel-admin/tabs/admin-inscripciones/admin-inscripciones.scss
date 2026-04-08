@@ -1,0 +1,146 @@
+@import '../../../../../styles/variables';
+@import '../../../../../styles/mixins';
+
+.admin-wrapper {
+    padding: 2.5rem;
+    background-color: $color-fondo-pagina;
+    min-height: 100vh;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; // Centrado vertical perfecto
+    margin-bottom: 2rem;
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+
+        .btn-back {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            &:hover { border-color: $color-marca-principal; color: $color-marca-principal; }
+        }
+    }
+
+    .txt-h1 { font-family: $fuente-enfasis; font-weight: 700; font-size: 1.6rem; margin: 0; }
+    .txt-bajada { color: $color-superficie-suave; font-size: 0.9rem; margin: 0; }
+
+    .btn-primario-aula {
+        @include boton-primario;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.6rem 1.2rem;
+    }
+}
+
+.admin-card {
+    background: white;
+    border-radius: $radio-curvatura;
+    box-shadow: $sombra-nivel-1;
+    border: 1px solid #eee;
+    overflow: hidden;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+        padding: 1rem 1.2rem;
+        background: #fafafa;
+        color: $color-superficie-suave;
+        font-family: $fuente-enfasis;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+    }
+
+    td {
+        padding: 1rem 1.2rem;
+        border-bottom: 1px solid #f8f8f8;
+        vertical-align: middle;
+        color: $color-secundario-frio-2;
+    }
+
+    .item-info {
+        display: flex;
+        flex-direction: column;
+        .main-text { font-weight: 700; font-family: $fuente-enfasis; }
+        .text-muted { font-size: 0.75rem; }
+    }
+
+    .date-stack {
+        display: flex;
+        flex-direction: column;
+        .d-main { font-weight: 600; font-size: 0.85rem; }
+        .d-sub { font-size: 0.7rem; color: #999; }
+    }
+
+    .price-tag { font-weight: 800; }
+}
+
+.badge-aula {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+    
+    &.success { background: rgba($color-marca-principal, 0.1); color: $color-marca-principal; }
+    &.warning { background: rgba($color-secundario-calido-1, 0.1); color: $color-secundario-calido-1; }
+    &.info { background: rgba($color-secundario-frio-1, 0.1); color: $color-secundario-frio-1; }
+}
+
+.actions-group {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    align-items: center;
+
+    .btn-tool {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.2s;
+        color: $color-secundario-frio-2;
+        padding: 0;
+
+        i { font-size: 1.1rem; display: flex; }
+
+        &:hover {
+            border-color: $color-marca-principal;
+            color: $color-marca-principal;
+            background: rgba($color-marca-principal, 0.05);
+        }
+
+        &.delete:hover {
+            border-color: $color-secundario-calido-1;
+            color: $color-secundario-calido-1;
+            background: #fff1f1;
+        }
+
+        .text-success { color: $color-marca-principal !important; }
+    }
+}
+
+.text-right { text-align: right; }

@@ -120,6 +120,10 @@ export class AdminTalleres implements OnInit {
     });
   }
 
+  verInscritos(idTaller: number) {
+    this.router.navigate(['/panel-admin/talleres', idTaller, 'inscripciones']);
+  }
+
 
   verHorario(id: number) {
     this.router.navigate(['/panel-admin/talleres', id, 'horario']);

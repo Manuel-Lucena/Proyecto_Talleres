@@ -1,0 +1,102 @@
+<div class="admin-wrapper">
+    <header class="admin-header">
+        <div class="header-left">
+            <button class="btn-back" (click)="volver()" title="Volver">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <div class="title-group">
+                <h1 class="txt-h1">{{ titulo }}</h1>
+                <p class="txt-bajada">{{ subtitulo }}</p>
+            </div>
+        </div>
+        
+        <button class="btn-primario-aula" (click)="abrirInscripcion()">
+            <i class="bi bi-plus-lg"></i>
+            <span class="btn-text">Nueva Inscripción</span>
+        </button>
+    </header>
+
+    @if (cargando) {
+        <div class="admin-card d-flex justify-content-center align-items-center py-5">
+            <div class="spinner-border text-success" role="status"></div>
+            <span class="ms-3">Cargando registros...</span>
+        </div>
+    } @else {
+        <div class="admin-card">
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>{{ esVistaTaller ? 'Alumno' : 'Taller' }}</th>
+                            <th>Fecha Registro</th>
+                            <th>Monto</th>
+                            <th>Pago</th>
+                            <th>Estado Alta</th>
+                            <th class="text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (ins of inscripciones; track ins.idInscripcion) {
+                        <tr>
+                            <td>
+                                <div class="item-info">
+                                    <span class="main-text">{{ esVistaTaller ? ins.emailUsuario : ins.nombreTaller }}</span>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="date-stack">
+                                    <span class="d-main">{{ ins.fechaInscripcion | date:'dd/MM/yyyy' }}</span>
+                                   
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="price-tag">{{ ins.montoPagado }}€</span>
+                            </td>
+
+                            <td>
+                                <span class="badge-aula" [class.success]="ins.estadoPago === 'COMPLETADO'" [class.info]="ins.estadoPago !== 'COMPLETADO'">
+                                    {{ ins.estadoPago }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="badge-aula" [class.success]="ins.activa" [class.warning]="!ins.activa">
+                                    {{ ins.activa ? 'ACTIVA' : 'BAJA' }}
+                                </span>
+                            </td>
+
+                            <td class="text-right">
+                                <div class="actions-group">
+                                    <button class="btn-tool" 
+                                            [title]="ins.activa ? 'Dar de baja' : 'Activar'"
+                                            (click)="alternarEstado(ins.idInscripcion)">
+                                        <i class="bi" [ngClass]="ins.activa ? 'bi-toggle-on text-success' : 'bi-toggle-off'"></i>
+                                    </button>
+
+                                    <button class="btn-tool delete" 
+                                            (click)="eliminar(ins.idInscripcion)" 
+                                            title="Eliminar permanentemente">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        } @empty {
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <i class="bi bi-info-circle text-muted fs-3"></i>
+                                <p class="mt-2 text-muted">No hay registros para mostrar.</p>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+<app-confirmacion></app-confirmacion>
+<app-modal-notificacion></app-modal-notificacion>

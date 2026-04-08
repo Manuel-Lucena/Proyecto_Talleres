@@ -62,14 +62,13 @@ public class TareaController {
     }
 
     /**
-     * [ALUMNO] Obtiene solo las tareas que tienen el flag de visibilidad activo.
-     * * @param idTaller Identificador del taller.
-     * 
-     * @return ApiResponse con la lista de tareas visibles.
+     * Lista tareas personalizadas.
+     * El profesor elige aquí qué alumnos ven la tarea según su nivel
      */
-    @GetMapping("/taller/{idTaller}/visibles")
-    public ApiResponse<List<TareaResponseDTO>> listarVisiblesParaAlumno(@PathVariable Long idTaller) {
-        return ApiResponse.success(tareaService.listarVisibles(idTaller), "Tareas visibles obtenidas con éxito");
+    @GetMapping("/taller/{idTaller}/visibles/{idAlumno}")
+    public ApiResponse<List<TareaResponseDTO>> listarVisibles(@PathVariable Long idTaller,
+            @PathVariable Long idAlumno) {
+        return ApiResponse.success(tareaService.listarVisibles(idTaller, idAlumno), "Tareas de tu nivel obtenidas");
     }
 
     /**

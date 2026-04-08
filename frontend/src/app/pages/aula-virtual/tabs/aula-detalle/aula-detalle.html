@@ -1,6 +1,5 @@
 <div class="pagina-detalle-wrapper">
     <div class="contenedor-ancho fade-in">
-
         <div class="nav-superior">
             <button (click)='volver()' class="btn-link-volver">
                 <i class="bi bi-arrow-left-short"></i> Volver al curso
@@ -15,26 +14,27 @@
                 class="btn-link-volver btn-editar-recurso">
                 <i class="bi bi-pencil"></i> Editar {{ tipo }}
             </button>
+
+            <button *ngIf="!esNuevo && !editando && esProfesor()" (click)="eliminarRecurso()"
+                class="btn-link-volver btn-eliminar-recurso">
+                <i class="bi bi-trash3"></i> Eliminar {{ tipo }}
+            </button>
         </div>
 
         <main class="card-tarea-principal" *ngIf="!cargando && recurso">
-
             <header class="encabezado-tarea">
                 <div class="info-titulo">
                     <div class="d-flex align-items-center gap-3 mb-2">
                         <span class="badge-categoria" [ngClass]="tipo">{{ tipo }}</span>
-
                         <button *ngIf="esProfesor() && !esNuevo" (click)="toggleVisibilidadRapida()"
                             class="btn-ojo-minimal" [class.is-hidden]="!recurso.visible"
                             [title]="recurso.visible ? 'Ocultar' : 'Mostrar'">
                             <i class="bi" [ngClass]="recurso.visible ? 'bi-eye-fill' : 'bi-eye-slash'"></i>
                         </button>
                     </div>
-
                     <h1 class="titulo-extremo" *ngIf="!editando && !esNuevo" [class.oculto]="!recurso.visible">
                         {{ recurso.titulo }}
                     </h1>
-
                     <div *ngIf="esNuevo || editando" [formGroup]="form" class="mt-2">
                         <input type="text" formControlName="titulo" class="form-control-titulo-edit"
                             [placeholder]="'Título de la ' + tipo + '...'">
@@ -44,25 +44,19 @@
                 <div class="bloque-fechas-horizontal" *ngIf="!esNuevo && !editando">
                     <div class="fecha-item">
                         <span class="label">Publicado</span>
-                        <span class="valor">
-                            {{ (recurso.fechaPublicacion || recurso.createdAt) | date:"d 'de' MMMM 'de' y, HH:mm" }}
-                        </span>
+                        <span class="valor">{{ (recurso.fechaPublicacion || recurso.createdAt) | date:"d 'de' MMMM 'de'
+                            y, HH:mm" }}</span>
                     </div>
-
                     <div class="fecha-item" *ngIf="tipo === 'tarea'">
                         <span class="label">Fecha Límite</span>
-                        <span class="valor">
-                            {{ recurso.fechaEntrega | date:"d 'de' MMMM 'de' y, HH:mm" }}
-                        </span>
+                        <span class="valor">{{ recurso.fechaEntrega | date:"d 'de' MMMM 'de' y, HH:mm" }}</span>
                     </div>
                 </div>
             </header>
 
             <section class="seccion-enunciado">
                 <ng-container *ngIf="!editando">
-                    <div class="contenido-texto">
-                        {{ tipo === 'tarea' ? recurso.descripcion : recurso.contenido }}
-                    </div>
+                    <div class="contenido-texto">{{ tipo === 'tarea' ? recurso.descripcion : recurso.contenido }}</div>
                 </ng-container>
 
                 <div *ngIf="editando" [formGroup]="form" class="form-edicion">
@@ -70,6 +64,7 @@
                         <label class="label-form">Descripción / Instrucciones</label>
                         <textarea formControlName="descripcion" class="form-control-custom" rows="8"></textarea>
                     </div>
+
                     <div class="row" *ngIf="tipo === 'tarea'">
                         <div class="col-md-6 mb-4">
                             <label class="label-form">Fecha de entrega</label>
@@ -80,13 +75,11 @@
                             <div class="dropdown-extensiones-custom">
                                 <div class="dropdown-trigger-custom"
                                     (click)="toggleDropdownExt(); $event.stopPropagation()">
-                                    <span class="text-truncate">
-                                        {{ form.get('extensionesPermitidas')?.value || 'Seleccionar formatos...' }}
-                                    </span>
+                                    <span class="text-truncate">{{ form.get('extensionesPermitidas')?.value ||
+                                        'Seleccionar formatos...' }}</span>
                                     <i class="bi bi-chevron-down"></i>
                                 </div>
-                                <div class="dropdown-menu-custom" [class.show]="mostrarDropdownExt"
-                                    (click)="$event.stopPropagation()">
+                                <div class="dropdown-menu-custom" [class.show]="mostrarDropdownExt">
                                     <label *ngFor="let ext of extensionesDisponibles" class="dropdown-item-check">
                                         <input type="checkbox" [value]="ext.value" [checked]="estaMarcada(ext.value)"
                                             (change)="onExtensionChange($event)">
@@ -94,6 +87,40 @@
                                     </label>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="row" *ngIf="tipo === 'tarea' && esProfesor()">
+                        <div class="col-12 mb-4">
+                            <label class="label-form">Asignar a alumnos específicos (Opcional)</label>
+                            <div class="dropdown-extensiones-custom">
+                                <div class="dropdown-trigger-custom"
+                                    (click)="toggleDropdownAlumnos(); $event.stopPropagation()">
+                                    <span class="text-truncate">
+                                        {{ alumnosSeleccionadosIds.length === 0 ? 'Visible para todos los alumnos' :
+                                        alumnosSeleccionadosIds.length + ' alumnos seleccionados' }}
+                                    </span>
+                                    <i class="bi bi-people-fill"></i>
+                                </div>
+                                <div class="dropdown-menu-custom" [class.show]="mostrarDropdownAlumnos"
+                                    (click)="$event.stopPropagation()">
+                                    <div class="p-2 border-bottom">
+                                        <input type="text" class="form-control-custom"
+                                            style="padding: 5px; font-size: 0.8rem;" placeholder="Buscar alumno..."
+                                            [(ngModel)]="filtroAlumno" [ngModelOptions]="{standalone: true}">
+                                    </div>
+                                    <div style="max-height: 200px; overflow-y: auto;">
+                                        <label *ngFor="let alu of alumnosFiltrados" class="dropdown-item-check">
+                                            <input type="checkbox"
+                                                [checked]="alumnosSeleccionadosIds.includes(alu.idUsuario)"
+                                                (change)="onAlumnoToggle(alu.idUsuario)">
+                                            <span>{{ alu.nombre }} {{ alu.apellidos }}</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="text-muted">Si no seleccionas a nadie, la tarea será visible para todo el
+                                taller.</small>
                         </div>
                     </div>
                 </div>
@@ -109,19 +136,15 @@
                                 <span class="file-name">{{ arch.nombre }}</span>
                                 <span class="file-ext">Existente</span>
                             </div>
-                            <button *ngIf="editando" class="btn-borrar-file" (click)="marcarParaEliminar(arch.id)">
-                                <i class="bi bi-x-circle-fill"></i>
-                            </button>
+                            <button *ngIf="editando" class="btn-borrar-file" (click)="marcarParaEliminar(arch.id)"><i
+                                    class="bi bi-x-circle-fill"></i></button>
                         </div>
                         <div *ngFor="let arch of nuevosArchivos; let i = index" class="item-archivo nuevo">
                             <i class="bi bi-file-earmark-arrow-up"></i>
-                            <div class="file-meta">
-                                <span class="file-name">{{ arch.name }}</span>
-                                <span class="badge-nuevo">Por subir</span>
-                            </div>
-                            <button class="btn-borrar-file" (click)="quitarNuevoArchivo(i)">
-                                <i class="bi bi-x-circle-fill"></i>
-                            </button>
+                            <div class="file-meta"><span class="file-name">{{ arch.name }}</span><span
+                                    class="badge-nuevo">Por subir</span></div>
+                            <button class="btn-borrar-file" (click)="quitarNuevoArchivo(i)"><i
+                                    class="bi bi-x-circle-fill"></i></button>
                         </div>
                     </div>
                     <div *ngIf="editando" class="zona-upload upload-pequeno mt-3">
@@ -141,7 +164,6 @@
 
             <section class="seccion-tabla-moodle" *ngIf="tipo === 'tarea' && !editando && !esProfesor()">
                 <h3 class="titulo-tabla">Estado de la entrega</h3>
-
                 <div class="wrapper-tabla">
                     <table class="tabla-custom">
                         <tbody>
@@ -171,8 +193,7 @@
                                     <div class="lista-vertical-entregas">
                                         <div *ngFor="let a of archivosEntregaExistentes" class="archivo-entregado-link"
                                             (click)="descargarArchivoAlumno(a)">
-                                            <i class="bi bi-file-earmark-arrow-down"></i>
-                                            <span>{{ a.nombre }}</span>
+                                            <i class="bi bi-file-earmark-arrow-down"></i><span>{{ a.nombre }}</span>
                                         </div>
                                     </div>
                                 </td>
@@ -180,7 +201,6 @@
                         </tbody>
                     </table>
                 </div>
-
                 <div class="contenedor-acciones-entrega">
                     <button (click)="abrirModalEntrega()" class="btn-entrega-alumno">
                         <i class="bi" [ngClass]="recurso.entregado ? 'bi-pencil-square' : 'bi-plus-lg'"></i>
@@ -200,3 +220,7 @@
     [archivosExistentes]="archivosEntregaExistentes" (cerrar)="mostrarModalEntrega = false"
     (guardado)="onEntregaGuardada()">
 </app-form-entrega>
+
+<app-confirmacion></app-confirmacion>
+
+<app-modal-notificacion></app-modal-notificacion>
