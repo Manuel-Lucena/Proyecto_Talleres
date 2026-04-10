@@ -1,45 +1,44 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
-  <div class="modal-body contenedor-formulario" (click)="$event.stopPropagation()">
-    <button class="btn-close" (click)="cerrar.emit()">&times;</button>
+  <div class="modal-body" (click)="$event.stopPropagation()">
+    <button class="btn-close" (click)="cerrar.emit()">
+      <i class="bi bi-x-lg"></i>
+    </button>
 
     <div class="checkout-layout">
       
       <div class="resumen-checkout-taller" *ngIf="tallerParaInscribir">
         <div class="mini-card-info">
           <img [src]="tallerParaInscribir.fotoRuta || 'assets/images/placeholder-taller.jpg'" class="img-preview">
-          <div class="p-4">
-            <span class="etiqueta-pago">Resumen del pedido</span>
-            <h4 class="nombre-taller">{{ tallerParaInscribir.nombre }}</h4>
-            <p class="profesor-taller">Prof. {{ tallerParaInscribir.nombreCompletoProfesor }}</p>
-            
-            <div class="separador-puntos"></div>
-            
-            <div class="fila-total">
-              <span>Total a pagar</span>
-              <span class="precio-destacado">{{ tallerParaInscribir.precio }}€</span>
-            </div>
+          <span class="etiqueta-pago">Tu suscripción</span>
+          <h4 class="nombre-taller">{{ tallerParaInscribir.nombre }}</h4>
+          <p class="profesor-taller">Impartido por Prof. {{ tallerParaInscribir.nombreCompletoProfesor }}</p>
+          
+          <div class="separador-puntos"></div>
+          
+          <div class="fila-total">
+            <span>Importe Total</span>
+            <span class="precio-destacado">{{ tallerParaInscribir.precio }}€</span>
           </div>
         </div>
       </div>
 
       <div class="seccion-formulario-pago">
-        <div class="titulo-formulario mb-4">Finalizar Compra</div>
+        <div class="titulo-formulario">Finalizar Compra</div>
 
         <form [formGroup]="inscripcionForm" (ngSubmit)="enviar()">
-          
           <input type="hidden" formControlName="idUsuario">
           <input type="hidden" formControlName="idTaller">
 
           <div class="alerta-seguridad mb-4">
-            <i class="bi bi-shield-lock-fill"></i>
+            <i class="bi bi-shield-check"></i>
             <div>
-              <p class="m-0">Pago procesado de forma segura</p>
-              <small>Referencia: {{ inscripcionForm.get('orderId')?.value }}</small>
+              <p>Transacción Protegida</p>
+              <small>ID: {{ inscripcionForm.get('orderId')?.value }}</small>
             </div>
           </div>
 
-          <div class="campo-formulario mb-4">
-            <label>Confirmar Importe</label>
+          <div class="campo-formulario">
+            <label>Monto a cargar en cuenta</label>
             <div class="input-checkout-grande">
                 <span>{{ tallerParaInscribir?.precio }}</span>
                 <small>EUR</small>
@@ -47,11 +46,12 @@
           </div>
 
           <div class="acciones-finales mt-auto">
-            <button type="submit" class="btn-guardar w-100" [disabled]="inscripcionForm.invalid">
-              Confirmar y Pagar Ahora
+            <button type="submit" class="btn-pagar-checkout" [disabled]="inscripcionForm.invalid">
+              Confirmar y Inscribirme
             </button>
-            <p class="text-center mt-3 text-muted small">
-              Al confirmar, aceptas los términos de Aula Viva.
+            <p class="text-center mt-4 text-muted small">
+              Al hacer clic, confirmas tu inscripción en el taller seleccionado. 
+              <br><strong>Aula Viva &copy; 2026</strong>
             </p>
           </div>
         </form>

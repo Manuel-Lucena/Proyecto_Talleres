@@ -1,24 +1,29 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { InscripcionService } from '../../../../services/Inscripcion.Service';
 import { NotificacionService } from '../../../../services/Notificacion.Service';
 import { InscripcionResponse } from '../../../../interfaces/Inscripcion.Interface';
 import { Confirmacion } from "../../../../components/dialogs/confirmacion/confirmacion";
 import { Notificacion } from "../../../../components/dialogs/mensaje/notificacion";
+import { FormInscripcionAdmin } from '../../../../components/forms/form-inscripcion-admin/form-inscripcion-admin';
 
 @Component({
   selector: 'app-admin-inscripciones',
   standalone: true,
-  imports: [CommonModule, Confirmacion, Notificacion],
+  imports: [CommonModule, Confirmacion, Notificacion, FormInscripcionAdmin],
   templateUrl: './admin-inscripciones.html',
   styleUrl: './admin-inscripciones.scss',
 })
 export class AdminInscripciones implements OnInit {
   inscripciones: InscripcionResponse[] = [];
   cargando = true;
+  mostrarModal = false;
 
-  // Contexto de la vista (Viene por URL)
+  // CONTEXTOS PARA EL MODAL
+  tallerContexto: any = null;
+  usuarioContexto: any = null; // <--- Agregamos esta propiedad
+
   idTaller?: number;
   idUsuario?: number;
   esVistaTaller = false; 
@@ -35,7 +40,6 @@ export class AdminInscripciones implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Detectamos si venimos de la gestión de un Taller o de un Usuario
     this.route.params.subscribe(params => {
       if (params['idTaller']) {
         this.idTaller = Number(params['idTaller']);
@@ -49,12 +53,8 @@ export class AdminInscripciones implements OnInit {
     });
   }
 
-  /**
-   * Carga la lista de inscripciones desde el servidor
-   */
   cargarDatos(tipo: 'taller' | 'usuario', id: number) {
     this.cargando = true;
-    
     const peticion = tipo === 'taller' 
       ? this.inscripcionService.listarPorTaller(id) 
       : this.inscripcionService.listarPorUsuario(id);
@@ -62,112 +62,107 @@ export class AdminInscripciones implements OnInit {
     peticion.subscribe({
       next: (res) => {
         this.inscripciones = res.data;
+        
+        // CONFIGURACIÓN DE CONTEXTOS SEGÚN LA VISTA
+        if (tipo === 'taller') {
+          this.usuarioContexto = null; // Limpiamos contexto de usuario
+          this.tallerContexto = {
+            idTaller: id,
+            nombre: this.inscripciones.length > 0 ? this.inscripciones[0].nombreTaller : 'Taller',
+            precio: this.inscripciones.length > 0 ? this.inscripciones[0].montoPagado : 0
+          };
+        } else {
+          this.tallerContexto = null; // Limpiamos contexto de taller
+          this.usuarioContexto = {
+            idUsuario: id,
+            email: this.inscripciones.length > 0 ? this.inscripciones[0].emailUsuario : 'Usuario'
+          };
+        }
+
         this.configurarTextos();
         this.cargando = false;
         this.cdr.detectChanges();
       },
       error: () => {
         this.cargando = false;
-        this.notificacionService.mostrar({ 
-          titulo: 'Error', 
-          mensaje: 'No se pudo obtener la información de las inscripciones', 
-          tipo: 'error' 
-        });
       }
     });
   }
 
-  /**
-   * Configura dinámicamente los títulos de la cabecera
-   */
   configurarTextos() {
     if (this.esVistaTaller) {
       this.titulo = "Gestión de Alumnos";
       this.subtitulo = this.inscripciones.length > 0 
         ? `Inscritos en ${this.inscripciones[0].nombreTaller}` 
-        : "No hay alumnos inscritos en este taller";
+        : "Lista de alumnos";
     } else {
       this.titulo = "Talleres del Usuario";
       this.subtitulo = this.inscripciones.length > 0 
-        ? `Cursos activos de ${this.inscripciones[0].emailUsuario}` 
-        : "Este usuario no tiene inscripciones activas";
+        ? `Cursos de ${this.inscripciones[0].emailUsuario}` 
+        : "Inscripciones del usuario";
     }
   }
 
-  /**
-   * Cambia el estado de la inscripción (Activa / Baja)
-   */
-  alternarEstado(id: number) {
-    this.inscripcionService.cambiarEstado(id).subscribe({
-      next: (res) => {
-        // Actualizamos el registro en el array local para reflejar el cambio en la tabla
-        const index = this.inscripciones.findIndex(i => i.idInscripcion === id);
-        if (index !== -1) {
-          this.inscripciones[index].activa = res.data.activa;
-          this.cdr.detectChanges();
-        }
+  abrirInscripcion() {
+    this.mostrarModal = true;
+  }
 
+  cerrarModal() {
+    this.mostrarModal = false;
+  }
+
+  guardarInscripcion(datos: any) {
+    this.inscripcionService.inscribir(datos).subscribe({
+      next: () => {
         this.notificacionService.mostrar({ 
-          titulo: 'Estado Actualizado', 
-          mensaje: `La inscripción ahora está ${res.data.activa ? 'Activa' : 'de Baja'}`, 
+          titulo: 'Éxito', 
+          mensaje: 'Registrado correctamente', 
           tipo: 'exito' 
         });
+        this.cerrarModal();
+        if (this.idTaller) this.cargarDatos('taller', this.idTaller);
+        else if (this.idUsuario) this.cargarDatos('usuario', this.idUsuario);
       },
-      error: () => {
+      error: (err) => {
         this.notificacionService.mostrar({ 
           titulo: 'Error', 
-          mensaje: 'No se pudo cambiar el estado de la inscripción', 
+          mensaje: err.error?.message || 'Error al inscribir', 
           tipo: 'error' 
         });
       }
     });
   }
 
-  /**
-   * Elimina permanentemente una inscripción previa confirmación
-   */
+  alternarEstado(id: number) {
+    this.inscripcionService.cambiarEstado(id).subscribe({
+      next: (res) => {
+        const index = this.inscripciones.findIndex(i => i.idInscripcion === id);
+        if (index !== -1) {
+          this.inscripciones[index].activa = res.data.activa;
+          this.cdr.detectChanges();
+        }
+      }
+    });
+  }
+
   eliminar(id: number) {
     this.notificacionService.confirmar({
-      titulo: '¿Eliminar Inscripción?',
-      mensaje: 'Esta acción es irreversible y el alumno perderá acceso al material.',
+      titulo: '¿Eliminar?',
+      mensaje: 'Esta acción no se puede deshacer.',
       textoConfirmar: 'Eliminar',
       textoCancelar: 'Cancelar'
     }).then(confirmado => {
       if (confirmado) {
         this.inscripcionService.eliminar(id).subscribe({
           next: () => {
-            // Eliminamos del array local
             this.inscripciones = this.inscripciones.filter(i => i.idInscripcion !== id);
             this.cdr.detectChanges();
-            
-            this.notificacionService.mostrar({ 
-              titulo: 'Éxito', 
-              mensaje: 'Inscripción eliminada correctamente', 
-              tipo: 'exito' 
-            });
           }
         });
       }
     });
   }
 
-  /**
-   * Lógica para el botón de inscribir (Aquí llamarías a tu modal de creación)
-   */
-  abrirInscripcion() {
-    // Aquí iría la lógica para abrir el modal de "Nueva Inscripción"
-    console.log("Abrir modal para:", this.esVistaTaller ? 'Taller ' + this.idTaller : 'Usuario ' + this.idUsuario);
-    
-    this.notificacionService.mostrar({
-      titulo: 'Nueva Inscripción',
-      mensaje: 'El formulario de registro se abrirá en un modal.',
-      tipo: 'info'
-    });
-  }
-
-  /**
-   * Navegación hacia atrás
-   */
   volver() {
     this.location.back();
   }

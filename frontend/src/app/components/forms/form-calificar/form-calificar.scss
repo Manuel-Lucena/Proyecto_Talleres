@@ -1,227 +1,228 @@
-@import '../../../../styles/variables';
-@import '../../../../styles/mixins';
-@import '../../../../styles/formularios';
+@use '../../../../styles/variables' as v;
+@use '../../../../styles/mixins' as m;
+@use '../../../../styles/formularios' as f;
+
+:host {
+    display: block;
+}
 
 .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba($color-secundario-frio-2, 0.5);
-    backdrop-filter: blur(4px);
+    inset: 0;
+    background: rgba(v.$color-secundario-frio-2, 0.75);
+    backdrop-filter: blur(8px);
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     z-index: 9999;
-    padding: 20px;
+    padding: 1.5rem;
+    @include m.animacion-entrada;
 }
 
-.modal-content-custom {
-    // Si da error aquí también, usa: background: white; border-radius: 15px; etc.
-    @extend .contenedor-formulario !optional;
+.modal-card {
+    @include f.estilo-contenedor-formulario;
     width: 100%;
     max-width: 700px;
-    padding: 2.5rem;
+    background: v.$color-neutro-max;
+    box-shadow: v.$sombra-nivel-3;
+    padding: 3rem 2.5rem;
     position: relative;
-    background: white;
+    border: none;
 
-    header {
+    &:hover { transform: none; }
+}
+
+// --- HEADER ---
+.modal-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid v.$color-fondo-pagina;
+    
+    h2 {
+        @extend .titulo-formulario !optional; // Por si tienes la clase en formularios.scss
+        font-size: 1.8rem;
+        color: v.$color-secundario-frio-2;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .btn-close-modal {
+        position: absolute;
+        top: 2.5rem;
+        right: 2.5rem;
+        background: v.$color-fondo-pagina;
+        border: 1px solid #eee;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        cursor: pointer;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.5rem;
-        border-bottom: 2px solid #f0f0f0;
-        padding-bottom: 1rem;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: v.$color-superficie-suave;
+        transition: 0.2s;
 
-        h2 {
-            margin: 0;
-            font-size: 1.4rem;
-            color: $color-secundario-frio-2;
-            font-weight: 800;
-        }
-
-        .btn-close-modal {
-            background: none;
-            border: none;
-            font-size: 2rem;
-            color: #ccc;
-            cursor: pointer;
-            line-height: 1;
-
-            &:hover {
-                color: $color-marca-principal;
-            }
+        &:hover {
+            color: v.$color-secundario-calido-1;
+            border-color: v.$color-secundario-calido-1;
         }
     }
 }
 
+// --- SECCIONES DE INFORMACIÓN (ENTREGA DEL ALUMNO) ---
 .info-entrega {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
 
-    label {
-        font-weight: 700;
-        color: $color-marca-principal;
+    .label-seccion {
         display: block;
-        margin-bottom: 8px;
+        font-family: v.$fuente-enfasis;
+        font-weight: 800;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: v.$color-secundario-calido-2; // Verde para identificar info del alumno
+        margin-bottom: 10px;
     }
 
     .texto-alumno {
-        background: #f8f9fa;
-        padding: 1.2rem;
-        border-radius: 10px;
+        background: v.$color-fondo-pagina;
+        padding: 1.5rem;
+        border-radius: 12px;
         font-size: 0.95rem;
-        color: #555;
-        border: 1px solid #eee;
+        color: v.$color-secundario-frio-2;
+        line-height: 1.6;
+        border: 1px solid #eef0f2;
     }
 }
 
-// --- ARCHIVOS EN FILA ENTERA (Como pediste) ---
 .archivos-alumno {
-    margin-bottom: 1.5rem;
-
-    label {
-        font-weight: 700;
-        margin-bottom: 10px;
-        display: block;
-    }
+    margin-bottom: 2.5rem;
 
     .lista-archivos-enteros {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+        display: grid;
+        gap: 12px;
     }
 
     .item-archivo-completo {
         display: flex;
         align-items: center;
-        padding: 12px 18px;
-        background: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 12px;
+        padding: 14px 20px;
+        background: v.$color-neutro-max;
+        border: 2px solid v.$color-fondo-pagina;
+        border-radius: v.$radio-curvatura;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
 
         i {
-            font-size: 1.6rem;
-            color: $color-marca-principal;
+            font-size: 1.8rem;
+            color: v.$color-secundario-calido-2;
             margin-right: 15px;
         }
 
-        .info-archivo {
+        .info {
             display: flex;
             flex-direction: column;
-
-            .nombre-archivo {
-                font-weight: 600;
-                font-size: 0.9rem;
-                color: #333;
-            }
-
-            .hint-descarga {
-                font-size: 0.75rem;
-                color: #999;
-            }
+            .nombre { font-weight: 700; color: v.$color-secundario-frio-2; font-size: 0.9rem; }
+            .sub { font-size: 0.75rem; color: v.$color-superficie-suave; font-weight: 600; }
         }
 
         &:hover {
-            border-color: $color-marca-principal;
-            background: rgba($color-marca-principal, 0.03);
-            transform: translateX(5px);
+            border-color: v.$color-secundario-calido-2;
+            background: rgba(v.$color-secundario-calido-2, 0.02);
+            transform: translateX(8px);
         }
     }
 }
 
-// --- FORMULARIO Y ERRORES ---
-.fila-formulario {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-
-    @media (max-width: 600px) {
-        grid-template-columns: 1fr;
-    }
-}
-
-.campo-formulario {
+// --- FORMULARIO DE CALIFICACIÓN ---
+.form-calificacion {
     display: flex;
     flex-direction: column;
+    gap: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px dashed v.$color-fondo-pagina;
+
+    .fila-input {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 1.5rem;
+        align-items: start;
+
+        @media (max-width: 600px) { grid-template-columns: 1fr; gap: 8px; }
+    }
 
     label {
-        font-weight: 700;
-        margin-bottom: 5px;
+        font-family: v.$fuente-enfasis;
+        font-weight: 800;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: v.$color-secundario-frio-2;
+        margin-top: 12px;
     }
 
-    // Cambiamos @extend por clases manuales para evitar el error de "not found"
-    input,
-    textarea {
-        padding: 10px 15px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        outline: none;
-        font-family: inherit;
-
+    input, textarea {
+        @include m.estilo-input-base;
+        
         &.is-invalid {
-            border-color: $color-secundario-calido-1 !important;
-            background-color: rgba($color-secundario-calido-1, 0.02);
-        }
-    }
-
-    .error-container {
-        min-height: 20px;
-        margin-top: 4px;
-
-        .error-message {
-            color: $color-secundario-calido-1;
-            font-size: 0.75rem;
-            font-weight: 700;
+            border-color: v.$color-secundario-calido-1;
+            background: rgba(v.$color-secundario-calido-1, 0.02);
         }
     }
 }
 
-footer {
-    margin-top: 2rem;
-    display: flex;
-    justify-content: center; // <--- ESTO centra los botones
-    gap: 1.5rem; // Un poco más de espacio entre ellos
-    padding-top: 1.5rem;
-    border-top: 1px solid #eee;
-
-    .btn-secondary {
-        background: #f0f0f0;
-        border: none;
-        padding: 12px 30px; // Aumentamos padding para que tengan cuerpo
-        border-radius: 8px;
+.error-container {
+    min-height: 20px;
+    margin-top: 4px;
+    .error-message {
+        color: v.$color-secundario-calido-1;
+        font-size: 0.75rem;
         font-weight: 700;
+    }
+}
+
+// --- FOOTER ---
+.modal-footer {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: center;
+
+    .footer-actions {
+        display: flex;
+        gap: 1.5rem;
+        width: 100%;
+        max-width: 450px;
+    }
+
+    .btn-cancelar {
+        flex: 1;
+        background: v.$color-fondo-pagina;
+        border: 1px solid #dcdcdc;
+        border-radius: v.$radio-curvatura;
+        font-family: v.$fuente-enfasis;
+        font-weight: 700;
+        color: v.$color-superficie-suave;
+        height: 50px;
         cursor: pointer;
-        color: #666;
-        transition: background 0.2s;
+        transition: 0.2s;
 
         &:hover {
-            background: #e5e5e5;
+            background: #e2e2e2;
+            color: v.$color-secundario-frio-2;
         }
     }
 
-    .btn-primary {
-        @extend .btn-guardar;
-        background-color: $color-marca-principal;
-        color: white;
-        border: none;
-        padding: 12px 30px; // Mismo padding que el cancelar
-        border-radius: 8px;
-        font-weight: 700;
-        cursor: pointer;
-        min-width: 180px; // Para que el botón de guardar destaque un poco
+    .btn-confirmar {
+        flex: 1.5;
+        @include m.boton-primario;
+        margin: 0;
+        height: 50px;
 
         &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+            background: #e0e0e0;
             filter: grayscale(1);
-        }
-
-        &:hover:not(:disabled) {
-            filter: brightness(1.1);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
         }
     }
 }

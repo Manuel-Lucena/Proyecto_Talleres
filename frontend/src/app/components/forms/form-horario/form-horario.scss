@@ -13,13 +13,13 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(v.$color-neutro-min, 0.5);
-    backdrop-filter: blur(4px);
+    background: rgba(v.$color-secundario-frio-2, 0.75); // Azul corporativo más profundo
+    backdrop-filter: blur(8px);
     z-index: 999999;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 1.5rem;
     pointer-events: auto; 
     @include m.animacion-entrada;
 }
@@ -27,13 +27,12 @@
 .modal-content-custom {
     @include f.estilo-contenedor-formulario;
     width: 100%;
-    max-width: 500px;
-    display: flex;
-    flex-direction: column;
-    position: relative;
+    max-width: 550px; // Un poco más ancho para que las horas respiren en desktop
     background: v.$color-neutro-max;
     box-shadow: v.$sombra-nivel-3;
-    padding: 2.5rem; // Más padding para que respire como en Noticias
+    padding: 3rem 2.5rem; // Padding generoso según guía de estilo
+    position: relative;
+    border: none;
 
     &:hover { transform: none; }
 
@@ -41,31 +40,30 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 2rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #eee; // Línea divisoria limpia
-
+        margin-bottom: 2.5rem;
+        
         .titulo-formulario {
             margin: 0;
-            font-family: v.$fuente-enfasis;
-            color: v.$color-secundario-frio-2;
-            font-size: 1.5rem;
-            font-weight: 800;
+            // El mixin de formularios ya suele añadir el borde inferior decorativo
         }
 
         .btn-close-modal {
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            color: #bbb;
+            background: v.$color-fondo-pagina;
+            border: 1px solid #eee;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            color: v.$color-superficie-suave;
             cursor: pointer;
             display: flex;
             align-items: center;
-            transition: 0.3s;
+            justify-content: center;
+            transition: all 0.3s ease;
             
             &:hover { 
                 color: v.$color-secundario-calido-1; 
-                transform: scale(1.1);
+                border-color: v.$color-secundario-calido-1;
+                transform: rotate(90deg);
             }
         }
     }
@@ -73,33 +71,33 @@
 
 .fila-formulario {
     display: flex;
-    gap: 20px;
-    margin-bottom: 5px;
+    gap: 1.5rem;
+    margin-bottom: 0.5rem;
 
     @media (max-width: 600px) {
         flex-direction: column;
-        gap: 0;
+        gap: 0; // El gap se maneja con el error-container
     }
 }
 
 .campo-formulario {
     display: flex;
     flex-direction: column;
+    gap: 8px;
     flex: 1;
 
     label {
         font-family: v.$fuente-enfasis;
-        font-weight: 700;
-        font-size: 0.75rem;
+        font-weight: 800;
+        font-size: 0.7rem;
         color: v.$color-secundario-frio-2;
         text-transform: uppercase;
-        margin-bottom: 8px;
-        letter-spacing: 0.5px;
+        letter-spacing: 1px;
     }
     
     .input-personalizado {
-        @include f.estilo-input-base;
-        width: 100%;
+        @include m.estilo-input-base;
+        height: 52px; // Altura ideal para touch targets
 
         &.is-invalid {
             border-color: v.$color-secundario-calido-1;
@@ -109,43 +107,65 @@
 }
 
 .error-container {
-    min-height: 18px;
+    min-height: 24px;
     margin-top: 4px;
     
     .error-message {
         color: v.$color-secundario-calido-1;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        &::before {
+            content: '\F33A';
+            font-family: 'bootstrap-icons';
+        }
     }
 }
 
+// --- CENTRADO DE BOTONES ---
 .acciones-form {
     margin-top: 2rem;
     display: flex;
-    gap: 1rem;
-    justify-content: flex-end; // Alineados a la derecha o usa 'center' si prefieres
+    gap: 1.2rem;
+    justify-content: center; // Centrado horizontal
+    align-items: center;
+    width: 100%;
 
-    .btn-cancelar, .btn-guardar {
-        padding: 0.8rem 1.5rem;
-        border-radius: v.$radio-curvatura;
+    @media (max-width: 480px) {
+        flex-direction: column; // Stack vertical en móvil
+        gap: 1rem;
+        
+        button {
+            width: 100% !important;
+            max-width: 100%;
+        }
+    }
+
+    button {
+        min-width: 180px; // Botones equilibrados
+        height: 50px;
         font-family: v.$fuente-enfasis;
         font-weight: 700;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
+        border-radius: v.$radio-curvatura;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: 0.3s;
-        min-width: 140px; // Asegura que no sean demasiado pequeños
+        transition: all 0.3s ease;
     }
 
     .btn-cancelar {
-        background: #f8f9fa;
-        border: 1px solid #ddd;
+        background: transparent;
+        border: 2px solid #eee;
         color: v.$color-superficie-suave;
         cursor: pointer;
 
         &:hover { 
-            background: #eee;
+            background: v.$color-fondo-pagina;
+            border-color: v.$color-superficie-suave;
             color: v.$color-secundario-frio-2;
         }
     }
@@ -153,11 +173,11 @@
     .btn-guardar {
         @include m.boton-primario;
         border: none;
-        cursor: pointer;
-
+        margin: 0; 
+        
         &:disabled {
-            background-color: #d1d1d1;
-            color: #888;
+            background-color: #e0e0e0;
+            color: #a0a0a0;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;

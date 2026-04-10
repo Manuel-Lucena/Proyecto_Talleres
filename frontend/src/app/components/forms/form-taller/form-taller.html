@@ -1,118 +1,65 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
   <div class="modal-body" (click)="$event.stopPropagation()">
 
-    <div class="cabecera-modal">
+    <header class="cabecera-modal">
       <h2>{{ tallerParaEditar ? 'Editar Taller' : 'Nuevo Taller' }}</h2>
       <button class="btn-close" (click)="cerrar.emit()">&times;</button>
-    </div>
+    </header>
 
     <form [formGroup]="tallerForm" (ngSubmit)="enviar()" class="noticia-grid-container">
 
       <div class="noticia-form-col">
-
-        <div class="campo-formulario">
+        <div class="campo-taller">
           <label>Nombre del Taller</label>
-          <input type="text" formControlName="nombre"
-            [class.is-invalid]="errorService.mostrarError(tallerForm, 'nombre')"
-            placeholder="Ej: Taller de Acuarela Avanzada">
-          <div class="error-container">
-            @if (errorService.mostrarError(tallerForm, 'nombre')) {
-            <span class="error-message">{{ errorService.getErrorMessage(tallerForm, 'nombre') }}</span>
-            }
-          </div>
+          <input type="text" formControlName="nombre" placeholder="Ej: Taller de Acuarela Avanzada">
         </div>
 
         <div class="fila-formulario">
-          <div class="campo-formulario">
+          <div class="campo-taller">
             <label>Fecha Inicio</label>
-            <input type="date" formControlName="fechaInicio"
-              [class.is-invalid]="errorService.mostrarError(tallerForm, 'fechaInicio') || tallerForm.hasError('fechaInvalida')">
+            <input type="date" formControlName="fechaInicio">
           </div>
-          <div class="campo-formulario">
+          <div class="campo-taller">
             <label>Fecha Fin</label>
-            <input type="date" formControlName="fechaFin"
-              [class.is-invalid]="errorService.mostrarError(tallerForm, 'fechaFin') || tallerForm.hasError('fechaInvalida')">
+            <input type="date" formControlName="fechaFin">
           </div>
-        </div>
-
-        <div class="error-container">
-          @if (tallerForm.hasError('fechaInvalida') && (tallerForm.get('fechaFin')?.touched ||
-          tallerForm.get('fechaFin')?.dirty)) {
-          <span class="error-message">La fecha de fin no puede ser anterior a la de inicio</span>
-          } @else if (errorService.mostrarError(tallerForm, 'fechaInicio') || errorService.mostrarError(tallerForm,
-          'fechaFin')) {
-          <span class="error-message">Las fechas son obligatorias</span>
-          }
         </div>
 
         <div class="fila-formulario">
-          <div class="campo-formulario">
-            <label>Plazas</label>
-            <input type="number" formControlName="plazasMaximas"
-              [class.is-invalid]="errorService.mostrarError(tallerForm, 'plazasMaximas')">
-            <div class="error-container">
-              @if (errorService.mostrarError(tallerForm, 'plazasMaximas')) {
-              <span class="error-message">Mínimo 1 plaza</span>
-              }
-            </div>
+          <div class="campo-taller">
+            <label>Plazas Máximas</label>
+            <input type="number" formControlName="plazasMaximas">
           </div>
-          <div class="campo-formulario">
+          <div class="campo-taller">
             <label>Precio (€)</label>
-            <input type="number" formControlName="precio"
-              [class.is-invalid]="errorService.mostrarError(tallerForm, 'precio')">
-            <div class="error-container">
-              @if (errorService.mostrarError(tallerForm, 'precio')) {
-              <span class="error-message">El precio no puede ser negativo</span>
-              }
-            </div>
+            <input type="number" formControlName="precio">
           </div>
         </div>
 
-        <div class="campo-formulario">
+        <div class="campo-taller">
           <label>Profesor Asignado</label>
-          <ng-select formControlName="idProfesor"
-           [items]="profesores" bindLabel="nombre" bindValue="idUsuario"
-            placeholder="Seleccionar profesor..." [clearable]="true" [searchable]="true" class="custom-ng-select">
-
-            <ng-template ng-label-tmp let-item="item">
-              <span>{{ item.nombre }} {{ item.apellidos }}</span>
-            </ng-template>
-
+          <ng-select formControlName="idProfesor" [items]="profesores" bindLabel="nombre" bindValue="idUsuario"
+            class="custom-ng-select" placeholder="Seleccionar profesor...">
             <ng-template ng-option-tmp let-item="item">
-              <div class="option-prof">
-                <strong>{{ item.nombre }} {{ item.apellidos }}</strong>
-                <br>
-                <small class="text-muted">{{ item.email }} | {{ item.dni }}</small>
-              </div>
+              <strong>{{ item.nombre }} {{ item.apellidos }}</strong><br>
+              <small>{{ item.email }}</small>
             </ng-template>
           </ng-select>
-          <div class="error-container">
-            @if (errorService.mostrarError(tallerForm, 'idProfesor')) {
-            <span class="error-message">Debes asignar un profesor</span>
-            }
-          </div>
         </div>
 
-        <div class="campo-formulario">
+        <div class="campo-taller">
           <label>Descripción</label>
-          <textarea formControlName="descripcion"
-            [class.is-invalid]="errorService.mostrarError(tallerForm, 'descripcion')"
-            placeholder="¿Qué aprenderán?"></textarea>
-          <div class="error-container">
-            @if (errorService.mostrarError(tallerForm, 'descripcion')) {
-            <span class="error-message">Mínimo 20 caracteres</span>
-            }
-          </div>
+          <textarea formControlName="descripcion" placeholder="¿Qué aprenderán los alumnos?"></textarea>
         </div>
 
-        <div class="zona-subida" [class.archivo-listo]="archivoSeleccionado || fotoPreview" (click)="fileInput.click()">
+        <div class="zona-subida-taller" [class.archivo-listo]="archivoSeleccionado || fotoPreview" (click)="fileInput.click()">
           <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/*">
           <i class="bi bi-cloud-arrow-up"></i>
           <span>{{ archivoSeleccionado ? archivoSeleccionado.name : 'Subir foto de portada' }}</span>
         </div>
       </div>
 
-      <div class="noticia-preview-col">
+      <aside class="noticia-preview-col">
         <span class="label-preview">Vista Previa</span>
 
         <div class="vista-previa-tarjeta">
@@ -125,18 +72,15 @@
               {{ (tallerForm.get('fechaFin')?.value | date:'dd MMM') || '--' }}
             </span>
             <h3 class="preview-title">{{ tallerForm.get('nombre')?.value || 'Título...' }}</h3>
-            <p class="preview-text">{{ (tallerForm.get('descripcion')?.value || 'Sin descripción...') | slice:0:80 }}...
-            </p>
+            <p class="preview-text">{{ (tallerForm.get('descripcion')?.value || 'Sin descripción...') | slice:0:80 }}...</p>
+          </div>
 
-            <div class="preview-footer-card">
-              <div class="info-item">
-                <i class="bi bi-people"></i>
-                <span>{{ tallerForm.get('plazasMaximas')?.value || 0 }} plazas</span>
-              </div>
-              <div class="precio-item">
-                {{ tallerForm.get('precio')?.value || 0 }}€
-              </div>
+          <div class="preview-footer-card">
+            <div class="info-item">
+              <i class="bi bi-people"></i>
+              <span>{{ tallerForm.get('plazasMaximas')?.value || 0 }} plazas</span>
             </div>
+            <div class="precio-item">{{ tallerForm.get('precio')?.value || 0 }}€</div>
           </div>
         </div>
 
@@ -145,7 +89,7 @@
             {{ tallerParaEditar ? 'Guardar Cambios' : 'Publicar Taller' }}
           </button>
         </div>
-      </div>
+      </aside>
 
     </form>
   </div>

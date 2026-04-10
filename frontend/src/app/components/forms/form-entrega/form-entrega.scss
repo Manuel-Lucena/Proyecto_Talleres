@@ -1,152 +1,162 @@
 @use '../../../../styles/variables' as v;
 @use '../../../../styles/mixins' as m;
+@use '../../../../styles/formularios' as f;
+
+:host {
+    display: block;
+}
 
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(v.$color-secundario-frio-2, 0.4);
+    background: rgba(v.$color-secundario-frio-2, 0.75);
     backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2500;
-    padding: 20px;
+    z-index: 9999;
+    padding: 1.5rem;
+    @include m.animacion-entrada;
 }
 
 .modal-card {
-    background: white;
+    @include f.estilo-contenedor-formulario; 
     width: 100%;
     max-width: 650px;
-    border-radius: 24px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    @include m.animacion-entrada;
+    background: v.$color-neutro-max;
+    box-shadow: v.$sombra-nivel-3; 
+    padding: 3rem 2.5rem; 
+    border: none;
+    position: relative;
+
+    &:hover { transform: none; } 
 }
 
 // --- HEADER ---
 .modal-header {
-    padding: 2rem 2.5rem;
-    background: #fdfdfd;
-    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 2.5rem;
     position: relative;
-
+    
     .badge-tarea {
-        background: rgba(v.$color-marca-principal, 0.1);
-        color: v.$color-marca-principal;
+        display: inline-block;
+        background: rgba(v.$color-secundario-calido-2, 0.1);
+        color: v.$color-secundario-calido-2;
         padding: 4px 12px;
         border-radius: 50px;
-        font-size: 0.75rem;
+        font-family: v.$fuente-enfasis;
         font-weight: 800;
+        font-size: 0.7rem;
         text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
     }
 
     .tarea-titulo {
-        margin: 10px 0 5px;
-        font-size: 1.6rem;
-        color: v.$color-secundario-frio-2;
-        font-weight: 800;
+        @extend .titulo-formulario; 
+        font-size: 1.8rem;
+        margin: 0 0 0.5rem 0;
+        width: 100%;
     }
 
     .tarea-meta {
         display: flex;
         align-items: center;
         gap: 8px;
-        color: #777;
-        font-size: 0.9rem;
+        color: v.$color-superficie-suave;
+        font-size: 0.85rem;
+        font-weight: 600;
+        i { color: v.$color-secundario-calido-1; }
     }
 }
 
+// Botón de cierre SIN animación de rotación
 .btn-close-circle {
     position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    border: none;
-    background: #eee;
-    width: 35px;
-    height: 35px;
+    top: -0.5rem;
+    right: -0.5rem;
+    background: v.$color-fondo-pagina;
+    border: 1px solid #e0e0e0;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
+    cursor: pointer;
+    color: v.$color-superficie-suave;
+    transition: background 0.2s, color 0.2s; // Solo transiciones de color
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    transition: 0.3s;
 
     &:hover {
-        background: #ff4d4f;
-        color: white;
+        background: v.$color-neutro-max;
+        color: v.$color-secundario-calido-1;
+        border-color: v.$color-secundario-calido-1;
+        // Eliminada la transformación de rotación
     }
 }
 
 // --- CUERPO ---
 .modal-content-body {
-    padding: 2.5rem;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1.5rem;
 }
 
-.label-custom {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: 700;
-    color: v.$color-secundario-frio-2;
-    font-size: 0.95rem;
-}
+.seccion-input {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 
-.textarea-entrega {
-    width: 100%;
-    border: 2px solid #f0f0f0;
-    border-radius: 12px;
-    padding: 15px;
-    font-family: inherit;
-    resize: none;
-    transition: 0.3s;
+    label {
+        font-family: v.$fuente-enfasis;
+        font-weight: 800;
+        font-size: 0.75rem;
+        color: v.$color-secundario-frio-2;
+        text-transform: uppercase;
+    }
 
-    &:focus {
-        outline: none;
-        border-color: v.$color-marca-principal;
-        background: #fff;
+    .textarea-entrega {
+        @include m.estilo-input-base;
+        min-height: 120px;
+        padding: 1rem;
     }
 }
 
-// --- DROPZONE ---
 .dropzone-entrega {
-    position: relative;
-    border: 2px dashed #d9d9d9;
-    border-radius: 16px;
-    padding: 30px;
+    border: 2px dashed v.$color-fondo-pagina;
+    border-radius: v.$radio-curvatura;
+    padding: 2.5rem;
     text-align: center;
-    background: #fafafa;
+    background: v.$color-fondo-pagina;
+    cursor: pointer;
     transition: 0.3s;
+    position: relative;
 
     &:hover {
-        border-color: v.$color-marca-principal;
-        background: #f0f7ff;
+        border-color: v.$color-secundario-calido-2;
+        background: rgba(v.$color-secundario-calido-2, 0.02);
     }
 
     i {
         font-size: 2.5rem;
-        color: v.$color-marca-principal;
+        color: v.$color-secundario-calido-2;
+        margin-bottom: 10px;
+        display: block;
     }
 
-    .texts {
-        margin-top: 10px;
-
-        .main-text {
-            display: block;
-            font-weight: 700;
-            color: #444;
-        }
-
-        .sub-text {
-            font-size: 0.8rem;
-            color: #999;
-        }
+    .main-text {
+        display: block;
+        font-weight: 700;
+        color: v.$color-secundario-frio-2;
+        font-size: 0.95rem;
     }
 
-    .input-hidden {
+    .sub-text {
+        font-size: 0.8rem;
+        color: v.$color-superficie-suave;
+        font-weight: 600;
+    }
+
+    input[type="file"] {
         position: absolute;
         inset: 0;
         opacity: 0;
@@ -154,118 +164,92 @@
     }
 }
 
-// --- ARCHIVOS CHIPS ---
 .grid-archivos-entregados {
-    margin-top: 15px;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    margin-top: 1rem;
 
     .file-chip {
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 8px 15px;
+        gap: 8px;
+        padding: 8px 12px;
+        background: v.$color-neutro-max;
+        border: 1px solid v.$color-fondo-pagina;
         border-radius: 10px;
-        font-size: 0.85rem;
-        font-weight: 600;
-
-        &.existente {
-            background: #f1f3f5;
-            border: 1px solid #e0e0e0;
-        }
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: v.$color-secundario-frio-2;
 
         &.nuevo {
-            background: #e7f3ff;
-            border: 1px solid rgba(v.$color-marca-principal, 0.3);
-        }
-
-        .name {
-            max-width: 150px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            background: rgba(v.$color-secundario-calido-1, 0.05);
+            border-color: rgba(v.$color-secundario-calido-1, 0.2);
         }
 
         .btn-del {
             border: none;
-            background: transparent;
-            color: #ff4d4f;
+            background: none;
+            color: v.$color-superficie-suave;
             padding: 0;
             cursor: pointer;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
+            &:hover { color: v.$color-secundario-calido-1; }
         }
     }
 }
 
 // --- FOOTER ---
-// --- FOOTER CENTRADO ---
 .modal-footer {
-    padding: 2rem 2.5rem;
-    background: #fdfdfd;
-    border-top: 1px solid #f0f0f0;
+    margin-top: 3rem;
     display: flex;
-    justify-content: center; // <--- Cambio clave: Centrado absoluto
-    
+    justify-content: center;
+
     .footer-actions {
         display: flex;
-        align-items: center;
-        gap: 20px;
+        gap: 1.5rem;
         width: 100%;
-        max-width: 400px; // Limitamos el ancho para que no se peguen a los bordes
+        max-width: 450px; 
     }
 
     .btn-cancelar {
-        flex: 1; // Hace que ambos botones tengan el mismo peso visual
-        background: #f5f5f5;
-        border: none;
-        border-radius: 12px;
+        flex: 1;
+        // Ahora con fondo sólido suave para que no sea tan "transparente"
+        background: v.$color-fondo-pagina; 
+        border: 1px solid #dcdcdc;
+        border-radius: v.$radio-curvatura;
+        font-family: v.$fuente-enfasis;
         font-weight: 700;
-        color: #666;
+        color: v.$color-superficie-suave;
+        height: 50px;
         cursor: pointer;
-        padding: 14px 20px;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
 
         &:hover {
-            background: #e0e0e0;
-            color: v.$color-secundario-calido-1;
+            background: #e2e2e2;
+            color: v.$color-secundario-frio-2;
+            border-color: #bcbcbc;
         }
     }
 
     .btn-enviar-final {
-        flex: 2; // El botón de acción principal es un poco más ancho
-        @include m.boton-primario; 
-        padding: 14px 30px;
-        border-radius: 12px;
-        font-weight: 800;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        box-shadow: 0 8px 15px rgba(v.$color-marca-principal, 0.2);
-
+        flex: 1.5;
+        @include m.boton-primario;
+        margin: 0;
+        height: 50px;
+        
         &:disabled {
-            filter: grayscale(1);
-            opacity: 0.6;
-            transform: none !important;
-        }
-
-        i {
-            font-size: 1.1rem;
+            background: #e0e0e0;
+            color: #aaa;
+            box-shadow: none;
+            transform: none;
         }
     }
 }
 
-// Ajuste extra para el responsive
 @media (max-width: 480px) {
+    .modal-card { padding: 2rem 1.5rem; }
     .footer-actions {
-        flex-direction: column-reverse; // En móvil, cancelar abajo
-        gap: 10px;
-        
-        .btn-cancelar, .btn-enviar-final {
-            width: 100%;
-        }
+        flex-direction: column-reverse;
+        .btn-cancelar, .btn-enviar-final { width: 100%; }
     }
 }

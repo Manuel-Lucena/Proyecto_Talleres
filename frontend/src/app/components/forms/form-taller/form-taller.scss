@@ -5,28 +5,29 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(v.$color-secundario-frio-2, 0.6);
-    backdrop-filter: blur(2px);
+    background: rgba(v.$color-secundario-frio-2, 0.7); // Azul profundo con transparencia
+    backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
     padding: 20px;
+    @include m.animacion-entrada;
 }
 
 .modal-body {
-    background: white;
+    background: v.$color-neutro-max;
     width: 100%;
     max-width: 950px;
     max-height: 95vh;
-    border-radius: 8px;
+    border-radius: v.$radio-curvatura * 2;
+    box-shadow: v.$sombra-nivel-3; // Nivel 3 para modales
     position: relative;
-    overflow: visible;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
 
     .cabecera-modal {
-        padding: 20px 40px;
-        border-bottom: 1px solid #eee;
+        padding: 1.5rem 2.5rem;
+        border-bottom: 1px solid v.$color-fondo-pagina;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -34,10 +35,24 @@
         h2 {
             margin: 0;
             font-family: v.$fuente-enfasis;
-            font-size: 1.3rem;
+            font-size: v.$tamaño-titular-md;
             color: v.$color-secundario-frio-2;
             border-left: 4px solid v.$color-marca-principal;
             padding-left: 15px;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: v.$color-superficie-suave;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+
+            &:hover {
+                color: v.$color-secundario-calido-1; // Naranja de acción
+                transform: rotate(90deg);
+            }
         }
     }
 }
@@ -45,146 +60,80 @@
 .noticia-grid-container {
     display: grid;
     grid-template-columns: 1fr 340px;
-    max-height: 80vh;
-    overflow: visible;
+    height: 70vh;
 }
 
 .noticia-form-col {
-    padding: 30px 40px;
+    padding: 2rem 2.5rem;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    overflow-y: auto;
-    max-height: 70vh;
+    gap: 1.2rem;
+
+    // Reutilizamos tu lógica de campo-formulario
+    .campo-taller {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        label {
+            font-family: v.$fuente-enfasis;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: v.$color-secundario-frio-2;
+            text-transform: uppercase;
+        }
+
+        input, textarea {
+            @include m.estilo-input-base;
+            
+            &.is-invalid {
+                border-color: v.$color-secundario-calido-1;
+            }
+        }
+        
+        textarea { height: 100px; resize: none; }
+    }
 }
 
 .noticia-preview-col {
-    background: #f9fafb;
-    padding: 30px;
+    background: v.$color-fondo-pagina;
+    padding: 2rem;
     border-left: 1px solid #eee;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 1.5rem;
 
     .label-preview {
-        font-size: 0.75rem;
-        font-weight: 800;
-        color: #999;
-        text-transform: uppercase;
-    }
-}
-
-.fila-formulario {
-    display: flex;
-    gap: 20px;
-
-    .campo-formulario {
-        flex: 1;
-    }
-}
-
-.campo-formulario {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-
-    label {
+        font-family: v.$fuente-enfasis;
         font-size: 0.7rem;
         font-weight: 800;
-        color: v.$color-secundario-frio-2;
+        color: v.$color-superficie-suave;
         text-transform: uppercase;
-    }
-
-    input,
-    textarea {
-        @include f.estilo-input-base;
-        padding: 10px;
-        font-size: 0.9rem;
-
-        &.is-invalid {
-            border-color: v.$color-secundario-calido-1;
-        }
-    }
-
-    textarea {
-        height: 80px;
-        resize: none;
+        letter-spacing: 1px;
     }
 }
 
-.custom-ng-select {
-    ::ng-deep .ng-select-container {
-        @include f.estilo-input-base;
-        min-height: 42px;
-        border-radius: 6px;
-        border: 1px solid #ddd;
-        padding: 0 8px;
-        display: flex;
-        align-items: center;
-
-        &:after {
-            border-top: none;
-        }
-    }
-
-    ::ng-deep .ng-dropdown-panel {
-        z-index: 10001;
-        border: 1px solid v.$color-marca-principal;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        border-radius: 6px;
-        background: white;
-    }
-
-    .option-prof {
-        line-height: 1.2;
-
-        span {
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .text-muted {
-            font-size: 0.75rem;
-            color: #888;
-        }
-    }
+// Adaptación de tu zona-subida al contexto del modal
+.zona-subida-taller {
+    @extend .zona-subida; // Hereda de _formularios.scss
+    padding: 20px;
+    border-radius: v.$radio-curvatura;
 }
 
-.error-container {
-    min-height: 15px;
-
-    .error-message {
-        color: v.$color-secundario-calido-1;
-        font-size: 0.7rem;
-        font-weight: 600;
-    }
-}
-
+// Vista previa estilo Card Aula Viva
 .vista-previa-tarjeta {
+    @include m.card-elevada;
     background: white;
-    border-radius: 8px;
-    border: 1px solid #eee;
-    overflow: hidden;
 
     .img-contenedor {
-        height: 150px;
+        height: 160px;
         background: #eee;
-
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        img { width: 100%; height: 100%; object-fit: cover; }
     }
 
     .p-3-preview {
-        padding: 15px;
-
-        .preview-title {
-            font-size: 1.1rem;
-            font-family: v.$fuente-enfasis;
-            margin: 8px 0;
-        }
+        padding: 1.2rem;
 
         .preview-date {
             color: v.$color-marca-principal;
@@ -192,36 +141,30 @@
             font-size: 0.8rem;
         }
 
+        .preview-title {
+            font-family: v.$fuente-enfasis;
+            font-size: 1.1rem;
+            margin: 8px 0;
+            color: v.$color-secundario-frio-2;
+        }
+
         .preview-text {
-            font-size: 0.8rem;
-            color: #666;
-            @include m.limitar-lineas(3);
+            font-size: 0.85rem;
+            color: v.$color-superficie-suave;
+            @include m.limitar-lineas(2);
         }
     }
 
     .preview-footer-card {
+        padding: 1rem 1.2rem;
+        border-top: 1px solid v.$color-fondo-pagina;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 12px;
-        padding-top: 10px;
-        border-top: 1px solid #f0f0f0;
-
-        .info-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.8rem;
-            color: #777;
-
-            i {
-                color: v.$color-marca-principal;
-            }
-        }
 
         .precio-item {
-            font-weight: 900;
-            font-size: 1.1rem;
+            font-weight: 800;
+            font-size: 1.2rem;
             color: v.$color-secundario-frio-2;
         }
     }
@@ -229,49 +172,27 @@
 
 .acciones-finales {
     margin-top: auto;
-
     button {
         @include m.boton-primario;
         width: 100%;
-        padding: 12px;
-
+        padding: 14px;
         &:disabled {
             filter: grayscale(1);
             opacity: 0.5;
-            transform: none !important;
+            cursor: not-allowed;
         }
     }
 }
 
-.btn-close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: #ccc;
-    cursor: pointer;
-
-    &:hover {
-        color: v.$color-secundario-calido-1;
+// Personalización de ng-select para que no desentone
+.custom-ng-select {
+    ::ng-deep .ng-select-container {
+        @include m.estilo-input-base;
+        border: 2px solid #f0f0f0 !important;
+        min-height: 48px;
     }
-}
-
-.zona-subida {
-    border: 2px dashed #ddd;
-    padding: 12px;
-    border-radius: 6px;
-    text-align: center;
-    cursor: pointer;
-    font-size: 0.8rem;
-    color: #777;
-
-    i {
-        font-size: 1.1rem;
-        display: block;
-    }
-
-    &.archivo-listo {
-        border-color: v.$color-marca-principal;
-        color: v.$color-marca-principal;
-        border-style: solid;
+    ::ng-deep .ng-dropdown-panel {
+        border-radius: v.$radio-curvatura;
+        box-shadow: v.$sombra-nivel-2;
     }
 }

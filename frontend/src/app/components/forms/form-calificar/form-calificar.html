@@ -1,59 +1,72 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
-  <div class="modal-content-custom" (click)="$event.stopPropagation()">
-    <header>
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    
+    <header class="modal-header">
       <h2>Calificar Entrega</h2>
-      <button (click)="cerrar.emit()" class="btn-close-modal">×</button>
+      <button (click)="cerrar.emit()" class="btn-close-modal" title="Cerrar">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </header>
 
     <main *ngIf="entrega">
       <div class="info-entrega">
-        <label>Texto del alumno:</label>
-        <p class="texto-alumno">{{ entrega.textoEntrega || 'Sin comentarios' }}</p>
+        <span class="label-seccion">Comentarios del alumno</span>
+        <p class="texto-alumno">{{ entrega.textoEntrega || 'El alumno no ha adjuntado comentarios.' }}</p>
       </div>
 
       <div class="archivos-alumno" *ngIf="archivosAlumno.length > 0">
-        <label>Archivos adjuntos:</label>
+        <span class="label-seccion">Material entregado</span>
         <div class="lista-archivos-enteros">
           <div *ngFor="let a of archivosAlumno" (click)="descargarArchivo(a)" class="item-archivo-completo">
             <i class="bi bi-file-earmark-arrow-down"></i>
             <div class="info">
               <span class="nombre">{{ a.nombre }}</span>
-              <span class="sub">Click para descargar</span>
+              <span class="sub">Haz clic para descargar archivo</span>
             </div>
           </div>
         </div>
       </div>
 
-      <form [formGroup]="form" (submit)="$event.preventDefault()" class="mt-4">
-        <div class="fila-formulario">
-          <div class="campo-formulario">
-            <label>Nota (0 - 10)</label>
-            <input type="number" formControlName="calificacion" class="input-personalizado"
-              [class.is-invalid]="errorService.mostrarError(form, 'calificacion')">
+      <form [formGroup]="form" (submit)="$event.preventDefault()" class="form-calificacion">
+        
+        <div class="fila-input">
+          <label>Calificación</label>
+          <div class="input-wrapper">
+            <input type="number" formControlName="calificacion" 
+                   placeholder="0.00"
+                   class="input-personalizado"
+                   [class.is-invalid]="errorService.mostrarError(form, 'calificacion')">
             
             <div class="error-container">
-              @if (errorService.mostrarError(form, 'calificacion')) { 
-                <span class="error-message">{{ errorService.getErrorMessage(form, 'calificacion') }}</span> 
-              }
+              <span *ngIf="errorService.mostrarError(form, 'calificacion')" class="error-message">
+                {{ errorService.getErrorMessage(form, 'calificacion') }}
+              </span>
             </div>
           </div>
         </div>
 
-        <div class="fila-formulario">
-          <div class="campo-formulario">
-            <label>Feedback / Comentario</label>
-            <textarea formControlName="comentarioProfesor" class="input-personalizado" rows="3"></textarea>
-            <div class="error-container"></div>
+        <div class="fila-input">
+          <label>Feedback</label>
+          <div class="input-wrapper">
+            <textarea formControlName="comentarioProfesor" 
+                      rows="4" 
+                      placeholder="Escribe una retroalimentación constructiva para el alumno..."
+                      class="input-personalizado"></textarea>
           </div>
         </div>
+
       </form>
     </main>
 
-    <footer>
-      <button (click)="cerrar.emit()" class="btn-secondary">Cancelar</button>
-      <button (click)="guardarNota()" [disabled]="form.invalid || cargando" class="btn-primary">
-        {{ cargando ? 'Guardando...' : 'Confirmar Nota' }}
-      </button>
+    <footer class="modal-footer">
+      <div class="footer-actions">
+        <button (click)="cerrar.emit()" class="btn-cancelar">Cancelar</button>
+        <button (click)="guardarNota()" [disabled]="form.invalid || cargando" class="btn-confirmar">
+          <span *ngIf="!cargando">Confirmar Nota</span>
+          <span *ngIf="cargando" class="spinner-border spinner-border-sm"></span>
+        </button>
+      </div>
     </footer>
+
   </div>
 </div>

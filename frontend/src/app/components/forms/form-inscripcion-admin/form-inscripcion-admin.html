@@ -1,0 +1,81 @@
+<div class="modal-overlay" (click)="cerrar.emit()">
+  <div class="modal-body-admin" (click)="$event.stopPropagation()">
+    
+    <button class="btn-close-modal" (click)="cerrar.emit()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+
+    <h2 class="titulo-formulario">Nueva Matrícula</h2>
+
+    <div class="context-badge" *ngIf="usuarioParaInscribir">
+      <i class="bi bi-person-check"></i>
+      <div class="text-content">
+        <span>Alumno a inscribir</span>
+        <strong>{{ usuarioParaInscribir.email }}</strong>
+      </div>
+    </div>
+
+    <div class="context-badge" *ngIf="tallerParaInscribir">
+      <i class="bi bi-journal-check"></i>
+      <div class="text-content">
+        <span>Taller seleccionado</span>
+        <strong>{{ tallerParaInscribir.nombre }}</strong>
+      </div>
+    </div>
+
+    <form [formGroup]="inscripcionForm" (ngSubmit)="enviar()">
+      
+      <div class="campo-formulario mb-4" *ngIf="!usuarioParaInscribir">
+        <label>Buscar Alumno</label>
+        <ng-select 
+          [items]="usuarios"
+          bindLabel="email" 
+          bindValue="idUsuario"
+          formControlName="idUsuario"
+          placeholder="Escriba email o nombre del alumno">
+        </ng-select>
+      </div>
+
+      <div class="campo-formulario mb-4" *ngIf="!tallerParaInscribir">
+        <label>Seleccionar Taller</label>
+        <ng-select 
+          [items]="talleres"
+          bindLabel="nombre"
+          bindValue="idTaller"
+          formControlName="idTaller"
+          placeholder="Seleccione el curso">
+        </ng-select>
+      </div>
+
+      <div class="fila-formulario">
+        <div class="campo-formulario">
+          <label>Importe Recibido</label>
+          <div class="input-currency-wrapper">
+            <input type="number" formControlName="montoPagado">
+            <span class="currency-tag">€</span>
+          </div>
+        </div>
+
+        <div class="campo-formulario">
+          <label>Referencia Administrativa</label>
+          <div class="order-id-box">
+            <code>{{ inscripcionForm.get('orderId')?.value }}</code>
+            <button type="button" (click)="generarOrderId()" title="Regenerar código">
+              <i class="bi bi-arrow-repeat"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-actions">
+        <button type="button" class="btn-cancelar" (click)="cerrar.emit()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-guardar" [disabled]="inscripcionForm.invalid">
+          Confirmar Matrícula
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

@@ -3,23 +3,24 @@
 
         <header>
             <h2 class="titulo-formulario">Programar Sesión</h2>
-            <button (click)="cerrar.emit()" class="btn-close-modal">
+            <button (click)="cerrar.emit()" class="btn-close-modal" title="Cerrar">
                 <i class="bi bi-x-lg"></i>
             </button>
         </header>
 
-        <form [formGroup]="form" (submit)="$event.preventDefault()">
+        <form [formGroup]="form" (ngSubmit)="enviar()">
 
             <div class="fila-formulario">
                 <div class="campo-formulario">
-                    <label>DÍA DE LA SEMANA</label>
+                    <label>Día de la semana</label>
                     <select formControlName="diaSemana" class="input-personalizado"
                         [class.is-invalid]="errorService.mostrarError(form, 'diaSemana')">
+                        <option value="" disabled>Selecciona un día...</option>
                         <option *ngFor="let d of dias" [value]="d">{{d}}</option>
                     </select>
                     <div class="error-container">
                         @if (errorService.mostrarError(form, 'diaSemana')) {
-                        <span class="error-message">{{ errorService.getErrorMessage(form, 'diaSemana') }}</span>
+                            <span class="error-message">{{ errorService.getErrorMessage(form, 'diaSemana') }}</span>
                         }
                     </div>
                 </div>
@@ -27,34 +28,36 @@
 
             <div class="fila-formulario">
                 <div class="campo-formulario">
-                    <label>HORA INICIO</label>
+                    <label>Hora Inicio</label>
                     <input type="time" formControlName="fechaInicio" class="input-personalizado"
                         [class.is-invalid]="errorService.mostrarError(form, 'fechaInicio')">
                     <div class="error-container">
                         @if (errorService.mostrarError(form, 'fechaInicio')) {
-                        <span class="error-message">{{ errorService.getErrorMessage(form, 'fechaInicio') }}</span>
+                            <span class="error-message">{{ errorService.getErrorMessage(form, 'fechaInicio') }}</span>
                         }
                     </div>
                 </div>
 
                 <div class="campo-formulario">
-                    <label>HORA FIN</label>
+                    <label>Hora Fin</label>
                     <input type="time" formControlName="fechaFin" class="input-personalizado"
                         [class.is-invalid]="errorService.mostrarError(form, 'fechaFin') || form.hasError('fechaInvalida')">
-
                     <div class="error-container">
-                        @if (errorService.mostrarError(form, 'fechaFin') || (form.hasError('fechaInvalida') &&
-                        form.get('fechaFin')?.touched)) {
-                        <span class="error-message">{{ errorService.getErrorMessage(form, 'fechaFin') }}</span>
+                        @if (errorService.mostrarError(form, 'fechaFin') || (form.hasError('fechaInvalida') && form.get('fechaFin')?.touched)) {
+                            <span class="error-message">
+                                {{ form.hasError('fechaInvalida') ? 'La hora de fin debe ser posterior' : errorService.getErrorMessage(form, 'fechaFin') }}
+                            </span>
                         }
                     </div>
                 </div>
             </div>
 
             <footer class="acciones-form">
-                <button type="button" class="btn-cancelar" (click)="cerrar.emit()">Cancelar</button>
-                <button type="submit" class="btn-guardar" (click)="enviar()" [disabled]="form.invalid">
-                    <i class="bi bi-calendar-plus me-2"></i> Confirmar Horario
+                <button type="button" class="btn-cancelar" (click)="cerrar.emit()">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-guardar" [disabled]="form.invalid">
+                    <i class="bi bi-calendar-check me-2"></i> Confirmar
                 </button>
             </footer>
         </form>

@@ -1,0 +1,140 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+@import '../../../../styles/formularios';
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba($color-secundario-frio-2, 0.7); 
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 1.5rem;
+}
+
+.modal-body-admin {
+    @include estilo-contenedor-formulario; 
+    @include animacion-entrada;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: $sombra-nivel-3; 
+    position: relative;
+    border: none; 
+
+    .btn-close-modal {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: $color-superficie-suave;
+        cursor: pointer;
+        transition: color 0.3s ease;
+        &:hover { color: $color-secundario-calido-1; }
+    }
+}
+
+// Bloque de información contextual
+.context-badge {
+    background: rgba($color-marca-principal, 0.08);
+    border-radius: $radio-curvatura;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid rgba($color-marca-principal, 0.2);
+
+    i { color: $color-marca-principal; font-size: 1.5rem; }
+    
+    .text-content {
+        span { 
+            display: block; 
+            font-size: 0.7rem; 
+            text-transform: uppercase; 
+            font-weight: 700; 
+            color: $color-secundario-frio-2;
+            letter-spacing: 0.5px;
+        }
+        strong { 
+            font-family: $fuente-enfasis;
+            color: $color-marca-oscuro; 
+            font-size: 1rem;
+        }
+    }
+}
+
+// Input de monto con estilo moneda
+.input-currency-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    
+    input {
+        padding-right: 3rem;
+        font-weight: 800;
+        color: $color-secundario-frio-2;
+        font-size: 1.1rem;
+    }
+    
+    .currency-tag {
+        position: absolute;
+        right: 1.2rem;
+        font-weight: 700;
+        color: $color-superficie-suave;
+    }
+}
+
+// Badge de Order ID (Lectura)
+.order-id-box {
+    @include estilo-input-base;
+    background: #fdfdfd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-style: dashed; 
+
+    code { 
+        font-family: monospace; 
+        font-weight: 700; 
+        color: $color-secundario-frio-1; 
+        font-size: 1rem;
+    }
+
+    button {
+        background: none;
+        border: none;
+        color: $color-secundario-calido-1;
+        cursor: pointer;
+        padding: 4px;
+        &:hover { transform: rotate(30deg); transition: 0.2s; }
+    }
+}
+
+.footer-actions {
+    margin-top: 2.5rem;
+    display: flex;
+    gap: 1rem;
+
+    .btn-cancelar {
+        flex: 1;
+        background: transparent;
+        border: 2px solid #eee;
+        border-radius: $radio-curvatura;
+        font-family: $fuente-enfasis;
+        font-weight: 700;
+        color: $color-superficie-suave;
+        cursor: pointer;
+        transition: all 0.3s;
+        &:hover { background: #fafafa; color: $color-secundario-frio-2; }
+    }
+
+    .btn-guardar {
+        flex: 2;
+        @include boton-inscripcion-aula; 
+        margin-bottom: 0;
+    }
+}
