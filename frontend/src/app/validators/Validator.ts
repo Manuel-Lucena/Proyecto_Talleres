@@ -1,24 +1,43 @@
-import { AbstractControl, ValidationErrors, FormGroup } from '@angular/forms';
+import { AbstractControl, ValidationErrors } from '@angular/forms';
 
 export class Validator {
 
-  // Validador de DNI Español (8 números + Letra)
+  // --- LÓGICA PURA (Para usar en la Tabla de Carga Masiva o donde quieras) ---
+  
+  static isEmail(value: string): boolean {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(value);
+  }
+
+  static isDni(value: string): boolean {
+    const regex = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$/i;
+    return regex.test(value);
+  }
+
+  static isTelefono(value: string): boolean {
+    const regex = /^[0-9]{9}$/;
+    return regex.test(value);
+  }
+
+  static hasMinLength(value: string, min: number): boolean {
+    return value ? value.trim().length >= min : false;
+  }
+
+
+  // --- VALIDADORES PARA ANGULAR (Los que ya tenías, no se tocan) ---
+
   static dni(control: AbstractControl): ValidationErrors | null {
     const value = control.value;
     if (!value) return null;
-    const validDniRegex = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$/i;
-    return validDniRegex.test(value) ? null : { invalidDni: true };
+    return Validator.isDni(value) ? null : { invalidDni: true };
   }
 
-  // Validador de Teléfono (9 dígitos)
   static telefono(control: AbstractControl): ValidationErrors | null {
     const value = control.value;
     if (!value) return null;
-    const validTelRegex = /^[0-9]{9}$/;
-    return validTelRegex.test(value) ? null : { invalidTel: true };
+    return Validator.isTelefono(value) ? null : { invalidTel: true };
   }
 
-  // Validador de coincidencia de contraseñas (Para Registro)
   static passwordMatch(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password')?.value;
     const repetirPassword = control.get('repetirPassword')?.value;
@@ -28,14 +47,7 @@ export class Validator {
   static validarFechas(control: AbstractControl): ValidationErrors | null {
     const inicio = control.get('fechaInicio')?.value;
     const fin = control.get('fechaFin')?.value;
-
-    if (inicio && fin) {
-      // Si los strings son horas (ej: "10:00"), se pueden comparar alfabéticamente
-      // Si son fechas, la comparación sigue siendo válida.
-      if (inicio >= fin) {
-        return { fechaInvalida: true };
-      }
-    }
+    if (inicio && fin && inicio >= fin) return { fechaInvalida: true };
     return null;
   }
 }

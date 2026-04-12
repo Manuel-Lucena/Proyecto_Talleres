@@ -2,81 +2,68 @@
 @use '../../../../styles/mixins' as m;
 @use '../../../../styles/formularios' as f;
 
-:host {
-    position: fixed; 
-    inset: 0;
-    z-index: 999999; 
-    display: block;
-    pointer-events: none; 
-}
-
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(v.$color-secundario-frio-2, 0.75); // Azul corporativo más profundo
-    backdrop-filter: blur(8px);
-    z-index: 999999;
+    background: rgba(v.$color-secundario-frio-2, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 1.5rem;
-    pointer-events: auto; 
     @include m.animacion-entrada;
 }
 
-.modal-content-custom {
-    @include f.estilo-contenedor-formulario;
-    width: 100%;
-    max-width: 550px; // Un poco más ancho para que las horas respiren en desktop
+.modal-body {
     background: v.$color-neutro-max;
+    width: 100%;
+    max-width: 500px;
+    border-radius: v.$radio-curvatura * 2;
     box-shadow: v.$sombra-nivel-3;
-    padding: 3rem 2.5rem; // Padding generoso según guía de estilo
+    padding: 3.5rem 3rem;
     position: relative;
-    border: none;
-
-    &:hover { transform: none; }
-
-    header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2.5rem;
-        
-        .titulo-formulario {
-            margin: 0;
-            // El mixin de formularios ya suele añadir el borde inferior decorativo
-        }
-
-        .btn-close-modal {
-            background: v.$color-fondo-pagina;
-            border: 1px solid #eee;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            color: v.$color-superficie-suave;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            
-            &:hover { 
-                color: v.$color-secundario-calido-1; 
-                border-color: v.$color-secundario-calido-1;
-                transform: rotate(90deg);
-            }
-        }
+    
+    .btn-close {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        @include m.boton-cerrar-circular;
     }
 }
 
-.fila-formulario {
-    display: flex;
-    gap: 1.5rem;
-    margin-bottom: 0.5rem;
+.modal-header-simple {
+    margin-bottom: 2.5rem;
+    text-align: center;
 
-    @media (max-width: 600px) {
-        flex-direction: column;
-        gap: 0; // El gap se maneja con el error-container
+    .titulo-formulario {
+        font-family: v.$fuente-enfasis;
+        font-size: 1.8rem;
+        color: v.$color-secundario-frio-2;
+        margin-bottom: 0.5rem;
+    }
+
+    .subtitulo {
+        font-size: 0.9rem;
+        color: v.$color-superficie-suave;
+        font-weight: 500;
+    }
+}
+
+.form-sesion {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.fila-formulario {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+
+    @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
     }
 }
 
@@ -84,7 +71,6 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    flex: 1;
 
     label {
         font-family: v.$fuente-enfasis;
@@ -94,10 +80,10 @@
         text-transform: uppercase;
         letter-spacing: 1px;
     }
-    
+
     .input-personalizado {
         @include m.estilo-input-base;
-        height: 52px; // Altura ideal para touch targets
+        height: 50px;
 
         &.is-invalid {
             border-color: v.$color-secundario-calido-1;
@@ -107,50 +93,33 @@
 }
 
 .error-container {
-    min-height: 24px;
+    min-height: 20px;
     margin-top: 4px;
     
     .error-message {
         color: v.$color-secundario-calido-1;
         font-size: 0.72rem;
         font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-
-        &::before {
-            content: '\F33A';
-            font-family: 'bootstrap-icons';
-        }
     }
 }
 
-// --- CENTRADO DE BOTONES ---
 .acciones-form {
-    margin-top: 2rem;
-    display: flex;
-    gap: 1.2rem;
-    justify-content: center; // Centrado horizontal
-    align-items: center;
+    margin-top: 2.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr; // El de confirmar es ligeramente más ancho
+    gap: 1rem;
     width: 100%;
 
     @media (max-width: 480px) {
-        flex-direction: column; // Stack vertical en móvil
-        gap: 1rem;
-        
-        button {
-            width: 100% !important;
-            max-width: 100%;
-        }
+        grid-template-columns: 1fr; // Uno sobre otro en móvil
     }
 
     button {
-        min-width: 180px; // Botones equilibrados
-        height: 50px;
+        height: 52px;
+        border-radius: v.$radio-curvatura;
         font-family: v.$fuente-enfasis;
         font-weight: 700;
         font-size: 0.95rem;
-        border-radius: v.$radio-curvatura;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -158,23 +127,25 @@
     }
 
     .btn-cancelar {
-        background: transparent;
-        border: 2px solid #eee;
+        background: v.$color-fondo-pagina;
+        border: 2px solid transparent;
         color: v.$color-superficie-suave;
         cursor: pointer;
 
-        &:hover { 
-            background: v.$color-fondo-pagina;
-            border-color: v.$color-superficie-suave;
+        &:hover {
+            background: #e9ecef;
             color: v.$color-secundario-frio-2;
         }
     }
 
     .btn-guardar {
-        @include m.boton-primario;
+        @include m.boton-primario; // Tu mixin naranja/marca
         border: none;
-        margin: 0; 
+        margin: 0; // Reset de márgenes del mixin
+        gap: 8px;
         
+        i { font-size: 1.1rem; }
+
         &:disabled {
             background-color: #e0e0e0;
             color: #a0a0a0;

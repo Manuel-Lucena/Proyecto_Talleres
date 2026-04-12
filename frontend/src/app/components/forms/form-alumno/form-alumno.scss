@@ -5,7 +5,7 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(v.$color-secundario-frio-2, 0.7); 
+    background: rgba(v.$color-secundario-frio-2, 0.7);
     backdrop-filter: blur(4px);
     z-index: 10000;
     display: flex;
@@ -16,27 +16,24 @@
 }
 
 .modal-body {
-
-    @include f.estilo-contenedor-formulario; 
-    
+    @include f.estilo-contenedor-formulario;
     width: 100%;
     max-width: 900px;
     max-height: 95vh;
     overflow-y: auto;
     box-shadow: v.$sombra-nivel-3;
-    border: none; 
+    border: none;
 }
 
-
-.input-personalizado, .input-custom {
+.input-personalizado,
+.input-custom {
     @include m.estilo-input-base;
-    
+
     &.is-invalid {
         border-color: v.$color-secundario-calido-1;
         background-color: rgba(v.$color-secundario-calido-1, 0.02);
     }
 }
-
 
 .posicion-relativa {
     position: relative;
@@ -59,7 +56,6 @@
     }
 }
 
-
 .zona-subida-alumno {
     @include m.input-group-personalizado;
     background: v.$color-fondo-pagina;
@@ -69,9 +65,17 @@
     gap: 10px;
     cursor: pointer;
     border: 2px dashed v.$color-superficie-suave;
-    
-    i { color: v.$color-marca-principal; font-size: 1.2rem; }
-    span { font-size: 0.9rem; font-weight: 600; color: v.$color-secundario-frio-2; }
+
+    i {
+        color: v.$color-marca-principal;
+        font-size: 1.2rem;
+    }
+
+    span {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: v.$color-secundario-frio-2;
+    }
 
     &:hover {
         border-color: v.$color-marca-principal;
@@ -82,17 +86,17 @@
 
 .acciones-formulario {
     display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid v.$color-fondo-pagina;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(v.$color-superficie-suave, 0.1);
 
     .btn-cancelar {
         background: transparent;
         border: 2px solid v.$color-fondo-pagina;
         border-radius: v.$radio-curvatura;
-        padding: 0.8rem 1.5rem;
+        padding: 0.8rem 2.5rem;
         font-family: v.$fuente-enfasis;
         font-weight: 700;
         color: v.$color-superficie-suave;
@@ -101,12 +105,13 @@
         &:hover {
             background: v.$color-fondo-pagina;
             color: v.$color-secundario-frio-2;
+            transform: translateY(-2px);
         }
     }
 
     .btn-guardar {
         @include m.boton-primario;
-        padding: 0.8rem 2rem;
+        padding: 0.8rem 3rem;
 
         &:disabled {
             filter: grayscale(1);
@@ -114,5 +119,16 @@
             cursor: not-allowed;
             transform: none;
         }
+    }
+}
+
+.error-container {
+    min-height: 20px;
+    margin-top: 4px;
+
+    .error-message {
+        color: v.$color-secundario-calido-1;
+        font-size: 0.75rem;
+        font-weight: 700;
     }
 }

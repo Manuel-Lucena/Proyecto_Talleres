@@ -16,6 +16,23 @@
         </button>
     </header>
 
+    <section class="admin-toolbar shadow-1">
+        <div class="search-group">
+            <div class="criteria-box">
+                <div class="fixed-criteria">
+                    <i class="bi" [ngClass]="esVistaTaller ? 'bi-person-fill' : 'bi-palette-fill'"></i>
+                    <span>{{ esVistaTaller ? 'Alumno' : 'Taller' }}</span>
+                </div>
+            </div>
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text"
+                    [placeholder]="esVistaTaller ? 'Buscar por email de alumno...' : 'Buscar por nombre de taller...'"
+                    [(ngModel)]="busqueda" class="input-aula">
+            </div>
+        </div>
+    </section>
+
     @if (cargando) {
     <div class="admin-card d-flex justify-content-center align-items-center py-5">
         <div class="spinner-border text-success" role="status"></div>
@@ -32,11 +49,11 @@
                         <th>Monto</th>
                         <th>Pago</th>
                         <th>Estado Alta</th>
-                        <th class="text-right">Acciones</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @for (ins of inscripciones; track ins.idInscripcion) {
+                    @for (ins of inscripcionesFiltradas; track ins.idInscripcion) {
                     <tr>
                         <td>
                             <div class="item-info">
@@ -62,13 +79,15 @@
                                 {{ ins.activa ? 'ACTIVA' : 'BAJA' }}
                             </span>
                         </td>
-                        <td class="text-right">
+                        <td>
                             <div class="actions-group">
                                 <button class="btn-tool" [title]="ins.activa ? 'Dar de baja' : 'Activar'"
                                     (click)="alternarEstado(ins.idInscripcion)">
-                                    <i class="bi" [ngClass]="ins.activa ? 'bi-toggle-on text-success' : 'bi-toggle-off'"></i>
+                                    <i class="bi"
+                                        [ngClass]="ins.activa ? 'bi-toggle-on text-success' : 'bi-toggle-off'"></i>
                                 </button>
-                                <button class="btn-tool delete" (click)="eliminar(ins.idInscripcion)" title="Eliminar permanentemente">
+                                <button class="btn-tool delete" (click)="eliminar(ins.idInscripcion)"
+                                    title="Eliminar permanentemente">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
@@ -78,7 +97,7 @@
                     <tr>
                         <td colspan="6" class="text-center py-5">
                             <i class="bi bi-info-circle text-muted fs-3"></i>
-                            <p class="mt-2 text-muted">No hay registros para mostrar.</p>
+                            <p class="mt-2 text-muted">No se encontraron inscripciones.</p>
                         </td>
                     </tr>
                     }
@@ -88,13 +107,9 @@
     </div>
     }
 </div>
-
 @if (mostrarModal) {
-<app-form-inscripcion-admin
-    [tallerParaInscribir]="tallerContexto"
-    [usuarioParaInscribir]="usuarioContexto" 
-    (cerrar)="cerrarModal()"
-    (guardado)="guardarInscripcion($event)">
+<app-form-inscripcion-admin [tallerParaInscribir]="tallerContexto" [usuarioParaInscribir]="usuarioContexto"
+    (cerrar)="cerrarModal()" (guardado)="guardarInscripcion($event)">
 </app-form-inscripcion-admin>
 }
 

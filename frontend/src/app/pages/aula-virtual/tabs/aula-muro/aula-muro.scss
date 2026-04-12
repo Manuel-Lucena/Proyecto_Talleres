@@ -1,95 +1,190 @@
 @use '../../../../../styles/variables' as v;
 @use '../../../../../styles/mixins' as m;
 
-.contenedor-muro {
-    width: 100vw;
-    position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-    background: white;
-    @include m.animacion-entrada;
+.muro-container {
+    width: 100%;
 }
 
-.cuerpo-muro { width: 100%; border-top: 1px solid #eee; }
-
-.fila-actividad {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
+.loading-wrapper {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    padding: 1.8rem 5vw;
-    border-bottom: 1px solid #eee;
+    gap: 1rem;
+    padding: 5rem;
+    color: v.$color-superficie-suave;
+
+    .spinner-border {
+        color: v.$color-marca-principal;
+    }
+}
+
+.actividad-lista {
+    display: flex;
+    flex-direction: column;
+}
+
+.actividad-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 1.6rem 2.5rem; // Padding unificado con los otros
+    background: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
 
     &:hover {
-        background-color: #f9f9f9;
+        background-color: #fcfcfc;
         box-shadow: inset 6px 0 0 v.$color-marca-principal;
-        .titulo { color: v.$color-marca-principal; }
-    }
 
-    .celda-principal {
-        display: flex;
-        align-items: center;
-        gap: 2rem;
-
-        .icono-tipo i {
-            font-size: 2rem;
-            color: v.$color-superficie-suave;
+        .main-info .titulo {
+            color: v.$color-marca-principal;
         }
 
-        .info-texto {
-            .cabecera {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                margin-bottom: 4px;
+        .flecha-link {
+            transform: translateX(5px);
+            color: v.$color-marca-principal;
+        }
+    }
 
-                .tipo-etiqueta {
-                    font-size: 0.65rem;
-                    font-weight: 800;
-                    padding: 2px 6px;
-                    border-radius: 4px;
-                    background: #f0f0f0;
-                    color: #888;
+    .card-content {
+        display: flex;
+        align-items: center;
+        gap: 1.8rem;
+        min-width: 0;
+
+        // LA CAJA DEL ICONO: Ahora es cuadrada-redondeada como los otros
+        .icon-container {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            i {
+                font-size: 1.7rem;
+            }
+
+            &.bg-verde {
+                background: rgba(v.$color-marca-principal, 0.1);
+
+                i {
+                    color: v.$color-marca-principal;
                 }
+            }
 
-                .titulo {
-                    font-family: v.$fuente-enfasis;
-                    font-weight: 700;
-                    font-size: 1.1rem;
+            &.bg-azul {
+                background: #f0f4f8;
+
+                i {
                     color: v.$color-secundario-frio-2;
                 }
             }
-
-            .resumen-lineal {
-                font-family: v.$fuente-lectura;
-                font-size: 0.9rem;
-                color: v.$color-superficie-suave;
-                display: block;
-                max-width: 55vw;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
         }
     }
 
-    .celda-fecha {
-        padding: 0 3rem;
-        font-size: 0.85rem;
-        color: v.$color-superficie-suave;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+    .main-info {
+        min-width: 0;
+
+        .info-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 4px;
+
+            .tipo-tag {
+                font-family: v.$fuente-enfasis;
+                font-size: 0.65rem;
+                font-weight: 800;
+                padding: 2px 8px;
+                border-radius: 4px;
+                text-transform: uppercase;
+
+                &.tarea {
+                    background: #fff3cd;
+                    color: #856404;
+                }
+
+                &.material {
+                    background: #cfe2ff;
+                    color: #084298;
+                }
+            }
+
+            .titulo {
+                margin: 0;
+                font-family: v.$fuente-enfasis;
+                font-weight: 700;
+                font-size: 1.15rem;
+                color: v.$color-secundario-frio-2;
+                transition: color 0.3s;
+            }
+        }
+
+        .resumen {
+            margin: 0;
+            font-family: v.$fuente-lectura;
+            font-size: 0.95rem;
+            color: v.$color-superficie-suave;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     }
 
-    .celda-accion { color: #ddd; i { font-size: 1.4rem; } }
+    .card-meta {
+        display: flex;
+        align-items: center;
+        gap: 3rem;
+
+        .fecha {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: v.$color-superficie-suave;
+            font-size: 0.85rem;
+            font-family: v.$fuente-enfasis;
+            white-space: nowrap;
+        }
+
+        .flecha-link {
+            color: #ddd;
+            font-size: 1.3rem;
+            transition: all 0.3s;
+        }
+    }
 }
 
-// Un detalle: si es tarea, el icono puede ser de otro color sutil
-.fila-actividad.es-tarea .icono-tipo i {
-    color: v.$color-marca-principal;
-    opacity: 0.7;
+// === RESPONSIVE UNIFICADO ===
+@media (max-width: 768px) {
+    .actividad-card {
+        grid-template-columns: 1fr;
+        padding: 1.4rem 1.5rem;
+        gap: 1rem;
+
+        .card-content {
+            gap: 1.2rem;
+        }
+
+        .icon-container {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+
+            i {
+                font-size: 1.4rem;
+            }
+        }
+
+        .card-meta {
+            justify-content: space-between;
+            padding-left: 60px;
+
+            .flecha-link {
+                display: none;
+            }
+        }
+    }
 }

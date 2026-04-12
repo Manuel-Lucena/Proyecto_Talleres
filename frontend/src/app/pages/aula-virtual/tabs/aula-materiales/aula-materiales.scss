@@ -1,103 +1,157 @@
 @use '../../../../../styles/variables' as v;
 @use '../../../../../styles/mixins' as m;
 
-.contenedor-recursos {
-    // Forzamos a que ignore los márgenes del padre si fuera necesario
-    width: 100vw;
-    position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-
-    background: white;
-    @include m.animacion-entrada;
+.recursos-container {
+  width: 100%;
 }
 
-.cuerpo-recursos {
-    width: 100%;
-    border-top: 1px solid #eee;
-    // ELIMINADO EL MAX-WIDTH QUE TE SOBRABA
+.loading-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5rem;
+  gap: 1rem;
+  color: v.$color-superficie-suave;
+  .spinner-border { color: v.$color-marca-principal; }
 }
 
-.fila-recurso {
-    display: grid;
-    // La primera columna (1fr) se comerá todo el espacio blanco que ves ahora
-    grid-template-columns: 1fr auto auto;
+.recursos-lista {
+  display: flex;
+  flex-direction: column;
+}
+
+.recurso-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  padding: 1.6rem 2.5rem; // Padding unificado
+  background: white;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #fcfcfc;
+    box-shadow: inset 6px 0 0 v.$color-marca-principal; // Inset unificado
+    
+    .text-box .titulo { color: v.$color-marca-principal; }
+    .action-icon { 
+      transform: translateX(5px); 
+      color: v.$color-marca-principal; 
+    }
+  }
+
+  .card-main {
+    display: flex;
     align-items: center;
-    padding: 1.8rem 5vw; // Usamos vw (viewport width) para que el margen crezca con la pantalla
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    gap: 1.8rem;
+    min-width: 0;
 
-    &:hover {
-        background-color: #f9f9f9;
-        box-shadow: inset 6px 0 0 v.$color-marca-principal;
+    // LA CAJA DEL ICONO: Estilo "Apple/Moderno" unificado
+    .icon-container {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
 
-        .titulo {
-            color: v.$color-marca-principal;
-        }
-
-        .celda-accion {
-            transform: translateX(8px);
-            color: v.$color-marca-principal;
-        }
-    }
-
-    .celda-principal {
-        display: flex;
-        align-items: center;
-        gap: 2rem;
-        min-width: 0; // Importante para que el truncado de texto funcione
-
-        .icono-recurso i {
-            font-size: 2rem; // Un poco más grande para llenar pantalla
-            color: v.$color-superficie-suave;
-        }
-
-        .info-texto {
-            flex: 1;
-
-            .titulo {
-                display: block;
-                font-family: v.$fuente-enfasis;
-                font-weight: 700;
-                font-size: 1.2rem;
-                color: v.$color-secundario-frio-2;
-                margin-bottom: 4px;
-            }
-
-            .resumen-lineal {
-                font-family: v.$fuente-lectura;
-                font-size: 0.95rem;
-                color: v.$color-superficie-suave;
-                // Hacemos que la descripción sea LARGA
-                display: block;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 60vw;
-            }
-        }
-    }
-
-    .celda-fecha {
-        padding: 0 3rem;
-        font-family: v.$fuente-lectura;
-        font-size: 0.9rem;
-        color: v.$color-superficie-suave;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        white-space: nowrap;
-    }
-
-    .celda-accion {
-        color: #ddd;
-        transition: all 0.3s;
-
+      &.bg-azul {
+        background: #f0f4f8; // Azul suave para recursos
         i {
-            font-size: 1.4rem;
+          font-size: 1.7rem;
+          color: v.$color-secundario-frio-2;
         }
+      }
     }
+
+    .text-box {
+      min-width: 0;
+      .titulo {
+        margin: 0 0 4px 0;
+        font-family: v.$fuente-enfasis;
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: v.$color-secundario-frio-2;
+        transition: color 0.3s;
+      }
+      .resumen {
+        margin: 0;
+        font-family: v.$fuente-lectura;
+        font-size: 0.95rem;
+        color: v.$color-superficie-suave;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  .card-side {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+
+    .info-date {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: v.$color-superficie-suave;
+      font-family: v.$fuente-enfasis;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      
+      i { font-size: 0.9rem; opacity: 0.7; }
+    }
+
+    .action-icon {
+      color: #ddd;
+      font-size: 1.3rem;
+      transition: all 0.3s;
+    }
+  }
+}
+
+// === RESPONSIVE UNIFICADO ===
+@media (max-width: 768px) {
+  .recurso-card {
+    grid-template-columns: 1fr;
+    padding: 1.4rem 1.5rem;
+    gap: 1rem;
+
+    .card-main {
+      gap: 1.2rem;
+      .icon-container {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        i { font-size: 1.4rem; }
+      }
+    }
+
+    .card-side {
+      justify-content: space-between;
+      padding-left: 60px; // Alineado con el inicio del texto
+      .action-icon { display: none; }
+    }
+  }
+}
+
+.sin-datos {
+  padding: 6rem 2rem;
+  text-align: center;
+  color: v.$color-superficie-suave;
+
+  .empty-state-icon {
+    font-size: 3.5rem;
+    opacity: 0.2;
+    margin-bottom: 1.5rem;
+  }
+
+  h3 {
+    font-family: v.$fuente-enfasis;
+    font-weight: 700;
+    color: v.$color-secundario-frio-2;
+  }
 }

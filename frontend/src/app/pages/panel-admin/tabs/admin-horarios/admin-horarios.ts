@@ -11,7 +11,7 @@ import { Notificacion } from "../../../../components/dialogs/mensaje/notificacio
 @Component({
   selector: 'app-admin-horarios',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormHorario, Confirmacion, Notificacion], // Añadidos los dialogs
+  imports: [CommonModule, RouterLink, FormHorario, Confirmacion, Notificacion], 
   templateUrl: './admin-horarios.html',
   styleUrl: './admin-horarios.scss',
 })

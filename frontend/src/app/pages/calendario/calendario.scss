@@ -1,140 +1,233 @@
 @use '../../../styles/variables' as v;
 
+// 1. SECCIÓN PRINCIPAL Y CONTENEDOR
 .calendario-seccion {
   background-color: v.$color-fondo-pagina;
-  padding: 60px 20px;
-  min-height: 85vh;
+  padding: 40px 4%; 
+  min-height: 90vh;
 }
 
 .calendario-container {
   max-width: 1400px;
   margin: 0 auto;
   background: white;
-  border-radius: 12px;
+  border-radius: v.$radio-curvatura;
   box-shadow: v.$sombra-nivel-1;
   overflow: hidden;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.05);
 }
 
+// 2. HEADER / TOOLBAR
 .calendario-toolbar {
-  padding: 25px 35px;
+  padding: 30px 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap; 
+  gap: 20px;
   background: white;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 2px solid v.$color-fondo-pagina;
 
-  .titulo-horario {
-    font-family: v.$fuente-enfasis;
-    font-weight: 800;
-    color: v.$color-secundario-frio-2;
-    margin: 0;
-    font-size: 1.6rem;
+  .toolbar-info {
+    .titulo-horario {
+      font-family: v.$fuente-enfasis;
+      font-weight: 800;
+      color: v.$color-secundario-frio-2;
+      margin: 0;
+      font-size: 1.8rem;
+
+      span { color: v.$color-marca-principal; }
+    }
+
+    .tag-semanal {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: v.$color-marca-principal;
+      font-weight: 800;
+      background: rgba(v.$color-marca-principal, 0.1);
+      padding: 4px 12px;
+      border-radius: 50px;
+      display: inline-block;
+      margin-top: 5px;
+    }
   }
 
-  .tag-semanal {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: v.$color-marca-principal;
-    font-weight: 700;
-  }
-
+  // CONTENEDOR DEL SELECT (Limpio, sin simbolito a la derecha)
   .filter-wrapper {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: #f8f9fa;
-    padding: 5px 15px;
-    border-radius: 8px;
-    border: 1px solid #eee;
+    gap: 12px;
+    background: white;
+    padding: 0 18px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    min-width: 280px;
+    height: 48px;
 
-    i { color: v.$color-superficie-suave; }
+    &:hover, &:focus-within {
+      border-color: v.$color-marca-principal;
+      box-shadow: v.$sombra-nivel-1;
+    }
+
+    i:first-child { 
+      color: v.$color-marca-principal; 
+      font-size: 1.1rem;
+    }
+
+    // HE ELIMINADO EL &::after QUE TENÍA EL ICONO DE LA FLECHA
   }
 
   .maquina-select {
+    appearance: none; 
+    -webkit-appearance: none;
+    -moz-appearance: none;
     border: none;
     background: transparent;
     font-family: v.$fuente-lectura;
     color: v.$color-secundario-frio-2;
-    padding: 8px;
-    min-width: 200px;
+    width: 100%;
     outline: none;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 8px 0; // Quitamos el padding extra de la derecha
+
+    option {
+      background: white;
+      color: v.$color-secundario-frio-2;
+    }
   }
 }
 
+// 3. GRID DEL CALENDARIO
 .calendario-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  background-color: #f0f0f0; 
+  grid-template-columns: repeat(6, 1fr); 
+  background-color: #f1f1f1; 
   gap: 1px; 
 }
 
 .dia-columna {
   background: white;
-  min-height: 550px;
+  min-height: 600px;
   display: flex;
   flex-direction: column;
 
   .dia-header {
-    padding: 20px;
+    padding: 22px;
     text-align: center;
     font-family: v.$fuente-enfasis;
-    font-weight: 700;
-    font-size: 0.9rem;
+    font-weight: 800;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     color: v.$color-secundario-frio-2;
-    border-bottom: 1px solid #f8f8f8;
-    background: #fafafa;
+    background: #fdfdfd;
+    border-bottom: 1px solid #f0f0f0;
   }
 }
 
 .eventos-container {
-  padding: 15px;
+  padding: 18px;
+  background-color: #fafafa; 
   flex-grow: 1;
 }
 
+// 4. TARJETAS DE EVENTO
 .evento-card {
   display: flex;
   background: white;
-  margin-bottom: 12px;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: v.$sombra-nivel-1;
   overflow: hidden;
-  border: 1px solid #f0f0f0;
+  border: 1px solid rgba(0,0,0,0.03);
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: v.$sombra-nivel-2;
+    border-color: rgba(v.$color-marca-principal, 0.2);
+  }
 
   .card-line {
-    width: 4px;
+    width: 5px;
     background: v.$color-marca-principal;
   }
 
   .card-content {
-    padding: 12px;
+    padding: 14px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     
     .hora {
-      display: block;
-      font-weight: 800;
-      color: v.$color-marca-oscuro;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 700;
+      color: v.$color-marca-principal;
       font-size: 0.75rem;
-      font-family: v.$fuente-lectura;
     }
 
     .nombre {
       font-family: v.$fuente-enfasis;
       color: v.$color-secundario-frio-2;
-      font-size: 0.9rem;
-      line-height: 1.2;
-      font-weight: 600;
+      font-size: 1rem;
+      line-height: 1.3;
+      font-weight: 700;
     }
   }
 }
 
+// 5. PLACEHOLDER VACÍO (SIN TAZA DE CAFÉ)
 .vacio-placeholder {
-  padding: 40px 10px;
+  padding: 50px 10px;
   text-align: center;
-  color: #ddd;
-  font-size: 0.75rem;
+  color: #bbb;
+  font-size: 0.8rem;
   font-style: italic;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  // HE ELIMINADO EL &::before QUE TENÍA EL ICONO '☕'
+}
+
+// 6. RESPONSIVE
+@media (max-width: 1100px) {
+  .calendario-grid {
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 10px;
+    background-color: v.$color-fondo-pagina;
+    padding: 10px;
+  }
+  
+  .dia-columna {
+    border-radius: 10px;
+    border: 1px solid #eee;
+    min-height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .calendario-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+
+    .filter-wrapper {
+      width: 100%;
+      min-width: 100%;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .calendario-grid {
+    grid-template-columns: 1fr; 
+  }
 }

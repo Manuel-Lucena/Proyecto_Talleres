@@ -1,7 +1,22 @@
 @use '../../../styles/variables' as v;
 @use '../../../styles/mixins' as m;
 
+.pagina-explorar-full {
+    width: 100%;
+    padding: 50px 4%;
+    background-color: v.$color-fondo-pagina;
+    min-height: 100vh;
+}
+
 .header-principal {
+    margin-bottom: 40px;
+
+    h2 {
+        font-size: 2.8rem;
+        color: v.$color-secundario-frio-2;
+        font-weight: 800;
+    }
+
     .linea-vertical {
         width: 2px;
         height: 35px;
@@ -10,7 +25,7 @@
     }
 
     .btn-azul-plus {
-        background-color: v.$color-secundario-frio-2; // Azul corporativo según guía
+        background-color: v.$color-secundario-frio-2;
         color: white;
         border: none;
         padding: 10px 20px;
@@ -19,37 +34,12 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        transition: all 0.3s ease-in-out;
+        transition: 0.3s;
 
         &:hover {
             background-color: v.$color-marca-principal;
             transform: scale(1.02);
-            box-shadow: v.$sombra-nivel-2;
         }
-    }
-}
-
-.pagina-explorar-full {
-    width: 100%;
-    padding: 50px 4%;
-    background-color: v.$color-fondo-pagina;
-    min-height: 100vh;
-    font-family: v.$fuente-lectura;
-}
-
-.header-principal {
-    margin-bottom: 40px;
-
-    h2 {
-        font-family: v.$fuente-enfasis;
-        font-size: 2.8rem;
-        color: v.$color-secundario-frio-2;
-        font-weight: 800;
-    }
-
-    p {
-        color: #666;
-        font-size: 1.1rem;
     }
 }
 
@@ -60,79 +50,108 @@
 }
 
 .sidebar-reserva {
-    width: 220px;
-    min-width: 220px;
+    width: 250px;
+    min-width: 250px;
     background: white;
     padding: 25px;
     border-radius: v.$radio-curvatura;
     border: 1px solid #f0f0f0;
     box-shadow: v.$sombra-nivel-1;
 
-    h3 {
-        font-family: v.$fuente-enfasis;
-        font-size: 1rem;
-        color: v.$color-secundario-frio-2;
-        margin-bottom: 10px;
-        font-weight: 700;
-    }
+    .form-filtros {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
 
-    .nota-sidebar {
-        font-size: 0.85rem;
-        color: #aaa;
-    }
-}
+        .grupo-filtro {
+            label {
+                display: block;
+                font-size: 0.85rem;
+                font-weight: 700;
+                margin-bottom: 8px;
 
-.seccion-lista-cursos {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
+                i {
+                    color: v.$color-marca-principal;
+                }
+            }
+
+            .form-control {
+                border-radius: 8px;
+                border: 1px solid #eee;
+            }
+        }
+
+        .btn-limpiar {
+            background: none;
+            border: 1px dashed #ccc;
+            color: #888;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+    }
 }
 
 .card-curso-horizontal {
     @include m.card-elevada;
     display: flex;
-    position: relative;
-    height: 270px;
+    position: relative; // Para posicionar el dropdown
+    min-height: 270px;
     width: 100%;
-    overflow: visible; // Para el dropdown
+    margin-bottom: 25px;
+    overflow: visible !important; // Permitir que el menú salga de la tarjeta
 
+    // Estilos del menú de administración
     .admin-dropdown {
         position: absolute;
         top: 15px;
         right: 15px;
-        z-index: 10;
+        z-index: 30;
 
         .btn-kebab {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid #eee;
-            width: 35px;
-            height: 35px;
+            background: white;
+            border: none;
+            color: #333;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #888;
-            transition: 0.3s ease-in-out;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: 0.2s;
+            outline: none !important;
 
-            &:hover {
-                color: v.$color-marca-principal;
-                background: white;
+            &:hover,
+            &:focus {
+                background: v.$color-marca-principal;
+                color: white;
             }
         }
 
         .dropdown-menu {
-            border: none;
-            border-radius: v.$radio-curvatura;
-            box-shadow: v.$sombra-nivel-3;
-            padding: 8px;
+            border-radius: 10px;
+            padding: 6px 0;
+            margin-top: 5px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+
+            .dropdown-item {
+                font-size: 0.9rem;
+                padding: 10px 20px;
+                display: flex;
+                align-items: center;
+
+                &:hover {
+                    background: #f8f9fa;
+                }
+            }
         }
     }
 
     .imagen-container {
         width: 340px;
         min-width: 340px;
-        position: relative;
 
         img {
             width: 100%;
@@ -160,24 +179,14 @@
         flex-direction: column;
         justify-content: space-between;
 
-        .periodo-curso {
-            color: v.$color-marca-principal;
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
         .titulo-curso {
-            font-family: v.$fuente-enfasis;
             font-size: 1.7rem;
             color: v.$color-secundario-frio-2;
             font-weight: 800;
-            margin: 5px 0;
         }
 
         .descripcion-curso {
             color: #666;
-            font-size: 0.95rem;
-            line-height: 1.5;
             @include m.limitar-lineas(2);
         }
     }
@@ -189,20 +198,24 @@
         padding-top: 15px;
         border-top: 1px solid #f9f9f9;
 
+        .sin-plazas {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
         .precio-inscripcion {
             display: flex;
             align-items: center;
-            gap: 25px; // SEPARACIÓN PRECIO Y BOTÓN
+            gap: 25px;
 
             .moneda {
-                font-family: v.$fuente-enfasis;
                 font-size: 2rem;
                 font-weight: 900;
                 color: v.$color-secundario-frio-2;
             }
 
             .btn-inscripcion {
-                @include m.boton-inscripcion-aula; // Aplicado el naranja de la guía
+                @include m.boton-inscripcion-aula;
             }
         }
     }
@@ -215,15 +228,25 @@
 
     .sidebar-reserva {
         width: 100%;
+        min-width: 100%;
     }
 
     .card-curso-horizontal {
         flex-direction: column;
-        height: auto;
 
         .imagen-container {
             width: 100%;
             height: 200px;
+        }
+
+        .footer-curso {
+            flex-direction: column;
+            gap: 15px;
+
+            .precio-inscripcion {
+                width: 100%;
+                justify-content: space-between;
+            }
         }
     }
 }

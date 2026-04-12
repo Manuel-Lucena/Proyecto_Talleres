@@ -26,8 +26,9 @@ public class HorarioController {
 
     /**
      * Registra un nuevo horario en el sistema.
+     * 
      * @param dto Datos del horario a crear (días, horas, taller asociado).
-     * @return    ApiResponse con el horario creado y mensaje de confirmación.
+     * @return ApiResponse con el horario creado y mensaje de confirmación.
      */
     @PostMapping
     public ApiResponse<HorarioResponseDTO> crear(@RequestBody HorarioRequestDTO dto) {
@@ -38,6 +39,7 @@ public class HorarioController {
 
     /**
      * Obtiene el listado completo de todos los horarios registrados en el sistema.
+     * 
      * @return ApiResponse con la lista global de horarios.
      */
     @GetMapping
@@ -46,9 +48,25 @@ public class HorarioController {
     }
 
     /**
+     * Recupera la planificación horaria personal de un usuario.
+     * Filtra los horarios basándose únicamente en los talleres donde el usuario
+     * figura como inscrito.
+     * * @param idUsuario Identificador del usuario.
+     * 
+     * @return ApiResponse con la lista de horarios que forman su calendario
+     *         personal.
+     */
+    @GetMapping("/usuario/{idUsuario}")
+    public ApiResponse<List<HorarioResponseDTO>> listarPorUsuario(@PathVariable Long idUsuario) {
+        return ApiResponse.success(horarioService.listarPorUsuario(idUsuario),
+                "Agenda personal obtenida correctamente");
+    }
+
+    /**
      * Recupera los horarios específicos vinculados a un taller concreto.
+     * 
      * @param idTaller Identificador único del taller.
-     * @return         ApiResponse con la lista de horarios del taller solicitado.
+     * @return ApiResponse con la lista de horarios del taller solicitado.
      */
     @GetMapping("/taller/{idTaller}")
     public ApiResponse<List<HorarioResponseDTO>> listarPorTaller(@PathVariable Long idTaller) {
@@ -59,9 +77,10 @@ public class HorarioController {
 
     /**
      * Actualiza la información de un horario existente.
+     * 
      * @param id  Identificador del horario a modificar.
      * @param dto Nuevos datos para el horario.
-     * @return    ApiResponse con el objeto HorarioResponseDTO actualizado.
+     * @return ApiResponse con el objeto HorarioResponseDTO actualizado.
      */
     @PutMapping("/{id}")
     public ApiResponse<HorarioResponseDTO> actualizar(@PathVariable Long id, @RequestBody HorarioRequestDTO dto) {
@@ -72,8 +91,9 @@ public class HorarioController {
 
     /**
      * Elimina de forma definitiva un registro de horario.
+     * 
      * @param id Identificador único del horario a suprimir.
-     * @return   ApiResponse confirmando la eliminación.
+     * @return ApiResponse confirmando la eliminación.
      */
     @DeleteMapping("/{id}")
     public ApiResponse<Void> eliminar(@PathVariable Long id) {

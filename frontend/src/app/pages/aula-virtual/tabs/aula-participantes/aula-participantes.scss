@@ -4,111 +4,134 @@
 .participantes-container {
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
-    padding-top: 1rem;
-    
-    // Aplicamos tu mixin de animación para que la lista entre suavemente
-    @include m.animacion-entrada;
+    gap: 3rem;
+    padding: 1.5rem 0;
 }
 
 .rol-section {
-    .rol-title {
-        // Usamos tu fuente de énfasis de las variables
-        font-family: v.$fuente-enfasis;
-        color: v.$color-secundario-frio-2;
-        font-size: v.$tamaño-titular-md;
-        font-weight: 800;
-        margin-bottom: 1.5rem;
-        border-bottom: 2px solid v.$color-fondo-pagina;
-        padding-bottom: 0.5rem;
-    }
-
-    .header-alumnos {
+    .section-header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.2rem;
-        
-        .count { 
-            font-size: 0.9rem; 
-            color: v.$color-superficie-suave; 
+        align-items: flex-end;
+        margin-bottom: 1.5rem;
+        padding: 0 2.5rem; // Alineado con el padding de las cards anteriores
+
+        .rol-title {
+            font-family: v.$fuente-enfasis;
+            color: v.$color-secundario-frio-2;
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .count {
+            font-size: 0.85rem;
+            color: v.$color-superficie-suave;
             font-weight: 700;
             font-family: v.$fuente-lectura;
+            background: #f0f0f0;
+            padding: 2px 10px;
+            border-radius: 12px;
         }
     }
 }
 
-// === TARJETA DE USUARIO REFINADA CON MIXINS ===
+.user-list {
+    display: flex;
+    flex-direction: column;
+}
+
 .user-card {
-    // Aplicamos tu mixin de card elevada para sombras y hover
-    @include m.card-elevada;
-    
     display: flex;
     align-items: center;
-    gap: 1.2rem;
-    padding: 1rem 1.5rem;
-    margin-bottom: 0.8rem;
-    border: 1px solid #f0f0f0; // Coincide con tu mixin base
+    gap: 1.8rem;
+    padding: 1.2rem 2.5rem; // MISMO PADDING QUE MURO/TAREAS
+    background: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
 
-    &.teacher {
-        // Resaltado para profesor usando tu marca principal
-        border-left: 5px solid v.$color-marca-principal;
-        background: linear-gradient(to right, rgba(v.$color-marca-principal, 0.03), white);
+    &:hover {
+        background-color: #fcfcfc;
+
+        .info .name {
+            color: v.$color-marca-principal;
+        }
     }
 
-    .avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%; // Mantenemos circular para perfiles
-        overflow: hidden;
-        background: v.$color-fondo-pagina;
+    &.teacher {
+        background: linear-gradient(to right, rgba(v.$color-marca-principal, 0.02), white);
+        border-left: 5px solid v.$color-marca-principal;
+    }
+
+    .avatar-wrapper {
+        width: 54px; // MISMO TAMAÑO QUE LOS ICONOS DE LAS OTRAS PESTAÑAS
+        height: 54px;
+        position: relative;
         flex-shrink: 0;
 
         img {
             width: 100%;
             height: 100%;
+            border-radius: 14px; // MISMO REDONDEO QUE LOS ICONOS
             object-fit: cover;
+            background: #f5f5f5;
         }
 
-        &.small {
-            width: 42px;
-            height: 42px;
+        .status-indicator {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 14px;
+            height: 14px;
+            background: #2ecc71;
+            border: 3px solid white;
+            border-radius: 50%;
         }
     }
 
     .info {
         flex: 1;
-        
-        .name {
-            display: block;
-            font-family: v.$fuente-enfasis;
-            font-weight: 700;
-            color: v.$color-superficie-oscura;
-            font-size: 1rem;
-            // Usamos tu mixin para evitar que nombres larguísimos rompan la card
-            @include m.limitar-lineas(1);
+        min-width: 0;
+
+        .name-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 2px;
+
+            .name {
+                font-family: v.$fuente-enfasis;
+                font-weight: 700;
+                color: v.$color-secundario-frio-2;
+                font-size: 1.1rem;
+                transition: color 0.3s;
+                @include m.limitar-lineas(1);
+            }
         }
 
         .email {
             font-family: v.$fuente-lectura;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: v.$color-superficie-suave;
-            
-            i { 
-                color: v.$color-secundario-frio-1; 
-                margin-right: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            i {
+                color: #aaa;
+                font-size: 0.85rem;
             }
         }
     }
 
     .badge-rol {
         font-family: v.$fuente-enfasis;
-        font-size: 0.65rem;
+        font-size: 0.6rem;
         font-weight: 800;
-        padding: 4px 12px;
-        border-radius: 20px;
-        background: v.$color-fondo-pagina;
-        color: v.$color-superficie-suave;
+        padding: 2px 8px;
+        border-radius: 4px;
+        background: #f0f0f0;
+        color: #888;
         text-transform: uppercase;
 
         &.teacher-badge {
@@ -118,16 +141,48 @@
     }
 }
 
-// Estado de carga y vacío adaptado
-.loading-state, .empty-state-card {
-    font-family: v.$fuente-lectura;
-    color: v.$color-superficie-suave;
+// === RESPONSIVE UNIFICADO ===
+@media (max-width: 768px) {
+    .rol-section .section-header {
+        padding: 0 1.5rem;
+    }
+
+    .user-card {
+        padding: 1.2rem 1.5rem;
+        gap: 1.2rem;
+
+        .avatar-wrapper {
+            width: 48px;
+            height: 48px;
+
+            img {
+                border-radius: 10px;
+            }
+        }
+
+        .info .name-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+        }
+    }
+}
+
+.loading-state,
+.empty-state-card {
     text-align: center;
-    padding: 3rem;
-    
+    padding: 4rem 2rem;
+    color: v.$color-superficie-suave;
+
     i {
         font-size: 3rem;
+        opacity: 0.2;
         margin-bottom: 1rem;
-        opacity: 0.5;
+        display: block;
+    }
+
+    h3 {
+        font-family: v.$fuente-enfasis;
+        color: v.$color-secundario-frio-2;
     }
 }

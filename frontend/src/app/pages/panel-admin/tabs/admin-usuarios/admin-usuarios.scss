@@ -1,142 +1,239 @@
-@import '../../../../../styles/variables';
-@import '../../../../../styles/mixins';
+@use '../../../../../styles/variables' as v;
+@use '../../../../../styles/mixins' as m;
 
 .admin-wrapper {
     padding: 2.5rem;
-    background-color: $color-fondo-pagina;
-    min-height: 100vh;
-    font-family: $fuente-lectura;
+    background-color: v.$color-fondo-pagina;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
+    @include m.animacion-entrada;
 }
 
 .admin-header {
+    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     margin-bottom: 2rem;
 
-    .txt-h1 {
-        font-family: $fuente-enfasis;
-        font-weight: 700;
-        font-size: $tamaño-titular-xl;
-        color: $color-secundario-frio-2;
-        margin: 0;
+    .title-group {
+        .txt-h1 {
+            font-family: v.$fuente-enfasis;
+            font-weight: 800;
+            font-size: v.$tamaño-titular-xl;
+            color: v.$color-secundario-frio-2;
+            margin: 0;
+        }
+
+        .txt-bajada {
+            color: v.$color-superficie-suave;
+            font-size: 1rem;
+        }
     }
 
-    .txt-bajada {
-        color: $color-superficie-suave;
-        font-size: 1rem;
+    .d-flex.gap-2 {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
     }
 
     .btn-primario-aula {
-        @include boton-primario;
+        @include m.boton-primario;
+        height: 48px;
+        padding: 0 1.8rem;
+        gap: 12px;
+    }
+
+    .btn-secundario-aula {
+        background: white;
+        border: 1px solid #e2e8f0;
+        color: v.$color-secundario-frio-2;
+        border-radius: v.$radio-curvatura;
+        font-family: v.$fuente-enfasis;
+        font-weight: 700;
+        padding: 0 1.5rem;
+        height: 48px;
         display: flex;
         align-items: center;
-        padding: 0.8rem 1.5rem;
+        gap: 10px;
+        transition: all 0.3s ease;
+        cursor: pointer;
 
-        .btn-text {
-            margin-left: 12px;
-            font-family: $fuente-enfasis;
-            font-weight: 600;
+        i {
+            color: v.$color-marca-principal;
+            font-size: 1.2rem;
+        }
+
+        &:hover {
+            background: #f8fafc;
+            border-color: v.$color-marca-principal;
+            transform: translateY(-2px);
+            box-shadow: v.$sombra-nivel-1;
         }
     }
-}
-
-.shadow-1 {
-    background: white;
-    border-radius: $radio-curvatura;
-    box-shadow: $sombra-nivel-1;
 }
 
 .admin-toolbar {
-    padding: 0.8rem 1.5rem;
+    flex-shrink: 0;
+    padding: 1rem 1.5rem;
     display: flex;
     gap: 1.5rem;
     margin-bottom: 1.5rem;
+    background: white;
+    border-radius: v.$radio-curvatura;
+    box-shadow: v.$sombra-nivel-1;
     align-items: center;
 
-    .search-box,
-    .filter-box {
-        position: relative;
+    .search-group {
         display: flex;
-        align-items: center;
-
-        i {
-            position: absolute;
-            left: 15px;
-            color: $color-marca-principal;
-            z-index: 2;
-        }
-    }
-
-    .search-box {
         flex: 2;
+        background: #fcfcfc;
+        border: 1px solid #e2e8f0;
+        border-radius: v.$radio-curvatura;
+        overflow: hidden;
 
-        .input-aula {
-            @include estilo-input-base;
-            padding-left: 45px;
+        &:focus-within {
+            border-color: v.$color-marca-principal;
+            box-shadow: 0 0 0 3px rgba(v.$color-marca-principal, 0.1);
+        }
+
+        .criteria-box {
+            width: 140px;
+            border-right: 1px solid #e2e8f0;
+
+            .select-criteria {
+                border: none;
+                background: #f1f5f9 url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") no-repeat right 10px center;
+                background-size: 14px;
+                height: 100%;
+                width: 100%;
+                padding: 0 30px 0 15px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: v.$color-secundario-frio-2;
+                appearance: none;
+                outline: none;
+            }
+        }
+
+        .search-box {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+
+            i {
+                position: absolute;
+                left: 15px;
+                color: v.$color-marca-principal;
+            }
+
+            .input-aula {
+                border: none;
+                padding-left: 45px;
+                width: 100%;
+                height: 45px;
+                background: transparent;
+                outline: none;
+            }
         }
     }
 
     .filter-box {
         flex: 1;
+        position: relative;
+
+        i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: v.$color-marca-principal;
+            z-index: 2;
+        }
 
         .select-aula {
-            @include estilo-input-base;
+            @include m.estilo-input-base;
             padding-left: 45px;
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232d4059' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 14px;
+            width: 100%;
+            height: 47px;
         }
     }
 }
 
 .admin-card {
-    overflow: hidden;
+    background: white;
+    border-radius: v.$radio-curvatura;
+    box-shadow: v.$sombra-nivel-1;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #e0e0e0;
+        border-radius: 10px;
+    }
 }
 
 .admin-table {
     width: 100%;
     border-collapse: collapse;
 
-    th {
-        padding: 1.2rem;
-        text-align: left;
+    thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
         background: #fafafa;
-        color: $color-superficie-suave;
-        font-family: $fuente-enfasis;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        border-bottom: 1px solid #eee;
+
+        th {
+            padding: 1.2rem;
+            text-align: left;
+            color: v.$color-superficie-suave;
+            font-family: v.$fuente-enfasis;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+
+            &:last-child {
+                text-align: right;
+            }
+
+            // Reemplaza .text-right en el th
+        }
     }
 
     td {
         padding: 1rem 1.2rem;
-        border-bottom: 1px solid #f8f8f8;
+        border-bottom: 1px solid #f5f5f5;
         vertical-align: middle;
-        color: $color-secundario-frio-2;
-    }
+        color: v.$color-secundario-frio-2;
 
-    tr:hover {
-        background-color: rgba($color-marca-principal, 0.015);
-        transition: 0.2s;
+        &:last-child {
+            text-align: right;
+        }
+
+        // Reemplaza .text-right en el td
     }
 }
 
 .user-item {
     display: flex;
     align-items: center;
-    gap: 1.2rem;
+    gap: 1rem;
 
     .avatar-frame {
-        width: 46px;
-        height: 46px;
-        border-radius: 8px;
-        border: 1px solid #eee;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
         overflow: hidden;
-        flex-shrink: 0;
+        border: 2px solid #f1f5f9;
 
         img {
             width: 100%;
@@ -145,23 +242,20 @@
         }
     }
 
-    .u-name {
-        display: block;
-        font-weight: 700;
-        font-family: $fuente-enfasis;
-        font-size: 0.95rem;
-    }
+    .user-meta {
+        display: flex;
+        flex-direction: column;
 
-    .u-email {
-        font-size: 0.8rem;
-        color: $color-superficie-suave;
-    }
-}
+        .u-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
 
-.u-dni {
-    font-family: $fuente-enfasis;
-    font-weight: 600;
-    color: $color-secundario-frio-2;
+        .u-email {
+            font-size: 0.8rem;
+            color: v.$color-superficie-suave;
+        }
+    }
 }
 
 .contact-vertical {
@@ -174,37 +268,41 @@
         align-items: center;
         gap: 8px;
         font-size: 0.85rem;
+        color: #64748b;
 
         i {
-            color: $color-marca-principal;
-            width: 15px;
+            color: v.$color-marca-principal;
+            font-size: 0.9rem;
         }
 
-        .u-dir {
-            font-size: 0.75rem;
-            color: $color-superficie-suave;
-            @include limitar-lineas(1);
+        &.mt-1 {
+            margin-top: 0.25rem;
         }
+
+        // Manejado aquí directamente
     }
 }
 
 .badge-rol {
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 0.7rem;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.65rem;
     font-weight: 800;
     text-transform: uppercase;
-    background: #f1f1f1;
-    color: #666;
 
     &.admin {
-        background: rgba($color-secundario-frio-2, 0.1);
-        color: $color-secundario-frio-2;
+        background: rgba(v.$color-secundario-frio-2, 0.1);
+        color: v.$color-secundario-frio-2;
     }
 
-    &.profe {
-        background: rgba($color-marca-principal, 0.1);
-        color: $color-marca-principal;
+    &.profesor {
+        background: rgba(v.$color-marca-principal, 0.1);
+        color: v.$color-marca-principal;
+    }
+
+    &.alumno {
+        background: rgba(v.$color-secundario-calido-2, 0.1);
+        color: v.$color-secundario-calido-2;
     }
 }
 
@@ -216,86 +314,25 @@
     .btn-tool {
         width: 36px;
         height: 36px;
-        border: 1px solid #eee;
+        border-radius: 10px;
+        border: 1px solid #edf2f7;
         background: white;
-        border-radius: 6px;
         cursor: pointer;
-        transition: 0.2s;
-        color: $color-secundario-frio-2;
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: 0.2s;
 
         &:hover {
-            border-color: $color-marca-principal;
-            color: $color-marca-principal;
             transform: translateY(-2px);
-        }
-
-        &.status.active {
-            color: $color-marca-principal;
-        }
-
-        &.status:not(.active) {
-            color: $color-secundario-calido-1;
+            border-color: v.$color-marca-principal;
+            color: v.$color-marca-principal;
         }
 
         &.delete:hover {
-            background: #fff1f1;
-            color: $color-secundario-calido-1;
-            border-color: $color-secundario-calido-1;
+            border-color: v.$color-secundario-calido-1;
+            color: v.$color-secundario-calido-1;
+            background: #fff5f5;
         }
-    }
-}
-
-.text-right {
-    text-align: right;
-}
-
-
-
-@media (max-width: 992px) {
-    .admin-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1.5rem;
-
-        .btn-primario-aula {
-            width: 100%;
-            justify-content: center;
-        }
-    }
-
-    .admin-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 1rem;
-        padding: 1.2rem;
-
-        .search-box,
-        .filter-box {
-            flex: none;
-            width: 100%;
-        }
-    }
-
-    .admin-card {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        border-radius: $radio-curvatura;
-
-        .admin-table {
-            min-width: 900px; 
-        }
-    }
-}
-
-@media (max-width: 576px) {
-    .admin-wrapper {
-        padding: 1.2rem; 
-    }
-
-    .txt-h1 {
-        font-size: 1.8rem;
     }
 }

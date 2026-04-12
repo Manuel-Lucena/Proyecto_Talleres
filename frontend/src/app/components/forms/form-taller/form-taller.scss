@@ -5,7 +5,7 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(v.$color-secundario-frio-2, 0.7); // Azul profundo con transparencia
+    background: rgba(v.$color-secundario-frio-2, 0.7);
     backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
@@ -21,7 +21,7 @@
     max-width: 950px;
     max-height: 95vh;
     border-radius: v.$radio-curvatura * 2;
-    box-shadow: v.$sombra-nivel-3; // Nivel 3 para modales
+    box-shadow: v.$sombra-nivel-3;
     position: relative;
     overflow: hidden;
 
@@ -42,17 +42,7 @@
         }
 
         .btn-close {
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            color: v.$color-superficie-suave;
-            cursor: pointer;
-            transition: all 0.3s ease-in-out;
-
-            &:hover {
-                color: v.$color-secundario-calido-1; // Naranja de acción
-                transform: rotate(90deg);
-            }
+            @include m.boton-cerrar-circular;
         }
     }
 }
@@ -61,6 +51,13 @@
     display: grid;
     grid-template-columns: 1fr 340px;
     height: 70vh;
+
+    @media (max-width: 850px) {
+        grid-template-columns: 1fr;
+        height: auto;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
 }
 
 .noticia-form-col {
@@ -70,7 +67,6 @@
     flex-direction: column;
     gap: 1.2rem;
 
-    // Reutilizamos tu lógica de campo-formulario
     .campo-taller {
         display: flex;
         flex-direction: column;
@@ -84,16 +80,52 @@
             text-transform: uppercase;
         }
 
-        input, textarea {
+        input,
+        textarea {
             @include m.estilo-input-base;
-            
-            &.is-invalid {
-                border-color: v.$color-secundario-calido-1;
-            }
         }
-        
-        textarea { height: 100px; resize: none; }
+
+        textarea {
+            height: 100px;
+            resize: none;
+        }
     }
+
+    .error-container {
+        min-height: 18px; // Reserva espacio para que el formulario no "salte" al aparecer el error
+        margin-top: 2px;
+
+        .error-message {
+            color: v.$color-secundario-calido-1; // El naranja/rojo de error
+            font-size: 0.7rem;
+            font-weight: 700;
+            font-family: v.$fuente-lectura;
+        }
+    }
+
+    // Estilo para el error de validación cruzada (fechas)
+    .error-container-global {
+        padding: 8px;
+        background: rgba(v.$color-secundario-calido-1, 0.1);
+        border-radius: 4px;
+        text-align: center;
+
+        .error-message {
+            color: v.$color-secundario-calido-1;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+    }
+
+    .fila-formulario {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+}
+
+.zona-subida-taller {
+    @include m.zona-subida-estandar;
 }
 
 .noticia-preview-col {
@@ -114,22 +146,20 @@
     }
 }
 
-// Adaptación de tu zona-subida al contexto del modal
-.zona-subida-taller {
-    @extend .zona-subida; // Hereda de _formularios.scss
-    padding: 20px;
-    border-radius: v.$radio-curvatura;
-}
-
-// Vista previa estilo Card Aula Viva
 .vista-previa-tarjeta {
     @include m.card-elevada;
     background: white;
+    pointer-events: none;
 
     .img-contenedor {
         height: 160px;
         background: #eee;
-        img { width: 100%; height: 100%; object-fit: cover; }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
     }
 
     .p-3-preview {
@@ -162,6 +192,14 @@
         justify-content: space-between;
         align-items: center;
 
+        .info-item {
+            font-size: 0.8rem;
+            color: v.$color-superficie-suave;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
         .precio-item {
             font-weight: 800;
             font-size: 1.2rem;
@@ -172,10 +210,12 @@
 
 .acciones-finales {
     margin-top: auto;
+
     button {
         @include m.boton-primario;
         width: 100%;
         padding: 14px;
+
         &:disabled {
             filter: grayscale(1);
             opacity: 0.5;
@@ -184,15 +224,11 @@
     }
 }
 
-// Personalización de ng-select para que no desentone
 .custom-ng-select {
     ::ng-deep .ng-select-container {
         @include m.estilo-input-base;
-        border: 2px solid #f0f0f0 !important;
+        border: 2px solid #f0f0f0;
         min-height: 48px;
-    }
-    ::ng-deep .ng-dropdown-panel {
-        border-radius: v.$radio-curvatura;
-        box-shadow: v.$sombra-nivel-2;
+        padding: 0 10px;
     }
 }

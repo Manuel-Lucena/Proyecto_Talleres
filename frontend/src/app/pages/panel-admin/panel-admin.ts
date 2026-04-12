@@ -20,5 +20,14 @@ export class PanelAdmin {
 
   toggleMenuMovil() {
     this.menuMovilAbierto = !this.menuMovilAbierto;
+
+    // Si está abierto, bloqueamos el scroll del body, si no, lo devolvemos
+    if (this.menuMovilAbierto) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
   }
+
+
 }

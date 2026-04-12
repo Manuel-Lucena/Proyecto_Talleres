@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Navbar } from "../../components/layout/navbar/navbar";
 import { Footer } from "../../components/layout/footer/footer";
 import { TallerService } from "../../services/Taller.Service";
@@ -17,9 +18,8 @@ import { Notificacion } from "../../components/dialogs/mensaje/notificacion";
   selector: 'app-talleres-explorar',
   standalone: true,
   imports: [
-    CommonModule, RouterModule, Navbar, Footer, 
-    FormTaller, FormInscripcion, // <--- Añadido FormInscripcion
-    Confirmacion, Notificacion
+    CommonModule, RouterModule, ReactiveFormsModule, Navbar, Footer, 
+    FormTaller, FormInscripcion, Confirmacion, Notificacion
   ],
   templateUrl: './talleres-explorar.html',
   styleUrl: './talleres-explorar.scss',
@@ -27,25 +27,37 @@ import { Notificacion } from "../../components/dialogs/mensaje/notificacion";
 export class TalleresExplorar implements OnInit {
 
   talleres: TallerResponse[] = [];
+  talleresFiltrados: TallerResponse[] = [];
+  filtroForm: FormGroup;
   cargando: boolean = true;
   puedeGestionar: boolean = false;
 
-  // Modales
-  mostrarModalForm: boolean = false;        // Para Taller (Admin)
-  mostrarModalInscripcion: boolean = false; // Para Inscripción (Usuario)
+  mostrarModalForm: boolean = false;
+  mostrarModalInscripcion: boolean = false;
   tallerSeleccionado: TallerResponse | null = null;
 
   constructor(
     private tallerService: TallerService,
     private tokenService: TokenService,
-    private inscripcionService: InscripcionService, // Inyectado
+    private inscripcionService: InscripcionService,
     private notify: NotificacionService,
-    private cdr: ChangeDetectorRef
-  ) { }
+    private cdr: ChangeDetectorRef,
+    private fb: FormBuilder
+  ) {
+    this.filtroForm = this.fb.group({
+      texto: [''],
+      precioMax: [500],
+      soloDisponibles: [false]
+    });
+  }
 
   ngOnInit(): void {
     this.comprobarPermisos();
     this.cargarTalleres();
+    
+    this.filtroForm.valueChanges.subscribe(() => {
+      this.aplicarFiltros();
+    });
   }
 
   comprobarPermisos(): void {
@@ -57,6 +69,7 @@ export class TalleresExplorar implements OnInit {
     this.tallerService.listarTodos().subscribe({
       next: (response) => {
         this.talleres = response.data;
+        this.aplicarFiltros();
         this.cargando = false;
         this.cdr.detectChanges();
       },
@@ -67,7 +80,24 @@ export class TalleresExplorar implements OnInit {
     });
   }
 
-  // --- LÓGICA TALLERES (ADMIN) ---
+  aplicarFiltros(): void {
+    const { texto, precioMax, soloDisponibles } = this.filtroForm.value;
+    const buscar = texto.toLowerCase();
+
+    this.talleresFiltrados = this.talleres.filter(t => {
+      const coincideTexto = t.nombre.toLowerCase().includes(buscar) || 
+                           t.descripcion.toLowerCase().includes(buscar);
+      const coincidePrecio = t.precio <= precioMax;
+      const coincidePlazas = soloDisponibles ? t.plazasDisponibles > 0 : true;
+
+      return coincideTexto && coincidePrecio && coincidePlazas;
+    });
+  }
+
+  limpiarFiltros(): void {
+    this.filtroForm.patchValue({ texto: '', precioMax: 500, soloDisponibles: false });
+  }
+
   abrirCreacion(): void {
     this.tallerSeleccionado = null;
     this.mostrarModalForm = true;
@@ -80,31 +110,20 @@ export class TalleresExplorar implements OnInit {
 
   guardarCambios(fd: FormData): void {
     const id = this.tallerSeleccionado?.idTaller;
-    if (!id) {
-      // Si no hay id, es creación
-      this.tallerService.crear(fd).subscribe({
-        next: () => {
-          this.notify.mostrar({ titulo: 'Éxito', mensaje: 'Taller creado', tipo: 'exito' });
-          this.mostrarModalForm = false;
-          this.cargarTalleres();
-        }
-      });
-      return;
-    }
+    const peticion = id ? this.tallerService.actualizar(id, fd) : this.tallerService.crear(fd);
 
-    this.tallerService.actualizar(id, fd).subscribe({
+    peticion.subscribe({
       next: () => {
-        this.notify.mostrar({ titulo: 'Éxito', mensaje: 'Taller actualizado', tipo: 'exito' });
+        this.notify.mostrar({ titulo: 'Éxito', mensaje: 'Operación realizada', tipo: 'exito' });
         this.mostrarModalForm = false;
         this.cargarTalleres();
       }
     });
   }
 
-  // --- LÓGICA INSCRIPCIÓN (USUARIO) ---
   abrirInscripcion(taller: TallerResponse): void {
     if (!this.tokenService.isLogged()) {
-      this.notify.mostrar({ titulo: 'Atención', mensaje: 'Debes iniciar sesión para inscribirte', tipo: 'error' });
+      this.notify.mostrar({ titulo: 'Atención', mensaje: 'Inicia sesión para inscribirte', tipo: 'error' });
       return;
     }
     this.tallerSeleccionado = { ...taller };
@@ -114,26 +133,24 @@ export class TalleresExplorar implements OnInit {
   finalizarInscripcion(dto: any): void {
     this.inscripcionService.inscribir(dto).subscribe({
       next: () => {
-        this.notify.mostrar({ titulo: '¡Enhorabuena!', mensaje: 'Inscripción realizada con éxito', tipo: 'exito' });
+        this.notify.mostrar({ titulo: '¡Éxito!', mensaje: 'Inscripción realizada', tipo: 'exito' });
         this.mostrarModalInscripcion = false;
-        this.cargarTalleres(); // Recargamos para actualizar plazas disponibles
+        this.cargarTalleres();
       },
-      error: (err) => {
-        this.notify.mostrar({ titulo: 'Error', mensaje: 'Ya estás inscrito o no quedan plazas', tipo: 'error' });
-      }
+      error: () => this.notify.mostrar({ titulo: 'Error', mensaje: 'No se pudo procesar', tipo: 'error' })
     });
   }
 
   async eliminarTaller(taller: TallerResponse): Promise<void> {
     const confirmar = await this.notify.confirmar({
-      titulo: 'Eliminar Taller',
-      mensaje: `¿Estás seguro de borrar "${taller.nombre}"?`
+      titulo: 'Eliminar',
+      mensaje: `¿Borrar "${taller.nombre}"?`
     });
 
     if (confirmar) {
       this.tallerService.eliminar(taller.idTaller).subscribe({
         next: () => {
-          this.talleres = this.talleres.filter(t => t.idTaller !== taller.idTaller);
+          this.cargarTalleres();
           this.notify.mostrar({ titulo: 'Borrado', mensaje: 'Taller eliminado', tipo: 'exito' });
         }
       });

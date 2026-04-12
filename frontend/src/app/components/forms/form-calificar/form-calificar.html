@@ -1,72 +1,82 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
-  <div class="modal-card" (click)="$event.stopPropagation()">
+  <div class="modal-body" (click)="$event.stopPropagation()">
     
-    <header class="modal-header">
-      <h2>Calificar Entrega</h2>
-      <button (click)="cerrar.emit()" class="btn-close-modal" title="Cerrar">
-        <i class="bi bi-x-lg"></i>
-      </button>
-    </header>
+    <button class="btn-close" (click)="cerrar.emit()">&times;</button>
 
-    <main *ngIf="entrega">
-      <div class="info-entrega">
-        <span class="label-seccion">Comentarios del alumno</span>
-        <p class="texto-alumno">{{ entrega.textoEntrega || 'El alumno no ha adjuntado comentarios.' }}</p>
-      </div>
+    <div class="calificar-layout" *ngIf="entrega">
+      
+      <aside class="entrega-contexto">
+        <header class="header-seccion">
+          <span class="badge-alumno">Entrega del Alumno</span>
+          <h2>Revisar Material</h2>
+        </header>
 
-      <div class="archivos-alumno" *ngIf="archivosAlumno.length > 0">
-        <span class="label-seccion">Material entregado</span>
-        <div class="lista-archivos-enteros">
-          <div *ngFor="let a of archivosAlumno" (click)="descargarArchivo(a)" class="item-archivo-completo">
-            <i class="bi bi-file-earmark-arrow-down"></i>
-            <div class="info">
-              <span class="nombre">{{ a.nombre }}</span>
-              <span class="sub">Haz clic para descargar archivo</span>
+        <div class="contenido-entrega">
+          <div class="bloque-info">
+            <label>Comentarios del alumno</label>
+            <div class="texto-caja">
+              {{ entrega.textoEntrega || 'El alumno no ha adjuntado comentarios adicionales.' }}
+            </div>
+          </div>
+
+          <div class="bloque-info" *ngIf="archivosAlumno.length > 0">
+            <label>Material adjunto ({{ archivosAlumno.length }})</label>
+            <div class="grid-archivos">
+              <div *ngFor="let a of archivosAlumno" 
+                   (click)="descargarArchivo(a)" 
+                   class="tarjeta-archivo"
+                   title="Descargar archivo">
+                <i class="bi bi-file-earmark-arrow-down"></i>
+                <div class="file-meta">
+                  <span class="file-name">{{ a.nombre }}</span>
+                  <span class="file-action">Clic para descargar</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </aside>
 
-      <form [formGroup]="form" (submit)="$event.preventDefault()" class="form-calificacion">
-        
-        <div class="fila-input">
-          <label>Calificación</label>
-          <div class="input-wrapper">
-            <input type="number" formControlName="calificacion" 
-                   placeholder="0.00"
-                   class="input-personalizado"
-                   [class.is-invalid]="errorService.mostrarError(form, 'calificacion')">
-            
+      <section class="evaluacion-form">
+        <header class="header-seccion">
+          <span class="badge-profesor">Evaluación</span>
+          <h2>Calificar Tarea</h2>
+        </header>
+
+        <form [formGroup]="form" (ngSubmit)="guardarNota()">
+          
+          <div class="campo-nota">
+            <label>Puntuación Final</label>
+            <div class="input-nota-wrapper">
+              <input type="number" formControlName="calificacion" 
+                     placeholder="0.00"
+                     [class.is-invalid]="errorService.mostrarError(form, 'calificacion')">
+              <span class="puntos-tag">/ 10</span>
+            </div>
             <div class="error-container">
               <span *ngIf="errorService.mostrarError(form, 'calificacion')" class="error-message">
                 {{ errorService.getErrorMessage(form, 'calificacion') }}
               </span>
             </div>
           </div>
-        </div>
 
-        <div class="fila-input">
-          <label>Feedback</label>
-          <div class="input-wrapper">
+          <div class="campo-feedback">
+            <label>Retroalimentación para el alumno</label>
             <textarea formControlName="comentarioProfesor" 
-                      rows="4" 
-                      placeholder="Escribe una retroalimentación constructiva para el alumno..."
-                      class="input-personalizado"></textarea>
+                      rows="6" 
+                      placeholder="Escribe aquí tus observaciones, puntos de mejora o felicitaciones..."></textarea>
           </div>
-        </div>
 
-      </form>
-    </main>
+          <div class="acciones-evaluacion">
+            <button type="submit" class="btn-confirmar" [disabled]="form.invalid || cargando">
+              <span *ngIf="!cargando">Publicar Calificación</span>
+              <span *ngIf="cargando" class="spinner-border spinner-border-sm"></span>
+            </button>
+            <button type="button" (click)="cerrar.emit()" class="btn-link-cancelar">Volver sin guardar</button>
+          </div>
+        </form>
+      </section>
 
-    <footer class="modal-footer">
-      <div class="footer-actions">
-        <button (click)="cerrar.emit()" class="btn-cancelar">Cancelar</button>
-        <button (click)="guardarNota()" [disabled]="form.invalid || cargando" class="btn-confirmar">
-          <span *ngIf="!cargando">Confirmar Nota</span>
-          <span *ngIf="cargando" class="spinner-border spinner-border-sm"></span>
-        </button>
-      </div>
-    </footer>
-
+    </div>
   </div>
 </div>

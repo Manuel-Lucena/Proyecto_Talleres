@@ -1,28 +1,26 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
-    <div class="modal-content-custom" (click)="$event.stopPropagation()">
+    <div class="modal-body" (click)="$event.stopPropagation()">
 
-        <header>
+        <button class="btn-close" (click)="cerrar.emit()">&times;</button>
+
+        <header class="modal-header-simple">
             <h2 class="titulo-formulario">Programar Sesión</h2>
-            <button (click)="cerrar.emit()" class="btn-close-modal" title="Cerrar">
-                <i class="bi bi-x-lg"></i>
-            </button>
+            <p class="subtitulo">Define el horario semanal para esta actividad</p>
         </header>
 
-        <form [formGroup]="form" (ngSubmit)="enviar()">
+        <form [formGroup]="form" (ngSubmit)="enviar()" class="form-sesion">
 
-            <div class="fila-formulario">
-                <div class="campo-formulario">
-                    <label>Día de la semana</label>
-                    <select formControlName="diaSemana" class="input-personalizado"
-                        [class.is-invalid]="errorService.mostrarError(form, 'diaSemana')">
-                        <option value="" disabled>Selecciona un día...</option>
-                        <option *ngFor="let d of dias" [value]="d">{{d}}</option>
-                    </select>
-                    <div class="error-container">
-                        @if (errorService.mostrarError(form, 'diaSemana')) {
-                            <span class="error-message">{{ errorService.getErrorMessage(form, 'diaSemana') }}</span>
-                        }
-                    </div>
+            <div class="campo-formulario">
+                <label>Día de la semana</label>
+                <select formControlName="diaSemana" class="input-personalizado"
+                    [class.is-invalid]="errorService.mostrarError(form, 'diaSemana')">
+                    <option value="" disabled>Selecciona un día...</option>
+                    <option *ngFor="let d of dias" [value]="d">{{d}}</option>
+                </select>
+                <div class="error-container">
+                    <span *ngIf="errorService.mostrarError(form, 'diaSemana')" class="error-message">
+                        {{ errorService.getErrorMessage(form, 'diaSemana') }}
+                    </span>
                 </div>
             </div>
 
@@ -32,9 +30,9 @@
                     <input type="time" formControlName="fechaInicio" class="input-personalizado"
                         [class.is-invalid]="errorService.mostrarError(form, 'fechaInicio')">
                     <div class="error-container">
-                        @if (errorService.mostrarError(form, 'fechaInicio')) {
-                            <span class="error-message">{{ errorService.getErrorMessage(form, 'fechaInicio') }}</span>
-                        }
+                        <span *ngIf="errorService.mostrarError(form, 'fechaInicio')" class="error-message">
+                            {{ errorService.getErrorMessage(form, 'fechaInicio') }}
+                        </span>
                     </div>
                 </div>
 
@@ -43,11 +41,12 @@
                     <input type="time" formControlName="fechaFin" class="input-personalizado"
                         [class.is-invalid]="errorService.mostrarError(form, 'fechaFin') || form.hasError('fechaInvalida')">
                     <div class="error-container">
-                        @if (errorService.mostrarError(form, 'fechaFin') || (form.hasError('fechaInvalida') && form.get('fechaFin')?.touched)) {
-                            <span class="error-message">
-                                {{ form.hasError('fechaInvalida') ? 'La hora de fin debe ser posterior' : errorService.getErrorMessage(form, 'fechaFin') }}
-                            </span>
-                        }
+                        <span
+                            *ngIf="errorService.mostrarError(form, 'fechaFin') || (form.hasError('fechaInvalida') && form.get('fechaFin')?.touched)"
+                            class="error-message">
+                            {{ form.hasError('fechaInvalida') ? 'Debe ser posterior al inicio' :
+                            errorService.getErrorMessage(form, 'fechaFin') }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -57,7 +56,7 @@
                     Cancelar
                 </button>
                 <button type="submit" class="btn-guardar" [disabled]="form.invalid">
-                    <i class="bi bi-calendar-check me-2"></i> Confirmar
+                    <i class="bi bi-calendar-check"></i> Confirmar
                 </button>
             </footer>
         </form>

@@ -4,12 +4,10 @@
   <header class="header-principal">
     <div class="d-flex align-items-center gap-3">
       <h2>Explorar Talleres</h2>
-
       <ng-container *ngIf="puedeGestionar">
         <div class="linea-vertical"></div>
         <button class="btn-azul-plus" (click)="abrirCreacion()">
-          <i class="bi bi-plus-lg"></i>
-          Nuevo Taller
+          <i class="bi bi-plus-lg"></i> Nuevo Taller
         </button>
       </ng-container>
     </div>
@@ -20,18 +18,44 @@
     <aside class="sidebar-reserva">
       <div class="info-sidebar">
         <h3>Filtrar talleres</h3>
-        <p class="nota-sidebar">Configura tus preferencias para encontrar el taller ideal.</p>
+        <p class="nota-sidebar">Configura tus preferencias.</p>
       </div>
+
+      <form [formGroup]="filtroForm" class="form-filtros">
+        <div class="grupo-filtro">
+          <label><i class="bi bi-search"></i> Buscar</label>
+          <input type="text" formControlName="texto" placeholder="Nombre..." class="form-control">
+        </div>
+
+        <div class="grupo-filtro">
+          <label><i class="bi bi-currency-euro"></i> Precio Máx: {{filtroForm.get('precioMax')?.value}}€</label>
+          <input type="range" formControlName="precioMax" min="0" max="500" step="10" class="form-range">
+        </div>
+
+        <div class="grupo-filtro">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" formControlName="soloDisponibles" id="checkP">
+            <label class="form-check-label" for="checkP">Solo con plazas</label>
+          </div>
+        </div>
+
+        <button type="button" class="btn-limpiar" (click)="limpiarFiltros()">Limpiar filtros</button>
+      </form>
     </aside>
 
     <main class="seccion-lista-cursos">
-      <div class="card-curso-horizontal" *ngFor="let taller of talleres">
+      <div class="alerta-vacia" *ngIf="talleresFiltrados.length === 0 && !cargando">
+        <i class="bi bi-search"></i>
+        <p>No hay talleres que coincidan con los filtros.</p>
+      </div>
+
+      <div class="card-curso-horizontal" *ngFor="let taller of talleresFiltrados">
 
         <div class="dropdown admin-dropdown" *ngIf="puedeGestionar">
           <button class="btn-kebab" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-three-dots-vertical"></i>
           </button>
-          <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+          <ul class="dropdown-menu shadow border-0">
             <li>
               <button class="dropdown-item" (click)="abrirEdicion(taller)">
                 <i class="bi bi-pencil me-2 text-primary"></i> Actualizar
@@ -66,11 +90,9 @@
           <div class="footer-curso">
             <div class="detalles-tecnicos">
               <span [class.sin-plazas]="taller.plazasDisponibles === 0">
-                <i class="bi bi-people"></i>
-                {{ taller.plazasDisponibles }} de {{ taller.plazasMaximas }} plazas libres
+                <i class="bi bi-people"></i> {{ taller.plazasDisponibles }} de {{ taller.plazasMaximas }} plazas
               </span>
             </div>
-
             <div class="precio-inscripcion">
               <span class="moneda">{{ taller.precio }}€</span>
               <button class="btn-inscripcion" [disabled]="taller.plazasDisponibles === 0"
@@ -86,13 +108,9 @@
 </div>
 
 <app-form-taller *ngIf="mostrarModalForm" [tallerParaEditar]="tallerSeleccionado" (cerrar)="mostrarModalForm = false"
-  (guardado)="guardarCambios($event)">
-</app-form-taller>
-
+  (guardado)="guardarCambios($event)"></app-form-taller>
 <app-form-inscripcion *ngIf="mostrarModalInscripcion" [tallerParaInscribir]="tallerSeleccionado"
-  (cerrar)="mostrarModalInscripcion = false" (guardado)="finalizarInscripcion($event)">
-</app-form-inscripcion>
-
+  (cerrar)="mostrarModalInscripcion = false" (guardado)="finalizarInscripcion($event)"></app-form-inscripcion>
 <app-confirmacion></app-confirmacion>
 <app-modal-notificacion></app-modal-notificacion>
 <app-footer></app-footer>

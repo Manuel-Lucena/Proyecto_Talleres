@@ -1,97 +1,178 @@
 @use '../../../../../styles/variables' as v;
 @use '../../../../../styles/mixins' as m;
 
-.contenedor-tareas {
-    width: 100vw;
-    position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-    background: white;
-    @include m.animacion-entrada;
+.tareas-container {
+  width: 100%;
 }
 
-.cuerpo-tareas {
-    width: 100%;
-    border-top: 1px solid #eee;
+.loading-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5rem;
+  gap: 1rem;
+  color: v.$color-superficie-suave;
+  .spinner-border { color: v.$color-marca-principal; }
 }
 
-.fila-tarea {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
+.tareas-lista {
+  display: flex;
+  flex-direction: column;
+}
+
+.tarea-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  padding: 1.6rem 2.5rem; // Unificado
+  background: white;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #fcfcfc;
+    box-shadow: inset 6px 0 0 v.$color-marca-principal; // Unificado
+    
+    .text-box .titulo { color: v.$color-marca-principal; }
+    .action-icon { 
+      transform: translateX(5px); 
+      color: v.$color-marca-principal; 
+    }
+  }
+
+  .card-main {
+    display: flex;
     align-items: center;
-    padding: 1.8rem 5vw; 
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    gap: 1.8rem;
+    min-width: 0;
 
-    &:hover {
-        background-color: #f9f9f9;
-        box-shadow: inset 6px 0 0 v.$color-marca-principal;
+    // CONTENEDOR UNIFICADO (Mismo que Muro y Recursos)
+    .icon-container {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
 
-        .titulo { color: v.$color-marca-principal; }
-        .celda-accion {
-            transform: translateX(8px);
-            color: v.$color-marca-principal;
+      &.bg-verde {
+        background: rgba(v.$color-marca-principal, 0.08);
+        i {
+          font-size: 1.8rem;
+          color: v.$color-marca-principal;
         }
+      }
     }
 
-    .celda-principal {
+    .text-box {
+      min-width: 0;
+      .titulo {
+        margin: 0 0 4px 0;
+        font-family: v.$fuente-enfasis;
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: v.$color-secundario-frio-2;
+        transition: color 0.3s;
+      }
+      .descripcion {
+        margin: 0;
+        font-family: v.$fuente-lectura;
+        font-size: 0.95rem;
+        color: v.$color-superficie-suave;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  .card-side {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+
+    .info-deadline {
+      text-align: right;
+      .label {
+        display: block;
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #999;
+        margin-bottom: 2px;
+        letter-spacing: 0.5px;
+      }
+      .fecha-valor {
         display: flex;
         align-items: center;
-        gap: 2rem;
-        min-width: 0;
-
-        .icono-tarea i {
-            font-size: 2rem;
-            color: v.$color-superficie-suave;
-        }
-
-        .info-texto {
-            flex: 1;
-            .titulo {
-                display: block;
-                font-family: v.$fuente-enfasis;
-                font-weight: 700;
-                font-size: 1.2rem;
-                color: v.$color-secundario-frio-2;
-                margin-bottom: 4px;
-            }
-            .resumen-lineal {
-                font-family: v.$fuente-lectura;
-                font-size: 0.95rem;
-                color: v.$color-superficie-suave;
-                display: block;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 60vw;
-            }
-        }
+        gap: 8px;
+        color: v.$color-secundario-frio-2;
+        font-family: v.$fuente-enfasis;
+        font-weight: 600;
+        font-size: 0.9rem;
+        i { font-size: 0.8rem; color: v.$color-superficie-suave; }
+      }
     }
 
-    .celda-fecha {
-        padding: 0 3rem;
-        font-family: v.$fuente-lectura;
-        font-size: 0.9rem;
-        color: v.$color-superficie-suave;
+    .action-icon {
+      color: #ddd;
+      font-size: 1.3rem;
+      transition: all 0.3s;
+    }
+  }
+}
+
+// === RESPONSIVE UNIFICADO ===
+@media (max-width: 768px) {
+  .tarea-card {
+    grid-template-columns: 1fr;
+    padding: 1.4rem 1.5rem;
+    gap: 1.2rem;
+
+    .card-main {
+      gap: 1.2rem;
+      .icon-container {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        i { font-size: 1.4rem; }
+      }
+      .text-box .titulo { font-size: 1.05rem; }
+    }
+
+    .card-side {
+      justify-content: space-between;
+      padding-left: 60px; // Alineado con el icono de 48px + gap
+      
+      .info-deadline { 
+        text-align: left; 
         display: flex;
         align-items: center;
         gap: 10px;
-        white-space: nowrap;
+        .label { margin-bottom: 0; }
+      }
+      
+      .action-icon { display: none; }
     }
-
-    .celda-accion {
-        color: #ddd;
-        transition: all 0.3s;
-        i { font-size: 1.4rem; }
-    }
+  }
 }
 
 .sin-datos {
-    padding: 4rem;
-    text-align: center;
-    color: v.$color-superficie-suave;
-    i { font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.5; }
+  padding: 6rem 2rem;
+  text-align: center;
+  color: v.$color-superficie-suave;
+
+  .empty-state-icon {
+    font-size: 3.5rem;
+    opacity: 0.2;
+    margin-bottom: 1.5rem;
+  }
+
+  h3 {
+    font-family: v.$fuente-enfasis;
+    font-weight: 700;
+    color: v.$color-secundario-frio-2;
+  }
 }

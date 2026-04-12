@@ -1,14 +1,14 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
   <div class="modal-body" (click)="$event.stopPropagation()">
-    <button class="btn-close" (click)="cerrar.emit()">
-      <i class="bi bi-x-lg"></i>
-    </button>
+    
+    <button class="btn-close" (click)="cerrar.emit()">&times;</button>
 
     <div class="checkout-layout">
       
-      <div class="resumen-checkout-taller" *ngIf="tallerParaInscribir">
+      <aside class="resumen-checkout-taller" *ngIf="tallerParaInscribir">
         <div class="mini-card-info">
-          <img [src]="tallerParaInscribir.fotoRuta || 'assets/images/placeholder-taller.jpg'" class="img-preview">
+          <img [src]="tallerParaInscribir.fotoRuta || 'assets/images/placeholder-taller.jpg'" class="img-preview" alt="Miniatura taller">
+          
           <span class="etiqueta-pago">Tu suscripción</span>
           <h4 class="nombre-taller">{{ tallerParaInscribir.nombre }}</h4>
           <p class="profesor-taller">Impartido por Prof. {{ tallerParaInscribir.nombreCompletoProfesor }}</p>
@@ -20,16 +20,16 @@
             <span class="precio-destacado">{{ tallerParaInscribir.precio }}€</span>
           </div>
         </div>
-      </div>
+      </aside>
 
-      <div class="seccion-formulario-pago">
-        <div class="titulo-formulario">Finalizar Compra</div>
+      <section class="seccion-formulario-pago">
+        <h2 class="titulo-formulario">Finalizar Compra</h2>
 
         <form [formGroup]="inscripcionForm" (ngSubmit)="enviar()">
           <input type="hidden" formControlName="idUsuario">
           <input type="hidden" formControlName="idTaller">
 
-          <div class="alerta-seguridad mb-4">
+          <div class="alerta-seguridad">
             <i class="bi bi-shield-check"></i>
             <div>
               <p>Transacción Protegida</p>
@@ -45,18 +45,19 @@
             </div>
           </div>
 
-          <div class="acciones-finales mt-auto">
+          <div class="acciones-finales">
             <button type="submit" class="btn-pagar-checkout" [disabled]="inscripcionForm.invalid">
-              Confirmar y Inscribirme
+              Confirmar e Inscribirme
             </button>
+            
             <p class="text-center mt-4 text-muted small">
               Al hacer clic, confirmas tu inscripción en el taller seleccionado. 
               <br><strong>Aula Viva &copy; 2026</strong>
             </p>
           </div>
         </form>
-      </div>
+      </section>
+      
     </div>
-
   </div>
 </div>

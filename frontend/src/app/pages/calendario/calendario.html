@@ -2,18 +2,17 @@
 
 <div class="calendario-seccion">
   <div class="calendario-container">
-    
+
     <div class="calendario-toolbar">
       <div class="toolbar-info">
-        <h2 class="titulo-horario">Horarios de Talleres</h2>
-        <span class="tag-semanal">Programación Fija</span>
+        <h2 class="titulo-horario">Horarios de <span>Talleres</span></h2>
       </div>
 
       <div class="toolbar-actions">
         <div class="filter-wrapper">
           <i class="bi bi-funnel"></i>
           <select class="maquina-select" (change)="onFiltroChange($event)">
-            <option value="">Todas las disciplinas</option>
+            <option value="">Todos los talleres</option>
             <option *ngFor="let t of talleresDisponibles" [value]="t">{{ t }}</option>
           </select>
         </div>
@@ -25,7 +24,7 @@
         <div class="dia-header">
           <span class="nombre-dia">{{ dia }}</span>
         </div>
-        
+
         <div class="eventos-container">
           <div class="evento-card" *ngFor="let h of filtrarPorDia(dia)">
             <div class="card-line"></div>

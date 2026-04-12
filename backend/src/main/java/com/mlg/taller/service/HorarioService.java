@@ -31,10 +31,12 @@ public class HorarioService {
 
     /**
      * Registra un nuevo horario para un taller específico.
+     * 
      * @param dto Datos del horario.
      * @return Horario guardado.
      * @throws ResourceNotFoundException Si el taller no existe.
-     * @throws BadRequestException Si la hora de inicio es posterior a la de fin.
+     * @throws BadRequestException       Si la hora de inicio es posterior a la de
+     *                                   fin.
      */
     @Transactional
     public HorarioResponseDTO crear(HorarioRequestDTO dto) {
@@ -55,6 +57,7 @@ public class HorarioService {
 
     /**
      * Obtiene todos los horarios registrados.
+     * 
      * @return Lista de horarios.
      */
     @Transactional(readOnly = true)
@@ -66,6 +69,7 @@ public class HorarioService {
 
     /**
      * Lista los horarios asignados a un taller concreto.
+     * 
      * @param idTaller ID del taller.
      * @return Lista de horarios del taller.
      */
@@ -76,15 +80,30 @@ public class HorarioService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene la agenda personalizada de un usuario basada en sus talleres
+     * inscritos.
+     * * @param idUsuario ID del usuario autenticado.
+     * 
+     * @return Lista de HorarioResponseDTO con los turnos de sus talleres.
+     */
+    @Transactional(readOnly = true)
+    public List<HorarioResponseDTO> listarPorUsuario(Long idUsuario) {
+        return horarioRepository.findHorariosByUsuarioInscrito(idUsuario).stream()
+                .map(horarioMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
     // --- MÉTODOS PUT ---
 
     /**
      * Actualiza la información de un horario existente.
-     * @param id ID del horario a modificar.
+     * 
+     * @param id  ID del horario a modificar.
      * @param dto Nuevos datos.
      * @return Horario actualizado.
      * @throws ResourceNotFoundException Si el horario no existe.
-     * @throws BadRequestException Si las horas son inconsistentes.
+     * @throws BadRequestException       Si las horas son inconsistentes.
      */
     @Transactional
     public HorarioResponseDTO actualizar(Long id, HorarioRequestDTO dto) {
@@ -94,11 +113,11 @@ public class HorarioService {
 
         Horario h = horarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Horario no encontrado con ID: " + id));
-        
+
         h.setDiaSemana(dto.getDiaSemana());
         h.setHoraInicio(dto.getHoraInicio());
         h.setHoraFin(dto.getHoraFin());
-        
+
         return horarioMapper.toResponse(horarioRepository.save(h));
     }
 
@@ -106,6 +125,7 @@ public class HorarioService {
 
     /**
      * Elimina un horario del sistema.
+     * 
      * @param id ID del horario a borrar.
      * @throws ResourceNotFoundException Si el horario no existe.
      */

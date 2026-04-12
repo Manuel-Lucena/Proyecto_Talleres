@@ -26,7 +26,7 @@
           <div class="campo-formulario">
             <label>CONTENIDO</label>
             <textarea formControlName="contenido" 
-                      class="input-personalizado area-texto" 
+                      class="input-personalizado" 
                       [class.is-invalid]="errorService.mostrarError(form, 'contenido')"
                       rows="9" 
                       placeholder="Escribe aquí el cuerpo de la noticia..."></textarea>
@@ -37,10 +37,10 @@
             </div>
           </div>
           
-          <div class="zona-subida" (click)="fileInput.click()">
+          <div class="zona-subida-noticia" (click)="fileInput.click()">
             <input type="file" #fileInput (change)="onFileSelected($event)" hidden accept="image/*">
             <i class="bi bi-image me-2"></i> 
-            {{ fileSeleccionado ? fileSeleccionado.name : 'Cambiar imagen destacada' }}
+            <span>{{ fileSeleccionado ? fileSeleccionado.name : 'Cambiar imagen destacada' }}</span>
           </div>
         </form>
       </div>
@@ -55,7 +55,7 @@
             </div>
             <div class="p-3">
               <h5 class="preview-title">{{ form.value.titulo || 'Título de ejemplo' }}</h5>
-              <p class="preview-text">{{ (form.value.contenido || 'Sin contenido aún...') | slice:0:80 }}...</p>
+              <p class="preview-text">{{ (form.value.contenido || 'Sin contenido aún...') | slice:0:120 }}...</p>
             </div>
           </div>
         </div>
@@ -66,7 +66,7 @@
                   [disabled]="form.invalid" 
                   (click)="enviar()">
             <i class="bi bi-check-circle-fill me-2"></i>
-            {{ noticiaParaEditar ? 'Guardar Cambios' : 'Publicar Ahora' }}
+            {{ noticiaParaEditar ? 'GUARDAR CAMBIOS' : 'PUBLICAR AHORA' }}
           </button>
         </div>
       </div>

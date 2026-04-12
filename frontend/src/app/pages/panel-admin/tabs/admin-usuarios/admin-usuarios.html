@@ -4,17 +4,36 @@
       <h1 class="txt-h1">Gestión de Usuarios</h1>
       <p class="txt-bajada">Directorio oficial de la comunidad Aula Viva</p>
     </div>
-    <button class="btn-primario-aula" (click)="abrirCrear()">
-      <i class="bi bi-person-plus-fill"></i>
-      <span class="btn-text">Nuevo Miembro</span>
-    </button>
+
+    <div class="d-flex gap-2">
+      <button class="btn-secundario-aula" (click)="mostrarModalCarga = true" title="Importar desde CSV">
+        <i class="bi bi-file-earmark-arrow-up-fill"></i>
+        <span class="btn-text">Carga Masiva</span>
+      </button>
+
+      <button class="btn-primario-aula" (click)="abrirCrear()">
+        <i class="bi bi-person-plus-fill"></i>
+        <span class="btn-text">Nuevo Miembro</span>
+      </button>
+    </div>
   </header>
 
   <section class="admin-toolbar shadow-1">
-    <div class="search-box">
-      <i class="bi bi-search"></i>
-      <input type="text" placeholder="Buscar por DNI, nombre o correo..." [(ngModel)]="busqueda" class="input-aula">
+    <div class="search-group">
+      <div class="criteria-box">
+        <select [(ngModel)]="criterioBusqueda" class="select-criteria">
+          <option value="todos">Todos</option>
+          <option value="nombre">Nombre</option>
+          <option value="dni">DNI</option>
+          <option value="email">Correo</option>
+        </select>
+      </div>
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" [placeholder]="getPlaceholder()" [(ngModel)]="busqueda" class="input-aula">
+      </div>
     </div>
+
     <div class="filter-box">
       <i class="bi bi-filter"></i>
       <select [(ngModel)]="filtroRol" class="select-aula">
@@ -70,7 +89,6 @@
           </td>
           <td class="text-right">
             <div class="actions-group">
-
               <button class="btn-tool info" (click)="verInscripciones(u.idUsuario)" title="Ver Talleres Inscritos">
                 <i class="bi bi-journal-check"></i>
               </button>
@@ -78,10 +96,12 @@
                 title="Cambiar estado">
                 <i class="bi" [class]="u.activo ? 'bi-shield-check' : 'bi-shield-slash'"></i>
               </button>
-              <button class="btn-tool edit" (click)="abrirEditar(u)" title="Editar"><i
-                  class="bi bi-pencil-square"></i></button>
-              <button class="btn-tool delete" (click)="eliminarUsuario(u.idUsuario)" title="Eliminar"><i
-                  class="bi bi-trash3"></i></button>
+              <button class="btn-tool edit" (click)="abrirEditar(u)" title="Editar">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              <button class="btn-tool delete" (click)="eliminarUsuario(u.idUsuario)" title="Eliminar">
+                <i class="bi bi-trash3"></i>
+              </button>
             </div>
           </td>
         </tr>
@@ -95,6 +115,11 @@
 <app-form-alumno [usuarioParaEditar]="usuarioSeleccionado" (cerrar)="mostrarModal = false"
   (usuarioGuardado)="ejecutarGuardado($event)">
 </app-form-alumno>
+}
+
+@if (mostrarModalCarga) {
+<app-form-carga-usuarios (cerrar)="mostrarModalCarga = false" (guardado)="cargarUsuarios()">
+</app-form-carga-usuarios>
 }
 
 <app-confirmacion></app-confirmacion>

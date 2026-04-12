@@ -1,4 +1,3 @@
-// ARCHIVO _MIXINS
 @import 'variables';
 
 // 1. BOTONES
@@ -9,7 +8,7 @@
     border-radius: $radio-curvatura;
     font-family: $fuente-enfasis;
     font-weight: 700;
-    transition: all 0.3s ease-in-out; // 300ms según guía
+    transition: all 0.3s ease-in-out;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -23,7 +22,6 @@
     }
 }
 
-// Mixin específico para el botón de inscripción (Naranja de acción)
 @mixin boton-inscripcion-aula {
     background-color: $color-secundario-calido-1;
     border: none;
@@ -46,6 +44,36 @@
     }
 }
 
+@mixin boton-cerrar-circular {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    color: $color-superficie-suave;
+    font-size: 2.2rem;
+    font-weight: 600;
+    line-height: 0.7;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    z-index: 110;
+    padding: 5px;
+
+
+    &:focus,
+    &:active {
+        outline: none;
+        box-shadow: none;
+    }
+
+    &:hover {
+        color: $color-secundario-calido-1;
+        transform: scale(1.1);
+    }
+}
+
 // 2. INPUTS
 @mixin estilo-input-base {
     width: 100%;
@@ -62,6 +90,8 @@
         box-shadow: 0 0 0 4px rgba($color-marca-principal, 0.1);
     }
 }
+
+
 
 // 3. TEXTOS Y TÍTULOS
 @mixin titulo-seccion($color-texto: $color-secundario-frio-2) {
@@ -108,6 +138,85 @@
             opacity: 1;
             transform: scale(1);
         }
+    }
+}
+
+@mixin zona-subida-estandar {
+    // Aquí usamos las variables directamente sin el "v."
+    border: 2px dashed $color-superficie-suave;
+    background: $color-fondo-pagina;
+    border-radius: $radio-curvatura;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    margin-top: 0.5rem;
+
+    i {
+        color: $color-marca-principal;
+        font-size: 1.4rem;
+    }
+
+    span {
+        font-family: $fuente-lectura;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: $color-secundario-frio-2;
+    }
+
+    &:hover {
+        border-color: $color-marca-principal;
+        background: white;
+        transform: translateY(-2px);
+        box-shadow: $sombra-nivel-1;
+    }
+
+    &.archivo-listo {
+        border-style: solid;
+        border-color: $color-marca-principal;
+        background: rgba($color-marca-principal, 0.05);
+    }
+}
+
+@mixin card-aula-viva {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 1.6rem 2.5rem;
+    background: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background-color: #fcfcfc;
+        box-shadow: inset 6px 0 0 v.$color-marca-principal;
+
+        .titulo {
+            color: v.$color-marca-principal;
+        }
+
+        .action-icon,
+        .flecha-link {
+            transform: translateX(5px);
+            color: v.$color-marca-principal;
+        }
+    }
+}
+
+// En _mixins.scss
+@mixin hover-escala {
+    transition: transform 0.2s ease-in-out;
+
+    &:hover {
+        transform: scale(1.1);
+    }
+
+    &:active {
+        transform: scale(0.95);
     }
 }
 

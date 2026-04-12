@@ -5,25 +5,27 @@
     height: calc(100vh - 80px);
     background-color: #f0f2f5;
     position: relative;
+    overflow: hidden;
 
-    // Estado colapsado en PC
     &.colapsado {
         .barra-lateral-admin {
             width: 80px;
+            min-width: 80px;
 
             .etiqueta-seccion,
             span {
                 display: none;
             }
 
+            // Centramos el icono del menú cuando está colapsado
             .sidebar-header {
                 justify-content: center;
-                padding: 0;
+                padding: 25px 0;
             }
 
             .enlace-pestana {
                 justify-content: center;
-                padding: 18px 0;
+                padding: 20px 0;
                 gap: 0;
             }
         }
@@ -32,18 +34,24 @@
 
 .barra-lateral-admin {
     width: 280px;
+    min-width: 280px;
     background-color: v.$color-secundario-frio-2;
     display: flex;
     flex-direction: column;
-    padding: 20px 0;
-    transition: width 0.3s ease;
     z-index: 100;
+    transition: width 0.3s ease;
+
+    position: sticky;
+    top: 0;
+    height: 100%;
+    overflow-y: auto;
 
     .sidebar-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0 25px 20px;
+        // MÁS AIRE: Aumentamos el padding superior e inferior
+        padding: 40px 25px 30px;
 
         .etiqueta-seccion {
             font-family: v.$fuente-enfasis;
@@ -51,6 +59,7 @@
             text-transform: uppercase;
             color: rgba(255, 255, 255, 0.4);
             font-weight: 800;
+            letter-spacing: 1.5px; // Un poco de espacio entre letras queda más "pro"
         }
 
         .btn-colapsar-pc {
@@ -58,6 +67,11 @@
             border: none;
             color: white;
             cursor: pointer;
+            opacity: 0.6;
+
+            &:hover {
+                opacity: 1;
+            }
 
             @media (max-width: 992px) {
                 display: none;
@@ -69,17 +83,18 @@
 .menu-pestanas {
     display: flex;
     flex-direction: column;
+    gap: 5px; // Separación entre botones del menú
 
     .enlace-pestana {
         display: flex;
         align-items: center;
         gap: 15px;
-        padding: 18px 30px;
+        padding: 16px 30px;
         text-decoration: none;
         color: rgba(255, 255, 255, 0.7);
         font-family: v.$fuente-lectura;
-        transition: 0.2s;
-        border-left: 5px solid transparent;
+        transition: 0.3s ease;
+        border-left: 4px solid transparent;
 
         i {
             font-size: 1.2rem;
@@ -88,12 +103,14 @@
         &:hover {
             background: rgba(255, 255, 255, 0.05);
             color: white;
+            padding-left: 35px; // Efecto de empuje suave
         }
 
         &.activo {
             background-color: rgba(255, 255, 255, 0.1);
             color: white;
             border-left-color: v.$color-marca-principal;
+            font-weight: 600;
 
             i {
                 color: v.$color-marca-principal;
@@ -104,28 +121,10 @@
 
 .contenido-principal-admin {
     flex: 1;
-    padding: 30px;
+    padding: 40px; // Más espacio para que el contenido respire
     overflow-y: auto;
-}
-
-// BOTÓN FLOTANTE MÓVIL
-.btn-movil-toggle {
-    display: none;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: v.$color-marca-principal;
-    color: white;
-    border: none;
-    z-index: 200;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-
-    @media (max-width: 992px) {
-        display: block;
-    }
+    height: 100%;
+    background-color: #f8f9fa; // Gris más limpio de la guía
 }
 
 // RESPONSIVE MÓVIL
@@ -134,8 +133,8 @@
         position: fixed;
         left: -280px;
         top: 80px;
-        height: 100%;
-        transition: left 0.3s ease;
+        height: calc(100vh - 80px);
+        padding-top: 30px; // Espacio para que el título no choque en móvil
 
         &.movil-show {
             left: 0;
@@ -147,19 +146,32 @@
         position: fixed;
         inset: 80px 0 0 0;
         background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(2px); // Un toque de desenfoque moderno
         z-index: 90;
 
         &.show {
             display: block;
         }
     }
+}
 
-    .contenedor-admin.colapsado .barra-lateral-admin {
-        width: 280px; // Evita que se colapse en móvil si estaba colapsado en PC
+.btn-movil-toggle {
+    display: none;
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 55px;
+    height: 55px;
+    border-radius: 12px;
+    background: v.$color-marca-principal;
+    color: white;
+    border: none;
+    z-index: 200;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 
-        .etiqueta-seccion,
-        span {
-            display: block;
-        }
+    @media (max-width: 992px) {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }

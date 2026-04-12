@@ -11,9 +11,18 @@
   </header>
 
   <section class="admin-toolbar shadow-1">
-    <div class="search-box">
-      <i class="bi bi-search"></i>
-      <input type="text" placeholder="Buscar taller por nombre o profesor..." [(ngModel)]="busqueda" class="input-aula">
+    <div class="search-group">
+      <div class="criteria-box">
+        <select [(ngModel)]="criterioBusqueda" class="select-criteria">
+          <option value="todos">Todos</option>
+          <option value="nombre">Taller</option>
+          <option value="profesor">Profesor</option>
+        </select>
+      </div>
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" [placeholder]="getPlaceholder()" [(ngModel)]="busqueda" class="input-aula">
+      </div>
     </div>
   </section>
 
@@ -27,8 +36,7 @@
             <th>Fechas</th>
             <th>Cupos</th>
             <th>Precio</th>
-            <th class="text-right">Acciones</th>
-          </tr>
+            <th>Acciones</th> </tr>
         </thead>
         <tbody>
           @for (t of talleresFiltrados; track t.idTaller) {
@@ -67,8 +75,7 @@
             <td>
               <span class="price-tag">{{ t.precio | currency:'EUR' }}</span>
             </td>
-            <td class="text-right">
-              <div class="actions-group">
+            <td> <div class="actions-group">
                 <button class="btn-tool info" (click)="verInscritos(t.idTaller)" title="Ver Alumnos Inscritos">
                   <i class="bi bi-people-fill"></i>
                 </button>

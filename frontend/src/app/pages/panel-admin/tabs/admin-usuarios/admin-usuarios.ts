@@ -5,6 +5,7 @@ import { UsuarioService } from '../../../../services/Usuario.Service';
 import { NotificacionService } from '../../../../services/Notificacion.Service';
 import { UsuarioResponse } from '../../../../interfaces/Usuario.Interface';
 import { FormAlumno } from '../../../../components/forms/form-alumno/form-alumno';
+import { FormCargaUsuarios } from '../../../../components/forms/form-carga-usuarios/form-carga-usuarios';
 import { Confirmacion } from "../../../../components/dialogs/confirmacion/confirmacion";
 import { Notificacion } from "../../../../components/dialogs/mensaje/notificacion";
 import { Router } from '@angular/router';
@@ -12,7 +13,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-admin-usuarios',
   standalone: true,
-  imports: [CommonModule, FormsModule, FormAlumno, Confirmacion, Notificacion],
+  imports: [CommonModule, FormsModule, FormAlumno, FormCargaUsuarios, Confirmacion, Notificacion],
   templateUrl: './admin-usuarios.html',
   styleUrl: './admin-usuarios.scss'
 })
@@ -20,7 +21,10 @@ export class AdminUsuarios implements OnInit {
   usuarios: UsuarioResponse[] = [];
   busqueda: string = '';
   filtroRol: string = '';
+  criterioBusqueda: string = 'todos';
+
   mostrarModal: boolean = false;
+  mostrarModalCarga: boolean = false; // Control del nuevo modal
   usuarioSeleccionado: UsuarioResponse | null = null;
 
   constructor(
@@ -45,10 +49,31 @@ export class AdminUsuarios implements OnInit {
 
   get usuariosFiltrados() {
     const term = this.busqueda.toLowerCase().trim();
-    return this.usuarios.filter(u =>
-      (u.nombre + u.apellidos + u.dni + u.email).toLowerCase().includes(term) &&
-      (this.filtroRol === '' || u.nombreRol === this.filtroRol)
-    );
+    return this.usuarios.filter(u => {
+      const cumpleRol = this.filtroRol === '' || u.nombreRol === this.filtroRol;
+      if (!cumpleRol) return false;
+      if (!term) return true;
+
+      switch (this.criterioBusqueda) {
+        case 'nombre':
+          return (u.nombre + ' ' + u.apellidos).toLowerCase().includes(term);
+        case 'dni':
+          return u.dni.toLowerCase().includes(term);
+        case 'email':
+          return u.email.toLowerCase().includes(term);
+        default:
+          return (u.nombre + u.apellidos + u.dni + u.email).toLowerCase().includes(term);
+      }
+    });
+  }
+
+  getPlaceholder() {
+    switch (this.criterioBusqueda) {
+      case 'nombre': return 'Buscar por nombre...';
+      case 'dni': return 'Buscar por DNI...';
+      case 'email': return 'Buscar por correo...';
+      default: return 'Búsqueda general...';
+    }
   }
 
   abrirCrear() {
@@ -61,54 +86,45 @@ export class AdminUsuarios implements OnInit {
     this.mostrarModal = true;
   }
 
-  // --- GUARDAR (CREAR O EDITAR) ---
   ejecutarGuardado(fd: FormData): void {
-    if (this.usuarioSeleccionado) {
-      // MODO EDICIÓN
-      this.usuarioService.actualizarUsuario(this.usuarioSeleccionado.idUsuario, fd).subscribe({
-        next: () => {
-          this.notificacionService.mostrar({ titulo: 'Éxito', mensaje: 'Usuario actualizado correctamente', tipo: 'exito' });
-          this.mostrarModal = false;
-          this.cargarUsuarios();
-        },
-        error: () => this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'No se pudo actualizar', tipo: 'error' })
-      });
-    } else {
-      // MODO CREACIÓN
-      this.usuarioService.crearUsuario(fd).subscribe({
-        next: () => {
-          this.notificacionService.mostrar({ titulo: 'Éxito', mensaje: 'Usuario creado con éxito', tipo: 'exito' });
-          this.mostrarModal = false;
-          this.cargarUsuarios();
-        },
-        error: () => this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'Error al crear usuario', tipo: 'error' })
-      });
-    }
+    const esEdicion = !!this.usuarioSeleccionado;
+
+    const peticion$ = (esEdicion
+      ? this.usuarioService.actualizarUsuario(this.usuarioSeleccionado!.idUsuario, fd)
+      : this.usuarioService.crearUsuario(fd)) as import('rxjs').Observable<any>;
+
+    peticion$.subscribe({
+      next: () => {
+        this.notificacionService.mostrar({
+          titulo: 'Éxito',
+          mensaje: esEdicion ? 'Usuario actualizado correctamente' : 'Usuario creado con éxito',
+          tipo: 'exito'
+        });
+        this.mostrarModal = false;
+        this.cargarUsuarios();
+      },
+      error: (err) => {
+        console.error('Error en la operación:', err);
+        const mensajeError = err.error?.mensaje || 'No se pudo completar la operación. Inténtalo de nuevo.';
+
+        this.notificacionService.mostrar({
+          titulo: 'Error',
+          mensaje: mensajeError,
+          tipo: 'error'
+        });
+      }
+    });
   }
 
-  // --- CAMBIAR ESTADO (ACTIVO/INACTIVO) ---
   toggleEstado(u: UsuarioResponse) {
     this.notificacionService.confirmar({
       titulo: u.activo ? 'Dar de baja' : 'Reactivar',
-      mensaje: `¿Estás seguro de cambiar el estado de ${u.nombre}?`,
-      textoConfirmar: 'Confirmar',
-      textoCancelar: 'Cancelar'
+      mensaje: `¿Cambiar estado de ${u.nombre}?`,
     }).then((confirmado) => {
       if (confirmado) {
         const fd = new FormData();
-        const usuarioDTO = {
-          idUsuario: u.idUsuario,
-          dni: u.dni,
-          nombre: u.nombre,
-          apellidos: u.apellidos,
-          email: u.email,
-          telefono: u.telefono,
-          direccion: u.direccion,
-          idRol: (u as any).idRol || (u.nombreRol === 'ADMIN' ? 1 : 3),
-          activo: !u.activo
-        };
-        fd.append('usuario', new Blob([JSON.stringify(usuarioDTO)], { type: 'application/json' }));
-
+        const dto = { ...u, activo: !u.activo, idRol: (u as any).idRol || 3 };
+        fd.append('usuario', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
         this.usuarioService.actualizarUsuario(u.idUsuario, fd).subscribe({
           next: () => {
             this.notificacionService.mostrar({ titulo: 'Éxito', mensaje: 'Estado actualizado', tipo: 'exito' });
@@ -119,22 +135,16 @@ export class AdminUsuarios implements OnInit {
     });
   }
 
-  // --- ELIMINAR CON CONFIRMACIÓN ---
   eliminarUsuario(id: number) {
     this.notificacionService.confirmar({
-      titulo: '¿Eliminar permanentemente?',
-      mensaje: 'Esta acción borrará al usuario de forma definitiva y no se puede deshacer.',
-      textoConfirmar: 'Eliminar',
-      textoCancelar: 'Cancelar'
-    }).then((confirmado) => {
-      if (confirmado) {
+      titulo: '¿Eliminar?',
+      mensaje: 'Esta acción no se puede deshacer.',
+    }).then((conf) => {
+      if (conf) {
         this.usuarioService.eliminar(id).subscribe({
           next: () => {
-            this.notificacionService.mostrar({ titulo: 'Eliminado', mensaje: 'El usuario ha sido borrado', tipo: 'exito' });
+            this.notificacionService.mostrar({ titulo: 'Eliminado', mensaje: 'Usuario borrado', tipo: 'exito' });
             this.cargarUsuarios();
-          },
-          error: () => {
-            this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'No se pudo eliminar el usuario', tipo: 'error' });
           }
         });
       }

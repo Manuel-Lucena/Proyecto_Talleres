@@ -1,0 +1,74 @@
+<div class="modal-overlay" (click)="cerrar.emit()">
+  <div class="modal-body modal-body-wide" (click)="$event.stopPropagation()">
+    
+    <button class="btn-close" (click)="cerrar.emit()"><i class="bi bi-x"></i></button>
+
+    <div class="modal-header-simple">
+      <h2 class="titulo-formulario">Gestor de Importación</h2>
+      <p class="subtitulo">Sube tu archivo y corrige los datos directamente en la tabla antes de la carga final.</p>
+    </div>
+
+    <div class="barra-carga">
+      <div class="input-file-wrapper">
+        <i class="bi bi-file-earmark-arrow-up"></i>
+        <input type="file" (change)="onFileSelected($event)" accept=".csv, .xlsx">
+        <span class="file-custom">{{ archivoNombre || 'Seleccionar archivo...' }}</span>
+      </div>
+      <button class="btn-procesar" [disabled]="!archivoNombre" (click)="procesarArchivo()">
+        <i class="bi bi-gear-wide-connected"></i> Analizar
+      </button>
+    </div>
+
+    <div class="contenedor-editor" *ngIf="usuariosPrevia.length > 0">
+      <div class="scroll-tabla">
+        <table class="tabla-editable">
+          <thead>
+            <tr>
+              <th class="col-check"></th>
+              <th>Nombre</th>
+              <th>Apellidos</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Estado/Errores</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of usuariosPrevia" [class.row-invalid]="u.errores.length > 0">
+              <td class="col-check">
+                <input type="checkbox" [(ngModel)]="u.seleccionado" [disabled]="u.errores.length > 0">
+              </td>
+              <td><input type="text" [(ngModel)]="u.nombre" (input)="validarFila(u)"></td>
+              <td><input type="text" [(ngModel)]="u.apellidos" (input)="validarFila(u)"></td>
+              <td><input type="email" [(ngModel)]="u.email" (input)="validarFila(u)" [class.input-error]="u.emailError"></td>
+              <td>
+                <select [(ngModel)]="u.rol" (change)="validarFila(u)">
+                  <option value="Alumno">Alumno</option>
+                  <option value="Profesor">Profesor</option>
+                </select>
+              </td>
+              <td class="col-errores">
+                <div class="error-tag" *ngFor="let err of u.errores">
+                  <i class="bi bi-exclamation-circle"></i> {{err}}
+                </div>
+                <span class="ok-tag" *ngIf="u.errores.length === 0">
+                  <i class="bi bi-check-circle"></i> Válido
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="acciones-form">
+      <button type="button" class="btn-cancelar" (click)="cerrar.emit()">Cancelar</button>
+      <button type="button" class="btn-guardar" 
+              [disabled]="!haySeleccionados() || procesando" 
+              (click)="confirmarCarga()">
+        <span *ngIf="!procesando">Cargar {{ totalSeleccionados() }} usuarios</span>
+        <span *ngIf="procesando" class="spinner-border spinner-border-sm"></span>
+      </button>
+    </div>
+
+  </div>
+</div>

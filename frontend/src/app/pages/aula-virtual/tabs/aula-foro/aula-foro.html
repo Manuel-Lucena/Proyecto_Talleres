@@ -1,4 +1,4 @@
-<div class="foro-container">
+<div class="foro-container fade-in">
 
     <header class="foro-header">
         <h2>Foro de Discusión</h2>
@@ -7,48 +7,52 @@
 
     <div class="publicar-seccion">
         <div class="input-wrapper">
-            <textarea [(ngModel)]="nuevoMensaje" placeholder="Escribe un nuevo tema o mensaje..." rows="3">
-      </textarea>
+            <textarea [(ngModel)]="nuevoMensaje" 
+                      placeholder="Escribe un nuevo tema o mensaje..." 
+                      rows="3"></textarea>
+            
             <div class="footer-publicar">
-                <small>{{ nuevoMensaje.length }} caracteres</small>
-                <button (click)="enviarMensaje()" [disabled]="!nuevoMensaje.trim()">
-                    <i class="bi bi-chat-left-text"></i> Publicar en el foro
+                <small class="char-count">{{ nuevoMensaje.length }} caracteres</small>
+                <button class="btn-publicar" (click)="enviarMensaje()" [disabled]="!nuevoMensaje.trim()">
+                    <i class="bi bi-send-fill"></i> Publicar en el foro
                 </button>
             </div>
         </div>
     </div>
 
     <div class="mensajes-feed">
-        <div *ngIf="cargando" class="text-center p-5">
-            <div class="spinner-border text-success" role="status"></div>
+        <div *ngIf="cargando" class="loading-state">
+            <div class="spinner-border" role="status"></div>
+            <span>Cargando conversaciones...</span>
         </div>
 
         <div class="mensaje-item" *ngFor="let m of mensajes">
-            <div class="mensaje-card">
-                <div class="autor-info">
+            <article class="mensaje-card">
+                <div class="card-header">
                     <div class="avatar-wrapper">
-                        <img [src]="m.idUsuario   ? '/Usuarios/user_' + m.idUsuario + '.jpg'  : '/Usuarios/Predeterminada.png'"
-                            alt="Foto de perfil">
+                        <img #imgForo
+                             [src]="m.idUsuario ? '/usuarios/user_' + m.idUsuario + '.jpg' : '/usuarios/Predeterminada.png'"
+                             (error)="imgForo.src = '/usuarios/Predeterminada.png'"
+                             alt="Avatar">
                     </div>
                     <div class="meta">
                         <span class="nombre">{{ m.nombreAutor }}</span>
-                        <span class="fecha">{{ m.fechaEnvio | date:'medium' }}</span>
+                        <span class="fecha">
+                            <i class="bi bi-clock"></i> {{ m.fechaEnvio | date:'dd MMM, yyyy • HH:mm' }}
+                        </span>
                     </div>
                 </div>
 
                 <div class="contenido">
                     <p>{{ m.contenido }}</p>
                 </div>
-
-                <div class="interacciones">
-                    <button class="btn-interact"><i class="bi bi-reply"></i> Responder</button>
-                    <button class="btn-interact"><i class="bi bi-hand-thumbs-up"></i> Me gusta</button>
-                </div>
-            </div>
+                
+                </article>
         </div>
 
         <div class="empty-foro" *ngIf="!cargando && mensajes.length === 0">
             <i class="bi bi-chat-dots"></i>
+            <h3>Silencio en el aula...</h3>
             <p>Aún no hay hilos de conversación. ¡Inicia el primero!</p>
         </div>
     </div>

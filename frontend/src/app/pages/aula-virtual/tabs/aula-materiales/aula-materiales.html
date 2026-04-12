@@ -1,37 +1,47 @@
-<div class="contenedor-recursos fade-in">
+<div class="recursos-container fade-in">
   
-  <div class="cuerpo-recursos">
-    <div *ngIf="cargando" class="text-center p-5">
-      <div class="spinner-border text-success" role="status"></div>
-    </div>
+  <div *ngIf="cargando" class="loading-wrapper">
+    <div class="spinner-border" role="status"></div>
+    <span>Cargando materiales...</span>
+  </div>
 
-    <div class="fila-recurso" 
-         *ngFor="let m of materiales" 
-         (click)="verDetalle(m.id)">
+  <div class="recursos-lista" *ngIf="!cargando">
+    
+    <article class="recurso-card" 
+             *ngFor="let m of materiales" 
+             (click)="verDetalle(m.id)">
       
-      <div class="celda-principal">
-        <div class="icono-recurso">
+      <div class="card-main">
+        <div class="icon-container bg-azul">
           <i class="bi bi-file-earmark-text"></i>
         </div>
-        <div class="info-texto">
-          <span class="titulo">{{ m.titulo }}</span>
-          <span class="resumen-lineal">{{ m.contenido }}</span>
+
+        <div class="text-box">
+          <h3 class="titulo">{{ m.titulo }}</h3>
+          <p class="resumen">{{ m.contenido }}</p>
         </div>
       </div>
 
-      <div class="celda-fecha">
-        <i class="bi bi-calendar3"></i>
-        {{ m.fechaSubida | date:'dd MMM, yyyy' }}
+      <div class="card-side">
+        <div class="info-date">
+          <i class="bi bi-calendar3"></i>
+          <span>{{ m.fechaSubida | date:'dd MMM, yyyy' }}</span>
+        </div>
+        
+        <div class="action-icon">
+          <i class="bi bi-chevron-right"></i>
+        </div>
       </div>
 
-      <div class="celda-accion">
-        <i class="bi bi-chevron-right"></i>
+    </article>
+
+    <div class="sin-datos" *ngIf="materiales.length === 0">
+      <div class="empty-state-icon">
+        <i class="bi bi-folder2-open"></i>
       </div>
+      <h3>Biblioteca vacía</h3>
+      <p>Aún no se han compartido archivos en este taller.</p>
     </div>
 
-    <div class="sin-datos" *ngIf="!cargando && materiales.length === 0">
-      <i class="bi bi-folder2-open"></i>
-      <p>No hay archivos o materiales compartidos en este taller.</p>
-    </div>
   </div>
 </div>

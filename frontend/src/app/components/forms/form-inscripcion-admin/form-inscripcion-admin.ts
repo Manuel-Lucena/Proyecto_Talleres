@@ -14,11 +14,9 @@ import { UsuarioResponse } from '../../../interfaces/Usuario.Interface';
   templateUrl: './form-inscripcion-admin.html',
   styleUrl: './form-inscripcion-admin.scss'
 })
-// ... (imports iguales)
-
 export class FormInscripcionAdmin implements OnInit {
   @Input() tallerParaInscribir: any = null; 
-  @Input() usuarioParaInscribir: any = null; // IMPORTANTE: Que el padre pase {idUsuario, email}
+  @Input() usuarioParaInscribir: any = null; 
   
   @Output() guardado = new EventEmitter<any>();
   @Output() cerrar = new EventEmitter<void>();
@@ -51,7 +49,6 @@ export class FormInscripcionAdmin implements OnInit {
   }
 
   private aplicarContexto() {
-    // Si venimos desde un Taller
     if (this.tallerParaInscribir) {
       this.inscripcionForm.patchValue({
         idTaller: this.tallerParaInscribir.idTaller,
@@ -59,7 +56,6 @@ export class FormInscripcionAdmin implements OnInit {
       });
     }
 
-    // Si venimos desde un Alumno (ESTO ARREGLA TU PROBLEMA)
     if (this.usuarioParaInscribir) {
       this.inscripcionForm.patchValue({
         idUsuario: this.usuarioParaInscribir.idUsuario
@@ -68,11 +64,22 @@ export class FormInscripcionAdmin implements OnInit {
   }
 
   cargarDatosIniciales() {
+    // Carga de talleres si no vienen por contexto
     if (!this.tallerParaInscribir) {
-      this.tallerService.listarTodos().subscribe(res => this.talleres = res.data);
+      this.tallerService.listarTodos().subscribe({
+        next: (res) => this.talleres = res.data
+      });
     }
+
+    // Carga de usuarios filtrados por Rol 3 (Alumnos)
     if (!this.usuarioParaInscribir) {
-      this.usuarioService.listar().subscribe(res => this.usuarios = res.data);
+      this.usuarioService.listarPorRol(3).subscribe({
+        next: (res) => {
+          // Filtramos en el cliente para asegurar que solo pasen los que tengan nombreRol 'ALUMNO'
+          this.usuarios = res.data.filter(u => u.nombreRol === 'ALUMNO');
+        },
+        error: (err) => console.error('Error al cargar alumnos', err)
+      });
     }
   }
 

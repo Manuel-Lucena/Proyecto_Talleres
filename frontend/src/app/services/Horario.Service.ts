@@ -13,7 +13,7 @@ export class HorarioService {
 
   private apiUrl = 'http://localhost:8080/api/horarios';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Recupera todos los horarios configurados en la plataforma.
@@ -21,6 +21,14 @@ export class HorarioService {
    */
   listar(): Observable<ApiResponse<HorarioResponse[]>> {
     return this.http.get<ApiResponse<HorarioResponse[]>>(this.apiUrl);
+  }
+
+    /**
+   * Recupera todos los horarios del usuario.
+   * @returns Observable con la lista de los horarios del usuario.
+   */
+  listarPorUsuario(idUsuario: number | null): Observable<ApiResponse<HorarioResponse[]>> {
+    return this.http.get<ApiResponse<HorarioResponse[]>>(`${this.apiUrl}/usuario/${idUsuario}`);
   }
 
   /**

@@ -5,20 +5,48 @@
                 <i class="bi bi-arrow-left-short"></i> Volver al curso
             </button>
 
-            <button *ngIf="tipo === 'tarea' && !esNuevo && !editando && esProfesor()" (click)="irASeguimiento()"
-                class="btn-link-volver btn-seguimiento-tarea">
-                <i class="bi bi-people-fill"></i> Ver entregas y calificar
-            </button>
+            <div class="acciones-desktop-wrapper" *ngIf="esProfesor() && !esNuevo && !editando">
+                <button *ngIf="tipo === 'tarea'" (click)="irASeguimiento()" class="btn-link-volver">
+                    <i class="bi bi-people-fill"></i> Ver entregas y calificar
+                </button>
 
-            <button *ngIf="!esNuevo && !editando && esProfesor()" (click)="activarEdicion()"
-                class="btn-link-volver btn-editar-recurso">
-                <i class="bi bi-pencil"></i> Editar {{ tipo }}
-            </button>
+                <button (click)="activarEdicion()" class="btn-link-volver">
+                    <i class="bi bi-pencil"></i> Editar {{ tipo }}
+                </button>
 
-            <button *ngIf="!esNuevo && !editando && esProfesor()" (click)="eliminarRecurso()"
-                class="btn-link-volver btn-eliminar-recurso">
-                <i class="bi bi-trash3"></i> Eliminar {{ tipo }}
-            </button>
+                <button (click)="eliminarRecurso()" class="btn-link-volver btn-eliminar-recurso">
+                    <i class="bi bi-trash3"></i> Eliminar {{ tipo }}
+                </button>
+            </div>
+
+            <div class="acciones-mobile-wrapper" *ngIf="esProfesor() && !esNuevo && !editando">
+                <div class="dropdown">
+                    <button class="btn-dropdown-trigger" type="button" id="dropdownMenuAcciones"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownMenuAcciones">
+                        <li *ngIf="tipo === 'tarea'">
+                            <button class="dropdown-item" (click)="irASeguimiento()">
+                                <i class="bi bi-people-fill me-2"></i> Ver entregas
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" (click)="activarEdicion()">
+                                <i class="bi bi-pencil me-2"></i> Editar {{ tipo }}
+                            </button>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <button class="dropdown-item text-danger" (click)="eliminarRecurso()">
+                                <i class="bi bi-trash3 me-2"></i> Eliminar
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
         <main class="card-tarea-principal" *ngIf="!cargando && recurso">
@@ -105,11 +133,10 @@
                                 <div class="dropdown-menu-custom" [class.show]="mostrarDropdownAlumnos"
                                     (click)="$event.stopPropagation()">
                                     <div class="p-2 border-bottom">
-                                        <input type="text" class="form-control-custom"
-                                            style="padding: 5px; font-size: 0.8rem;" placeholder="Buscar alumno..."
+                                        <input type="text" class="form-control-custom" placeholder="Buscar alumno..."
                                             [(ngModel)]="filtroAlumno" [ngModelOptions]="{standalone: true}">
                                     </div>
-                                    <div style="max-height: 200px; overflow-y: auto;">
+                                    <div>
                                         <label *ngFor="let alu of alumnosFiltrados" class="dropdown-item-check">
                                             <input type="checkbox"
                                                 [checked]="alumnosSeleccionadosIds.includes(alu.idUsuario)"
@@ -222,5 +249,4 @@
 </app-form-entrega>
 
 <app-confirmacion></app-confirmacion>
-
 <app-modal-notificacion></app-modal-notificacion>

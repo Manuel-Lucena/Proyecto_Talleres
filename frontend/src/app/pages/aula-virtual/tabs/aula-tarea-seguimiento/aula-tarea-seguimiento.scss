@@ -2,7 +2,7 @@
 @use '../../../../../styles/mixins' as m;
 
 .seguimiento-wrapper {
-    padding: 2rem;
+    padding: 2rem 2.5rem;
     max-width: 1200px;
     margin: 0 auto;
     animation: fadeInSeguimiento 0.5s ease-in-out;
@@ -20,15 +20,15 @@
         align-items: center;
 
         .btn-circular {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: 1px solid #e0e0e0;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            border: 1px solid #eee;
             background: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             cursor: pointer;
             color: v.$color-secundario-frio-2;
 
@@ -36,45 +36,55 @@
                 background: v.$color-marca-principal;
                 color: white;
                 border-color: v.$color-marca-principal;
+                transform: translateX(-3px);
             }
         }
 
         .titulos {
             h1 {
-                font-size: 1.8rem;
+                font-family: v.$fuente-enfasis;
+                font-size: 1.6rem;
                 font-weight: 800;
                 color: v.$color-secundario-frio-2;
                 margin: 0;
             }
 
             .subtitulo {
-                color: #888;
-                margin-top: 4px;
-                font-weight: 500;
+                font-family: v.$fuente-lectura;
+                color: v.$color-superficie-suave;
+                margin: 0;
+                font-size: 1rem;
             }
         }
     }
 
     .header-stats {
         display: flex;
-        gap: 2rem;
+        gap: 3rem;
 
         .stat {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
+            text-align: right;
 
             .label {
-                font-size: 0.75rem;
-                color: #999;
+                display: block;
+                font-size: 0.65rem;
+                font-weight: 800;
+                color: #aaa;
                 text-transform: uppercase;
                 letter-spacing: 1px;
+                margin-bottom: 2px;
             }
 
             .valor {
+                font-family: v.$fuente-enfasis;
                 font-size: 1.5rem;
                 font-weight: 800;
                 color: v.$color-secundario-frio-2;
+
+                small {
+                    font-size: 0.9rem;
+                    color: #ccc;
+                }
             }
 
             &.highlight .valor {
@@ -86,10 +96,9 @@
 
 .card-tabla {
     background: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-    border: 1px solid #f0f0f0;
-    min-height: 300px;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
     overflow: hidden;
 }
 
@@ -98,58 +107,118 @@
     border-collapse: collapse;
 
     th {
-        padding: 1.2rem;
+        padding: 1rem 1.5rem;
         background: #fafafa;
         color: #999;
-        font-size: 0.75rem;
+        font-family: v.$fuente-enfasis;
+        font-size: 0.7rem;
+        font-weight: 800;
         text-transform: uppercase;
-        border-bottom: 2px solid #f0f0f0;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #eee;
         text-align: left;
     }
 
     td {
-        padding: 1.2rem;
-        border-bottom: 1px solid #f5f5f5;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f8f8f8;
         vertical-align: middle;
+        font-family: v.$fuente-lectura;
+        color: v.$color-superficie-oscura;
     }
 
-    .user-info {
+    .user-cell {
         display: flex;
-        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
 
-        .user-name {
-            font-weight: 700;
-            color: v.$color-secundario-frio-2;
+        .avatar-wrapper {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border-radius: 50%; // Imagen circular
+            overflow: hidden;
+            background: transparent; // Eliminado fondo gris
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
         }
 
-        .user-email {
-            font-size: 0.8rem;
-            color: #999;
+        .user-info {
+            display: flex;
+            flex-direction: column;
+
+            .user-name {
+                font-weight: 700;
+                color: v.$color-secundario-frio-2;
+                line-height: 1.2;
+            }
+
+            .user-email {
+                font-size: 0.75rem;
+                color: #aaa;
+            }
         }
     }
 
-    .nota-valor {
-        font-weight: 800;
-        color: #ccc;
+    .fecha-cell {
+        font-size: 0.85rem;
+        color: #777;
 
-        &.tiene-nota {
-            color: v.$color-marca-principal;
-            font-size: 1.1rem;
+        i {
+            margin-right: 6px;
+            color: #ccc;
+        }
+    }
+
+    .nota-container {
+        display: flex;
+        align-items: baseline;
+
+        .nota-valor {
+            font-family: v.$fuente-enfasis;
+            font-weight: 800;
+            color: #ddd;
+
+            &.tiene-nota {
+                color: v.$color-marca-principal;
+                font-size: 1.2rem;
+            }
+        }
+
+        .nota-max {
+            font-size: 0.75rem;
+            color: #ccc;
+            margin-left: 2px;
         }
     }
 
     tr.fila-pendiente {
-        background-color: #fafafa;
+        background-color: #fcfcfc;
+
+        .user-name {
+            color: #888;
+        }
     }
 }
 
 .badge-status {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.65rem;
     font-weight: 800;
-    display: inline-block;
     text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    i {
+        font-size: 6px;
+    }
 
     &.pendiente {
         background: #fff1f0;
@@ -168,34 +237,36 @@
 }
 
 .btn-accion-revisar {
-    background: v.$color-marca-principal;
-    color: white;
-    padding: 10px 20px;
-    font-size: 0.85rem;
-    border-radius: 12px;
+    @include m.boton-primario;
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    border-radius: 8px;
     border: none;
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: transform 0.2s;
-
-    &:hover {
-        transform: scale(1.05);
-    }
 }
 
-.empty-state,
-.loading-state {
+.esperando-txt {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #ccc;
+    font-style: italic;
+}
+
+.loading-state,
+.empty-state {
     padding: 5rem;
     text-align: center;
-    color: #999;
 
     i {
         font-size: 3rem;
+        opacity: 0.2;
         margin-bottom: 1rem;
         display: block;
-        opacity: 0.3;
+    }
+
+    p {
+        color: #999;
+        font-family: v.$fuente-lectura;
     }
 }
 

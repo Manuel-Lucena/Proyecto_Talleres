@@ -1,25 +1,25 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
-  <div class="modal-card" (click)="$event.stopPropagation()">
+  <div class="modal-body" (click)="$event.stopPropagation()">
+    
+    <button class="btn-close" (click)="cerrar.emit()">&times;</button>
 
     <header class="modal-header">
       <div class="header-content">
-        <span class="badge-tarea">Entrega de Tarea</span>
         <h2 class="tarea-titulo">{{ recurso?.titulo }}</h2>
-        <div class="tarea-meta">
+        <div class="tarea-meta" *ngIf="recurso?.fechaEntrega">
           <i class="bi bi-clock-history"></i>
           <span>Límite: {{ recurso?.fechaEntrega | date:'EEEE, d MMMM, HH:mm' }}</span>
         </div>
       </div>
-      <button class="btn-close-circle" (click)="cerrar.emit()">
-        <i class="bi bi-x-lg"></i>
-      </button>
     </header>
 
     <div class="modal-content-body">
       <div class="seccion-input">
         <label class="label-custom">Aclaraciones o comentarios</label>
-        <textarea [(ngModel)]="textoEntrega" class="textarea-entrega" rows="3"
-          placeholder="Escribe aquí cualquier observación sobre tu entrega...">
+        <textarea [(ngModel)]="textoEntrega" 
+                  class="textarea-entrega" 
+                  rows="3"
+                  placeholder="Escribe aquí cualquier observación sobre tu entrega...">
         </textarea>
       </div>
 
@@ -38,22 +38,29 @@
         </div>
 
         <div class="grid-archivos-entregados" *ngIf="archivosExistentes.length > 0 || nuevosArchivos.length > 0">
+          
           <div *ngFor="let arch of archivosExistentes" class="file-chip existente">
             <i class="bi bi-file-earmark-check"></i>
             <span class="name">{{ arch.nombre }}</span>
-            <button class="btn-del" (click)="marcarEliminar(arch.id)"><i class="bi bi-trash3"></i></button>
+            <button class="btn-del" (click)="marcarEliminar(arch.id)" title="Eliminar existente">
+              <i class="bi bi-trash3"></i>
+            </button>
           </div>
+
           <div *ngFor="let arch of nuevosArchivos; let i = index" class="file-chip nuevo">
             <i class="bi bi-file-earmark-arrow-up"></i>
             <span class="name">{{ arch.name }}</span>
-            <button class="btn-del" (click)="quitarNuevo(i)"><i class="bi bi-x-circle"></i></button>
+            <button class="btn-del" (click)="quitarNuevo(i)" title="Quitar">
+              <i class="bi bi-x-circle"></i>
+            </button>
           </div>
+          
         </div>
       </div>
     </div>
 
     <footer class="modal-footer">
-      <div class="footer-actions">
+      <div class="acciones-form-unificada">
         <button type="button" class="btn-cancelar" (click)="cerrar.emit()">
           Cancelar
         </button>

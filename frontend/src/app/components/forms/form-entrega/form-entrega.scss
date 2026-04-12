@@ -2,15 +2,12 @@
 @use '../../../../styles/mixins' as m;
 @use '../../../../styles/formularios' as f;
 
-:host {
-    display: block;
-}
-
+// --- CONTENEDOR PRINCIPAL ---
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(v.$color-secundario-frio-2, 0.75);
-    backdrop-filter: blur(8px);
+    background: rgba(v.$color-secundario-frio-2, 0.7);
+    backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -19,43 +16,49 @@
     @include m.animacion-entrada;
 }
 
-.modal-card {
-    @include f.estilo-contenedor-formulario; 
-    width: 100%;
-    max-width: 650px;
+.modal-body {
     background: v.$color-neutro-max;
+    width: 100%;
+    max-width: 600px;
+    border-radius: v.$radio-curvatura * 2;
     box-shadow: v.$sombra-nivel-3; 
-    padding: 3rem 2.5rem; 
-    border: none;
+    padding: 3.5rem; 
     position: relative;
-
-    &:hover { transform: none; } 
+    
+    .btn-close {
+        @include m.boton-cerrar-circular;
+        // Forzamos posición para asegurar que respete el diseño
+        position: absolute;
+        top: 1.2rem;
+        right: 1.5rem;
+    }
 }
 
 // --- HEADER ---
 .modal-header {
     margin-bottom: 2.5rem;
-    position: relative;
     
     .badge-tarea {
         display: inline-block;
         background: rgba(v.$color-secundario-calido-2, 0.1);
         color: v.$color-secundario-calido-2;
-        padding: 4px 12px;
+        padding: 4px 14px;
         border-radius: 50px;
         font-family: v.$fuente-enfasis;
         font-weight: 800;
         font-size: 0.7rem;
         text-transform: uppercase;
         letter-spacing: 1px;
-        margin-bottom: 1rem;
+        margin-bottom: 0.8rem;
     }
 
     .tarea-titulo {
-        @extend .titulo-formulario; 
+        font-family: v.$fuente-enfasis;
         font-size: 1.8rem;
+        color: v.$color-secundario-frio-2;
         margin: 0 0 0.5rem 0;
-        width: 100%;
+        font-weight: 900;
+        line-height: 1.2;
     }
 
     .tarea-meta {
@@ -63,193 +66,174 @@
         align-items: center;
         gap: 8px;
         color: v.$color-superficie-suave;
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         font-weight: 600;
+        
         i { color: v.$color-secundario-calido-1; }
     }
 }
 
-// Botón de cierre SIN animación de rotación
-.btn-close-circle {
-    position: absolute;
-    top: -0.5rem;
-    right: -0.5rem;
-    background: v.$color-fondo-pagina;
-    border: 1px solid #e0e0e0;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    cursor: pointer;
-    color: v.$color-superficie-suave;
-    transition: background 0.2s, color 0.2s; // Solo transiciones de color
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &:hover {
-        background: v.$color-neutro-max;
-        color: v.$color-secundario-calido-1;
-        border-color: v.$color-secundario-calido-1;
-        // Eliminada la transformación de rotación
-    }
-}
-
-// --- CUERPO ---
+// --- CUERPO DEL FORMULARIO ---
 .modal-content-body {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-.seccion-input {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-
-    label {
-        font-family: v.$fuente-enfasis;
-        font-weight: 800;
-        font-size: 0.75rem;
-        color: v.$color-secundario-frio-2;
-        text-transform: uppercase;
-    }
-
-    .textarea-entrega {
-        @include m.estilo-input-base;
-        min-height: 120px;
-        padding: 1rem;
-    }
+.label-custom {
+    display: block;
+    font-family: v.$fuente-enfasis;
+    font-weight: 800;
+    font-size: 0.75rem;
+    color: v.$color-secundario-frio-2;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
 }
 
+.textarea-entrega {
+    @include m.estilo-input-base;
+    min-height: 100px;
+    resize: none;
+    font-family: v.$fuente-lectura;
+}
+
+// --- ZONA DE SUBIDA (DROPZONE) ---
 .dropzone-entrega {
-    border: 2px dashed v.$color-fondo-pagina;
-    border-radius: v.$radio-curvatura;
-    padding: 2.5rem;
-    text-align: center;
-    background: v.$color-fondo-pagina;
-    cursor: pointer;
-    transition: 0.3s;
+    @include m.zona-subida-estandar; // Tu mixin corregido
     position: relative;
+    min-height: 140px;
+    flex-direction: column;
+    padding: 2rem;
+    border-width: 2px;
 
-    &:hover {
-        border-color: v.$color-secundario-calido-2;
-        background: rgba(v.$color-secundario-calido-2, 0.02);
-    }
-
-    i {
-        font-size: 2.5rem;
-        color: v.$color-secundario-calido-2;
-        margin-bottom: 10px;
-        display: block;
-    }
-
-    .main-text {
-        display: block;
-        font-weight: 700;
-        color: v.$color-secundario-frio-2;
-        font-size: 0.95rem;
-    }
-
-    .sub-text {
-        font-size: 0.8rem;
-        color: v.$color-superficie-suave;
-        font-weight: 600;
-    }
-
-    input[type="file"] {
+    .input-hidden {
         position: absolute;
         inset: 0;
         opacity: 0;
         cursor: pointer;
+        z-index: 2;
+    }
+
+    .dropzone-info {
+        text-align: center;
+        pointer-events: none;
+
+        i {
+            display: block;
+            font-size: 2.5rem;
+            color: v.$color-secundario-calido-2;
+            margin-bottom: 10px;
+        }
+
+        .main-text {
+            display: block;
+            font-weight: 700;
+            color: v.$color-secundario-frio-2;
+            font-size: 0.95rem;
+        }
+
+        .sub-text {
+            font-size: 0.8rem;
+            color: v.$color-superficie-suave;
+        }
     }
 }
 
+// --- LISTADO DE ARCHIVOS ---
 .grid-archivos-entregados {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    flex-direction: column;
+    gap: 8px;
     margin-top: 1rem;
 
     .file-chip {
         display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 8px 12px;
+        padding: 10px 15px;
         background: v.$color-neutro-max;
-        border: 1px solid v.$color-fondo-pagina;
-        border-radius: 10px;
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: v.$color-secundario-frio-2;
+        border: 1px solid #eee;
+        border-radius: v.$radio-curvatura;
+        animation: slideIn 0.3s ease-out;
 
-        &.nuevo {
-            background: rgba(v.$color-secundario-calido-1, 0.05);
-            border-color: rgba(v.$color-secundario-calido-1, 0.2);
-        }
+        i { margin-right: 12px; font-size: 1.2rem; }
+        .name { flex: 1; font-weight: 600; color: v.$color-secundario-frio-2; font-size: 0.85rem; }
 
         .btn-del {
-            border: none;
             background: none;
-            color: v.$color-superficie-suave;
-            padding: 0;
+            border: none;
             cursor: pointer;
+            color: v.$color-superficie-suave;
+            padding: 5px;
+            display: flex;
+            transition: color 0.2s;
             &:hover { color: v.$color-secundario-calido-1; }
         }
+
+        &.existente { border-left: 4px solid v.$color-secundario-calido-2; }
+        &.nuevo { border-left: 4px solid v.$color-marca-principal; }
     }
 }
 
-// --- FOOTER ---
+// --- FOOTER (BOTONERA CENTRADA) ---
 .modal-footer {
-    margin-top: 3rem;
+    margin-top: 2.5rem;
     display: flex;
     justify-content: center;
+}
 
-    .footer-actions {
-        display: flex;
-        gap: 1.5rem;
-        width: 100%;
-        max-width: 450px; 
+.acciones-form-unificada {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    max-width: 450px; // Limita el ancho para que no se estiren demasiado
+
+    @media (max-width: 480px) {
+        flex-direction: column-reverse;
     }
 
-    .btn-cancelar {
+    button {
         flex: 1;
-        // Ahora con fondo sólido suave para que no sea tan "transparente"
-        background: v.$color-fondo-pagina; 
-        border: 1px solid #dcdcdc;
+        height: 52px;
         border-radius: v.$radio-curvatura;
         font-family: v.$fuente-enfasis;
         font-weight: 700;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancelar {
+        background: #f1f3f5; // Gris suave con cuerpo
+        border: 1px solid #e2e4e7;
         color: v.$color-superficie-suave;
-        height: 50px;
         cursor: pointer;
-        transition: all 0.2s ease;
 
         &:hover {
-            background: #e2e2e2;
+            background: #e9ecef;
             color: v.$color-secundario-frio-2;
-            border-color: #bcbcbc;
+            border-color: #d1d4d7;
         }
     }
 
     .btn-enviar-final {
-        flex: 1.5;
         @include m.boton-primario;
         margin: 0;
-        height: 50px;
+        border: none;
         
         &:disabled {
-            background: #e0e0e0;
-            color: #aaa;
-            box-shadow: none;
+            background-color: #e0e0e0;
+            color: #a0a0a0;
+            cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
     }
 }
 
-@media (max-width: 480px) {
-    .modal-card { padding: 2rem 1.5rem; }
-    .footer-actions {
-        flex-direction: column-reverse;
-        .btn-cancelar, .btn-enviar-final { width: 100%; }
-    }
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
 }

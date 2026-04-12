@@ -2,133 +2,173 @@
 @use '../../../styles/mixins' as m;
 
 .aula-virtual-container {
-    background-color: v.$color-fondo-pagina;
-    min-height: 100vh;
-    font-family: v.$fuente-lectura;
+  background-color: v.$color-fondo-pagina;
+  min-height: 100vh;
+  font-family: v.$fuente-lectura;
 }
 
-// === BANDA DE PESTAÑAS Y ACCIONES ===
+// === BANDA DE PESTAÑAS ===
 .aula-tabs-band {
-    background-color: v.$color-secundario-frio-2;
-    padding: 0 5%;
+  background-color: v.$color-secundario-frio-2;
+  padding: 0 4%;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 
-    .tabs-wrapper {
-        max-width: 1200px;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-
-        .tab-btn {
-            padding: 1.2rem 1.5rem;
-            color: rgba(v.$color-neutro-max, 0.6);
-            font-family: v.$fuente-enfasis;
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            border-bottom: 4px solid transparent;
-
-            i { font-size: 1.1rem; }
-
-            &:hover {
-                color: v.$color-neutro-max;
-                background-color: rgba(v.$color-neutro-max, 0.05);
-            }
-
-            &.active {
-                color: v.$color-neutro-max;
-                border-bottom-color: v.$color-marca-principal;
-            }
-        }
-
-        // --- Botón de Crear (Añadido a la derecha) ---
-        .admin-menu-wrapper {
-            margin-left: auto;
-            padding-left: 20px;
-
-            .btn-crear {
-                background-color: v.$color-marca-principal;
-                color: white;
-                border: none;
-                padding: 0.6rem 1.2rem;
-                border-radius: 50px;
-                font-family: v.$fuente-enfasis;
-                font-weight: 700;
-                font-size: 0.85rem;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-                cursor: pointer;
-
-                &:hover {
-                    transform: translateY(-2px);
-                    filter: brightness(1.1);
-                    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
-                }
-            }
-
-            .dropdown-menu {
-                border: none;
-                border-radius: 12px;
-                margin-top: 10px;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-                
-                .dropdown-item {
-                    padding: 0.8rem 1.2rem;
-                    font-weight: 600;
-                    font-size: 0.9rem;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    
-                    &:hover {
-                        background-color: #f8f9fa;
-                        color: v.$color-marca-principal;
-                    }
-                }
-            }
-        }
-    }
-}
-
-// === CONTENIDO PRINCIPAL ===
-.aula-content {
-    width: 100%;
-    max-width: 1600px;
+  .tabs-wrapper {
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 2.5rem 2%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 70px;
+  }
 }
 
-.breadcrumb-minimal {
+// --- Escritorio (Pestañas horizontales) ---
+.nav-desktop {
+  display: flex;
+  height: 100%;
+  
+  .tab-btn {
+    padding: 0 1.5rem;
+    height: 70px; 
+    color: rgba(white, 0.65);
+    font-family: v.$fuente-enfasis;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    text-decoration: none;
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 0.85rem;
-    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+    border-bottom: 4px solid transparent;
 
-    a {
-        color: v.$color-marca-principal;
-        text-decoration: none;
-        font-weight: 700;
-        &:hover { text-decoration: underline; }
+    &:hover { 
+      color: white; 
+      background: rgba(255,255,255,0.08); 
     }
-
-    i { font-size: 0.6rem; color: #ccc; }
-    .current { color: v.$color-superficie-suave; }
+    
+    &.active {
+      color: white;
+      border-bottom-color: v.$color-marca-principal;
+      background-color: rgba(v.$color-marca-principal, 0.15);
+    }
+  }
 }
 
-// === ANIMACIÓN ===
-.fade-in {
-    animation: fadeIn 0.4s ease-out;
+// --- Móvil (Dropdown Secciones) ---
+.nav-mobile {
+  display: none;
+  .btn-sections {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-family: v.$fuente-enfasis;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+
+    &:active { background: rgba(255,255,255,0.2); }
+  }
 }
 
+// --- Botón Crear ---
+.admin-menu-wrapper {
+  .btn-crear {
+    background-color: v.$color-marca-principal;
+    color: white;
+    border: none;
+    padding: 0.7rem 1.4rem;
+    border-radius: 50px;
+    font-family: v.$fuente-enfasis;
+    font-weight: 800;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: v.$sombra-nivel-1;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    &:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+      box-shadow: v.$sombra-nivel-2;
+    }
+  }
+}
+
+// === BREADCRUMB CON HOVER ===
+.breadcrumb-minimal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  margin-bottom: 2.5rem;
+  text-transform: uppercase;
+  font-family: v.$fuente-enfasis;
+  letter-spacing: 0.5px;
+  
+  a { 
+    color: v.$color-superficie-suave; 
+    text-decoration: none; 
+    font-weight: 700;
+    transition: all 0.2s ease;
+    position: relative;
+
+    &:hover { 
+      color: v.$color-marca-principal; 
+      transform: translateX(2px);
+    }
+  }
+
+  i { 
+    font-size: 0.7rem; 
+    color: #cbd5e0; 
+  }
+
+  .current { 
+    color: v.$color-secundario-frio-2; 
+    font-weight: 800; 
+  }
+}
+
+// === RESPONSIVE ===
+@media (max-width: 992px) {
+  .nav-desktop { display: none; }
+  .nav-mobile { display: block; }
+  
+  .admin-menu-wrapper {
+    .btn-crear {
+      padding: 0.7rem 1rem;
+      .btn-text { display: none; }
+      i { font-size: 1.3rem; margin: 0; }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .aula-tabs-band { padding: 0 15px; }
+  .aula-content { padding: 1.5rem 15px; }
+  .breadcrumb-minimal { margin-bottom: 1.5rem; }
+}
+
+// === CONTENIDO Y ANIMACIÓN ===
+.aula-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2.5rem 4%;
+}
+
+.fade-in { animation: fadeIn 0.4s ease-out; }
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
