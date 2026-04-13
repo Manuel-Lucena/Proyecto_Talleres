@@ -18,7 +18,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/archivos-entrega")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 public class ArchivoEntregaController {
 
     private final ArchivoEntregaService archivoEntregaService;

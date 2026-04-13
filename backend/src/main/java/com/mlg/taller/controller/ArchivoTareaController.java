@@ -20,7 +20,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/archivos-tarea")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 public class ArchivoTareaController {
 
     private final ArchivoTareaService archivoTareaService;

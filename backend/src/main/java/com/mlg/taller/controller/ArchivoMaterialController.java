@@ -18,7 +18,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/archivos-material")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 public class ArchivoMaterialController {
 
     private final ArchivoMaterialService archivoMaterialService;

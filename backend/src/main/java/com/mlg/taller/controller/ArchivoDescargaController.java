@@ -25,7 +25,6 @@ import java.nio.file.Path;
 @RestController
 @RequestMapping("/api/descargas")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 public class ArchivoDescargaController {
 
     private final FileUtil fileUtil;

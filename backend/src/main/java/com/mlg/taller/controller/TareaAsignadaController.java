@@ -16,7 +16,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/tareas-asignadas")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 public class TareaAsignadaController {
 
     private final TareaAsignadaService tareaAsignadaService;

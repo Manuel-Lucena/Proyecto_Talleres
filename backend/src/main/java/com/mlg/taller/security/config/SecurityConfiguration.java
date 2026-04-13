@@ -84,6 +84,138 @@ public class SecurityConfiguration {
                         // Comunicación: Alumnos/Profesores pueden enviar y ver chats de sus talleres
                         .requestMatchers("/api/mensajes/**").authenticated()
 
+                        // =========================================================
+                        // 5. ENTIDAD: TAREAS (Gestión de Actividades)
+                        // =========================================================
+
+                        // Lectura: Cualquier usuario logueado puede ver tareas (sujeto a la lógica de
+                        // visibilidad del Service)
+                        .requestMatchers(HttpMethod.GET, "/api/tareas/**").authenticated()
+
+                        // Gestión: El Profesor y el Admin pueden Crear, Editar (incluida visibilidad) y
+                        // Eliminar
+                        .requestMatchers(HttpMethod.POST, "/api/tareas/**").hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/tareas/**").hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/tareas/**").hasAnyRole("ADMIN", "PROFESOR")
+
+                        // =========================================================
+                        // 6. ENTIDAD: TAREAS ASIGNADAS (Visibilidad selectiva)
+                        // =========================================================
+
+                        // El Profe crea y elimina las asignaciones de sus tareas
+                        .requestMatchers(HttpMethod.GET, "/api/tareas-asignadas/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/tareas-asignadas/actualizar/**")
+                        .hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/tareas-asignadas/**").hasAnyRole("ADMIN", "PROFESOR")
+
+                        // =========================================================
+                        // 7. ENTIDAD: MATERIALES
+                        // =========================================================
+
+                        // Lectura: Alumnos y Profesores pueden ver materiales (el Service filtra la
+                        // visibilidad)
+                        .requestMatchers(HttpMethod.GET, "/api/materiales/**").authenticated()
+
+                        // Gestión: El Profesor y el Admin pueden Crear, Editar y Eliminar materiales
+                        .requestMatchers(HttpMethod.POST, "/api/materiales/**").hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/materiales/**").hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/materiales/**").hasAnyRole("ADMIN", "PROFESOR")
+
+                        // =========================================================
+                        // 8. ENTIDAD: INSCRIPCIONES
+                        // =========================================================
+
+                        // Alta y consulta personal: Cualquier usuario logueado
+                        .requestMatchers(HttpMethod.POST, "/api/inscripciones").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/inscripciones/usuario/**").authenticated()
+
+                        // Gestión y Listados grupales: Solo Admin y Profesor
+                        .requestMatchers(HttpMethod.GET, "/api/inscripciones", "/api/inscripciones/taller/**")
+                        .hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/inscripciones/**").hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/inscripciones/**").hasAnyRole("ADMIN", "PROFESOR")
+
+                        // Consulta de ID específico (Suele ser para detalles de gestión)
+                        .requestMatchers(HttpMethod.GET, "/api/inscripciones/{id}").authenticated()
+
+                        // =========================================================
+                        // 9. ENTIDAD: HORARIOS
+                        // =========================================================
+
+                        // Lectura: Los alumnos ven su agenda y los horarios de los talleres
+                        .requestMatchers(HttpMethod.GET, "/api/horarios/**").authenticated()
+
+                        // Gestión: Solo Admin y Profesor crean, editan o borran turnos
+                        .requestMatchers(HttpMethod.POST, "/api/horarios/**").hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/horarios/**").hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/horarios/**").hasAnyRole("ADMIN", "PROFESOR")
+
+                        // =========================================================
+                        // 10. ENTIDAD: ENTREGAS (Calificaciones y Trabajos)
+                        // =========================================================
+
+                        // Acción de entregar: Alumno autenticado
+                        .requestMatchers(HttpMethod.POST, "/api/entregas").authenticated()
+
+                        // Calificar y Feedback: Solo Admin y Profesor
+                        .requestMatchers(HttpMethod.PUT, "/api/entregas/*/calificar").hasAnyRole("ADMIN", "PROFESOR")
+
+                        // Listados grupales y gestión: Solo Admin y Profesor
+                        .requestMatchers(HttpMethod.GET, "/api/entregas", "/api/entregas/tarea/**")
+                        .hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/entregas/**").hasAnyRole("ADMIN", "PROFESOR")
+
+                        // Consulta de entrega individual y actualización: Alumno (dueño) o Profesor
+                        .requestMatchers("/api/entregas/**").authenticated()
+
+                        // =========================================================
+                        // 11. ENTIDAD: ARCHIVOS DE TAREA (Adjuntos/Enunciados)
+                        // =========================================================
+
+                        // Lectura: Cualquier alumno o profesor puede ver/descargar los adjuntos
+                        .requestMatchers(HttpMethod.GET, "/api/archivos-tarea/**").authenticated()
+
+                        // Gestión de recursos: Solo Admin y Profesor suben, editan o borran enunciados
+                        .requestMatchers(HttpMethod.POST, "/api/archivos-tarea/**").hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/archivos-tarea/**").hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/archivos-tarea/**").hasAnyRole("ADMIN", "PROFESOR")
+
+                        // =========================================================
+                        // 12. ENTIDAD: ARCHIVOS DE MATERIAL (Recursos de apoyo)
+                        // =========================================================
+
+                        // Lectura: Alumnos y Profesores acceden a los archivos del material didáctico
+                        .requestMatchers(HttpMethod.GET, "/api/archivos-material/**").authenticated()
+
+                        // Gestión: Solo Admin y Profesor pueden subir, editar o borrar estos archivos
+                        .requestMatchers(HttpMethod.POST, "/api/archivos-material/**").hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/archivos-material/**").hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/archivos-material/**").hasAnyRole("ADMIN", "PROFESOR")
+
+                        // =========================================================
+                        // 13. ENTIDAD: ARCHIVOS DE ENTREGA (Trabajos de Alumnos)
+                        // =========================================================
+
+                        // El Alumno sube sus propios archivos de trabajo
+                        .requestMatchers(HttpMethod.POST, "/api/archivos-entrega").authenticated()
+
+                        // Lectura: El alumno ve sus archivos y el Profesor/Admin los descarga para
+                        // evaluar
+                        .requestMatchers(HttpMethod.GET, "/api/archivos-entrega/**").authenticated()
+
+                        // Eliminación: El alumno puede borrar su archivo (si el Service lo permite)
+                        // y el Admin/Profe por gestión.
+                        .requestMatchers(HttpMethod.DELETE, "/api/archivos-entrega/**").authenticated()
+
+                        // =========================================================
+                        // 14. CONTROLADOR DE DESCARGAS (Acceso a Binarios)
+                        // =========================================================
+
+                        // Todas las descargas requieren estar logueado.
+                        // La lógica interna del controlador ya se apoya en los Services
+                        // para asegurar que el archivo existe y es válido.
+                        .requestMatchers("/api/descargas/**").authenticated()
+
                         // ... resto de tus rutas ...
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())

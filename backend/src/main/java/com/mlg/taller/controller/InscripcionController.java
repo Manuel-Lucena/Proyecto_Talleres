@@ -19,7 +19,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/inscripciones")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 public class InscripcionController {
 
     private final InscripcionService inscripcionService;
