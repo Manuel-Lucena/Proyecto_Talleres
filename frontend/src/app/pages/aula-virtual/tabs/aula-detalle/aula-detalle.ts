@@ -22,6 +22,10 @@ import { BreadcrumbService } from '../../../../services/Breadcrumb.Service';
 import { Notificacion } from "../../../../components/dialogs/mensaje/notificacion";
 import { Confirmacion } from "../../../../components/dialogs/confirmacion/confirmacion";
 
+/**
+ * Componente para gestionar el detalle de recursos (Tareas o Materiales).
+ * Permite la creación, edición, asignación de alumnos y gestión de archivos.
+ */
 @Component({
   selector: 'app-aula-detalle',
   standalone: true,
@@ -30,10 +34,10 @@ import { Confirmacion } from "../../../../components/dialogs/confirmacion/confir
   styleUrl: './aula-detalle.scss',
 })
 export class AulaDetalle implements OnInit {
-  recurso: any = null;
-  tipo: string = '';
-  cargando = true;
-  idTaller: number = 0;
+  recurso: any = null; // Datos del recurso actual
+  tipo: string = ''; // 'tarea' o 'material'
+  cargando: boolean = true; // Estado de carga de la interfaz
+  idTaller: number = 0; // ID del taller actual
 
   // Modales y Dropdowns
   mostrarModalEntrega: boolean = false;
@@ -41,22 +45,22 @@ export class AulaDetalle implements OnInit {
   mostrarDropdownAlumnos: boolean = false;
 
   // Gestión de Alumnos y Asignaciones
-  alumnosTaller: UsuarioResponse[] = [];
-  alumnosSeleccionadosIds: number[] = [];
-  filtroAlumno: string = '';
+  alumnosTaller: UsuarioResponse[] = []; // Alumnos disponibles en el taller
+  alumnosSeleccionadosIds: number[] = []; // IDs de alumnos asignados al recurso
+  filtroAlumno: string = ''; // Texto para filtrar la lista de alumnos
 
-  // Recurso (Material/Tarea Enunciado)
-  archivosAdjuntos: any[] = [];
-  archivosParaEliminar: number[] = [];
-  nuevosArchivos: File[] = [];
+  // Gestión de Archivos (Enunciados/Material)
+  archivosAdjuntos: any[] = []; // Archivos ya subidos
+  archivosParaEliminar: number[] = []; // IDs de archivos a borrar al guardar
+  nuevosArchivos: File[] = []; // Archivos seleccionados pendientes de subida
 
-  // Datos de la Entrega del Alumno
-  entregaRealizada: any = null;
-  archivosEntregaExistentes: any[] = [];
+  // Datos de Entrega (Vista Alumno)
+  entregaRealizada: any = null; // Registro de la entrega del alumno
+  archivosEntregaExistentes: any[] = []; // Archivos de la entrega del alumno
 
-  esNuevo: boolean = false;
-  editando: boolean = false;
-  form: FormGroup;
+  esNuevo: boolean = false; // Indica si se está creando un recurso
+  editando: boolean = false; // Indica si el formulario de edición está activo
+  form: FormGroup; // Formulario reactivo de edición/creación
 
   extensionesDisponibles = [
     { label: 'Documentos PDF (.pdf)', value: '.pdf' },
@@ -84,7 +88,6 @@ export class AulaDetalle implements OnInit {
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private eRef: ElementRef
-
   ) {
     this.form = this.fb.group({
       titulo: ['', Validators.required],
@@ -94,20 +97,25 @@ export class AulaDetalle implements OnInit {
     });
   }
 
+  /**
+   * Cierra los menús desplegables al detectar un click fuera del componente.
+   */
   @HostListener('document:click', ['$event'])
-  clickOut(event: any) {
+  clickOut(event: any): void {
     if (!this.eRef.nativeElement.contains(event.target)) {
       this.mostrarDropdownExt = false;
       this.mostrarDropdownAlumnos = false;
     }
   }
 
-  ngOnInit() {
+  /**
+   * Inicializa el componente recuperando parámetros de ruta e identificando el modo (nuevo/lectura).
+   */
+  ngOnInit(): void {
     this.idTaller = Number(this.route.parent?.snapshot.paramMap.get('id'));
     this.tipo = this.route.snapshot.paramMap.get('tipo') || '';
     const idRecursoRaw = this.route.snapshot.paramMap.get('idRecurso');
 
-    // Si es profesor, cargamos la lista de alumnos del taller para el selector
     if (this.esProfesor()) {
       this.cargarAlumnosDelTaller();
     }
@@ -122,23 +130,28 @@ export class AulaDetalle implements OnInit {
     }
   }
 
-  private cargarAlumnosDelTaller() {
+  /**
+   * Carga la lista de alumnos inscritos en el taller.
+   */
+  private cargarAlumnosDelTaller(): void {
     this.usuarioService.listarPorTaller(this.idTaller).subscribe({
       next: (resp) => {
-        // Filtramos para quedarnos solo con alumnos (ID_ROL suele ser 2 o según tu lógica de nombreRol)
         this.alumnosTaller = resp.data.filter(u => u.nombreRol === 'ALUMNO');
       }
     });
   }
 
-  cargarDatos(id: number) {
+  /**
+   * Obtiene la información completa del recurso y gestiona la carga de archivos y entregas.
+   * @param id ID del recurso a cargar.
+   */
+  cargarDatos(id: number): void {
     this.cargando = true;
     const service: any = this.tipo === 'tarea' ? this.tareaService : this.materialService;
 
     service.obtenerPorId(id).subscribe({
       next: (resp: any) => {
         this.recurso = resp.data;
-
         this.breadcrumbService.setRecursoNombre(this.recurso.titulo);
         this.obtenerArchivos(id);
 
@@ -146,7 +159,6 @@ export class AulaDetalle implements OnInit {
           if (!this.esProfesor()) {
             this.verificarEntregaExistente(id);
           } else {
-            // Si es profesor, cargamos quién tiene asignada esta tarea
             this.cargarAsignaciones(id);
           }
         }
@@ -155,7 +167,10 @@ export class AulaDetalle implements OnInit {
     });
   }
 
-  private cargarAsignaciones(idTarea: number) {
+  /**
+   * Carga los alumnos asignados a una tarea concreta.
+   */
+  private cargarAsignaciones(idTarea: number): void {
     this.tareaAsignadaService.listarPorTarea(idTarea).subscribe({
       next: (resp) => {
         this.alumnosSeleccionadosIds = resp.data.map((a: any) => a.idAlumno);
@@ -163,7 +178,10 @@ export class AulaDetalle implements OnInit {
     });
   }
 
-  private verificarEntregaExistente(idTarea: number) {
+  /**
+   * Verifica si el alumno actual ya ha realizado una entrega para la tarea.
+   */
+  private verificarEntregaExistente(idTarea: number): void {
     const idUsuario = this.tokenService.getId();
     if (!idUsuario) return;
 
@@ -190,7 +208,10 @@ export class AulaDetalle implements OnInit {
     });
   }
 
-  private obtenerArchivos(id: number) {
+  /**
+   * Obtiene los archivos adjuntos vinculados al recurso.
+   */
+  private obtenerArchivos(id: number): void {
     const service: any = this.tipo === 'tarea' ? this.archivoTareaService : this.archivoMaterialService;
     const metodo = this.tipo === 'tarea' ? 'listarPorTarea' : 'listarPorMaterial';
 
@@ -208,11 +229,16 @@ export class AulaDetalle implements OnInit {
   }
 
   // --- Lógica del Selector de Alumnos ---
-  toggleDropdownAlumnos() {
+
+  toggleDropdownAlumnos(): void {
     this.mostrarDropdownAlumnos = !this.mostrarDropdownAlumnos;
   }
 
-  onAlumnoToggle(idAlumno: number) {
+  /**
+   * Gestiona la selección/deselección de alumnos para asignar la tarea.
+   * @param idAlumno ID del alumno seleccionado.
+   */
+  onAlumnoToggle(idAlumno: number): void {
     const index = this.alumnosSeleccionadosIds.indexOf(idAlumno);
     if (index > -1) {
       this.alumnosSeleccionadosIds.splice(index, 1);
@@ -221,7 +247,10 @@ export class AulaDetalle implements OnInit {
     }
   }
 
-  get alumnosFiltrados() {
+  /**
+   * Filtra la lista de alumnos basándose en el nombre o apellidos.
+   */
+  get alumnosFiltrados(): UsuarioResponse[] {
     if (!this.filtroAlumno) return this.alumnosTaller;
     const busqueda = this.filtroAlumno.toLowerCase();
     return this.alumnosTaller.filter(a =>
@@ -230,9 +259,15 @@ export class AulaDetalle implements OnInit {
   }
 
   // --- Lógica de Formularios y Archivos ---
-  toggleDropdownExt() { this.mostrarDropdownExt = !this.mostrarDropdownExt; }
 
-  onExtensionChange(event: any) {
+  toggleDropdownExt(): void { 
+    this.mostrarDropdownExt = !this.mostrarDropdownExt; 
+  }
+
+  /**
+   * Actualiza el string de extensiones permitidas según los checkboxes seleccionados.
+   */
+  onExtensionChange(event: any): void {
     const value = event.target.value;
     let seleccionadas = this.form.get('extensionesPermitidas')?.value
       ? this.form.get('extensionesPermitidas')?.value.split(',').map((s: string) => s.trim()).filter((s: string) => s !== "")
@@ -246,17 +281,26 @@ export class AulaDetalle implements OnInit {
     this.form.patchValue({ extensionesPermitidas: seleccionadas.join(', ') });
   }
 
+  /**
+   * Comprueba si una extensión está dentro de la lista permitida para mostrar el checkbox activo.
+   */
   estaMarcada(value: string): boolean {
     const current = this.form.get('extensionesPermitidas')?.value || '';
     return current.includes(value);
   }
 
+  /**
+   * Valida si el usuario actual tiene rol de Profesor o Administrador.
+   */
   esProfesor(): boolean {
     const rol = this.tokenService.getRol();
     return rol === 'PROFESOR' || rol === 'ADMIN';
   }
 
-  activarEdicion() {
+  /**
+   * Activa el modo edición cargando los valores actuales en el formulario reactivo.
+   */
+  activarEdicion(): void {
     this.editando = true;
     this.form.patchValue({
       titulo: this.recurso.titulo,
@@ -266,21 +310,35 @@ export class AulaDetalle implements OnInit {
     });
   }
 
-  onFileChange(event: any) {
+  /**
+   * Captura los archivos seleccionados por el usuario para su posterior subida.
+   */
+  onFileChange(event: any): void {
     if (event.target.files.length > 0) {
       this.nuevosArchivos.push(...Array.from(event.target.files) as File[]);
       event.target.value = '';
     }
   }
 
-  quitarNuevoArchivo(index: number) { this.nuevosArchivos.splice(index, 1); }
+  /**
+   * Quita un archivo de la lista de pendientes por subir.
+   */
+  quitarNuevoArchivo(index: number): void { 
+    this.nuevosArchivos.splice(index, 1); 
+  }
 
-  marcarParaEliminar(id: number) {
+  /**
+   * Marca un archivo existente en el servidor para ser eliminado al guardar.
+   */
+  marcarParaEliminar(id: number): void {
     this.archivosParaEliminar.push(id);
     this.archivosAdjuntos = this.archivosAdjuntos.filter(a => a.id !== id);
   }
 
-  async guardarTodo() {
+  /**
+   * Realiza el guardado integral: Crea/Actualiza el recurso, asigna alumnos y gestiona archivos.
+   */
+  async guardarTodo(): Promise<void> {
     if (this.form.invalid) return;
     this.cargando = true;
 
@@ -303,17 +361,14 @@ export class AulaDetalle implements OnInit {
       next: async (resp: any) => {
         const idActual = this.esNuevo ? (resp.data.idTarea || resp.data.id) : idRec;
 
-        // 1. Sincronizar asignaciones de alumnos si es tarea
         if (this.tipo === 'tarea') {
           await lastValueFrom(this.tareaAsignadaService.actualizarAsignaciones(idActual, this.alumnosSeleccionadosIds));
         }
 
-        // 2. Eliminar archivos marcados
         for (const fId of this.archivosParaEliminar) {
           await lastValueFrom(archService.eliminar(fId));
         }
 
-        // 3. Subir nuevos archivos
         for (const file of this.nuevosArchivos) {
           await lastValueFrom(archService.guardar(idActual, file));
         }
@@ -327,15 +382,17 @@ export class AulaDetalle implements OnInit {
     });
   }
 
- // --- ELIMINAR CON VUESTRO MODAL DE CONFIRMACIÓN ---
-  eliminarRecurso() {
+  /**
+   * Elimina el recurso actual tras la confirmación del usuario.
+   */
+  eliminarRecurso(): void {
     const esTarea = this.tipo === 'tarea';
     const idRecurso = esTarea ? this.recurso.idTarea : this.recurso.id;
     const tituloRecurso = this.recurso.titulo;
 
     this.notificacionService.confirmar({
       titulo: `¿Eliminar ${this.tipo}?`,
-      mensaje: `Estás a punto de borrar permanentemente "${tituloRecurso}" y sus entregas. Esta acción no se puede deshacer.`,
+      mensaje: `Estás a punto de borrar permanentemente "${tituloRecurso}" y sus entregas.`,
       textoConfirmar: 'Eliminar',
       textoCancelar: 'Cancelar'
     }).then((confirmado) => {
@@ -365,7 +422,10 @@ export class AulaDetalle implements OnInit {
     });
   }
 
-  toggleVisibilidadRapida() {
+  /**
+   * Cambia el estado de visibilidad del recurso sin entrar en modo edición.
+   */
+  toggleVisibilidadRapida(): void {
     const id = this.recurso.idTarea || this.recurso.id;
     const service: any = this.tipo === 'tarea' ? this.tareaService : this.materialService;
     if (!id) return;
@@ -378,21 +438,31 @@ export class AulaDetalle implements OnInit {
     });
   }
 
-  // --- Descargas ---
-  descargarAdjunto(archivo: any) {
+  // --- Lógica de Descargas ---
+
+  /**
+   * Obtiene y descarga un archivo adjunto del recurso.
+   */
+  descargarAdjunto(archivo: any): void {
     if (this.editando) return;
     this.archivoService.obtenerBlob(this.tipo === 'tarea' ? 'tarea' : 'material', archivo.id).subscribe({
       next: (blob) => this.ejecutarDescarga(blob, archivo.nombre)
     });
   }
 
-  descargarArchivoAlumno(archivo: any) {
+  /**
+   * Obtiene y descarga un archivo perteneciente a la entrega de un alumno.
+   */
+  descargarArchivoAlumno(archivo: any): void {
     this.archivoService.obtenerBlob('entrega', archivo.id).subscribe({
       next: (blob) => this.ejecutarDescarga(blob, archivo.nombre)
     });
   }
 
-  private ejecutarDescarga(blob: Blob, nombre: string) {
+  /**
+   * Ejecuta la descarga física del archivo en el navegador.
+   */
+  private ejecutarDescarga(blob: Blob, nombre: string): void {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = nombre; a.click();
@@ -400,7 +470,11 @@ export class AulaDetalle implements OnInit {
   }
 
   // --- Navegación ---
-  private finalizarGuardado(id: number) {
+
+  /**
+   * Finaliza el proceso de guardado limpiando el estado y navegando si es necesario.
+   */
+  private finalizarGuardado(id: number): void {
     this.editando = false;
     this.nuevosArchivos = [];
     this.archivosParaEliminar = [];
@@ -413,7 +487,10 @@ export class AulaDetalle implements OnInit {
     }
   }
 
-  cancelar() {
+  /**
+   * Cancela la edición o creación del recurso.
+   */
+  cancelar(): void {
     if (this.esNuevo) this.volver();
     else {
       this.editando = false;
@@ -421,26 +498,44 @@ export class AulaDetalle implements OnInit {
     }
   }
 
-  abrirModalEntrega() { this.mostrarModalEntrega = true; }
+  abrirModalEntrega(): void { 
+    this.mostrarModalEntrega = true; 
+  }
 
-  onEntregaGuardada() {
+  /**
+   * Recarga la información cuando se confirma que una entrega ha sido guardada.
+   */
+  onEntregaGuardada(): void {
     this.notificacionService.mostrar({ titulo: '¡Hecho!', mensaje: 'Entrega procesada correctamente', tipo: 'exito' });
     this.cargarDatos(this.recurso.idTarea || this.recurso.id);
   }
 
-  irASeguimiento() {
+  /**
+   * Navega a la vista de seguimiento y corrección de la tarea.
+   */
+  irASeguimiento(): void {
     const idTarea = this.recurso.idTarea || this.recurso.id;
     this.router.navigate(['/aula-virtual', this.idTaller, 'tareas', idTarea, 'seguimiento']);
   }
 
-  volver() {
+  /**
+   * Regresa al listado principal de recursos del aula.
+   */
+  volver(): void {
     this.router.navigate(['/aula-virtual', this.idTaller, this.tipo === 'tarea' ? 'tareas' : 'recursos']);
   }
 
-  private redirigirPorError() {
+  /**
+   * Redirige al muro en caso de error crítico al cargar datos.
+   */
+  private redirigirPorError(): void {
     this.router.navigate(['/aula-virtual', this.idTaller, 'muro']);
   }
 
+  /**
+   * Calcula el tiempo restante hasta la fecha de entrega.
+   * @returns Texto descriptivo del tiempo restante.
+   */
   calcularTiempo(fechaFin: string): string {
     if (!fechaFin) return 'Sin fecha límite';
     const diff = new Date(fechaFin).getTime() - new Date().getTime();

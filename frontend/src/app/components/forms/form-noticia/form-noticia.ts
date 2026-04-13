@@ -4,6 +4,9 @@ import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angula
 import { NoticiaResponse } from '../../../interfaces/Noticia.Interface';
 import { FormErrorService } from '../../../services/FormError.Service';
 
+/**
+ * Componente de formulario para la creación y edición de noticias.
+ */
 @Component({
   selector: 'app-form-noticia',
   standalone: true,
@@ -12,13 +15,14 @@ import { FormErrorService } from '../../../services/FormError.Service';
   styleUrl: './form-noticia.scss',
 })
 export class FormNoticia implements OnInit {
-  @Input() noticiaParaEditar: NoticiaResponse | null = null;
-  @Output() noticiaGuardada = new EventEmitter<FormData>();
-  @Output() cerrar = new EventEmitter<void>();
+  @Input() noticiaParaEditar: NoticiaResponse | null = null; // Datos de la noticia en modo edición
+  @Output() noticiaGuardada = new EventEmitter<FormData>(); // Emite el FormData al componente padre
+  @Output() cerrar = new EventEmitter<void>(); // Notifica el cierre del modal
 
-  imagenPreview: string | ArrayBuffer | null = null;
-  fileSeleccionado: File | null = null;
+  imagenPreview: string | ArrayBuffer | null = null; // URL temporal para la vista previa de la imagen
+  fileSeleccionado: File | null = null; // Referencia al archivo de imagen seleccionado
 
+  /** Estructura del formulario reactivo con validaciones de longitud */
   form = new FormGroup({
     titulo: new FormControl('', { 
       validators: [Validators.required, Validators.minLength(5)], 
@@ -30,11 +34,18 @@ export class FormNoticia implements OnInit {
     }),
   });
 
+  /**
+   * @param cdr Servicio para forzar la detección de cambios al cargar imágenes.
+   * @param errorService Servicio para gestionar la visualización de errores en el template.
+   */
   constructor(
     private cdr: ChangeDetectorRef,
-    public errorService: FormErrorService // Inyectado para el HTML
+    public errorService: FormErrorService
   ) { }
 
+  /**
+   * Inicializa el formulario y la vista previa si se recibe una noticia para editar.
+   */
   ngOnInit(): void {
     if (this.noticiaParaEditar) {
       this.form.patchValue({
@@ -49,6 +60,10 @@ export class FormNoticia implements OnInit {
     }
   }
 
+  /**
+   * Procesa el archivo seleccionado y genera una previsualización en base64.
+   * @param event Evento de selección de archivos.
+   */
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
@@ -62,6 +77,9 @@ export class FormNoticia implements OnInit {
     }
   }
 
+  /**
+   * Valida el formulario y construye el FormData con el DTO y el archivo.
+   */
   enviar(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -87,6 +105,9 @@ export class FormNoticia implements OnInit {
     this.noticiaGuardada.emit(formData);
   }
 
+  /**
+   * Emite el evento de cierre del formulario.
+   */
   cerrarModal() {
     this.cerrar.emit();
   }

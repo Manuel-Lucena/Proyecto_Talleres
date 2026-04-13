@@ -1,0 +1,81 @@
+@use '../styles/variables' as v;
+
+.accessibility-container {
+    // Esto es lo que hace que "siga" a la pantalla
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 9999; // Para que esté por encima de todo
+
+    // Evitamos que cualquier padre con 'transform' nos mueva
+    display: block;
+
+    .accessibility-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background-color: #00c853;
+        color: white;
+        border: 2px solid white;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+
+    .accessibility-panel {
+        position: absolute;
+        bottom: 60px;
+        left: 0;
+        width: 250px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border: 1px solid #eee;
+        display: none;
+        overflow: hidden;
+
+        &.show {
+            display: block;
+        }
+
+        .panel-header {
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .panel-body {
+            padding: 15px;
+
+            span,
+            label {
+                font-size: 0.8rem;
+                font-weight: 600;
+            }
+
+            .reset-btn {
+                background: none;
+                border: 1px solid #ff5252;
+                color: #ff5252;
+                padding: 8px;
+                border-radius: 8px;
+                font-size: 0.75rem;
+                cursor: pointer;
+
+                &:hover {
+                    background: #fff5f5;
+                }
+            }
+        }
+    }
+}

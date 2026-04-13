@@ -6,6 +6,9 @@ import { ArchivoEntregaService } from '../../../services/ArchivoEntrega.Service'
 import { ArchivoService } from '../../../services/Archivo.Service';
 import { FormErrorService } from '../../../services/FormError.Service';
 
+/**
+ * Componente para la calificación de entregas de tareas por parte del profesor.
+ */
 @Component({
   selector: 'app-form-calificar',
   standalone: true,
@@ -14,13 +17,15 @@ import { FormErrorService } from '../../../services/FormError.Service';
   styleUrl: './form-calificar.scss'
 })
 export class FormCalificar implements OnInit {
-  @Input() entrega: any;
-  @Output() cerrar = new EventEmitter<void>();
-  @Output() guardado = new EventEmitter<void>();
+  
+  @Input() entrega: any; // Datos de la entrega a calificar
+  @Output() cerrar = new EventEmitter<void>(); // Notifica el cierre del modal
+  @Output() guardado = new EventEmitter<void>(); // Notifica éxito en la persistencia
 
-  cargando = false;
-  archivosAlumno: any[] = [];
+  cargando = false; // Estado de carga para feedback visual
+  archivosAlumno: any[] = []; // Archivos adjuntos del alumno
 
+  /** Estructura del formulario con validaciones */
   form = new FormGroup({
     calificacion: new FormControl('', { 
       validators: [Validators.required, Validators.min(0), Validators.max(10)], 
@@ -29,6 +34,13 @@ export class FormCalificar implements OnInit {
     comentarioProfesor: new FormControl('', { updateOn: 'blur' })
   });
 
+  /**
+   * @param entregaService Operaciones para calificar entregas.
+   * @param archivoEntregaService Listado de metadatos de archivos.
+   * @param archivoService Descarga física de archivos (Blobs).
+   * @param errorService Gestión de errores en el template.
+   * @param cdr Detección de cambios para actualizaciones asíncronas.
+   */
   constructor(
     private entregaService: EntregaService,
     private archivoEntregaService: ArchivoEntregaService,
@@ -37,7 +49,10 @@ export class FormCalificar implements OnInit {
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
+  /**
+   * Carga los datos iniciales de la entrega y recupera los archivos adjuntos.
+   */
+  ngOnInit(): void {
     if (this.entrega) {
       this.form.patchValue({
         calificacion: this.entrega.calificacion?.toString() || '',
@@ -47,7 +62,10 @@ export class FormCalificar implements OnInit {
     }
   }
 
-  cargarArchivosAlumno() {
+  /**
+   * Obtiene la lista de archivos subidos por el alumno.
+   */
+  cargarArchivosAlumno(): void {
     const id = this.entrega.idEntrega || this.entrega.id;
     if (!id) return;
     this.archivoEntregaService.listarPorEntrega(id).subscribe({
@@ -58,7 +76,11 @@ export class FormCalificar implements OnInit {
     });
   }
 
-  descargarArchivo(archivo: any) {
+  /**
+   * Gestiona la descarga de archivos convirtiéndolos en URL local.
+   * @param archivo Metadatos del archivo a descargar.
+   */
+  descargarArchivo(archivo: any): void {
     this.archivoService.obtenerBlob('entrega', archivo.id).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
@@ -71,7 +93,10 @@ export class FormCalificar implements OnInit {
     });
   }
 
-  guardarNota() {
+  /**
+   * Valida y envía la calificación al servidor.
+   */
+  guardarNota(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -81,11 +106,10 @@ export class FormCalificar implements OnInit {
     const idEntrega = this.entrega.idEntrega || this.entrega.id;
     const raw = this.form.getRawValue();
 
-    // CONSTRUCCIÓN DEL BODY PARA EVITAR ERRORES DE TIPO
     const body: any = {
       idTarea: this.entrega.idTarea,
       idUsuario: this.entrega.idUsuario,
-      calificacion: Number(raw.calificacion), // Convertimos a número
+      calificacion: Number(raw.calificacion),
       comentarioProfesor: raw.comentarioProfesor || ''
     };
 

@@ -7,6 +7,11 @@ import { TokenService } from '../../services/Token.Service';
 import { NoticiaResponse } from '../../interfaces/Noticia.Interface';
 import { FormNoticia } from '../../components/forms/form-noticia/form-noticia';
 
+/**
+ * Componente de la página de inicio (Landing Page).
+ * Gestiona la visualización de las últimas noticias y permite a los administradores
+ * realizar acciones rápidas de creación y edición de contenido informativo.
+ */
 @Component({
   selector: 'app-landing',
   standalone: true,
@@ -15,45 +20,65 @@ import { FormNoticia } from '../../components/forms/form-noticia/form-noticia';
   styleUrl: './landing.scss',
 })
 export class Landing implements OnInit {
-  listaNoticias: NoticiaResponse[] = [];
-  noticiaSeleccionada: NoticiaResponse | null = null;
-  mostrarModal: boolean = false;
+  listaNoticias: NoticiaResponse[] = []; // Listado de noticias destacadas para la vista
+  noticiaSeleccionada: NoticiaResponse | null = null; // Clon de la noticia activa para edición
+  mostrarModal: boolean = false; // Control de visibilidad del modal de gestión
 
+  /**
+   * @param noticiaService Operaciones de consulta y persistencia de noticias.
+   * @param tokenService Gestión de identidad y permisos de usuario.
+   * @param cdr Detección de cambios manual para asegurar la sincronía de la UI.
+   */
   constructor(
     private noticiaService: NoticiaService,
     public tokenService: TokenService,
-    private cdr: ChangeDetectorRef // Inyectamos esto para evitar los "universos paralelos"
+    private cdr: ChangeDetectorRef
   ) { }
 
+  /**
+   * Inicializa el componente recuperando las noticias más recientes.
+   */
   ngOnInit(): void {
     this.cargarNoticias();
   }
 
+  /**
+   * Obtiene las últimas noticias (máximo 6) y actualiza la referencia de la lista.
+   */
   cargarNoticias(): void {
     this.noticiaService.listar().subscribe({
       next: (res) => {
-        // Usamos el spread operator [...] para asegurar que Angular detecte el cambio de referencia
+        // Aseguramos la inmutabilidad para activar la detección de cambios
         this.listaNoticias = [...res.data.slice(0, 6)];
-        this.cdr.detectChanges(); // Forzamos a la vista a despertar
+        this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error al cargar:', err)
+      error: (err) => console.error('Error al cargar noticias:', err)
     });
   }
 
-  abrirCrear() {
+  /**
+   * Configura el entorno para la creación de una nueva noticia.
+   */
+  abrirCrear(): void {
     this.noticiaSeleccionada = null;
     this.mostrarModal = true;
     this.cdr.detectChanges();
   }
 
-  abrirEditar(noticia: NoticiaResponse) {
-    // Usamos JSON parse/stringify para romper CUALQUIER relación con el objeto de la lista
-    // Así, si el formulario "trastea" con el objeto, la card de la landing ni se entera
+  /**
+   * Clona una noticia existente para su edición sin afectar al listado principal.
+   * @param noticia Objeto noticia seleccionado desde la interfaz.
+   */
+  abrirEditar(noticia: NoticiaResponse): void {
     this.noticiaSeleccionada = JSON.parse(JSON.stringify(noticia));
     this.mostrarModal = true;
     this.cdr.detectChanges();
   }
 
+  /**
+   * Procesa el guardado (creación o actualización) de una noticia y refresca la vista.
+   * @param datos Objeto FormData con los campos de la noticia e imagen adjunta.
+   */
   onPublicarNoticia(datos: FormData): void {
     const accion = this.noticiaSeleccionada
       ? this.noticiaService.actualizar(this.noticiaSeleccionada.idNoticia, datos)
@@ -62,17 +87,19 @@ export class Landing implements OnInit {
     accion.subscribe({
       next: () => {
         this.cerrarModal();
-
-      
+        // Delay técnico para permitir la sincronización de archivos en el servidor
         setTimeout(() => {
           this.cargarNoticias();
         }, 800);
       },
-      error: (err) => console.error("Error al guardar:", err)
+      error: (err) => console.error("Error al guardar noticia:", err)
     });
   }
 
-  cerrarModal() {
+  /**
+   * Cierra el modal de gestión y limpia la selección actual.
+   */
+  cerrarModal(): void {
     this.mostrarModal = false;
     this.noticiaSeleccionada = null;
     this.cdr.detectChanges();

@@ -3,12 +3,16 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
-// Servicios
 import { UsuarioService } from '../../../../services/Usuario.Service';
 import { EntregaService } from '../../../../services/Entrega.Service';
 import { TareaService } from '../../../../services/Tarea.Service';
 import { FormCalificar } from '../../../../components/forms/form-calificar/form-calificar';
 
+/**
+ * Componente para el seguimiento y calificación de tareas por parte del profesor.
+ * Cruza los datos de alumnos inscritos con sus respectivas entregas para generar
+ * una matriz de estado y permitir la calificación individual.
+ */
 @Component({
   selector: 'app-aula-tarea-seguimiento',
   standalone: true,
@@ -17,15 +21,23 @@ import { FormCalificar } from '../../../../components/forms/form-calificar/form-
   styleUrl: './aula-tarea-seguimiento.scss'
 })
 export class AulaTareaSeguimiento implements OnInit {
-  idTaller: number = 0;
-  idTarea: number = 0;
-  tarea: any = null;
-  cargando = true;
-  filas: any[] = []; // Array de objetos genéricos
+  idTaller: number = 0; // Identificador del taller obtenido del contexto de ruta
+  idTarea: number = 0; // Identificador de la tarea específica a supervisar
+  tarea: any = null; // Metadatos de la tarea (título, descripción, etc.)
+  cargando = true; // Estado de carga para la sincronización de múltiples peticiones
+  filas: any[] = []; // Colección de objetos que vinculan Alumno + Entrega + Estado
 
-  mostrarModalCalificar = false;
-  entregaSeleccionada: any = null;
+  mostrarModalCalificar = false; // Control de visibilidad del formulario de calificación
+  entregaSeleccionada: any = null; // Referencia de la entrega activa para calificar
 
+  /**
+   * @param route Acceso a parámetros de ruta (idTaller, idRecurso).
+   * @param router Gestión de navegación de retorno.
+   * @param usuarioService Recuperación de alumnos inscritos en el taller.
+   * @param entregaService Obtención de archivos y estados de entrega.
+   * @param tareaService Consulta de información base de la tarea.
+   * @param cdr Detección manual de cambios para actualizaciones concurrentes.
+   */
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -35,8 +47,10 @@ export class AulaTareaSeguimiento implements OnInit {
     private cdr: ChangeDetectorRef
   ) { }
 
-  ngOnInit() {
-    // Captura de IDs robusta
+  /**
+   * Inicializa el componente capturando los IDs necesarios y disparando la carga de datos.
+   */
+  ngOnInit(): void {
     this.idTarea = Number(this.route.snapshot.paramMap.get('idRecurso'));
     this.idTaller = Number(this.route.snapshot.paramMap.get('id')) ||
       Number(this.route.parent?.snapshot.paramMap.get('id'));
@@ -44,7 +58,11 @@ export class AulaTareaSeguimiento implements OnInit {
     this.cargarDatos();
   }
 
-  cargarDatos() {
+  /**
+   * Ejecuta peticiones paralelas para sincronizar alumnos y entregas.
+   * Mapea los resultados en una estructura unificada para la tabla de seguimiento.
+   */
+  cargarDatos(): void {
     this.cargando = true;
     this.cdr.detectChanges();
 
@@ -55,18 +73,13 @@ export class AulaTareaSeguimiento implements OnInit {
     }).subscribe({
       next: (res: any) => {
         this.tarea = res.tarea?.data;
-
         const listaUsuarios = res.usuarios?.data || [];
         const listaEntregas = res.entregas?.data || [];
 
-        // 1. Filtramos para que SOLO aparezcan ALUMNOS
-        // Usamos 'nombreRol' que es como viene en tu interfaz
+        // Cruce de datos: Mapeo de alumnos con su entrega (si existe)
         this.filas = listaUsuarios
           .filter((u: any) => u.nombreRol?.toUpperCase() === 'ALUMNO')
           .map((alumno: any) => {
-
-            // 2. Buscamos la entrega usando 'idUsuario' en ambos lados
-            // Forzamos String para evitar errores de tipo
             const entrega = listaEntregas.find((e: any) =>
               String(e.idUsuario) === String(alumno.idUsuario)
             );
@@ -78,7 +91,6 @@ export class AulaTareaSeguimiento implements OnInit {
             };
           });
 
-        console.log('Seguimiento procesado:', this.filas);
         this.cargando = false;
         this.cdr.detectChanges();
       },
@@ -90,29 +102,40 @@ export class AulaTareaSeguimiento implements OnInit {
     });
   }
 
-  // Asegúrate de que el botón volver use la ruta absoluta para evitar el error de Match
-  volver() {
+  /**
+   * Navega de regreso al listado de tareas del aula virtual.
+   */
+  volver(): void {
     this.router.navigate(['/aula-virtual', this.idTaller, 'tareas']);
   }
 
+  /**
+   * Calcula el total de alumnos que han realizado el envío.
+   */
   get totalEntregados(): number {
     return this.filas.filter((f: any) => f.entrega !== null).length;
   }
 
+  /**
+   * Determina el estado visual del alumno respecto a la tarea.
+   * @param entrega Objeto de entrega del alumno.
+   * @returns 'PENDIENTE', 'CALIFICADO' o 'ENTREGADO'.
+   */
   private definirEstado(entrega: any): string {
     if (!entrega) return 'PENDIENTE';
-    // Si existe calificación (aunque sea 0), marcamos como calificado
     if (entrega.calificacion !== null && entrega.calificacion !== undefined) return 'CALIFICADO';
     return 'ENTREGADO';
   }
 
-  abrirCalificador(fila: any) {
+  /**
+   * Abre el modal de calificación para una fila específica si existe una entrega.
+   * @param fila Objeto de la fila seleccionada.
+   */
+  abrirCalificador(fila: any): void {
     if (fila.entrega) {
       this.entregaSeleccionada = fila.entrega;
       this.mostrarModalCalificar = true;
       this.cdr.detectChanges();
     }
   }
-
-
 }

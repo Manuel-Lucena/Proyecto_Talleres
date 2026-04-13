@@ -10,6 +10,10 @@ import { Confirmacion } from "../../../../components/dialogs/confirmacion/confir
 import { Notificacion } from "../../../../components/dialogs/mensaje/notificacion";
 import { Router } from '@angular/router';
 
+/**
+ * Componente para la gestión administrativa de usuarios.
+ * Permite listar, filtrar, crear, editar, eliminar y gestionar el estado de los usuarios.
+ */
 @Component({
   selector: 'app-admin-usuarios',
   standalone: true,
@@ -18,15 +22,21 @@ import { Router } from '@angular/router';
   styleUrl: './admin-usuarios.scss'
 })
 export class AdminUsuarios implements OnInit {
-  usuarios: UsuarioResponse[] = [];
-  busqueda: string = '';
-  filtroRol: string = '';
-  criterioBusqueda: string = 'todos';
+  usuarios: UsuarioResponse[] = []; // Listado completo de usuarios
+  busqueda: string = ''; // Término de búsqueda actual
+  filtroRol: string = ''; // Rol seleccionado para filtrar
+  criterioBusqueda: string = 'todos'; // Campo por el cual filtrar (nombre, dni, email)
 
-  mostrarModal: boolean = false;
-  mostrarModalCarga: boolean = false; // Control del nuevo modal
-  usuarioSeleccionado: UsuarioResponse | null = null;
+  mostrarModal: boolean = false; // Control del modal de creación/edición
+  mostrarModalCarga: boolean = false; // Control del modal de carga masiva
+  usuarioSeleccionado: UsuarioResponse | null = null; // Usuario activo para edición
 
+  /**
+   * @param usuarioService Operaciones de persistencia de usuarios.
+   * @param notificacionService Gestión de diálogos y alertas globales.
+   * @param router Servicio de navegación para acceso a inscripciones.
+   * @param cdr Detección manual de cambios para actualizaciones asíncronas.
+   */
   constructor(
     private usuarioService: UsuarioService,
     private notificacionService: NotificacionService,
@@ -34,10 +44,16 @@ export class AdminUsuarios implements OnInit {
     private cdr: ChangeDetectorRef
   ) { }
 
+  /**
+   * Inicializa el listado de usuarios al cargar el componente.
+   */
   ngOnInit(): void {
     this.cargarUsuarios();
   }
 
+  /**
+   * Obtiene la colección actualizada de usuarios desde el servidor.
+   */
   cargarUsuarios(): void {
     this.usuarioService.listar().subscribe({
       next: (res) => {
@@ -47,6 +63,9 @@ export class AdminUsuarios implements OnInit {
     });
   }
 
+  /**
+   * Getter que aplica los filtros de búsqueda y rol sobre la lista de usuarios.
+   */
   get usuariosFiltrados() {
     const term = this.busqueda.toLowerCase().trim();
     return this.usuarios.filter(u => {
@@ -67,6 +86,9 @@ export class AdminUsuarios implements OnInit {
     });
   }
 
+  /**
+   * Genera el texto de sugerencia para el buscador según el criterio.
+   */
   getPlaceholder() {
     switch (this.criterioBusqueda) {
       case 'nombre': return 'Buscar por nombre...';
@@ -76,16 +98,27 @@ export class AdminUsuarios implements OnInit {
     }
   }
 
+  /**
+   * Prepara el estado para la creación de un nuevo usuario.
+   */
   abrirCrear() {
     this.usuarioSeleccionado = null;
     this.mostrarModal = true;
   }
 
+  /**
+   * Carga un usuario en el modal para su edición.
+   * @param u Usuario seleccionado.
+   */
   abrirEditar(u: UsuarioResponse) {
     this.usuarioSeleccionado = JSON.parse(JSON.stringify(u));
     this.mostrarModal = true;
   }
 
+  /**
+   * Procesa el guardado de datos (creación o edición) y gestiona la respuesta.
+   * @param fd FormData con el DTO del usuario y posible archivo de imagen.
+   */
   ejecutarGuardado(fd: FormData): void {
     const esEdicion = !!this.usuarioSeleccionado;
 
@@ -104,18 +137,16 @@ export class AdminUsuarios implements OnInit {
         this.cargarUsuarios();
       },
       error: (err) => {
-        console.error('Error en la operación:', err);
-        const mensajeError = err.error?.mensaje || 'No se pudo completar la operación. Inténtalo de nuevo.';
-
-        this.notificacionService.mostrar({
-          titulo: 'Error',
-          mensaje: mensajeError,
-          tipo: 'error'
-        });
+        const mensajeError = err.error?.mensaje || 'No se pudo completar la operación.';
+        this.notificacionService.mostrar({ titulo: 'Error', mensaje: mensajeError, tipo: 'error' });
       }
     });
   }
 
+  /**
+   * Alterna el estado activo/inactivo de un usuario previa confirmación.
+   * @param u Usuario a modificar.
+   */
   toggleEstado(u: UsuarioResponse) {
     this.notificacionService.confirmar({
       titulo: u.activo ? 'Dar de baja' : 'Reactivar',
@@ -135,6 +166,10 @@ export class AdminUsuarios implements OnInit {
     });
   }
 
+  /**
+   * Solicita confirmación y elimina un usuario de forma definitiva.
+   * @param id Identificador único del usuario.
+   */
   eliminarUsuario(id: number) {
     this.notificacionService.confirmar({
       titulo: '¿Eliminar?',
@@ -151,6 +186,10 @@ export class AdminUsuarios implements OnInit {
     });
   }
 
+  /**
+   * Navega a la vista de inscripciones detallada de un usuario.
+   * @param idUsuario Identificador del usuario.
+   */
   verInscripciones(idUsuario: number) {
     this.router.navigate(['/panel-admin/usuarios', idUsuario, 'inscripciones']);
   }

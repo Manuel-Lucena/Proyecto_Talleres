@@ -3,26 +3,25 @@ import { AbstractControl, ValidationErrors } from '@angular/forms';
 export class Validator {
 
   // --- LÓGICA PURA (Para usar en la Tabla de Carga Masiva o donde quieras) ---
-  
   static isEmail(value: string): boolean {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return regex.test(value);
   }
 
   static isDni(value: string): boolean {
-    const regex = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$/i;
+    // Regex idéntica a la de tu Java (soporta DNI y NIE)
+    const regex = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$|^[XYZ][0-9]{7}[TRWAGMYFPDXBNJZSQVHLCKE]$/i;
     return regex.test(value);
   }
 
   static isTelefono(value: string): boolean {
-    const regex = /^[0-9]{9}$/;
+    const regex = /^\d{9}$/;
     return regex.test(value);
   }
 
   static hasMinLength(value: string, min: number): boolean {
     return value ? value.trim().length >= min : false;
   }
-
 
   // --- VALIDADORES PARA ANGULAR (Los que ya tenías, no se tocan) ---
 

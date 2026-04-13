@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 import { UsuarioService } from '../../services/Usuario.Service';
@@ -7,12 +7,15 @@ import { TokenService } from '../../services/Token.Service';
 import { NotificacionService } from '../../services/Notificacion.Service';
 import { Validator } from '../../validators/Validator';
 
-
 import { Navbar } from "../../components/layout/navbar/navbar";
 import { UsuarioResponse } from '../../interfaces/Usuario.Interface';
 import { Confirmacion } from "../../components/dialogs/confirmacion/confirmacion";
 import { Notificacion } from "../../components/dialogs/mensaje/notificacion";
 
+/**
+ * Componente para la gestión del perfil del usuario autenticado.
+ * Permite visualizar datos personales, actualizar información y cambiar la foto de perfil.
+ */
 @Component({
   selector: 'app-perfil',
   standalone: true,
@@ -21,9 +24,16 @@ import { Notificacion } from "../../components/dialogs/mensaje/notificacion";
   styleUrl: './perfil.scss',
 })
 export class Perfil implements OnInit {
-  usuario: UsuarioResponse | null = null;
-  perfilForm!: FormGroup;
+  usuario: UsuarioResponse | null = null; // Datos del usuario actual
+  perfilForm!: FormGroup; // Formulario reactivo para la edición del perfil
 
+  /**
+   * @param fb Constructor de formularios reactivos.
+   * @param usuarioService Operaciones CRUD de usuarios.
+   * @param tokenService Gestión de sesión y credenciales.
+   * @param notify Servicio centralizado de alertas.
+   * @param cdr Detección manual de cambios para flujos asíncronos.
+   */
   constructor(
     private fb: FormBuilder,
     private usuarioService: UsuarioService,
@@ -32,14 +42,19 @@ export class Perfil implements OnInit {
     private cdr: ChangeDetectorRef
   ) { }
 
+  /**
+   * Inicializa la estructura del formulario y carga los datos del usuario.
+   */
   ngOnInit(): void {
     this.initForm();
     this.cargarDatosUsuario();
   }
 
+  /**
+   * Configura los controles y validaciones del formulario.
+   */
   private initForm(): void {
     this.perfilForm = this.fb.group({
-      // Usamos updateOn: 'blur' para que el error solo salga al salir del input
       nombre: ['', { validators: [Validators.required], updateOn: 'blur' }],
       apellidos: ['', { validators: [Validators.required], updateOn: 'blur' }],
       email: ['', { validators: [Validators.required, Validators.email], updateOn: 'blur' }],
@@ -49,6 +64,9 @@ export class Perfil implements OnInit {
     });
   }
 
+  /**
+   * Recupera la información del usuario autenticado desde el servidor.
+   */
   cargarDatosUsuario(): void {
     const userId = this.tokenService.getId();
     if (userId) {
@@ -67,12 +85,17 @@ export class Perfil implements OnInit {
     }
   }
 
-  // Helpers para mostrar errores en el HTML
+  /**
+   * Helper para validar la visibilidad de errores en el template.
+   */
   mostrarError(controlName: string): boolean {
     const control = this.perfilForm.get(controlName);
     return !!(control && control.invalid && control.touched);
   }
 
+  /**
+   * Retorna el mensaje de error correspondiente según la validación fallida.
+   */
   getErrorMessage(controlName: string): string {
     const control = this.perfilForm.get(controlName);
     if (!control || !control.errors) return '';
@@ -82,6 +105,9 @@ export class Perfil implements OnInit {
     return 'Campo inválido';
   }
 
+  /**
+   * Valida y procesa la actualización de los datos del perfil.
+   */
   actualizarPerfil(): void {
     if (this.perfilForm.valid && this.usuario) {
       this.enviarDatos(this.prepararFormData());
@@ -91,6 +117,9 @@ export class Perfil implements OnInit {
     }
   }
 
+  /**
+   * Gestiona la actualización inmediata del perfil al seleccionar una nueva imagen.
+   */
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file && this.usuario) {
@@ -100,6 +129,9 @@ export class Perfil implements OnInit {
     }
   }
 
+  /**
+   * Construye el objeto FormData incluyendo el DTO del usuario como Blob JSON.
+   */
   private prepararFormData(): FormData {
     const fd = new FormData();
     const valores = this.perfilForm.getRawValue();
@@ -126,6 +158,9 @@ export class Perfil implements OnInit {
     return fd;
   }
 
+  /**
+   * Envía la petición de actualización al servidor y gestiona la respuesta.
+   */
   private enviarDatos(fd: FormData): void {
     const id = this.usuario?.idUsuario;
     if (!id) return;
@@ -146,6 +181,9 @@ export class Perfil implements OnInit {
     });
   }
 
+  /**
+   * Solicita confirmación y cierra la sesión del usuario.
+   */
   async logout(): Promise<void> {
     const confirmar = await this.notify.confirmar({
       titulo: 'Cerrar Sesión',

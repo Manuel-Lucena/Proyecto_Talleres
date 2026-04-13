@@ -41,6 +41,16 @@ export class UsuarioService {
   }
 
   /**
+   * Realiza una carga masiva de usuarios.
+   * Envía un array de objetos.
+   * @param usuarios Array de objetos con la información de los usuarios a crear.
+   * @returns Observable con la respuesta de la API.
+   */
+  crearVariosUsuarios(usuarios: any[]): Observable<ApiResponse<UsuarioResponse[]>> {
+    return this.http.post<ApiResponse<UsuarioResponse[]>>(`${this.apiUrl}/batch`, usuarios);
+  }
+
+  /**
    * Obtiene la lista completa de usuarios registrados.
    * @returns Observable con un array de UsuarioResponse.
    */

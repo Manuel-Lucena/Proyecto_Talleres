@@ -4,18 +4,18 @@
     <button class="btn-close" (click)="cerrar.emit()"><i class="bi bi-x"></i></button>
 
     <div class="modal-header-simple">
-      <h2 class="titulo-formulario">Gestor de Importación</h2>
-      <p class="subtitulo">Sube tu archivo y corrige los datos directamente en la tabla antes de la carga final.</p>
+      <h2 class="titulo-formulario">Gestor de Importación Masiva</h2>
+      <p class="subtitulo">Verifica que el DNI, Email y Formatos sean correctos. Los datos en rojo deben ser corregidos para poder seleccionarlos.</p>
     </div>
 
     <div class="barra-carga">
       <div class="input-file-wrapper">
         <i class="bi bi-file-earmark-arrow-up"></i>
-        <input type="file" (change)="onFileSelected($event)" accept=".csv, .xlsx">
-        <span class="file-custom">{{ archivoNombre || 'Seleccionar archivo...' }}</span>
+        <input type="file" (change)="onFileSelected($event)" accept=".csv">
+        <span class="file-custom">{{ archivoNombre || 'Seleccionar archivo .csv...' }}</span>
       </div>
       <button class="btn-procesar" [disabled]="!archivoNombre" (click)="procesarArchivo()">
-        <i class="bi bi-gear-wide-connected"></i> Analizar
+        <i class="bi bi-gear-wide-connected"></i> Analizar Datos
       </button>
     </div>
 
@@ -25,11 +25,12 @@
           <thead>
             <tr>
               <th class="col-check"></th>
+              <th>DNI / NIE</th>
               <th>Nombre</th>
               <th>Apellidos</th>
               <th>Email</th>
               <th>Rol</th>
-              <th>Estado/Errores</th>
+              <th>Estado</th>
             </tr>
           </thead>
           <tbody>
@@ -37,9 +38,16 @@
               <td class="col-check">
                 <input type="checkbox" [(ngModel)]="u.seleccionado" [disabled]="u.errores.length > 0">
               </td>
+              <td>
+                <input type="text" [(ngModel)]="u.dni" (input)="validarFila(u)" 
+                       [class.input-error]="u.dniError" placeholder="12345678Z">
+              </td>
               <td><input type="text" [(ngModel)]="u.nombre" (input)="validarFila(u)"></td>
               <td><input type="text" [(ngModel)]="u.apellidos" (input)="validarFila(u)"></td>
-              <td><input type="email" [(ngModel)]="u.email" (input)="validarFila(u)" [class.input-error]="u.emailError"></td>
+              <td>
+                <input type="email" [(ngModel)]="u.email" (input)="validarFila(u)" 
+                       [class.input-error]="u.emailError">
+              </td>
               <td>
                 <select [(ngModel)]="u.rol" (change)="validarFila(u)">
                   <option value="Alumno">Alumno</option>
@@ -51,7 +59,7 @@
                   <i class="bi bi-exclamation-circle"></i> {{err}}
                 </div>
                 <span class="ok-tag" *ngIf="u.errores.length === 0">
-                  <i class="bi bi-check-circle"></i> Válido
+                  <i class="bi bi-check-circle"></i> Listo
                 </span>
               </td>
             </tr>
@@ -65,7 +73,7 @@
       <button type="button" class="btn-guardar" 
               [disabled]="!haySeleccionados() || procesando" 
               (click)="confirmarCarga()">
-        <span *ngIf="!procesando">Cargar {{ totalSeleccionados() }} usuarios</span>
+        <span *ngIf="!procesando">Importar {{ totalSeleccionados() }} registros</span>
         <span *ngIf="procesando" class="spinner-border spinner-border-sm"></span>
       </button>
     </div>

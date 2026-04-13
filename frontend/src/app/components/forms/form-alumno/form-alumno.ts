@@ -5,6 +5,9 @@ import { UsuarioRequest } from '../../../interfaces/Usuario.Interface';
 import { Validator } from '../../../validators/Validator'; 
 import { FormErrorService } from '../../../services/FormError.Service';
 
+/**
+ * Componente de formulario para la creación y edición de alumnos.
+ */
 @Component({
   selector: 'app-form-alumno',
   standalone: true,
@@ -13,16 +16,19 @@ import { FormErrorService } from '../../../services/FormError.Service';
   styleUrl: './form-alumno.scss',
 })
 export class FormAlumno implements OnInit {
-  @Input() usuarioParaEditar: any | null = null;
-  @Output() usuarioGuardado = new EventEmitter<FormData>();
-  @Output() cerrar = new EventEmitter<void>();
+  @Input() usuarioParaEditar: any | null = null; // Datos para modo edición
+  @Output() usuarioGuardado = new EventEmitter<FormData>(); // Emite el formulario al padre
+  @Output() cerrar = new EventEmitter<void>(); // Notifica el cierre del modal
 
-  fileSeleccionado: File | null = null;
-  verPassword = false;
+  fileSeleccionado: File | null = null; // Archivo de imagen de perfil
+  verPassword = false; // Control de visibilidad de contraseña
 
-  // Inyectamos el servicio como PUBLIC para que el HTML lo vea
+  /**
+   * @param errorService Servicio para gestionar la visualización de errores de validación.
+   */
   constructor(public errorService: FormErrorService) {}
 
+  /** Definición del formulario reactivo con sus validadores */
   form = new FormGroup({
     dni: new FormControl('', { validators: [Validators.required, Validator.dni], updateOn: 'blur' }),
     nombre: new FormControl('', { validators: [Validators.required], updateOn: 'blur' }),
@@ -35,6 +41,9 @@ export class FormAlumno implements OnInit {
     idRol: new FormControl(3)
   }, { validators: Validator.passwordMatch });
 
+  /**
+   * Carga los datos si es edición y ajusta validaciones de contraseña.
+   */
   ngOnInit(): void {
     if (this.usuarioParaEditar) {
       this.form.patchValue(this.usuarioParaEditar);
@@ -44,11 +53,18 @@ export class FormAlumno implements OnInit {
     }
   }
 
+  /**
+   * Captura el archivo seleccionado del input.
+   * @param event Evento de selección de archivos.
+   */
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) this.fileSeleccionado = file;
   }
 
+  /**
+   * Valida y emite los datos del alumno en formato FormData.
+   */
   enviar(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -75,5 +91,10 @@ export class FormAlumno implements OnInit {
     this.usuarioGuardado.emit(formData);
   }
 
-  cerrarModal() { this.cerrar.emit(); }
+  /**
+   * Emite el evento para cerrar el modal.
+   */
+  cerrarModal(): void { 
+    this.cerrar.emit(); 
+  }
 }

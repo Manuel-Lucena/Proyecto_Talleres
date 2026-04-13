@@ -14,6 +14,9 @@ import { FormInscripcion } from "../../components/forms/form-inscripcion/form-in
 import { Confirmacion } from "../../components/dialogs/confirmacion/confirmacion";
 import { Notificacion } from "../../components/dialogs/mensaje/notificacion";
 
+/**
+ * Componente principal para la exploración, filtrado y gestión de talleres.
+ */
 @Component({
   selector: 'app-talleres-explorar',
   standalone: true,
@@ -26,16 +29,24 @@ import { Notificacion } from "../../components/dialogs/mensaje/notificacion";
 })
 export class TalleresExplorar implements OnInit {
 
-  talleres: TallerResponse[] = [];
-  talleresFiltrados: TallerResponse[] = [];
-  filtroForm: FormGroup;
-  cargando: boolean = true;
-  puedeGestionar: boolean = false;
+  talleres: TallerResponse[] = []; // Listado completo de talleres desde el servidor
+  talleresFiltrados: TallerResponse[] = []; // Listado tras aplicar filtros de búsqueda
+  filtroForm: FormGroup; // Formulario reactivo para los filtros de la vista
+  cargando: boolean = true; // Estado de carga de la petición inicial
+  puedeGestionar: boolean = false; // Flag de permisos para acciones de Admin/Profesor
 
-  mostrarModalForm: boolean = false;
-  mostrarModalInscripcion: boolean = false;
-  tallerSeleccionado: TallerResponse | null = null;
+  mostrarModalForm: boolean = false; // Control de visibilidad del formulario de taller
+  mostrarModalInscripcion: boolean = false; // Control de visibilidad del formulario de pago
+  tallerSeleccionado: TallerResponse | null = null; // Taller activo para editar o inscribir
 
+  /**
+   * @param tallerService Servicio para operaciones CRUD de talleres.
+   * @param tokenService Servicio para validar identidad y roles.
+   * @param inscripcionService Servicio para procesar registros de alumnos.
+   * @param notify Servicio centralizado de alertas y confirmaciones.
+   * @param cdr Detección manual de cambios para procesos asíncronos.
+   * @param fb Constructor de formularios reactivos.
+   */
   constructor(
     private tallerService: TallerService,
     private tokenService: TokenService,
@@ -51,6 +62,9 @@ export class TalleresExplorar implements OnInit {
     });
   }
 
+  /**
+   * Inicializa la vista comprobando permisos y cargando los datos iniciales.
+   */
   ngOnInit(): void {
     this.comprobarPermisos();
     this.cargarTalleres();
@@ -60,11 +74,17 @@ export class TalleresExplorar implements OnInit {
     });
   }
 
+  /**
+   * Determina si el usuario actual tiene rango suficiente para crear o editar talleres.
+   */
   comprobarPermisos(): void {
     const rol = this.tokenService.getRol();
     this.puedeGestionar = (rol === 'ADMIN' || rol === 'PROFESOR');
   }
 
+  /**
+   * Recupera la colección de talleres de la API.
+   */
   cargarTalleres(): void {
     this.tallerService.listarTodos().subscribe({
       next: (response) => {
@@ -80,13 +100,16 @@ export class TalleresExplorar implements OnInit {
     });
   }
 
+  /**
+   * Filtra la lista de talleres en base al texto, precio y disponibilidad de plazas.
+   */
   aplicarFiltros(): void {
     const { texto, precioMax, soloDisponibles } = this.filtroForm.value;
     const buscar = texto.toLowerCase();
 
     this.talleresFiltrados = this.talleres.filter(t => {
       const coincideTexto = t.nombre.toLowerCase().includes(buscar) || 
-                           t.descripcion.toLowerCase().includes(buscar);
+                            t.descripcion.toLowerCase().includes(buscar);
       const coincidePrecio = t.precio <= precioMax;
       const coincidePlazas = soloDisponibles ? t.plazasDisponibles > 0 : true;
 
@@ -94,20 +117,34 @@ export class TalleresExplorar implements OnInit {
     });
   }
 
+  /**
+   * Resetea los filtros a sus valores por defecto.
+   */
   limpiarFiltros(): void {
     this.filtroForm.patchValue({ texto: '', precioMax: 500, soloDisponibles: false });
   }
 
+  /**
+   * Prepara el estado para crear un nuevo taller.
+   */
   abrirCreacion(): void {
     this.tallerSeleccionado = null;
     this.mostrarModalForm = true;
   }
 
+  /**
+   * Carga un taller específico para su edición.
+   * @param taller El objeto taller a editar.
+   */
   abrirEdicion(taller: TallerResponse): void {
     this.tallerSeleccionado = { ...taller };
     this.mostrarModalForm = true;
   }
 
+  /**
+   * Persiste los datos (creación o actualización) mediante FormData.
+   * @param fd Datos del taller incluyendo posible archivo de imagen.
+   */
   guardarCambios(fd: FormData): void {
     const id = this.tallerSeleccionado?.idTaller;
     const peticion = id ? this.tallerService.actualizar(id, fd) : this.tallerService.crear(fd);
@@ -121,6 +158,10 @@ export class TalleresExplorar implements OnInit {
     });
   }
 
+  /**
+   * Inicia el proceso de inscripción validando sesión previa.
+   * @param taller Taller al que se desea inscribir el alumno.
+   */
   abrirInscripcion(taller: TallerResponse): void {
     if (!this.tokenService.isLogged()) {
       this.notify.mostrar({ titulo: 'Atención', mensaje: 'Inicia sesión para inscribirte', tipo: 'error' });
@@ -130,6 +171,10 @@ export class TalleresExplorar implements OnInit {
     this.mostrarModalInscripcion = true;
   }
 
+  /**
+   * Envía los datos de inscripción y pago al servidor.
+   * @param dto Objeto con la información de la inscripción.
+   */
   finalizarInscripcion(dto: any): void {
     this.inscripcionService.inscribir(dto).subscribe({
       next: () => {
@@ -141,6 +186,10 @@ export class TalleresExplorar implements OnInit {
     });
   }
 
+  /**
+   * Solicita confirmación y elimina un taller del sistema.
+   * @param taller Taller a eliminar.
+   */
   async eliminarTaller(taller: TallerResponse): Promise<void> {
     const confirmar = await this.notify.confirmar({
       titulo: 'Eliminar',

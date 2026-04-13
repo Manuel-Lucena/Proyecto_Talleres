@@ -1,9 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
 import { NotificacionService } from '../../../services/Notificacion.Service';
+import { Observable } from 'rxjs';
 import { ConfirmacionConfig } from '../../../interfaces/Modal.Interface';
 
+/**
+ * Componente para la gestión visual de diálogos de confirmación dinámicos.
+ */
 @Component({
   selector: 'app-confirmacion',
   standalone: true,
@@ -12,13 +15,21 @@ import { ConfirmacionConfig } from '../../../interfaces/Modal.Interface';
   styleUrl: './confirmacion.scss'
 })
 export class Confirmacion {
-  public config$: Observable<ConfirmacionConfig | null>;
+  
+  public config$: Observable<ConfirmacionConfig | null>; // Estado y configuración del modal
 
+  /**
+   * @param notificacionService Servicio para suscribirse al estado global de confirmaciones.
+   */
   constructor(private notificacionService: NotificacionService) {
     this.config$ = this.notificacionService.confirmacionState$;
   }
 
-  responder(respuesta: boolean) {
+  /**
+   * Resuelve la promesa de confirmación según la interacción del usuario.
+   * @param respuesta Booleano que indica aceptación o cancelación.
+   */
+  responder(respuesta: boolean): void {
     this.notificacionService.responderConfirmacion(respuesta);
   }
 }
