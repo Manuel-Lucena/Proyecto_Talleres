@@ -80,6 +80,31 @@ public class UsuarioService {
         return mapearAuthResponse(usuario);
     }
 
+    /**
+     * Procesa una lista de usuarios para su inserción masiva.
+     * * @param dtos Lista de datos de usuarios a registrar.
+     * 
+     * @return Lista de usuarios creados mapeados a ResponseDTO.
+     */
+    @Transactional
+    public List<UsuarioResponseDTO> registrarMasivo(List<UsuarioRequestDTO> dtos) {
+        return dtos.stream().map(dto -> {
+            validarEmailUnico(dto.getEmail());
+            if (usuarioRepository.existsByDni(dto.getDni())) {
+                throw new DuplicateResourceException("El DNI " + dto.getDni() + " ya está registrado");
+            }
+
+            Usuario usuario = usuarioMapper.toEntity(dto); 
+            usuario.setId(null);
+
+            usuario.setRol(obtenerRol(dto.getIdRol()));
+            usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
+            usuario.setActivo(true);
+
+            return usuarioMapper.toResponse(usuarioRepository.save(usuario));
+        }).collect(Collectors.toList());
+    }
+
     // --- MÉTODOS GET ---
 
     /**

@@ -20,3 +20,12 @@ VALUES (1, 1, 'Lunes', '16:00:00', '18:00:00');
 -- 5. NOTICIAS (imagen_url en lugar de foto_ruta, según tu log de Hibernate)
 INSERT INTO noticia (id_noticia, titulo, contenido, fecha_publicacion, imagen_url) 
 VALUES (1, 'Bienvenidos', 'Contenido de prueba', CURRENT_DATE, 'noticia1.jpg');
+
+-- Sincronizar el contador de usuarios
+ALTER TABLE usuario ALTER COLUMN id_usuario RESTART WITH (SELECT MAX(id_usuario) + 1 FROM usuario);
+
+-- Sincronizar el contador de roles (por si acaso)
+ALTER TABLE rol ALTER COLUMN id_rol RESTART WITH (SELECT MAX(id_rol) + 1 FROM rol);
+
+-- Sincronizar el contador de talleres
+ALTER TABLE taller ALTER COLUMN id_taller RESTART WITH (SELECT MAX(id_taller) + 1 FROM taller);

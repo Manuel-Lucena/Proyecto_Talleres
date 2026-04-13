@@ -44,6 +44,18 @@ public class UsuarioController {
     }
 
     /**
+     * Registra múltiples usuarios de forma simultánea.
+     * * @param usuarios Lista de DTOs con los datos de los usuarios.
+     * 
+     * @return ApiResponse con la lista de usuarios creados.
+     */
+    @PostMapping("/batch")
+    public ApiResponse<List<UsuarioResponseDTO>> registrarMasivo(@RequestBody @Valid List<UsuarioRequestDTO> usuarios) {
+        List<UsuarioResponseDTO> creados = usuarioService.registrarMasivo(usuarios);
+        return ApiResponse.success(creados, "Se han importado " + creados.size() + " usuarios correctamente");
+    }
+
+    /**
      * Autentica a un usuario mediante sus credenciales.
      * 
      * @param dto Objeto que contiene email y password.

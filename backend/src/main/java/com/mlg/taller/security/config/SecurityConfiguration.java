@@ -35,8 +35,55 @@ public class SecurityConfiguration {
                         // 2. AÑADE ESTO: Permite todas las peticiones de tipo OPTIONS (Preflight)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // --- RUTAS USUARIOS ---
+                        // =========================================================
+                        // 1. ENTIDAD: USUARIOS & AUTH
+                        // =========================================================
+
+                        // Acceso Público (Registro y Login)
                         .requestMatchers(HttpMethod.POST, "/api/usuarios/register", "/api/usuarios/login").permitAll()
+
+                        // Acceso exclusivo ADMIN (Gestión masiva y eliminación)
+                        .requestMatchers(HttpMethod.POST, "/api/usuarios/batch").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/usuarios/**").hasRole("ADMIN")
+
+                        // Acceso Autenticado (Listar, ver perfil, actualizar)
+                        .requestMatchers("/api/usuarios/**").authenticated()
+
+                        // =========================================================
+                        // 2. ENTIDAD: TALLERES
+                        // =========================================================
+
+                        // Lectura: Cualquier usuario logueado puede ver el catálogo y sus talleres
+                        .requestMatchers(HttpMethod.GET, "/api/talleres/**").authenticated()
+
+                        // Escritura: Solo el ADMIN puede crear, modificar o eliminar talleres
+                        .requestMatchers(HttpMethod.POST, "/api/talleres/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/talleres/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/talleres/**").hasRole("ADMIN")
+
+                        // =========================================================
+                        // 3. ENTIDAD: NOTICIAS
+                        // =========================================================
+
+                        // Lectura: Público (Cualquiera puede leer las noticias)
+                        .requestMatchers(HttpMethod.GET, "/api/noticias/**").permitAll()
+
+                        // Gestión: Solo ADMIN puede publicar, editar o borrar
+                        .requestMatchers(HttpMethod.POST, "/api/noticias/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/noticias/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/noticias/**").hasRole("ADMIN")
+
+                        // =========================================================
+                        // 4. ENTIDAD: MENSAJES
+                        // =========================================================
+
+                        // Moderación y Auditoría: Solo ADMIN ve todo el historial global o elimina
+                        .requestMatchers(HttpMethod.GET, "/api/mensajes").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/mensajes/**").hasRole("ADMIN")
+
+                        // Comunicación: Alumnos/Profesores pueden enviar y ver chats de sus talleres
+                        .requestMatchers("/api/mensajes/**").authenticated()
+
                         // ... resto de tus rutas ...
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())
