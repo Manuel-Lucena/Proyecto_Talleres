@@ -11,27 +11,19 @@ import { RouterOutlet } from '@angular/router';
 })
 export class App {
   showAccessMenu = false;
-  isDarkMode = false;
   contrastValue = 100;
 
   toggleAccessMenu() {
     this.showAccessMenu = !this.showAccessMenu;
   }
 
-  toggleDarkMode(event: any) {
-    this.isDarkMode = event.target.checked;
-    document.body.classList.toggle('dark-mode', this.isDarkMode);
-  }
-
   updateContrast(event: any) {
     this.contrastValue = event.target.value;
-    // Esto cambia la variable de 50% (bajo) a 200% (alto)
     document.documentElement.style.setProperty('--app-contrast', `${this.contrastValue}%`);
   }
 
   setDaltonism(event: any) {
     const type = event.target.value;
-    // Eliminamos todas las posibles clases de daltonismo
     document.body.classList.remove('protanopia', 'deuteranopia', 'tritanopia');
     if (type !== 'none') {
       document.body.classList.add(type);
@@ -44,10 +36,9 @@ export class App {
   }
 
   resetAll() {
-    this.isDarkMode = false;
     this.contrastValue = 100;
     this.showAccessMenu = false;
     document.documentElement.style.setProperty('--app-contrast', '100%');
-    document.body.className = ''; // Limpia todas las clases (dark-mode, font, daltonismo)
+    document.body.classList.remove('protanopia', 'deuteranopia', 'tritanopia', 'font-small', 'font-medium', 'font-large');
   }
 }

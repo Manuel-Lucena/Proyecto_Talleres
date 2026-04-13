@@ -6,9 +6,9 @@
         <div class="logo-wrapper-static">
           <img src="icons/Logo.png" alt="Logo" class="logo-img">
         </div>
-        
+
         <div class="v-divider"></div>
-        
+
         <div class="brand-text">
           <h1 class="m-0 fw-bold">Aula Viva</h1>
           <p class="m-0 text-uppercase ls-2">Centro Educativo</p>
@@ -38,7 +38,7 @@
         <li class="nav-item">
           <a class="nav-link" routerLink="/calendario" routerLinkActive="active-link">Calendario</a>
         </li>
-        @if (tokenService?.getRol()?.toLowerCase() === 'admin') {
+        @if (tokenService.getRol()?.toLowerCase() === 'admin') {
         <li class="nav-item">
           <a class="nav-link" routerLink="/panel-admin" routerLinkActive="active-link">Panel Admin</a>
         </li>
@@ -50,7 +50,9 @@
         <div class="user-menu-container">
           <div class="user-trigger" (click)="toggleDropdown($event)">
             <div class="avatar-box">
-              <img [src]="usuarioData?.fotoPerfilRuta ? '/usuarios/' + usuarioData?.fotoPerfilRuta : '/usuarios/Predeterminada.png'" alt="User">
+              <img
+                [src]="usuarioData?.fotoPerfilRuta ? '/usuarios/' + usuarioData?.fotoPerfilRuta : '/usuarios/Predeterminada.png'"
+                alt="User">
             </div>
             <span class="user-display-name">{{ usuarioData?.nombre }}</span>
             <i class="bi bi-chevron-down arrow ms-2" [class.open]="mostrarDropdown"></i>

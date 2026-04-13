@@ -1,18 +1,27 @@
-// ARCHIVO _FORMULARIOS
+/* ==========================================================================
+   SISTEMA DE FORMULARIOS - AULA VIVA
+   Define la estética de contenedores, inputs y zonas de carga de archivos.
+   ========================================================================== */
+
 @import 'variables';
 @import 'mixins';
 
+/**
+ * Mixin para el contenedor principal de formularios.
+ * Crea una superficie elevada con un diseño limpio y profesional.
+ */
 @mixin estilo-contenedor-formulario {
     background: $color-neutro-max;
     padding: 2.5rem;
-    border-radius: $radio-curvatura * 2;
+    border-radius: $radio-curvatura * 2; // Bordes más redondeados para formularios
     box-shadow: 0 10px 30px rgba($color-neutro-min, 0.08);
     border: 1px solid rgba($color-marca-principal, 0.1);
 
     &:hover {
-        transform: none;
+        transform: none; // Evitamos elevación extra para mantener usabilidad
     }
 
+    // Título del formulario con línea decorativa lateral
     .titulo-formulario {
         font-family: $fuente-enfasis;
         font-size: $tamaño-titular-md;
@@ -32,6 +41,7 @@
         }
     }
 
+    // Layout de filas: Se vuelve columna en dispositivos móviles
     .fila-formulario {
         display: flex;
         gap: 1.5rem;
@@ -42,6 +52,7 @@
         }
     }
 
+    // Contenedor individual de etiqueta + input
     .campo-formulario {
         flex: 1 1 0px;
         display: flex;
@@ -53,13 +64,13 @@
             font-weight: 700;
             font-size: 0.75rem;
             color: $color-secundario-frio-2;
-            text-transform: uppercase;
+            text-transform: uppercase; // Estilo minimalista y profesional
         }
 
         input,
         select,
         textarea {
-            @include estilo-input-base;
+            @include estilo-input-base; // Mixin definido en _mixins.scss
         }
     }
 
@@ -72,13 +83,17 @@
     }
 }
 
+// Aplicación del mixin a la clase global
 .contenedor-formulario {
     @include estilo-contenedor-formulario;
 }
 
-// ZONA DE SUBIDA CORREGIDA (Sin el prefijo v.)
+/* --------------------------------------------------------------------------
+   ZONA DE SUBIDA DE ARCHIVOS (Drag & Drop)
+   Componente visual para la carga de documentos e imágenes.
+   -------------------------------------------------------------------------- */
 .zona-subida {
-    border: 2px dashed #ddd;
+    border: 2px dashed #ddd; // Borde punteado clásico de subida
     padding: 30px 20px;
     border-radius: 15px;
     display: flex;
@@ -104,20 +119,22 @@
         max-width: 200px;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
+        white-space: nowrap; // Evita que nombres de archivos largos rompan el diseño
     }
 
+    // Efecto de interacción (Hover / Focus)
     &:hover {
-        background-color: rgba($color-marca-principal, 0.03); // Corregido: sin v.
-        border-color: $color-marca-principal; // Corregido: sin v.
-        color: $color-marca-principal; // Corregido: sin v.
+        background-color: rgba($color-marca-principal, 0.03);
+        border-color: $color-marca-principal;
+        color: $color-marca-principal;
 
         i {
-            color: $color-marca-principal; // Corregido: sin v.
-            transform: translateY(-3px);
+            color: $color-marca-principal;
+            transform: translateY(-3px); // Pequeña animación de "salto"
         }
     }
 
+    // Estado cuando ya se ha seleccionado o detectado un archivo
     &.archivo-listo {
         border-style: solid;
         border-color: #27ae60;

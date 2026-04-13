@@ -1,43 +1,56 @@
+/* ==========================================================================
+   SISTEMA DE ACCESIBILIDAD GLOBAL
+   Controla: Contraste dinámico, Modos de Daltonismo y Escalado de Fuente.
+   ========================================================================== */
+
 :root {
+  // Variable CSS controlada desde Angular (updateContrast)
+  // Valor por defecto: 100% (Normal)
   --app-contrast: 100%;
 }
 
-// Contenedor principal para filtros
+/**
+ * Contenedor principal para filtros de imagen.
+ * Se aplica a este wrapper para evitar que los filtros afecten al panel 
+ * de accesibilidad flotante y para asegurar un rendimiento óptimo.
+ */
 .app-content-wrapper {
   filter: contrast(var(--app-contrast));
-  transition: filter 0.3s ease;
+  transition: filter 0.3s ease; // Transición suave al cambiar ajustes
   min-height: 100vh;
 }
 
-// MODO OSCURO (Basado en clases)
-body.dark-mode {
-  background-color: #121212;
-  color: #f5f5f5;
+/* --------------------------------------------------------------------------
+   FILTROS DE DALTONISMO
+   Ajustan la paleta mediante sepia, rotación de hue y saturación para 
+   mejorar la distinción de colores según la deficiencia visual.
+   -------------------------------------------------------------------------- */
 
-  .card, .sidebar, .main-nav, .table, .panel-header {
-    background-color: #1e1e1e;
-    color: #f5f5f5;
-    border-color: #333;
-  }
-}
-
-// DALTONISMO MEJORADO
-// Protanopia (Falta de rojo): Viramos hacia azules/amarillos
+// 1. Protanopia: Deficiencia de fotorreceptores rojos
 body.protanopia .app-content-wrapper {
   filter: contrast(var(--app-contrast)) sepia(50%) hue-rotate(-50deg) saturate(200%);
 }
 
-// Deuteranopia (Falta de verde): Similar a protanopia pero más cálido
+// 2. Deuteranopia: Deficiencia de fotorreceptores verdes (más común)
 body.deuteranopia .app-content-wrapper {
   filter: contrast(var(--app-contrast)) sepia(50%) hue-rotate(-10deg) saturate(180%);
 }
 
-// Tritanopia (Falta de azul): Viramos hacia rojos/verdes
+// 3. Tritanopia: Deficiencia de fotorreceptores azules (poco común)
 body.tritanopia .app-content-wrapper {
   filter: contrast(var(--app-contrast)) sepia(30%) hue-rotate(140deg) saturate(150%);
 }
 
-// TAMAÑOS
+/* --------------------------------------------------------------------------
+   ESCALADO DE FUENTE (TIPOGRAFÍA)
+   Controlado por clases aplicadas al body para herencia global.
+   -------------------------------------------------------------------------- */
+
+// Tamaño pequeño (Para usuarios que prefieren más densidad de datos)
 body.font-small { font-size: 0.85rem; }
+
+// Tamaño base (Estándar de la aplicación)
 body.font-medium { font-size: 1rem; }
+
+// Tamaño grande (Mejora la legibilidad para usuarios con visión baja)
 body.font-large { font-size: 1.2rem; }

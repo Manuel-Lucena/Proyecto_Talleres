@@ -58,8 +58,7 @@
 
       @media (min-width: 992px) {
         display: inline-block;
-        // ESPACIADO AUMENTADO AQUÍ (30px a los lados para que no estén pegados)
-        margin: 0 30px;
+        margin: 0 30px; // Espaciado amplio para que no estén pegadas
         padding: 10px 0;
       }
 
@@ -157,6 +156,26 @@
     padding: 10px 0 10px 20px;
     background: #fcfcfc;
     margin-top: 10px;
+  }
+
+  // CABECERA CON NOMBRE CENTRADO
+  .dropdown-header-box {
+    padding: 10px 0;
+    text-align: center;
+
+    .user-full-name {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: v.$color-secundario-frio-2;
+      font-family: v.$fuente-enfasis;
+      display: block;
+    }
+  }
+
+  .menu-divider {
+    height: 1px;
+    background: #eee;
+    margin: 10px 0;
   }
 
   .item-link {

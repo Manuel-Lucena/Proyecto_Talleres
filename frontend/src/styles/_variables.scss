@@ -1,52 +1,74 @@
-// ARCHIVO _VARIABLES
-// =========================================================
-// VARIABLES GLOBALES - AULA VIVA (SEMÁNTICO)
-// =========================================================
+/* ==========================================================================
+   VARIABLES GLOBALES - SISTEMA DE DISEÑO AULA VIVA
+   Este archivo centraliza los tokens de diseño (colores, tipografía, sombras).
+   Cualquier cambio aquí se reflejará en toda la aplicación.
+   ========================================================================== */
 
-// 1. COLORES DE IDENTIDAD
-$color-marca-principal:  #0ed145;
-$color-marca-claro:      #11e147;
-$color-marca-oscuro:     #0ce146;
+// --------------------------------------------------------------------------
+// 1. COLORES DE IDENTIDAD (Brand Colors)
+// Definidos según la paleta institucional de Aula Viva.
+// --------------------------------------------------------------------------
+$color-marca-principal: #0ed145; // Verde corporativo
+$color-marca-claro:     #11e147; // Variante para estados success o hover
+$color-marca-oscuro:    #0ce146; // Variante para contraste o bordes
 
-$color-neutro-max:       #ffffff;
-$color-neutro-min:       #000000;
+$color-neutro-max:      #ffffff; // Blanco puro
+$color-neutro-min:      #000000; // Negro puro
 
-// 2. COLORES SECUNDARIOS POR TEMPERATURA / FUNCIÓN
-$color-secundario-frio-1:   #00bcd4;
-$color-secundario-frio-2:   #2d4059;
-$color-secundario-calido-1: #f2994a; // Naranja de acción según guía
-$color-secundario-calido-2: #f2c94c;
+// --------------------------------------------------------------------------
+// 2. COLORES SECUNDARIOS (Temperatura y Función)
+// Utilizados para categorizar acciones y estados visuales.
+// --------------------------------------------------------------------------
+$color-secundario-frio-1:   #00bcd4; // Cian: Generalmente para información (Info)
+$color-secundario-frio-2:   #2d4059; // Azul oscuro: Contraste y encabezados
+$color-secundario-calido-1: #f2994a; // Naranja: Acciones de peligro o alerta (Danger)
+$color-secundario-calido-2: #f2c94c; // Amarillo: Advertencias (Warning)
 
-// 3. SUPERFICIES Y GRISES
-$color-superficie-suave:    #beb3b3;
-$color-superficie-oscura:   #373030;
-$color-fondo-pagina:        #f8f9fa;
+// --------------------------------------------------------------------------
+// 3. SUPERFICIES Y ESCALA DE GRISES
+// Controlan el fondo de la página y la profundidad de los componentes.
+// --------------------------------------------------------------------------
+$color-superficie-suave:    #beb3b3; // Gris medio para bordes inactivos
+$color-superficie-oscura:   #373030; // Gris carbón para texto principal
+$color-fondo-pagina:        #f8f9fa; // Gris muy claro (Layout de fondo)
 
-// 4. ASIGNACIÓN A BOOTSTRAP (Mapeo funcional)
-$primary:       $color-marca-principal;
-$secondary:     $color-secundario-frio-2;
-$success:       $color-marca-claro;
-$info:          $color-secundario-frio-1;
-$warning:       $color-secundario-calido-2;
-$danger:        $color-secundario-calido-1;
-$dark:          $color-neutro-min;
-$light:         $color-fondo-pagina;
+// --------------------------------------------------------------------------
+// 4. MAPEO FUNCIONAL (Bootstrap & Frameworks)
+// Vincula nuestros tokens de diseño con las variables estándar del framework.
+// --------------------------------------------------------------------------
+$primary:   $color-marca-principal;
+$secondary: $color-secundario-frio-2;
+$success:   $color-marca-claro;
+$info:      $color-secundario-frio-1;
+$warning:   $color-secundario-calido-2;
+$danger:    $color-secundario-calido-1;
+$dark:      $color-neutro-min;
+$light:     $color-fondo-pagina;
 
+// --------------------------------------------------------------------------
 // 5. TIPOGRAFÍA
+// Configuración de fuentes y escala modular de tamaños.
+// --------------------------------------------------------------------------
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,400;0,700&family=Poppins:wght@500;600;700&family=Inter:wght@400&display=swap');
 
-$fuente-lectura:     'Nunito Sans', sans-serif;
-$fuente-enfasis:      'Poppins', sans-serif;
+$fuente-lectura: 'Nunito Sans', sans-serif; // Para párrafos y bloques largos
+$fuente-enfasis: 'Poppins', sans-serif;     // Para titulares y botones
 
-$tamaño-raiz:        1rem;
-$tamaño-titular-xl:  calc(36rem / 16); 
-$tamaño-titular-lg:  calc(28rem / 16); 
-$tamaño-titular-md:  calc(22rem / 16); 
+// Escala modular basada en rem para accesibilidad
+$tamaño-raiz:       1rem;
+$tamaño-titular-xl: calc(36rem / 16); // ~36px
+$tamaño-titular-lg: calc(28rem / 16); // ~28px
+$tamaño-titular-md: calc(22rem / 16); // ~22px
 
-// 6. ESTRUCTURA
-$radio-curvatura:    0.5rem; // Ajustado a 8px según guía
+// --------------------------------------------------------------------------
+// 6. ESTRUCTURA Y GEOMETRÍA
+// --------------------------------------------------------------------------
+$radio-curvatura: 0.5rem; // Equivalente a 8px según guía de estilo
 
-// 7. PROFUNDIDAD (Sombras Guía de Estilo)
-$sombra-nivel-1: 0 2px 4px rgba(0,0,0,0.05);
-$sombra-nivel-2: 0 10px 20px rgba(0,0,0,0.08);
-$sombra-nivel-3: 0 20px 40px rgba(0,0,0,0.12);
+// --------------------------------------------------------------------------
+// 7. PROFUNDIDAD (Elevation / Sombras)
+// Basadas en la guía de estilo para generar jerarquía visual.
+// --------------------------------------------------------------------------
+$sombra-nivel-1: 0 2px 4px rgba(0, 0, 0, 0.05);   // Elementos sutiles (Cards)
+$sombra-nivel-2: 0 10px 20px rgba(0, 0, 0, 0.08); // Hover y Dropdowns
+$sombra-nivel-3: 0 20px 40px rgba(0, 0, 0, 0.12); // Modales y elementos críticos

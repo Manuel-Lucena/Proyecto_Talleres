@@ -1,6 +1,19 @@
+/* ==========================================================================
+   BIBLIOTECA DE MIXINS - AULA VIVA
+   Contiene bloques de código reutilizables para botones, inputs, tipografía
+   y comportamientos visuales comunes.
+   ========================================================================== */
+
 @import 'variables';
 
-// 1. BOTONES
+// --------------------------------------------------------------------------
+// 1. COMPONENTES: BOTONES
+// --------------------------------------------------------------------------
+
+/**
+ * Botón principal con los colores de identidad de la marca.
+ * Incluye estados de hover con elevación sutil.
+ */
 @mixin boton-primario {
     background-color: $color-marca-principal;
     border: none;
@@ -22,6 +35,10 @@
     }
 }
 
+/**
+ * Botón específico para acciones de inscripción.
+ * Utiliza el color de acento cálido y gestiona estados deshabilitados.
+ */
 @mixin boton-inscripcion-aula {
     background-color: $color-secundario-calido-1;
     border: none;
@@ -44,6 +61,10 @@
     }
 }
 
+/**
+ * Botón de cierre (X) para modales y paneles.
+ * Posicionamiento absoluto y efecto de escala al pasar el ratón.
+ */
 @mixin boton-cerrar-circular {
     position: absolute;
     top: 1.2rem;
@@ -61,7 +82,6 @@
     z-index: 110;
     padding: 5px;
 
-
     &:focus,
     &:active {
         outline: none;
@@ -74,7 +94,14 @@
     }
 }
 
-// 2. INPUTS
+// --------------------------------------------------------------------------
+// 2. COMPONENTES: INPUTS Y FORMULARIOS
+// --------------------------------------------------------------------------
+
+/**
+ * Estilo base para campos de entrada de texto.
+ * Incluye un estado de focus con un "glow" de marca.
+ */
 @mixin estilo-input-base {
     width: 100%;
     padding: 14px;
@@ -91,9 +118,30 @@
     }
 }
 
+/**
+ * Estructura para grupos de inputs que contienen iconos o botones adjuntos.
+ */
+@mixin input-group-personalizado {
+    border: 1px solid $color-superficie-suave;
+    border-radius: $radio-curvatura;
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+    display: flex;
 
+    &:focus-within {
+        border-color: $color-marca-principal;
+        box-shadow: 0 0 0 0.25rem rgba($color-marca-principal, 0.1);
+    }
+}
 
-// 3. TEXTOS Y TÍTULOS
+// --------------------------------------------------------------------------
+// 3. TIPOGRAFÍA Y TEXTO
+// --------------------------------------------------------------------------
+
+/**
+ * Generador de titulares de sección.
+ * @param {Color} $color-texto - Color del título (por defecto el frío oscuro).
+ */
 @mixin titulo-seccion($color-texto: $color-secundario-frio-2) {
     font-family: $fuente-enfasis;
     font-size: 2.5rem;
@@ -103,6 +151,10 @@
     line-height: 1.2;
 }
 
+/**
+ * Truncado de texto multilínea.
+ * @param {Number} $lineas - Cantidad de líneas visibles antes de los puntos suspensivos.
+ */
 @mixin limitar-lineas($lineas: 3) {
     display: -webkit-box;
     -webkit-line-clamp: $lineas;
@@ -110,7 +162,13 @@
     overflow: hidden;
 }
 
-// 4. CARDS Y ANIMACIONES
+// --------------------------------------------------------------------------
+// 4. CARDS, CONTENEDORES Y ANIMACIONES
+// --------------------------------------------------------------------------
+
+/**
+ * Contenedor con elevación y desplazamiento vertical en hover.
+ */
 @mixin card-elevada {
     background: white;
     border-radius: $radio-curvatura;
@@ -125,6 +183,9 @@
     }
 }
 
+/**
+ * Animación suave de entrada para modales o elementos nuevos en el DOM.
+ */
 @mixin animacion-entrada {
     animation: fadeInModal 0.3s ease-out forwards;
 
@@ -133,7 +194,6 @@
             opacity: 0;
             transform: scale(0.98);
         }
-
         to {
             opacity: 1;
             transform: scale(1);
@@ -141,8 +201,10 @@
     }
 }
 
+/**
+ * Estilo para zonas de arrastre de archivos (Drag & Drop) estándar.
+ */
 @mixin zona-subida-estandar {
-    // Aquí usamos las variables directamente sin el "v."
     border: 2px dashed $color-superficie-suave;
     background: $color-fondo-pagina;
     border-radius: $radio-curvatura;
@@ -181,6 +243,10 @@
     }
 }
 
+/**
+ * Estructura de fila para elementos de lista de Aula Viva.
+ * Incluye un indicador lateral dinámico en hover.
+ */
 @mixin card-aula-viva {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -193,21 +259,23 @@
 
     &:hover {
         background-color: #fcfcfc;
-        box-shadow: inset 6px 0 0 v.$color-marca-principal;
+        box-shadow: inset 6px 0 0 $color-marca-principal;
 
         .titulo {
-            color: v.$color-marca-principal;
+            color: $color-marca-principal;
         }
 
         .action-icon,
         .flecha-link {
             transform: translateX(5px);
-            color: v.$color-marca-principal;
+            color: $color-marca-principal;
         }
     }
 }
 
-// En _mixins.scss
+/**
+ * Efecto de escala interactiva para iconos y botones pequeños.
+ */
 @mixin hover-escala {
     transition: transform 0.2s ease-in-out;
 
@@ -217,18 +285,5 @@
 
     &:active {
         transform: scale(0.95);
-    }
-}
-
-@mixin input-group-personalizado {
-    border: 1px solid $color-superficie-suave;
-    border-radius: $radio-curvatura;
-    transition: all 0.3s ease-in-out;
-    overflow: hidden;
-    display: flex;
-
-    &:focus-within {
-        border-color: $color-marca-principal;
-        box-shadow: 0 0 0 0.25rem rgba($color-marca-principal, 0.1);
     }
 }
