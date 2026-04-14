@@ -34,6 +34,7 @@ public interface TareaMapper {
     @Mapping(target = "estado", ignore = true)
     @Mapping(target = "archivos", ignore = true)
     @Mapping(target = "asignaciones", ignore = true)
+    @Mapping(target = "entregas", ignore = true)
     Tarea toEntity(TareaRequestDTO dto);
 
     /**

@@ -39,18 +39,17 @@ public class SecurityConfiguration {
                         // 1. ENTIDAD: USUARIOS & AUTH
                         // =========================================================
 
-                        // Acceso Público (Registro y Login)
+                        // 1. PRIMERO LAS EXCEPCIONES PÚBLICAS (Orden importa)
                         .requestMatchers(HttpMethod.POST, "/api/usuarios/register", "/api/usuarios/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/usuarios/password-reset-request").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/usuarios/password-reset-confirm").permitAll()
 
-                        // Acceso exclusivo ADMIN (Gestión masiva y eliminación)
+                        // 2. LUEGO LAS REGLAS DE ADMIN
                         .requestMatchers(HttpMethod.POST, "/api/usuarios/batch").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/usuarios/**").hasRole("ADMIN")
 
-                        // Acceso Autenticado (Listar, ver perfil, actualizar)
+                        // 3. POR ÚLTIMO, TODO LO DEMÁS DE USUARIOS REQUIERE AUTH
                         .requestMatchers("/api/usuarios/**").authenticated()
-
-                        .requestMatchers("/api/usuarios/password-reset-request", "/api/usuarios/password-reset-confirm")
-                        .permitAll()
                         // =========================================================
                         // 2. ENTIDAD: TALLERES
                         // =========================================================
@@ -127,18 +126,21 @@ public class SecurityConfiguration {
                         // 8. ENTIDAD: INSCRIPCIONES
                         // =========================================================
 
-                        // Alta y consulta personal: Cualquier usuario logueado
+                        // 1. Rutas específicas de cambio de estado (MUY ESPECÍFICO)
+                        .requestMatchers(HttpMethod.PUT, "/api/inscripciones/*/estado").hasAnyRole("ADMIN", "PROFESOR")
+
+                        // 2. Rutas generales de gestión
+                        .requestMatchers(HttpMethod.GET, "/api/inscripciones/taller/**").hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.GET, "/api/inscripciones").hasAnyRole("ADMIN", "PROFESOR")
+
+                        // 3. Rutas de usuario (ALUMNO)
                         .requestMatchers(HttpMethod.POST, "/api/inscripciones").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/inscripciones/usuario/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/inscripciones/{id}").authenticated()
 
-                        // Gestión y Listados grupales: Solo Admin y Profesor
-                        .requestMatchers(HttpMethod.GET, "/api/inscripciones", "/api/inscripciones/taller/**")
-                        .hasAnyRole("ADMIN", "PROFESOR")
+                        // 4. Fallback para cualquier otro PUT/DELETE en inscripciones
                         .requestMatchers(HttpMethod.PUT, "/api/inscripciones/**").hasAnyRole("ADMIN", "PROFESOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/inscripciones/**").hasAnyRole("ADMIN", "PROFESOR")
-
-                        // Consulta de ID específico (Suele ser para detalles de gestión)
-                        .requestMatchers(HttpMethod.GET, "/api/inscripciones/{id}").authenticated()
 
                         // =========================================================
                         // 9. ENTIDAD: HORARIOS

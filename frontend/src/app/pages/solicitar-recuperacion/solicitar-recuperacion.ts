@@ -9,42 +9,41 @@ import { UsuarioService } from '../../services/Usuario.Service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './solicitar-recuperacion.html',
-  styleUrl: './solicitar-recuperacion.scss' 
+  styleUrl: './solicitar-recuperacion.scss'
 })
 export class SolicitarRecuperacion {
   public loading = false;
   public enviado = false;
-  public mensajeError = '';
 
   public recoveryForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email])
   });
 
   constructor(
-    private usuarioService: UsuarioService,
-    private router: Router
+    private usuarioService: UsuarioService
   ) {}
 
   public onSubmit(): void {
     if (this.recoveryForm.valid) {
       this.loading = true;
-      this.mensajeError = '';
-      
       const email = this.recoveryForm.controls.email.value!;
 
       this.usuarioService.solicitarRecuperacion(email).subscribe({
-        next: () => {
-          this.enviado = true;
-          this.loading = false;
-        },
+        next: () => this.finalizarProceso(),
         error: (err) => {
-          this.loading = false;
-          this.mensajeError = 'No se pudo procesar la solicitud. Inténtalo de nuevo.';
-          console.error(err);
+          console.warn('Error controlado por seguridad', err);
+          this.finalizarProceso();
         }
       });
     } else {
       this.recoveryForm.markAllAsTouched();
     }
+  }
+
+  private finalizarProceso(): void {
+    this.loading = false;
+    this.enviado = true;
+    // Opcional: Bloquear el input tras éxito
+    this.recoveryForm.get('email')?.disable();
   }
 }

@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * Entidad de Usuario con soporte nativo para Spring Security.
- * Implementa {@link UserDetails} para gestionar la autenticación y autorización 
+ * Implementa {@link UserDetails} para gestionar la autenticación y autorización
  * directamente sobre la tabla de la base de datos.
  */
 @Entity
@@ -48,13 +48,14 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @Column(length = 255) 
+    @Column(length = 255)
     private String direccion;
 
     @Column(length = 20)
     private String telefono;
 
-    /** * Rol del usuario. Se carga de forma ANSIOSA (EAGER) 
+    /**
+     * * Rol del usuario. Se carga de forma ANSIOSA (EAGER)
      * porque es necesario para casi todas las validaciones de seguridad.
      */
     @ManyToOne(fetch = FetchType.EAGER)
@@ -74,10 +75,14 @@ public class Usuario implements UserDetails {
     // IMPLEMENTACIÓN DE USERDETAILS
     // ==============================================================
 
-    /** Convierte el Rol de la entidad en una autoridad reconocible por Spring Security. */
+    /**
+     * Convierte el Rol de la entidad en una autoridad reconocible por Spring
+     * Security.
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(rol.getNombre()));
+      
+        return List.of(new SimpleGrantedAuthority("ROLE_" + rol.getNombre()));
     }
 
     @Override
@@ -86,13 +91,19 @@ public class Usuario implements UserDetails {
     }
 
     @Override
-    public boolean isAccountNonExpired() { return true; }
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
     @Override
-    public boolean isAccountNonLocked() { return true; }
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
     @Override
-    public boolean isCredentialsNonExpired() { return true; }
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
     /** El acceso depende del estado 'activo' (Soft Delete). */
     @Override

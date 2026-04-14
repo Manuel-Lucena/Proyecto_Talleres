@@ -36,6 +36,7 @@ public class InscripcionService {
     /**
      * Registra una nueva inscripción de un usuario en un taller.
      * * @param dto Datos de la inscripción.
+     * 
      * @return Inscripción guardada.
      * @throws ResourceNotFoundException Si el usuario o el taller no existen.
      */
@@ -51,7 +52,8 @@ public class InscripcionService {
         Inscripcion inscripcion = inscripcionMapper.toEntity(dto, usuario, taller);
         InscripcionResponseDTO response = inscripcionMapper.toResponse(inscripcionRepository.save(inscripcion));
 
-        emailService.enviarCorreo(usuario.getEmail(), "¡Inscripción Confirmada!", "confirmacion-inscripcion", Map.of("usuario", usuario, "taller", taller));
+        emailService.enviarCorreo(usuario.getEmail(), "¡Inscripción Confirmada!", "confirmacion-inscripcion",
+                Map.of("usuario", usuario, "taller", taller));
 
         return response;
     }
@@ -87,6 +89,7 @@ public class InscripcionService {
     /**
      * Recupera una inscripción por su identificador único.
      * * @param id Identificador de la inscripción.
+     * 
      * @return Inscripción encontrada.
      * @throws ResourceNotFoundException Si la inscripción no existe.
      */
@@ -100,6 +103,7 @@ public class InscripcionService {
     /**
      * Lista todas las inscripciones asociadas a un usuario concreto.
      * * @param idUsuario ID del usuario.
+     * 
      * @return Lista de sus inscripciones.
      */
     @Transactional(readOnly = true)
@@ -113,7 +117,8 @@ public class InscripcionService {
 
     /**
      * Actualiza los datos de una inscripción existente.
-     * * @param id  ID de la inscripción a modificar.
+     * * @param id ID de la inscripción a modificar.
+     * 
      * @param dto Nuevos datos.
      * @return Inscripción actualizada.
      * @throws ResourceNotFoundException Si la inscripción no existe.
@@ -133,24 +138,41 @@ public class InscripcionService {
     /**
      * Alterna el estado de activación de una inscripción (Toggle).
      * Permite al administrador suspender o reactivar el acceso de un alumno a un
-     * taller de forma manual, sin necesidad de eliminar el registro de la base de datos.
+     * taller de forma manual, sin necesidad de eliminar el registro de la base de
+     * datos.
      * * @param id Identificador único de la inscripción a modificar.
+     * 
      * @return DTO con la información actualizada, reflejando el nuevo estado de la
-     * propiedad 'activa'.
+     *         propiedad 'activa'.
      * @throws ResourceNotFoundException Si no se encuentra una inscripción con el
-     * ID proporcionado.
+     *                                   ID proporcionado.
      */
     @Transactional
     public InscripcionResponseDTO cambiarEstado(Long id) {
         Inscripcion inscripcion = inscripcionRepository.findByIdIncludingInactive(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Inscripcion no encontrada con ID: " + id));
 
+        // Cambiamos el estado (Toggle)
         inscripcion.setActiva(!inscripcion.isActiva());
         Inscripcion guardada = inscripcionRepository.save(inscripcion);
 
-       
-        String estadoMsg = guardada.isActiva() ? "Reactivada" : "Suspendida";
-        emailService.enviarCorreo(guardada.getUsuario().getEmail(), "Estado de tu inscripción: " + estadoMsg, "confirmacion-inscripcion", Map.of("usuario", guardada.getUsuario(), "taller", guardada.getTaller()));
+        // DETERMINAR ASUNTO Y PLANTILLA
+        String asunto;
+        String plantilla;
+
+        if (guardada.isActiva()) {
+            asunto = "¡Tu inscripción ha sido reactivada!";
+            plantilla = "confirmacion-inscripcion"; // O una específica de reactivación
+        } else {
+            asunto = "Notificación: Tu inscripción ha sido suspendida";
+            plantilla = "baja-taller"; // Reutilizamos la de baja o usa una de 'suspension'
+        }
+
+        emailService.enviarCorreo(
+                guardada.getUsuario().getEmail(),
+                asunto,
+                plantilla,
+                Map.of("usuario", guardada.getUsuario(), "taller", guardada.getTaller()));
 
         return inscripcionMapper.toResponse(guardada);
     }
@@ -160,6 +182,7 @@ public class InscripcionService {
     /**
      * Elimina permanentemente una inscripción del sistema.
      * * @param id ID de la inscripción a borrar.
+     * 
      * @throws ResourceNotFoundException Si la inscripción no existe.
      */
     @Transactional
@@ -173,6 +196,7 @@ public class InscripcionService {
 
         inscripcionRepository.delete(inscripcion);
 
-        emailService.enviarCorreo(usuario.getEmail(), "Notificación de baja de taller", "baja-taller", Map.of("usuario", usuario, "taller", taller));
+        emailService.enviarCorreo(usuario.getEmail(), "Notificación de baja de taller", "baja-taller",
+                Map.of("usuario", usuario, "taller", taller));
     }
 }
