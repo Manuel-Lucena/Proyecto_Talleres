@@ -14,3 +14,18 @@ export interface AuthResponse {
   nombre: string;
   rol: string;
 }
+
+/**
+ * Estructura para solicitar el enlace de recuperación de contraseña.
+ */
+export interface PasswordResetRequest {
+  email: string;
+}
+
+/**
+ * Estructura para confirmar el cambio de contraseña con el token recibido.
+ */
+export interface PasswordChangeRequest {
+  token: string;
+  nuevaPassword: string;
+}

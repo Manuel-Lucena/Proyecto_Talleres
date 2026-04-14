@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { ApiResponse } from '../interfaces/ApiResponse.Interface';
-import { LoginRequest, AuthResponse } from '../interfaces/Auth.Interface';
+import { LoginRequest, AuthResponse, PasswordChangeRequest } from '../interfaces/Auth.Interface';
 import { UsuarioResponse, UsuarioRequest } from '../interfaces/Usuario.Interface';
 
 /**
@@ -113,6 +113,26 @@ export class UsuarioService {
    */
   eliminar(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Envía una solicitud para iniciar el proceso de recuperación de contraseña.
+   * @param email Correo del usuario.
+   * @returns Observable con la respuesta de la operación.
+   */
+  solicitarRecuperacion(email: string): Observable<ApiResponse<void>> {
+    // Enviamos el objeto { email: email } como espera el DTO de Java
+    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/password-reset-request`, { email });
+  }
+
+  /**
+   * Envía el token y la nueva contraseña para finalizar el restablecimiento.
+   * @param datos Objeto con el token y la nueva password.
+   * @returns Observable con la respuesta de la operación.
+   */
+  restablecerPassword(datos: PasswordChangeRequest): Observable<ApiResponse<void>> {
+    // Enviamos el objeto { token, nuevaPassword }
+    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/password-reset-confirm`, datos);
   }
 
   /**

@@ -1,4 +1,7 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './guards/AuthGuard';
+
+// Imports de componentes (Eager Loading para rutas principales)
 import { Landing } from './pages/landing/landing';
 import { Login } from './pages/login/login';
 import { PanelAdmin } from './pages/panel-admin/panel-admin';
@@ -12,15 +15,31 @@ import { AulaForo } from './pages/aula-virtual/tabs/aula-foro/aula-foro';
 import { AulaTareas } from './pages/aula-virtual/tabs/aula-tareas/aula-tareas';
 import { AulaMateriales } from './pages/aula-virtual/tabs/aula-materiales/aula-materiales';
 import { AulaParticipantes } from './pages/aula-virtual/tabs/aula-participantes/aula-participantes';
+import { AccesoDenegado } from './pages/acceso-denegado/acceso-denegado';
+import { SolicitarRecuperacion } from './pages/solicitar-recuperacion/solicitar-recuperacion';
+import { CambiarPassword } from './pages/cambiar-password/cambiar-password';
 
 export const routes: Routes = [
+    // --- RUTAS PÚBLICAS ---
     { path: '', redirectTo: '/landing', pathMatch: 'full' },
     { path: 'landing', component: Landing },
     { path: 'login', component: Login },
-    { path: 'perfil', component: Perfil },
+    { path: 'no-autorizado', component: AccesoDenegado },
+    { path: 'solicitar-recuperacion', component: SolicitarRecuperacion },
+    { path: 'reset-password', component: CambiarPassword },
+
+    // --- RUTAS PROTEGIDAS (Cualquier usuario logueado) ---
+    { path: 'perfil', component: Perfil, canActivate: [authGuard] },
+    { path: 'talleres-explorar', component: TalleresExplorar, canActivate: [authGuard] },
+    { path: 'mis-talleres', component: MisTalleres, canActivate: [authGuard] },
+    { path: 'calendario', component: Calendario, canActivate: [authGuard] },
+
+    // --- RUTA PANEL ADMIN (Solo ADMIN) ---
     {
         path: 'panel-admin',
         component: PanelAdmin,
+        canActivate: [authGuard],
+        data: { roles: ['ADMIN'] }, 
         children: [
             { path: '', redirectTo: 'talleres', pathMatch: 'full' }, 
             {
@@ -49,12 +68,12 @@ export const routes: Routes = [
             }
         ]
     },
-    { path: 'talleres-explorar', component: TalleresExplorar },
-    { path: 'mis-talleres', component: MisTalleres },
-    { path: 'calendario', component: Calendario },
+
+    // --- RUTA AULA VIRTUAL (Acceso general + restricciones internas) ---
     {
         path: 'aula-virtual/:id',
         component: AulaVirtual,
+        canActivate: [authGuard],
         children: [
             { path: '', redirectTo: 'muro', pathMatch: 'full' },
             { path: 'muro', component: AulaMuro, data: { breadcrumb: 'Muro' } },
@@ -62,21 +81,30 @@ export const routes: Routes = [
             { path: 'tareas', component: AulaTareas, data: { breadcrumb: 'Tareas' } },
             { path: 'recursos', component: AulaMateriales, data: { breadcrumb: 'Materiales' } },
             { path: 'participantes', component: AulaParticipantes, data: { breadcrumb: 'Participantes' } },
+            
+            // Solo Profesores y Admins pueden ver seguimiento y crear contenido nuevo
             {
                 path: 'tareas/:idRecurso/seguimiento',
-                data: { breadcrumb: 'Seguimiento' },
+                canActivate: [authGuard],
+                data: { roles: ['ADMIN', 'PROFESOR'], breadcrumb: 'Seguimiento' },
                 loadComponent: () => import('./pages/aula-virtual/tabs/aula-tarea-seguimiento/aula-tarea-seguimiento').then(m => m.AulaTareaSeguimiento)
             },
             {
                 path: 'detalle/:tipo/nuevo',
-                data: { breadcrumb: 'Nuevo' },
+                canActivate: [authGuard],
+                data: { roles: ['ADMIN', 'PROFESOR'], breadcrumb: 'Nuevo' },
                 loadComponent: () => import('./pages/aula-virtual/tabs/aula-detalle/aula-detalle').then(m => m.AulaDetalle)
             },
+            // Ver el detalle de algo existente lo permitimos a todos (el Back filtrará el contenido)
             {
                 path: 'detalle/:tipo/:idRecurso',
-                data: { breadcrumb: '' },
+                canActivate: [authGuard],
+                data: { breadcrumb: 'Detalle' },
                 loadComponent: () => import('./pages/aula-virtual/tabs/aula-detalle/aula-detalle').then(m => m.AulaDetalle)
             }
         ]
-    }
+    },
+
+    // Comodín para rutas no encontradas
+    { path: '**', redirectTo: '/landing' }
 ];

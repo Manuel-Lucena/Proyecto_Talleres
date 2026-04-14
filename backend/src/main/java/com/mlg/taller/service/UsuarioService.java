@@ -2,9 +2,11 @@ package com.mlg.taller.service;
 
 import com.mlg.taller.exception.*;
 import com.mlg.taller.model.dtos.*;
+import com.mlg.taller.model.entities.PasswordResetToken;
 import com.mlg.taller.model.entities.Rol;
 import com.mlg.taller.model.entities.Usuario;
 import com.mlg.taller.model.mappers.UsuarioMapper;
+import com.mlg.taller.repositories.PasswordResetTokenRepository;
 import com.mlg.taller.repositories.RolRepository;
 import com.mlg.taller.repositories.UsuarioRepository;
 import com.mlg.taller.security.jwt.JwtService;
@@ -34,6 +36,8 @@ public class UsuarioService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final FileUtil fileUtil;
+    private final PasswordResetTokenRepository tokenRepository;
+    private final EmailService emailService;
 
     private static final String FOLDER = "Usuarios";
 
@@ -94,7 +98,7 @@ public class UsuarioService {
                 throw new DuplicateResourceException("El DNI " + dto.getDni() + " ya está registrado");
             }
 
-            Usuario usuario = usuarioMapper.toEntity(dto); 
+            Usuario usuario = usuarioMapper.toEntity(dto);
             usuario.setId(null);
 
             usuario.setRol(obtenerRol(dto.getIdRol()));
@@ -270,5 +274,64 @@ public class UsuarioService {
             response.setRol(usuario.getRol().getNombre());
         }
         return response;
+    }
+
+    // --- MÉTODOS DE RECUPERACIÓN DE CONTRASEÑA ---
+
+    /**
+     * Procesa la solicitud de recuperación generando un token y enviando el email.
+     * * @param dto Contiene el email del usuario que solicita el cambio.
+     * 
+     * @throws ResourceNotFoundException Si el email no está registrado.
+     */
+    @Transactional
+    public void solicitarRecuperacion(PasswordResetRequestDTO dto) {
+        Usuario usuario = usuarioRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se encontró un usuario con el email: " + dto.getEmail()));
+
+        tokenRepository.deleteByUsuario(usuario);
+
+      
+        String token = java.util.UUID.randomUUID().toString();
+
+     
+        PasswordResetToken tokenEntity = PasswordResetToken.builder()
+                .token(token)
+                .usuario(usuario)
+                .fechaExpiracion(java.time.LocalDateTime.now().plusMinutes(15)) // 15 minutos de validez
+                .build();
+
+        tokenRepository.save(tokenEntity);
+
+        String urlFront = "http://localhost:4200/reset-password?token=" + token;
+
+ 
+        emailService.enviarCorreo(usuario.getEmail(), "Restablecer contraseña - MLG Taller", "recuperar-password",
+                java.util.Map.of("usuario", usuario, "url", urlFront));
+    }
+
+    /**
+     * Valida el token y actualiza la contraseña del usuario en el sistema.
+     * * @param dto Contiene el token de validación y la nueva password.
+     * 
+     * @throws BadRequestException Si el token es inválido o ha expirado.
+     */
+    @Transactional
+    public void cambiarPassword(PasswordChangeRequestDTO dto) {
+        PasswordResetToken tokenReal = tokenRepository.findByToken(dto.getToken())
+                .orElseThrow(() -> new BadRequestException("El token de recuperación no es válido o ha expirado"));
+
+        if (tokenReal.isExpirado()) {
+            tokenRepository.delete(tokenReal);
+            throw new BadRequestException("El enlace de recuperación ha caducado. Solicite uno nuevo.");
+        }
+
+        Usuario usuario = tokenReal.getUsuario();
+        usuario.setPassword(passwordEncoder.encode(dto.getNuevaPassword()));
+
+        usuarioRepository.save(usuario);
+
+        tokenRepository.delete(tokenReal);
     }
 }

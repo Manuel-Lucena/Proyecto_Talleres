@@ -49,6 +49,8 @@ public class SecurityConfiguration {
                         // Acceso Autenticado (Listar, ver perfil, actualizar)
                         .requestMatchers("/api/usuarios/**").authenticated()
 
+                        .requestMatchers("/api/usuarios/password-reset-request", "/api/usuarios/password-reset-confirm")
+                        .permitAll()
                         // =========================================================
                         // 2. ENTIDAD: TALLERES
                         // =========================================================
@@ -216,6 +218,7 @@ public class SecurityConfiguration {
                         // para asegurar que el archivo existe y es válido.
                         .requestMatchers("/api/descargas/**").authenticated()
 
+                        .requestMatchers("/api/email/**").permitAll()
                         // ... resto de tus rutas ...
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())

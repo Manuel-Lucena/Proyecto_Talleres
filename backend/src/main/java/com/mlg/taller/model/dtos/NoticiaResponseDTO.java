@@ -1,4 +1,4 @@
-package com.mlg.taller.model.dtos;
+ package com.mlg.taller.model.dtos;
 
 import lombok.Data;
 import java.time.LocalDate;

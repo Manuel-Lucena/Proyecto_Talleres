@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body style="font-family: sans-serif;">
+    <h2 style="color: #28a745;">¡Hola <span th:text="${usuario.nombre}">Usuario</span>!</h2>
+    <p>Te confirmamos que te has inscrito correctamente al taller: 
+       <strong th:text="${taller.nombre}">Nombre del Taller</strong>.</p>
+    
+    <p th:if="${taller.descripcion != null}">
+        Información del taller: <span th:text="${taller.descripcion}">Descripción</span>
+    </p>
+
+    <p>¡Te esperamos!</p>
+</body>
+</html>

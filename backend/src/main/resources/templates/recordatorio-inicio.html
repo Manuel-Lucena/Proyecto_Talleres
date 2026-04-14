@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body style="font-family: sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px;">
+        <h2 style="color: #007bff; text-align: center;">¡Ya casi empezamos! 🚀</h2>
+        <p>Hola <span th:text="${usuario.nombre}">Usuario</span>,</p>
+        <p>Te escribimos porque falta muy poco para que comience el curso lectivo del taller: 
+           <strong th:text="${taller.nombre}">Nombre del Taller</strong>.</p>
+        
+        <div style="background-color: #f9f9f9; border-left: 5px solid #007bff; padding: 15px; margin: 20px 0;">
+            <p style="margin: 0;">📅 <strong>Fecha de inicio:</strong> <span th:text="${#temporals.format(taller.fechaInicio, 'dd/MM/yyyy')}">01/10/2024</span></p>
+            <p style="margin: 0;">📍 <strong>Lugar:</strong> <span th:text="${taller.ubicacion}">Aula Magna</span></p>
+        </div>
+
+        <p>Te recomendamos revisar que tienes todo el material listo. ¡Estamos muy emocionados de tenerte con nosotros este curso!</p>
+        
+        <p style="font-size: 0.9em; color: #777;">Si tienes alguna duda antes de empezar, responde a este correo.</p>
+        <p>Atentamente,<br><strong>Equipo MLG Taller</strong></p>
+    </div>
+</body>
+</html>

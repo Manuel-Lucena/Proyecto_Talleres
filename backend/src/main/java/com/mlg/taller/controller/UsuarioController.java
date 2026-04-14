@@ -2,6 +2,8 @@ package com.mlg.taller.controller;
 
 import com.mlg.taller.model.dtos.AuthResponseDTO;
 import com.mlg.taller.model.dtos.LoginRequestDTO;
+import com.mlg.taller.model.dtos.PasswordChangeRequestDTO;
+import com.mlg.taller.model.dtos.PasswordResetRequestDTO;
 import com.mlg.taller.model.dtos.UsuarioRequestDTO;
 import com.mlg.taller.model.dtos.UsuarioResponseDTO;
 import com.mlg.taller.service.UsuarioService;
@@ -157,5 +159,31 @@ public class UsuarioController {
     public ApiResponse<Void> eliminar(@PathVariable Long id) {
         usuarioService.eliminar(id);
         return ApiResponse.success(null, "Usuario desactivado correctamente");
+    }
+
+    // --- MÉTODOS DE RECUPERACIÓN DE CONTRASEÑA ---
+
+    /**
+     * Inicia el proceso de recuperación enviando un enlace al correo del usuario.
+     * * @param dto Objeto que contiene el email del usuario.
+     * 
+     * @return ApiResponse indicando que el correo ha sido enviado.
+     */
+    @PostMapping("/password-reset-request")
+    public ApiResponse<Void> solicitarRecuperacion(@RequestBody @Valid PasswordResetRequestDTO dto) {
+        usuarioService.solicitarRecuperacion(dto);
+        return ApiResponse.success(null, "Se ha enviado un correo para restablecer la contraseña");
+    }
+
+    /**
+     * Procesa el cambio de contraseña utilizando el token de validación.
+     * * @param dto Objeto que contiene el token y la nueva contraseña.
+     * 
+     * @return ApiResponse confirmando el cambio de credenciales.
+     */
+    @PostMapping("/password-reset-confirm")
+    public ApiResponse<Void> confirmarRestablecimiento(@RequestBody @Valid PasswordChangeRequestDTO dto) {
+        usuarioService.cambiarPassword(dto);
+        return ApiResponse.success(null, "La contraseña ha sido actualizada correctamente");
     }
 }

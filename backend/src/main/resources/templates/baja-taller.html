@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body style="font-family: sans-serif;">
+    <h2 style="color: #dc3545;">Notificación de baja</h2>
+    <p>Hola <span th:text="${usuario.nombre}">Usuario</span>,</p>
+    <p>Este correo es para confirmarte que ya no estás inscrito en el taller: 
+       <strong th:text="${taller.nombre}">Nombre del Taller</strong>.</p>
+    <p>Si crees que esto es un error, contacta con el administrador.</p>
+</body>
+</html>

@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
  * Entidad que vincula a un alumno con un taller mediante un proceso de matrícula.
  * Implementa 'Soft Delete' para mantener registros históricos de transacciones.
  */
+
 @Entity
 @Table(name = "INSCRIPCION")
 @SQLDelete(sql = "UPDATE inscripcion SET activa = false WHERE id_inscripcion = ?")

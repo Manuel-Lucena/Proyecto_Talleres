@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { UsuarioService } from '../../services/Usuario.Service';
 import { LoginRequest } from '../../interfaces/Auth.Interface';
 import { FormAlumno } from '../../components/forms/form-alumno/form-alumno';
+import { RouterModule } from '@angular/router';
 
 /**
  * Componente encargado de la autenticación de usuarios y acceso al registro.
@@ -13,7 +14,7 @@ import { FormAlumno } from '../../components/forms/form-alumno/form-alumno';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormAlumno],
+  imports: [CommonModule, ReactiveFormsModule, FormAlumno, RouterModule],
   templateUrl: './login.html',
   styleUrl: './login.scss'
 })

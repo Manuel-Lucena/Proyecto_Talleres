@@ -55,4 +55,10 @@ public interface InscripcionRepository extends JpaRepository<Inscripcion, Long> 
     @Query(value = "SELECT * FROM inscripcion WHERE id_inscripcion = :id", nativeQuery = true)
     java.util.Optional<Inscripcion> findByIdIncludingInactive(
             @org.springframework.data.repository.query.Param("id") Long id);
+
+    /**
+     * Busca inscripciones activas donde la fecha de inicio del taller asociado
+     * coincida con la fecha proporcionada.
+     */
+    List<Inscripcion> findAllByTaller_FechaInicioAndActivaTrue(java.time.LocalDate fecha);
 }
