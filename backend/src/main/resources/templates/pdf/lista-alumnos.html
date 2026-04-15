@@ -7,29 +7,27 @@
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th { background-color: #34495e; color: white; padding: 10px; }
         td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        .activo { color: green; }
-        .suspendido { color: red; }
     </style>
 </head>
+
 <body>
     <div class="header">
-        <h1 th:text="${'Taller: ' + tallerNombre}">Nombre del Taller</h1>
-        <p th:text="${'Fecha de generación: ' + fecha}"></p>
+        <h1 th:text="${'Taller: ' + taller.nombre}">Nombre del Taller</h1>
+        <p th:text="${'Fecha: ' + #dates.format(#dates.createNow(), 'dd/MM/yyyy')}"></p>
     </div>
     <table>
         <thead>
             <tr>
-                <th>DNI</th>
                 <th>Alumno</th>
-                <th>Estado</th>
+                <th>Email</th>
+                <th>Estado Pago</th>
             </tr>
         </thead>
         <tbody>
-            <tr th:each="alumno : ${alumnos}">
-                <td th:text="${alumno.usuarioDni}"></td>
-                <td th:text="${alumno.usuarioNombre + ' ' + alumno.usuarioApellidos}"></td>
-                <td th:text="${alumno.activa ? 'Activo' : 'Suspendido'}" 
-                    th:class="${alumno.activa ? 'activo' : 'suspendido'}"></td>
+            <tr th:each="alumno : ${inscripciones}">
+                <td th:text="${alumno.nombreUsuario}">Nombre Alumno</td>
+                <td th:text="${alumno.emailUsuario}">Email</td>
+                <td th:text="${alumno.estadoPago}">Estado</td>
             </tr>
         </tbody>
     </table>

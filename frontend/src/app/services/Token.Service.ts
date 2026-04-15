@@ -58,7 +58,14 @@ export class TokenService {
    */
   getRol(): string | null {
     const decoded = this.decode();
-    return decoded?.role || decoded?.rol || null; 
+    const rawRole: string | null = decoded?.role || decoded?.rol || null;
+
+
+    if (rawRole) {
+      return rawRole.replace(/^ROLE_/i, '').trim();
+    }
+
+    return null;
   }
 
   /**

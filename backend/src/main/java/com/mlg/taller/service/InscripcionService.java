@@ -60,7 +60,9 @@ public class InscripcionService {
 
                 // 3. Generación de la Factura en PDF (en memoria)
                 // Usamos el método que devuelve byte[] para no guardarlo en disco
-                byte[] pdfFactura = pdfService.generarBytesPdf("factura-inscripcion", Map.of("inscripcion", response));
+                byte[] pdfFactura = pdfService.generarBytesPdf("factura-inscripcion", Map.of(
+                                "inscripcion", response,
+                                "usuario", usuario));
 
                 // 4. Envío de Email con la Factura adjunta
                 emailService.enviarCorreoConAdjunto(
@@ -128,6 +130,21 @@ public class InscripcionService {
                 return inscripcionRepository.findByUsuarioId(idUsuario).stream()
                                 .map(inscripcionMapper::toResponse)
                                 .collect(Collectors.toList());
+        }
+
+        /**
+         * Genera el PDF de una factura para una inscripción ya existente.
+         * ESTE ES EL MÉTODO QUE LLAMARÁS DESDE EL CONTROLLER PARA LA DESCARGA MANUAL.
+         */
+        @Transactional(readOnly = true)
+        public byte[] obtenerFacturaPdf(Long idInscripcion) {
+                Inscripcion inscripcion = inscripcionRepository.findByIdIncludingInactive(idInscripcion)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Inscripción no encontrada con ID: " + idInscripcion));
+
+                return pdfService.generarBytesPdf("factura-inscripcion", Map.of(
+                                "inscripcion", inscripcionMapper.toResponse(inscripcion),
+                                "usuario", inscripcion.getUsuario()));
         }
 
         // --- MÉTODOS PUT ---
@@ -211,7 +228,6 @@ public class InscripcionService {
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "No se pudo eliminar: ID " + id + " no encontrado"));
 
-                // Capturamos datos para el mail antes de borrar definitivamente
                 Usuario usuario = inscripcion.getUsuario();
                 Taller taller = inscripcion.getTaller();
 

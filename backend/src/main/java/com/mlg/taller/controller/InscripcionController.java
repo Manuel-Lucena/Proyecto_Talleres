@@ -104,8 +104,9 @@ public class InscripcionController {
         var taller = tallerService.buscarPorId(idTaller);
         var inscripciones = inscripcionService.listarPorTaller(idTaller);
 
-        String nombreArchivo = "lista_alumnos_" + taller.getNombre().replace(" ", "_") + ".pdf";
-        response.setHeader("Content-Disposition", "attachment; filename=" + nombreArchivo);
+        String nombreArchivo = "pdf/lista_alumnos_" + idTaller + ".pdf";
+
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + nombreArchivo + "\"");
 
         pdfService.generarPdf("lista-alumnos", Map.of(
                 "taller", taller,
@@ -114,20 +115,22 @@ public class InscripcionController {
 
     /**
      * Genera el recibo oficial de inscripción en formato PDF para el alumno.
-     * Incluye detalles del pago, datos del usuario y confirmación de la plaza 
+     * Incluye detalles del pago, datos del usuario y confirmación de la plaza
      * para que sirva como justificante legal.
      * * @param id Identificador de la inscripción de la cual se genera la factura.
-     * @param response Objeto HttpServletResponse para la descarga directa del archivo.
+     * 
+     * @param response Objeto HttpServletResponse para la descarga directa del
+     *                 archivo.
      */
     @GetMapping("/{id}/factura")
     public void descargarFactura(@PathVariable Long id, HttpServletResponse response) {
-        var inscripcion = inscripcionService.buscarPorId(id);
+
+        var dto = inscripcionService.buscarPorId(id);
 
         String nombreArchivo = "Factura_Inscripcion_" + id + ".pdf";
-        response.setHeader("Content-Disposition", "attachment; filename=" + nombreArchivo);
-
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + nombreArchivo + "\"");
         pdfService.generarPdf("factura-inscripcion", Map.of(
-                "inscripcion", inscripcion), response);
+                "inscripcion", dto), response);
     }
 
     // --- MÉTODOS PUT ---

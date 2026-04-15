@@ -9,7 +9,6 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state) =
   const tokenService = inject(TokenService);
   const router = inject(Router);
 
-  // 1. Verificación de Autenticación: ¿Está logueado?
   if (!tokenService.isLogged()) {
     console.warn('Acceso denegado: Usuario no autenticado.');
     tokenService.logOut();
@@ -17,24 +16,28 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state) =
     return false;
   }
 
-  // 2. Verificación de Autorización: ¿Tiene el rol necesario?
   const rolesPermitidos: string[] = route.data['roles'];
-
-  // Solución al error de tipos: Si getRol() devuelve null, asignamos un string vacío ''
-  const rolUsuario: string = tokenService.getRol() ?? '';
+  // Obtenemos el rol y lo normalizamos a minúsculas
+  const rolUsuario = (tokenService.getRol() ?? '').toLowerCase();
 
   /**
-   * Caso A: La ruta no requiere roles específicos (rolesPermitidos es undefined o vacío).
-   * Caso B: El rol del usuario existe y está incluido en la lista permitida.
+   * Modificamos la lógica de comprobación:
+   * 1. Limpiamos el rol del usuario quitándole el prefijo 'role_' si lo tiene.
+   * 2. Comparamos de forma flexible.
    */
-  if (!rolesPermitidos || rolesPermitidos.length === 0 || rolesPermitidos.includes(rolUsuario)) {
+  const tienePermiso = !rolesPermitidos || 
+                       rolesPermitidos.length === 0 || 
+                       rolesPermitidos.some(rol => {
+                         const rolLimpio = rol.toLowerCase().replace('role_', '');
+                         const usuarioLimpio = rolUsuario.replace('role_', '');
+                         return rolLimpio === usuarioLimpio;
+                       });
+
+  if (tienePermiso) {
     return true;
   }
 
-  // 3. Acceso Prohibido: Logueado pero sin permisos suficientes
   console.error(`Acceso denegado: El rol [${rolUsuario}] no tiene permiso para ${state.url}`);
-
-  // Redirigimos a home para no cerrar la sesión del usuario
-  router.navigate(['/no-autorizado']);
+  router.navigate(['/landing']); // O a una página de 403
   return false;
 };

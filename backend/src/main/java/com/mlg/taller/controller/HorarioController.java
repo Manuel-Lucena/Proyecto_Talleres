@@ -81,24 +81,28 @@ public class HorarioController {
 
     /**
      * Genera y descarga un PDF con la agenda semanal personalizada de un usuario.
-     * El documento organiza cronológicamente todas las sesiones de los talleres 
+     * El documento organiza cronológicamente todas las sesiones de los talleres
      * en los que el usuario está actualmente inscrito.
      * * @param idUsuario Identificador del usuario que solicita su agenda.
-     * @param response  Objeto HttpServletResponse para la descarga del flujo binario.
+     * 
+     * @param response Objeto HttpServletResponse para la descarga del flujo
+     *                 binario.
      */
     @GetMapping("/usuario/{idUsuario}/pdf")
-    public void descargarAgendaPdf(@PathVariable Long idUsuario, HttpServletResponse response) {
-        var usuario = usuarioService.buscarPorId(idUsuario); // Necesitarás tener UsuarioService
-        var horarios = horarioService.listarPorUsuario(idUsuario);
+public void descargarAgendaPdf(@PathVariable Long idUsuario, HttpServletResponse response) {
+    var usuario = usuarioService.buscarPorId(idUsuario);
+    var horarios = horarioService.listarPorUsuario(idUsuario);
 
-        String nombreArchivo = "Agenda_Semanal_" + usuario.getNombre() + ".pdf";
-        response.setHeader("Content-Disposition", "attachment; filename=" + nombreArchivo);
+    // COMENTA ESTA LÍNEA TEMPORALMENTE PARA TESTEAR
+    // response.setContentType("application/pdf"); 
+    
+    response.setHeader("Content-Disposition", "attachment; filename=test.pdf");
 
-        pdfService.generarPdf("agenda-semanal", Map.of(
-                "usuario", usuario,
-                "horarios", horarios
-        ), response);
-    }
+    pdfService.generarPdf("agenda-semanal", Map.of(
+        "usuario", usuario,
+        "horarios", horarios
+    ), response);
+}
 
     // --- MÉTODOS PUT ---
 

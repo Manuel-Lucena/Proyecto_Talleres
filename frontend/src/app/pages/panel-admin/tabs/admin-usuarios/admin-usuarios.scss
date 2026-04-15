@@ -10,14 +10,29 @@
     box-sizing: border-box;
     overflow: hidden;
     @include m.animacion-entrada;
+
+    @media (max-width: 992px) {
+        padding: 1rem;
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+    }
 }
 
+// --- HEADER ---
 .admin-header {
     flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     margin-bottom: 2rem;
+    gap: 1.5rem;
+
+    @media (max-width: 992px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
 
     .title-group {
         .txt-h1 {
@@ -26,56 +41,77 @@
             font-size: v.$tamaño-titular-xl;
             color: v.$color-secundario-frio-2;
             margin: 0;
+            line-height: 1.1;
         }
 
         .txt-bajada {
             color: v.$color-superficie-suave;
             font-size: 1rem;
+            margin-top: 4px;
         }
     }
 
+    // --- ARREGLO DE BOTONES (RÉPLICA DEL ANTERIOR) ---
     .d-flex.gap-2 {
         display: flex;
         gap: 0.75rem;
         align-items: center;
-    }
 
-    .btn-primario-aula {
-        @include m.boton-primario;
-        height: 48px;
-        padding: 0 1.8rem;
-        gap: 12px;
-    }
-
-    .btn-secundario-aula {
-        background: white;
-        border: 1px solid #e2e8f0;
-        color: v.$color-secundario-frio-2;
-        border-radius: v.$radio-curvatura;
-        font-family: v.$fuente-enfasis;
-        font-weight: 700;
-        padding: 0 1.5rem;
-        height: 48px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        transition: all 0.3s ease;
-        cursor: pointer;
-
-        i {
-            color: v.$color-marca-principal;
-            font-size: 1.2rem;
+        @media (max-width: 992px) {
+            width: 100%;
+            flex-direction: column;
+            gap: 0.8rem;
         }
 
-        &:hover {
-            background: #f8fafc;
-            border-color: v.$color-marca-principal;
-            transform: translateY(-2px);
+        .btn-primario-aula,
+        .btn-secundario-aula {
+            height: 48px;
+            border-radius: v.$radio-curvatura;
+            font-family: v.$fuente-enfasis;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.95rem;
+
+            @media (max-width: 992px) {
+                width: 100%;
+                flex: none;
+            }
+        }
+
+        .btn-primario-aula {
+            @include m.boton-primario;
+            padding: 0 1.8rem;
+            border: none;
+        }
+
+        .btn-secundario-aula {
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: v.$color-secundario-frio-2;
+            padding: 0 1.5rem;
             box-shadow: v.$sombra-nivel-1;
+
+            i {
+                color: v.$color-marca-principal;
+                font-size: 1.2rem;
+            }
+
+            &:hover {
+                background: #f8fafc;
+                border-color: v.$color-marca-principal;
+                transform: translateY(-2px);
+            }
         }
     }
 }
 
+// --- TOOLBAR ---
 .admin-toolbar {
     flex-shrink: 0;
     padding: 1rem 1.5rem;
@@ -87,6 +123,12 @@
     box-shadow: v.$sombra-nivel-1;
     align-items: center;
 
+    @media (max-width: 768px) {
+        flex-direction: column;
+        padding: 1rem;
+        gap: 1rem;
+    }
+
     .search-group {
         display: flex;
         flex: 2;
@@ -94,6 +136,7 @@
         border: 1px solid #e2e8f0;
         border-radius: v.$radio-curvatura;
         overflow: hidden;
+        width: 100%;
 
         &:focus-within {
             border-color: v.$color-marca-principal;
@@ -106,16 +149,18 @@
 
             .select-criteria {
                 border: none;
-                background: #f1f5f9 url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") no-repeat right 10px center;
-                background-size: 14px;
+                background: #f1f5f9;
                 height: 100%;
                 width: 100%;
-                padding: 0 30px 0 15px;
+                padding: 0 15px;
                 font-size: 0.85rem;
                 font-weight: 600;
                 color: v.$color-secundario-frio-2;
-                appearance: none;
                 outline: none;
+            }
+
+            @media (max-width: 600px) {
+                width: 90px;
             }
         }
 
@@ -145,6 +190,7 @@
     .filter-box {
         flex: 1;
         position: relative;
+        width: 100%;
 
         i {
             position: absolute;
@@ -164,48 +210,59 @@
     }
 }
 
+// --- TABLA Y TARJETA ---
 .admin-card {
     background: white;
     border-radius: v.$radio-curvatura;
     box-shadow: v.$sombra-nivel-1;
     flex: 1;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     min-height: 0;
 
-    &::-webkit-scrollbar {
-        width: 6px;
-    }
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: auto;
+        flex: 1;
 
-    &::-webkit-scrollbar-thumb {
-        background: #e0e0e0;
-        border-radius: 10px;
+        &::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #e0e0e0;
+            border-radius: 10px;
+        }
     }
 }
 
 .admin-table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 950px; // Mantiene la tabla legible en móvil con scroll lateral
 
     thead {
         position: sticky;
         top: 0;
         z-index: 10;
         background: #fafafa;
+        box-shadow: 0 1px 0 #eee;
 
         th {
             padding: 1.2rem;
             text-align: left;
             color: v.$color-superficie-suave;
             font-family: v.$fuente-enfasis;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 800;
             text-transform: uppercase;
 
             &:last-child {
                 text-align: right;
             }
-
-            // Reemplaza .text-right en el th
         }
     }
 
@@ -218,11 +275,10 @@
         &:last-child {
             text-align: right;
         }
-
-        // Reemplaza .text-right en el td
     }
 }
 
+// --- ESTILOS DE CELDAS ORIGINALES ---
 .user-item {
     display: flex;
     align-items: center;
@@ -274,12 +330,6 @@
             color: v.$color-marca-principal;
             font-size: 0.9rem;
         }
-
-        &.mt-1 {
-            margin-top: 0.25rem;
-        }
-
-        // Manejado aquí directamente
     }
 }
 
@@ -289,6 +339,7 @@
     font-size: 0.65rem;
     font-weight: 800;
     text-transform: uppercase;
+    display: inline-block;
 
     &.admin {
         background: rgba(v.$color-secundario-frio-2, 0.1);

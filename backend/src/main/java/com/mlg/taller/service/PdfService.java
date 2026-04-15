@@ -27,16 +27,11 @@ public class PdfService {
      */
     public void generarPdf(String templateName, Map<String, Object> data, HttpServletResponse response) {
         try {
-            response.setContentType("application/pdf");
             OutputStream outputStream = response.getOutputStream();
-
-            // Reutilizamos la lógica de generación pasándole el stream de la respuesta
             escribirPdfEnStream(templateName, data, outputStream);
-
             outputStream.flush();
-            outputStream.close();
         } catch (Exception e) {
-            throw new RuntimeException("Error al generar el PDF para descarga: " + e.getMessage());
+            throw new RuntimeException("Error al generar el PDF: " + e.getMessage());
         }
     }
 
@@ -75,7 +70,6 @@ public class PdfService {
         renderer.layout();
         renderer.createPDF(outputStream);
 
-        // AÑADE ESTO PARA ASEGURAR EL VOLCADO
         outputStream.flush();
     }
 }

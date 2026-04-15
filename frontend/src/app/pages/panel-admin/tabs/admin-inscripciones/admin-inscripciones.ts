@@ -25,16 +25,17 @@ export class AdminInscripciones implements OnInit {
   cargando = true; // Estado de carga de la petición de datos
   mostrarModal = false; // Control de visibilidad para el formulario de inscripción
   busqueda: string = ''; // Término para el filtrado dinámico en la tabla
-
   tallerContexto: any = null; // Información resumida del taller si la vista es por taller
   usuarioContexto: any = null; // Información resumida del usuario si la vista es por usuario
-
   idTaller?: number; // Identificador del taller extraído de la URL
   idUsuario?: number; // Identificador del usuario extraído de la URL
   esVistaTaller = false; // Flag para determinar el modo de visualización
-
   titulo = ''; // Título dinámico del encabezado
   subtitulo = ''; // Subtítulo dinámico del encabezado
+
+  // Flags para feedback de descarga
+  descargandoLista = false;
+  descargandoFacturaId: number | null = null;
 
   /**
    * @param route Servicio para acceder a los parámetros de la ruta activa.
@@ -75,14 +76,10 @@ export class AdminInscripciones implements OnInit {
    */
   cargarDatos(tipo: 'taller' | 'usuario', id: number) {
     this.cargando = true;
-    const peticion = tipo === 'taller'
-      ? this.inscripcionService.listarPorTaller(id)
-      : this.inscripcionService.listarPorUsuario(id);
-
+    const peticion = tipo === 'taller' ? this.inscripcionService.listarPorTaller(id) : this.inscripcionService.listarPorUsuario(id);
     peticion.subscribe({
       next: (res) => {
         this.inscripciones = res.data || [];
-
         if (tipo === 'taller') {
           this.usuarioContexto = null;
           this.tallerContexto = {
@@ -97,7 +94,6 @@ export class AdminInscripciones implements OnInit {
             email: this.inscripciones.length > 0 ? this.inscripciones[0].emailUsuario : 'Usuario'
           };
         }
-
         this.configurarTextos();
         this.cargando = false;
         this.cdr.detectChanges();
@@ -112,7 +108,6 @@ export class AdminInscripciones implements OnInit {
   get inscripcionesFiltradas() {
     const term = this.busqueda?.toLowerCase().trim();
     if (!term) return this.inscripciones;
-
     return this.inscripciones.filter(ins => {
       if (this.esVistaTaller) {
         return ins.emailUsuario?.toLowerCase().includes(term);
@@ -128,30 +123,22 @@ export class AdminInscripciones implements OnInit {
   configurarTextos() {
     if (this.esVistaTaller) {
       this.titulo = "Gestión de Alumnos";
-      this.subtitulo = this.inscripciones.length > 0
-        ? `Inscritos en ${this.inscripciones[0].nombreTaller}`
-        : "Lista de alumnos";
+      this.subtitulo = this.inscripciones.length > 0 ? `Inscritos en ${this.inscripciones[0].nombreTaller}` : "Lista de alumnos";
     } else {
       this.titulo = "Talleres del Usuario";
-      this.subtitulo = this.inscripciones.length > 0
-        ? `Cursos de ${this.inscripciones[0].emailUsuario}`
-        : "Inscripciones del usuario";
+      this.subtitulo = this.inscripciones.length > 0 ? `Cursos de ${this.inscripciones[0].emailUsuario}` : "Inscripciones del usuario";
     }
   }
 
   /**
    * Muestra el modal para realizar una nueva inscripción administrativa.
    */
-  abrirInscripcion() {
-    this.mostrarModal = true;
-  }
+  abrirInscripcion() { this.mostrarModal = true; }
 
   /**
    * Oculta el modal de inscripción.
    */
-  cerrarModal() {
-    this.mostrarModal = false;
-  }
+  cerrarModal() { this.mostrarModal = false; }
 
   /**
    * Envía los datos de una nueva inscripción al servidor y refresca la lista.
@@ -166,11 +153,62 @@ export class AdminInscripciones implements OnInit {
         else if (this.idUsuario) this.cargarDatos('usuario', this.idUsuario);
       },
       error: (err) => {
-        this.notificacionService.mostrar({ 
-          titulo: 'Error', 
-          mensaje: err.error?.message || 'Error al inscribir', 
-          tipo: 'error' 
-        });
+        this.notificacionService.mostrar({ titulo: 'Error', mensaje: err.error?.message || 'Error al inscribir', tipo: 'error' });
+      }
+    });
+  }
+
+  /**
+   * Descarga la factura de una inscripción específica con feedback visual.
+   * @param idInscripcion ID de la inscripción.
+   */
+  descargarFactura(idInscripcion: number) {
+    this.descargandoFacturaId = idInscripcion;
+    this.inscripcionService.descargarFactura(idInscripcion).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Factura_${idInscripcion}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+        this.descargandoFacturaId = null;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.descargandoFacturaId = null;
+        this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'No se pudo generar la factura.', tipo: 'error' });
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  /**
+   * Descarga la lista completa de alumnos del taller actual con feedback visual.
+   */
+  descargarLista() {
+    if (!this.idTaller) return;
+    this.descargandoLista = true;
+    this.inscripcionService.descargarListaPdf(this.idTaller).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const nombreTaller = this.tallerContexto?.nombre.replace(/\s+/g, '_') || 'Taller';
+        a.download = `Lista_${nombreTaller}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+        this.descargandoLista = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.descargandoLista = false;
+        this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'No se pudo generar la lista de alumnos.', tipo: 'error' });
+        this.cdr.detectChanges();
       }
     });
   }
@@ -196,29 +234,16 @@ export class AdminInscripciones implements OnInit {
    * @param id Identificador único de la inscripción.
    */
   eliminar(id: number) {
-    this.notificacionService.confirmar({
-      titulo: '¿Eliminar inscripción?',
-      mensaje: 'Esta acción borrará el registro de forma permanente.',
-      textoConfirmar: 'Eliminar',
-      textoCancelar: 'Cancelar'
-    }).then(confirmado => {
+    this.notificacionService.confirmar({ titulo: '¿Eliminar inscripción?', mensaje: 'Esta acción borrará el registro de forma permanente.', textoConfirmar: 'Eliminar', textoCancelar: 'Cancelar' }).then(confirmado => {
       if (confirmado) {
         this.inscripcionService.eliminar(id).subscribe({
           next: () => {
             this.inscripciones = this.inscripciones.filter(i => i.idInscripcion !== id);
-            this.notificacionService.mostrar({
-              titulo: 'Inscripción eliminada',
-              mensaje: 'El registro ha sido borrado correctamente.',
-              tipo: 'exito'
-            });
+            this.notificacionService.mostrar({ titulo: 'Inscripción eliminada', mensaje: 'El registro ha sido borrado correctamente.', tipo: 'exito' });
             this.cdr.detectChanges();
           },
           error: (err) => {
-            this.notificacionService.mostrar({
-              titulo: 'Error',
-              mensaje: err.error?.message || 'No se pudo eliminar la inscripción',
-              tipo: 'error'
-            });
+            this.notificacionService.mostrar({ titulo: 'Error', mensaje: err.error?.message || 'No se pudo eliminar la inscripción', tipo: 'error' });
           }
         });
       }
@@ -228,7 +253,5 @@ export class AdminInscripciones implements OnInit {
   /**
    * Regresa a la página anterior utilizando el historial del navegador.
    */
-  volver() {
-    this.location.back();
-  }
+  volver() { this.location.back(); }
 }

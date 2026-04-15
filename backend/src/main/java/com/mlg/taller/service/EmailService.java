@@ -3,8 +3,8 @@ package com.mlg.taller.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j; // Para logs profesionales
-
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -14,6 +14,11 @@ import org.thymeleaf.context.Context;
 
 import java.util.Map;
 
+/**
+ * Servicio encargado de la gestión y envío de correos electrónicos.
+ * Permite el envío de mensajes simples y correos con archivos adjuntos
+ * utilizando plantillas de Thymeleaf para el cuerpo del mensaje.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -23,90 +28,68 @@ public class EmailService {
     private final TemplateEngine templateEngine;
 
     /**
-     * Envía un correo a uno o varios destinatarios.
-     * * @param to Un String (un correo) o String[] (varios correos)
-     * 
-     * @param subject      Asunto
-     * @param templateName Nombre del HTML en templates/
-     * @param variables    Mapa con objetos (pueden ser Entidades, Strings, etc.)
+     * Envía un correo electrónico que incluye un archivo adjunto (típicamente un PDF).
+     *
+     * @param to           Dirección de correo del destinatario.
+     * @param subject      Asunto del mensaje.
+     * @param templateName Ruta de la plantilla HTML (relativa a templates/).
+     * @param variables    Mapa con los datos que se inyectarán en la plantilla.
+     * @param pdfBytes     Contenido binario del archivo a adjuntar.
+     * @param fileName     Nombre que se le asignará al archivo en el correo (ej: factura.pdf).
      */
-    public void enviarCorreo(String[] to, String subject, String templateName, Map<String, Object> variables) {
-        try {
-            // 1. Preparamos el contexto de Thymeleaf
-            Context context = new Context();
-            if (variables != null) {
-                context.setVariables(variables);
-            }
-
-            // 2. Renderizamos el HTML
-            String htmlContent = templateEngine.process(templateName, context);
-
-            // 3. Configuramos el MimeMessage
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setTo(to); // Spring ya gestiona si es uno o varios
-            helper.setSubject(subject);
-            helper.setText(htmlContent, true);
-
-            // 4. Enviar
-            mailSender.send(message);
-            log.info("Email enviado con éxito a: {}", (Object) to);
-
-        } catch (MessagingException e) {
-            log.error("Error crítico al configurar el email para {}: {}", to, e.getMessage());
-            throw new RuntimeException("No se pudo enviar el correo", e);
-        }
-    }
-
-    /**
-     * Envía un correo con un archivo PDF adjunto.
-     * Útil para enviar facturas o justificantes en el momento de la inscripción.
-     * * @param to Email del destinatario
-     * 
-     * @param subject      Asunto del correo
-     * @param templateName Nombre de la plantilla HTML para el cuerpo del mensaje
-     * @param variables    Variables para personalizar el cuerpo del mensaje
-     * @param pdfBytes     El contenido del PDF en un array de bytes
-     * @param fileName     El nombre que tendrá el archivo adjunto (ej:
-     *                     "Factura.pdf")
-     */
+    @SneakyThrows(MessagingException.class)
     public void enviarCorreoConAdjunto(String to, String subject, String templateName,
-            Map<String, Object> variables, byte[] pdfBytes, String fileName) {
-        try {
-            Context context = new Context();
-            if (variables != null)
-                context.setVariables(variables);
+                                       Map<String, Object> variables, byte[] pdfBytes, String fileName) {
+        
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            String htmlContent = templateEngine.process(templateName, context);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(renderTemplate(templateName, variables), true);
 
-            MimeMessage message = mailSender.createMimeMessage();
-            // El parámetro 'true' indica que el mensaje es MULTIPART (permite adjuntos)
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(htmlContent, true);
-            // En EmailService.java, dentro de enviarCorreoConAdjunto
-            if (pdfBytes != null && pdfBytes.length > 0) {
-                // Usamos el constructor que permite especificar el MimeType (application/pdf)
-                helper.addAttachment(fileName, new ByteArrayResource(pdfBytes), "application/pdf");
-            }
-
-            mailSender.send(message);
-            log.info("Email con factura enviado con éxito a: {}", to);
-
-        } catch (MessagingException e) {
-            log.error("Error al enviar email con adjunto a {}: {}", to, e.getMessage());
-            throw new RuntimeException("Error enviando email con factura", e);
+        if (pdfBytes != null && pdfBytes.length > 0) {
+            helper.addAttachment(fileName, new ByteArrayResource(pdfBytes), "application/pdf");
         }
+
+        mailSender.send(message);
+        log.info("Email con adjunto enviado correctamente a: {}", to);
     }
 
     /**
-     * Sobrecarga para enviar a un solo destinatario de forma más cómoda (String en
-     * lugar de Array)
+     * Envía un correo electrónico estándar en formato HTML.
+     *
+     * @param to           Dirección de correo del destinatario.
+     * @param subject      Asunto del mensaje.
+     * @param templateName Ruta de la plantilla HTML (relativa a templates/).
+     * @param variables    Mapa con los datos para la plantilla.
      */
+    @SneakyThrows(MessagingException.class)
     public void enviarCorreo(String to, String subject, String templateName, Map<String, Object> variables) {
-        enviarCorreo(new String[] { to }, subject, templateName, variables);
+        
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(renderTemplate(templateName, variables), true);
+
+        mailSender.send(message);
+        log.info("Email enviado correctamente a: {}", to);
+    }
+
+    /**
+     * Procesa la plantilla HTML de Thymeleaf con las variables proporcionadas.
+     *
+     * @param templateName Nombre de la plantilla.
+     * @param variables    Datos para el contexto.
+     * @return El contenido HTML renderizado como String.
+     */
+    private String renderTemplate(String templateName, Map<String, Object> variables) {
+        Context context = new Context();
+        if (variables != null) {
+            context.setVariables(variables);
+        }
+        return templateEngine.process(templateName, context);
     }
 }

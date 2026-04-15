@@ -1,89 +1,71 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <style>
-        body {
-            font-family: 'Helvetica', sans-serif;
-            margin: 0;
-            padding: 30px;
-            color: #333;
-        }
-
-        .invoice-box {
-            max-width: 800px;
-            margin: auto;
-        }
-
-        .header {
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-        }
-
-        .header table {
-            width: 100%;
-        }
-
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: #3498db;
-        }
-
-        .invoice-info {
-            text-align: right;
-        }
-
-        .details {
-            width: 100%;
-            margin-bottom: 40px;
-        }
-
-        .details td {
-            padding: 10px;
-            vertical-align: top;
-        }
-
-        .items-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .items-table th {
-            background: #3498db;
-            color: white;
-            padding: 10px;
-            text-align: left;
-        }
-
-        .items-table td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .total {
-            text-align: right;
-            font-size: 20px;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-
-        .footer {
-            margin-top: 50px;
-            text-align: center;
-            font-size: 12px;
-            color: #777;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
-        }
+        @page { size: A4; margin: 2cm; }
+        body { font-family: Helvetica, Arial, sans-serif; color: #333; line-height: 1.5; font-size: 13px; }
+        .header-table { width: 100%; border-bottom: 2px solid #3498db; margin-bottom: 30px; padding-bottom: 10px; }
+        .info-box { width: 100%; margin-bottom: 30px; }
+        .info-box td { width: 50%; vertical-align: top; }
+        .main-table { width: 100%; border-collapse: collapse; }
+        .main-table th { background-color: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 12px; text-align: left; }
+        .main-table td { padding: 12px; border-bottom: 1px solid #eee; }
+        .total-box { text-align: right; margin-top: 30px; font-size: 16px; font-weight: bold; }
+        .footer { position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 10px; color: #999; }
     </style>
 </head>
-
 <body>
-    <h1>Prueba de Factura</h1>
-    <p>Hola, el objeto inscripcion ha llegado al PDF.</p>
-</body>
 
+    <table class="header-table">
+        <tr>
+            <td style="font-size: 24px; font-weight: bold;">FACTURA</td>
+            <td style="text-align: right;">
+                <strong>Nº:</strong> <span th:text="${inscripcion.idInscripcion}">0</span>
+            </td>
+        </tr>
+    </table>
+
+    <table class="info-box">
+        <tr>
+            <td>
+                <strong>EMISOR</strong><br/>
+                Aula Viva Centro Educativo
+            </td>
+            <td>
+                <strong>ALUMNO</strong><br/>
+                <span th:text="${inscripcion.nombreUsuario}">Nombre del Alumno</span><br/>
+                <span th:text="${inscripcion.emailUsuario}">Email</span>
+            </td>
+        </tr>
+    </table>
+
+    <table class="main-table">
+        <thead>
+            <tr>
+                <th>Descripción</th>
+                <th style="text-align: right;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    Inscripción: <strong th:text="${inscripcion.nombreTaller}">Taller</strong>
+                </td>
+                <td style="text-align: right;">
+                    <span th:text="${inscripcion.montoPagado}">0.00</span><span> €</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="total-box">
+        TOTAL: <span th:text="${inscripcion.montoPagado}">0.00</span><span> €</span>
+    </div>
+
+    <div class="footer">
+        Documento generado automáticamente.
+    </div>
+
+</body>
 </html>
