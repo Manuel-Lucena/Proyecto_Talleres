@@ -42,6 +42,26 @@ export class InscripcionService {
   }
 
   /**
+   * Descarga el PDF con la lista de alumnos de un taller.
+   * @param idTaller ID del taller.
+   */
+  descargarListaPdf(idTaller: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/taller/${idTaller}/pdf`, {
+      responseType: 'blob' 
+    });
+  }
+
+  /**
+   * Descarga la factura/recibo de una inscripción concreta.
+   * @param idInscripcion ID de la inscripción.
+   */
+  descargarFactura(idInscripcion: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/${idInscripcion}/factura`, {
+      responseType: 'blob'
+    });
+  }
+
+  /**
    * Registra una nueva inscripción vinculando a un usuario con un taller.
    * @param datos Objeto con los IDs del usuario, taller y datos del pago.
    * @returns Observable con la inscripción confirmada.

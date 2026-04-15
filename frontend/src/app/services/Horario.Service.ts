@@ -23,10 +23,10 @@ export class HorarioService {
     return this.http.get<ApiResponse<HorarioResponse[]>>(this.apiUrl);
   }
 
-    /**
-   * Recupera todos los horarios del usuario.
-   * @returns Observable con la lista de los horarios del usuario.
-   */
+  /**
+ * Recupera todos los horarios del usuario.
+ * @returns Observable con la lista de los horarios del usuario.
+ */
   listarPorUsuario(idUsuario: number | null): Observable<ApiResponse<HorarioResponse[]>> {
     return this.http.get<ApiResponse<HorarioResponse[]>>(`${this.apiUrl}/usuario/${idUsuario}`);
   }
@@ -39,6 +39,18 @@ export class HorarioService {
    */
   listarPorTaller(idTaller: number): Observable<ApiResponse<HorarioResponse[]>> {
     return this.http.get<ApiResponse<HorarioResponse[]>>(`${this.apiUrl}/taller/${idTaller}`);
+  }
+
+  /**
+   * Genera y descarga un documento PDF con la agenda semanal personalizada del usuario.
+   * El PDF organiza cronológicamente las sesiones de los talleres en los que participa.
+   * * @param idUsuario Identificador del usuario que solicita el documento.
+   * @returns Observable con los datos binarios del archivo PDF (Blob).
+   */
+  descargarAgendaPdf(idUsuario: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/usuario/${idUsuario}/pdf`, {
+      responseType: 'blob'
+    });
   }
 
   /**

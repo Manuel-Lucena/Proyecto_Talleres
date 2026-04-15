@@ -33,7 +33,7 @@ export class Calendario implements OnInit {
     private horarioService: HorarioService,
     private tokenService: TokenService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   /**
    * Inicializa la carga de la agenda personal al montar el componente.
@@ -47,15 +47,15 @@ export class Calendario implements OnInit {
    */
   cargarDatos(): void {
     const idUser = this.tokenService.getId();
-    
+
     this.horarioService.listarPorUsuario(idUser).subscribe({
       next: (resp) => {
         this.todasMisInscripciones = resp.data;
         this.horariosParaMostrar = [...this.todasMisInscripciones];
-        
+
         // Generación de lista única de nombres para el filtro
         this.talleresDisponibles = [...new Set(this.todasMisInscripciones.map(h => h.nombreTaller))];
-        
+
         this.cargando = false;
         this.cdr.detectChanges();
       },
@@ -90,5 +90,31 @@ export class Calendario implements OnInit {
     return this.horariosParaMostrar
       .filter(h => h.diaSemana.toLowerCase() === dia.toLowerCase())
       .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
+  }
+
+
+  /**
+   * Ejecuta la descarga de la agenda semanal en formato PDF.
+   */
+  descargarAgenda(): void {
+    const idUser = this.tokenService.getId();
+    if (!idUser) return;
+
+    this.horarioService.descargarAgendaPdf(idUser).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+
+        const fecha = new Date().toLocaleDateString().replace(/\//g, '-');
+        link.download = `Mi_Agenda_${fecha}.pdf`;
+
+        link.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Error al descargar el PDF:', err);
+      }
+    });
   }
 }

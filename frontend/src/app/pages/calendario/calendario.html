@@ -7,8 +7,13 @@
       <div class="toolbar-info">
         <h2 class="titulo-horario">Horarios de <span>Talleres</span></h2>
       </div>
-
+      
       <div class="toolbar-actions">
+        <button class="btn-pdf" (click)="descargarAgenda()" title="Descargar Agenda en PDF">
+          <i class="bi bi-file-earmark-pdf"></i>
+          <span>Exportar PDF</span>
+        </button>
+
         <div class="filter-wrapper">
           <i class="bi bi-funnel"></i>
           <select class="maquina-select" (change)="onFiltroChange($event)">

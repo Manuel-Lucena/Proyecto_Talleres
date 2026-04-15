@@ -3,11 +3,16 @@ package com.mlg.taller.controller;
 import com.mlg.taller.model.dtos.HorarioRequestDTO;
 import com.mlg.taller.model.dtos.HorarioResponseDTO;
 import com.mlg.taller.service.HorarioService;
+import com.mlg.taller.service.PdfService;
+import com.mlg.taller.service.UsuarioService;
 import com.mlg.taller.util.ApiResponse;
+
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controlador para la gestión de horarios de los talleres.
@@ -20,6 +25,8 @@ import java.util.List;
 public class HorarioController {
 
     private final HorarioService horarioService;
+    private final PdfService pdfService;
+    private final UsuarioService usuarioService;
 
     // --- MÉTODOS POST ---
 
@@ -70,6 +77,27 @@ public class HorarioController {
     @GetMapping("/taller/{idTaller}")
     public ApiResponse<List<HorarioResponseDTO>> listarPorTaller(@PathVariable Long idTaller) {
         return ApiResponse.success(horarioService.listarPorTaller(idTaller), "Horarios del taller obtenidos");
+    }
+
+    /**
+     * Genera y descarga un PDF con la agenda semanal personalizada de un usuario.
+     * El documento organiza cronológicamente todas las sesiones de los talleres 
+     * en los que el usuario está actualmente inscrito.
+     * * @param idUsuario Identificador del usuario que solicita su agenda.
+     * @param response  Objeto HttpServletResponse para la descarga del flujo binario.
+     */
+    @GetMapping("/usuario/{idUsuario}/pdf")
+    public void descargarAgendaPdf(@PathVariable Long idUsuario, HttpServletResponse response) {
+        var usuario = usuarioService.buscarPorId(idUsuario); // Necesitarás tener UsuarioService
+        var horarios = horarioService.listarPorUsuario(idUsuario);
+
+        String nombreArchivo = "Agenda_Semanal_" + usuario.getNombre() + ".pdf";
+        response.setHeader("Content-Disposition", "attachment; filename=" + nombreArchivo);
+
+        pdfService.generarPdf("agenda-semanal", Map.of(
+                "usuario", usuario,
+                "horarios", horarios
+        ), response);
     }
 
     // --- MÉTODOS PUT ---

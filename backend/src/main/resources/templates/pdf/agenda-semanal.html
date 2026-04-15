@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        @page {
+            margin: 1.5cm;
+        }
+        body {
+            font-family: 'Helvetica', Arial, sans-serif;
+            color: #333;
+            line-height: 1.4;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #2c3e50;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+        .header h1 {
+            margin: 0;
+            color: #2c3e50;
+            text-transform: uppercase;
+            font-size: 24px;
+        }
+        .user-info {
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        th {
+            background-color: #34495e;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #bdc3c7;
+            font-size: 12px;
+            word-wrap: break-word;
+        }
+        .dia-col { width: 15%; font-weight: bold; color: #2980b9; }
+        .hora-col { width: 20%; }
+        .taller-col { width: 45%; font-weight: bold; }
+        .aula-col { width: 20%; text-align: right; color: #7f8c8d; }
+        
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 10px;
+            color: #bdc3c7;
+            border-top: 1px solid #eee;
+            padding-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Mi Agenda Semanal</h1>
+        <p>Universidad Popular - Gestión de Talleres</p>
+    </div>
+
+    <div class="user-info">
+        <strong>Alumno/a:</strong> <span th:text="${usuario.nombre + ' ' + usuario.apellidos}">Nombre Apellido</span><br/>
+        <strong>DNI:</strong> <span th:text="${usuario.dni}">12345678X</span><br/>
+        <strong>Fecha de expedición:</strong> <span th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy HH:mm')}">15/04/2026</span>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="dia-col">Día</th>
+                <th class="hora-col">Horario</th>
+                <th class="taller-col">Taller / Actividad</th>
+                <th class="aula-col">Lugar/Aula</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="h : ${horarios}">
+                <td class="dia-col" th:text="${h.diaSemana}">Lunes</td>
+                <td class="hora-col">
+                    <span th:text="${h.horaInicio}">09:00</span> - 
+                    <span th:text="${h.horaFin}">11:00</span>
+                </td>
+                <td class="taller-col" th:text="${h.nombreTaller}">Taller de Pintura</td>
+                <td class="aula-col" th:text="${h.aula != null ? h.aula : 'No asignada'}">Aula 4</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(horarios)}">
+                <td colspan="4" style="text-align: center; padding: 20px;">
+                    No tienes sesiones programadas actualmente.
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Documento generado automáticamente por el sistema de gestión MLG Talleres.
+    </div>
+
+</body>
+</html>

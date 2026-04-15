@@ -3,13 +3,18 @@ package com.mlg.taller.controller;
 import com.mlg.taller.model.dtos.InscripcionRequestDTO;
 import com.mlg.taller.model.dtos.InscripcionResponseDTO;
 import com.mlg.taller.service.InscripcionService;
+import com.mlg.taller.service.PdfService;
+import com.mlg.taller.service.TallerService;
 import com.mlg.taller.util.ApiResponse;
+
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controlador para la gestión de inscripciones de alumnos en los talleres.
@@ -22,6 +27,8 @@ import java.util.List;
 public class InscripcionController {
 
     private final InscripcionService inscripcionService;
+    private final TallerService tallerService; //
+    private final PdfService pdfService;
 
     // --- MÉTODOS POST ---
 
@@ -62,7 +69,6 @@ public class InscripcionController {
         return ApiResponse.success(inscripcionService.listarPorTaller(idTaller), "Alumnos del taller obtenidos");
     }
 
-   
     /**
      * Busca la información de una inscripción específica mediante su identificador
      * único.
@@ -87,6 +93,43 @@ public class InscripcionController {
                 "Inscripciones del usuario obtenidas");
     }
 
+    /**
+     * Genera y descarga un PDF con la lista de alumnos inscritos en un taller.
+     * * @param idTaller Identificador del taller.
+     * 
+     * @param response Objeto para escribir el flujo del archivo.
+     */
+    @GetMapping("/taller/{idTaller}/pdf")
+    public void descargarListaPdf(@PathVariable Long idTaller, HttpServletResponse response) {
+        var taller = tallerService.buscarPorId(idTaller);
+        var inscripciones = inscripcionService.listarPorTaller(idTaller);
+
+        String nombreArchivo = "lista_alumnos_" + taller.getNombre().replace(" ", "_") + ".pdf";
+        response.setHeader("Content-Disposition", "attachment; filename=" + nombreArchivo);
+
+        pdfService.generarPdf("lista-alumnos", Map.of(
+                "taller", taller,
+                "inscripciones", inscripciones), response);
+    }
+
+    /**
+     * Genera el recibo oficial de inscripción en formato PDF para el alumno.
+     * Incluye detalles del pago, datos del usuario y confirmación de la plaza 
+     * para que sirva como justificante legal.
+     * * @param id Identificador de la inscripción de la cual se genera la factura.
+     * @param response Objeto HttpServletResponse para la descarga directa del archivo.
+     */
+    @GetMapping("/{id}/factura")
+    public void descargarFactura(@PathVariable Long id, HttpServletResponse response) {
+        var inscripcion = inscripcionService.buscarPorId(id);
+
+        String nombreArchivo = "Factura_Inscripcion_" + id + ".pdf";
+        response.setHeader("Content-Disposition", "attachment; filename=" + nombreArchivo);
+
+        pdfService.generarPdf("factura-inscripcion", Map.of(
+                "inscripcion", inscripcion), response);
+    }
+
     // --- MÉTODOS PUT ---
 
     /**
@@ -103,7 +146,7 @@ public class InscripcionController {
         return ApiResponse.success(inscripcionService.actualizar(id, dto), "Inscripción actualizada");
     }
 
-     /**
+    /**
      * Endpoint para pausar/reactivar una inscripción (Toggle).
      * 
      * @param id Identificador de la inscripción.
@@ -113,7 +156,6 @@ public class InscripcionController {
     public ApiResponse<InscripcionResponseDTO> cambiarEstado(@PathVariable Long id) {
         return ApiResponse.success(inscripcionService.cambiarEstado(id), "Estado de inscripción actualizado");
     }
-
 
     // --- MÉTODOS DELETE ---
 
