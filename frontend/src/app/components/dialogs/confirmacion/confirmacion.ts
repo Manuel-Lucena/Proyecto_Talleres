@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { ConfirmacionConfig } from '../../../interfaces/Modal.Interface';
 
 /**
- * Componente para la gestión visual de diálogos de confirmación dinámicos.
+ * DIÁLOGO DE CONFIRMACIÓN: Gestión de decisiones binarias (Aceptar/Cancelar) mediante promesas.
  */
 @Component({
   selector: 'app-confirmacion',
@@ -15,19 +15,24 @@ import { ConfirmacionConfig } from '../../../interfaces/Modal.Interface';
   styleUrl: './confirmacion.scss'
 })
 export class Confirmacion {
-  
-  public config$: Observable<ConfirmacionConfig | null>; // Estado y configuración del modal
+
+  // --- Propiedades de Estado ---
+  public config$: Observable<ConfirmacionConfig | null>; // Flujo reactivo con los textos y estado del modal
 
   /**
-   * @param notificacionService Servicio para suscribirse al estado global de confirmaciones.
+   * @param notificacionService Servicio central de mensajes para capturar peticiones de confirmación.
    */
   constructor(private notificacionService: NotificacionService) {
     this.config$ = this.notificacionService.confirmacionState$;
   }
 
+  // ===========================================================================
+  // --- GESTIÓN DE RESPUESTA ---
+  // ===========================================================================
+
   /**
-   * Resuelve la promesa de confirmación según la interacción del usuario.
-   * @param respuesta Booleano que indica aceptación o cancelación.
+   * Envía la decisión del usuario al servicio para resolver la suscripción pendiente.
+   * @param respuesta True para confirmar la acción, False para abortar.
    */
   responder(respuesta: boolean): void {
     this.notificacionService.responderConfirmacion(respuesta);

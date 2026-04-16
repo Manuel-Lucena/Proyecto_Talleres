@@ -5,7 +5,7 @@ import { NoticiaResponse } from '../../../interfaces/Noticia.Interface';
 import { FormErrorService } from '../../../services/FormError.Service';
 
 /**
- * Componente de formulario para la creación y edición de noticias.
+ * FORMULARIO DE NOTICIAS: Gestor para la creación y edición de entradas informativas.
  */
 @Component({
   selector: 'app-form-noticia',
@@ -15,28 +15,25 @@ import { FormErrorService } from '../../../services/FormError.Service';
   styleUrl: './form-noticia.scss',
 })
 export class FormNoticia implements OnInit {
-  @Input() noticiaParaEditar: NoticiaResponse | null = null; // Datos de la noticia en modo edición
-  @Output() noticiaGuardada = new EventEmitter<FormData>(); // Emite el FormData al componente padre
-  @Output() cerrar = new EventEmitter<void>(); // Notifica el cierre del modal
 
-  imagenPreview: string | ArrayBuffer | null = null; // URL temporal para la vista previa de la imagen
-  fileSeleccionado: File | null = null; // Referencia al archivo de imagen seleccionado
+  // --- Propiedades de Entrada y Salida ---
+  @Input() noticiaParaEditar: NoticiaResponse | null = null; // Datos para la carga en modo edición
+  @Output() noticiaGuardada = new EventEmitter<FormData>();  // Emisión de datos hacia el padre
+  @Output() cerrar = new EventEmitter<void>();                // Notificador de cierre de modal
 
-  /** Estructura del formulario reactivo con validaciones de longitud */
+  // --- Propiedades de Estado y UI ---
+  imagenPreview: string | ArrayBuffer | null = null; // Vista previa de la imagen seleccionada
+  fileSeleccionado: File | null = null;              // Archivo físico en memoria para el envío
+
+  /** Estructura reactiva con reglas de validación */
   form = new FormGroup({
-    titulo: new FormControl('', { 
-      validators: [Validators.required, Validators.minLength(5)], 
-      updateOn: 'blur' 
-    }),
-    contenido: new FormControl('', { 
-      validators: [Validators.required], 
-      updateOn: 'blur' 
-    }),
+    titulo: new FormControl('', { validators: [Validators.required, Validators.minLength(5)], updateOn: 'blur' }),
+    contenido: new FormControl('', { validators: [Validators.required], updateOn: 'blur' }),
   });
 
   /**
-   * @param cdr Servicio para forzar la detección de cambios al cargar imágenes.
-   * @param errorService Servicio para gestionar la visualización de errores en el template.
+   * @param cdr Trigger manual para asegurar la paridad de la vista tras cargar archivos.
+   * @param errorService Gestor de mensajes de validación para el template.
    */
   constructor(
     private cdr: ChangeDetectorRef,
@@ -44,25 +41,40 @@ export class FormNoticia implements OnInit {
   ) { }
 
   /**
-   * Inicializa el formulario y la vista previa si se recibe una noticia para editar.
+   * Ciclo de vida: Inicia el mapeo de datos si se recibe una noticia para editar.
    */
   ngOnInit(): void {
     if (this.noticiaParaEditar) {
-      this.form.patchValue({
-        titulo: this.noticiaParaEditar.titulo,
-        contenido: this.noticiaParaEditar.contenido
-      });
-
-      if (this.noticiaParaEditar.imagenUrl) {
-        this.imagenPreview = `/noticias/${this.noticiaParaEditar.imagenUrl}`;
-      }
-      this.cdr.detectChanges();
+      this.cargarDatosEdicion();
     }
   }
 
+  // ===========================================================================
+  // --- CARGA Y CONFIGURACIÓN ---
+  // ===========================================================================
+
   /**
-   * Procesa el archivo seleccionado y genera una previsualización en base64.
-   * @param event Evento de selección de archivos.
+   * Traslada los valores de la noticia seleccionada a los controles del formulario.
+   */
+  private cargarDatosEdicion(): void {
+    this.form.patchValue({
+      titulo: this.noticiaParaEditar?.titulo,
+      contenido: this.noticiaParaEditar?.contenido
+    });
+
+    if (this.noticiaParaEditar?.imagenUrl) {
+      this.imagenPreview = `/noticias/${this.noticiaParaEditar.imagenUrl}`;
+    }
+    this.cdr.detectChanges();
+  }
+
+  // ===========================================================================
+  // --- GESTIÓN DE ARCHIVOS Y ENVÍO ---
+  // ===========================================================================
+
+  /**
+   * Procesa la imagen seleccionada y genera la previsualización local.
+   * @param event Evento del input de archivos.
    */
   onFileSelected(event: any): void {
     const file = event.target.files[0];
@@ -78,7 +90,7 @@ export class FormNoticia implements OnInit {
   }
 
   /**
-   * Valida el formulario y construye el FormData con el DTO y el archivo.
+   * Empaqueta el DTO y el archivo en un FormData para el envío multiparte.
    */
   enviar(): void {
     if (this.form.invalid) {
@@ -94,9 +106,7 @@ export class FormNoticia implements OnInit {
       imagenUrl: this.noticiaParaEditar?.imagenUrl || null
     };
 
-    formData.append('noticia', new Blob([JSON.stringify(noticiaDTO)], {
-      type: 'application/json'
-    }));
+    formData.append('noticia', new Blob([JSON.stringify(noticiaDTO)], { type: 'application/json' }));
 
     if (this.fileSeleccionado) {
       formData.append('archivo', this.fileSeleccionado);
@@ -105,10 +115,14 @@ export class FormNoticia implements OnInit {
     this.noticiaGuardada.emit(formData);
   }
 
+  // ===========================================================================
+  // --- NAVEGACIÓN ---
+  // ===========================================================================
+
   /**
-   * Emite el evento de cierre del formulario.
+   * Solicita el cierre del componente.
    */
-  cerrarModal() {
+  cerrarModal(): void {
     this.cerrar.emit();
   }
 }

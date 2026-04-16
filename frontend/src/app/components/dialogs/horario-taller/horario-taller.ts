@@ -4,7 +4,7 @@ import { HorarioService } from '../../../services/Horario.Service';
 import { HorarioResponse } from '../../../interfaces/Horario.Interface';
 
 /**
- * Componente para visualizar el listado de horarios asociados a un taller.
+ * VISUALIZADOR DE HORARIOS: Gestión y despliegue de sesiones programadas por taller.
  */
 @Component({
   selector: 'app-horario-taller',
@@ -14,25 +14,27 @@ import { HorarioResponse } from '../../../interfaces/Horario.Interface';
   styleUrl: './horario-taller.scss',
 })
 export class HorarioTaller implements OnInit {
-  
-  @Input() idTaller!: number; // ID para la consulta de horarios
-  @Input() nombreTaller: string = ''; // Título para la interfaz
-  @Output() cerrar = new EventEmitter<void>(); // Notifica el cierre de la vista
 
-  horarios: HorarioResponse[] = []; // Listado de horarios de la API
-  cargando: boolean = true; // Estado de la petición asíncrona
+  // --- Propiedades de Entrada y Salida ---
+  @Input() idTaller!: number;              // Identificador de contexto para la consulta
+  @Input() nombreTaller: string = '';      // Etiqueta descriptiva para el encabezado
+  @Output() cerrar = new EventEmitter<void>(); // Notificador de cierre para el componente padre
+
+  // --- Propiedades de Datos y UI ---
+  horarios: HorarioResponse[] = [];        // Colección de sesiones recuperadas
+  cargando: boolean = true;                // Flag de control para el estado de carga
 
   /**
-   * @param horarioService Acceso a la API de horarios.
-   * @param cdr Control manual de detección de cambios.
+   * @param horarioService Abstracción de la API para la entidad Horario.
+   * @param cdr Trigger manual para la detección de cambios tras respuesta asíncrona.
    */
   constructor(
     private horarioService: HorarioService,
-    private cdr: ChangeDetectorRef 
+    private cdr: ChangeDetectorRef
   ) {}
 
   /**
-   * Inicializa la carga de datos si existe un ID de taller válido.
+   * Ciclo de vida: Dispara la recarga de datos basándose en el ID de taller recibido.
    */
   ngOnInit(): void {
     if (this.idTaller) {
@@ -40,31 +42,37 @@ export class HorarioTaller implements OnInit {
     }
   }
 
+  // ===========================================================================
+  // --- CAPA DE DATOS ---
+  // ===========================================================================
+
   /**
-   * Recupera los horarios del servidor y actualiza el estado de carga.
+   * Recupera la planificación horaria desde el servidor.
    */
   cargarHorarios(): void {
     this.cargando = true;
-    
     this.horarioService.listarPorTaller(this.idTaller).subscribe({
       next: (resp) => {
         this.horarios = resp.data;
         this.cargando = false;
-        this.cdr.detectChanges(); 
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error("Error cargando horarios", err);
+        console.error("ERROR: Fallo al obtener horarios del taller", err);
         this.cargando = false;
         this.cdr.detectChanges();
       }
     });
   }
 
+  // ===========================================================================
+  // --- GESTIÓN DE INTERFAZ ---
+  // ===========================================================================
+
   /**
-   * Gestiona la emisión del evento de cierre.
+   * Emite el evento de salida para que el contenedor superior destruya la instancia.
    */
   alCerrar(): void {
     this.cerrar.emit();
-    this.cdr.detectChanges();
   }
 }

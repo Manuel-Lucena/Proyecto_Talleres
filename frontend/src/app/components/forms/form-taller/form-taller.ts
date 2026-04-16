@@ -7,8 +7,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { UsuarioResponse } from '../../../interfaces/Usuario.Interface';
 
 /**
- * Componente de formulario para la creación y edición de talleres.
- * Permite gestionar datos básicos, asignación de profesor y carga de imagen.
+ * FORMULARIO DE TALLERES: Gestor para el alta y modificación de datos de talleres.
  */
 @Component({
   selector: 'app-form-taller',
@@ -19,19 +18,22 @@ import { UsuarioResponse } from '../../../interfaces/Usuario.Interface';
   styleUrl: './form-taller.scss'
 })
 export class FormTaller implements OnInit {
-  @Input() tallerParaEditar: any = null; // Datos del taller en modo edición
-  @Input() profesores: UsuarioResponse[] = []; // Listado de profesores disponibles
-  @Output() guardado = new EventEmitter<FormData>(); // Emite el FormData al padre
-  @Output() cerrar = new EventEmitter<void>(); // Notifica el cierre del modal
 
-  tallerForm!: FormGroup; // Instancia del formulario reactivo
-  fotoPreview: string | null = null; // URL para la previsualización de la imagen
-  archivoSeleccionado: File | null = null; // Referencia al archivo físico seleccionado
+  // --- Propiedades de Entrada y Salida ---
+  @Input() tallerParaEditar: any = null;      // Datos para la recarga en modo edición
+  @Input() profesores: UsuarioResponse[] = []; // Listado para el selector de docentes
+  @Output() guardado = new EventEmitter<FormData>(); // Emisión de datos empaquetados al padre
+  @Output() cerrar = new EventEmitter<void>();       // Notificador de cierre de modal
+
+  // --- Propiedades de Estado y UI ---
+  tallerForm!: FormGroup;                    // Instancia del control reactivo
+  fotoPreview: string | null = null;         // URL temporal para la previsualización
+  archivoSeleccionado: File | null = null;   // Referencia al archivo físico de imagen
 
   /**
-   * @param fb Constructor de formularios reactivos.
-   * @param datePipe Utilidad para formatear fechas del backend al input date.
-   * @param errorService Servicio para la gestión de errores en el template.
+   * @param fb Constructor para la estructura de controles.
+   * @param datePipe Herramienta para formatear fechas hacia el input.
+   * @param errorService Gestor de mensajes de validación en la vista.
    */
   constructor(
     private fb: FormBuilder,
@@ -42,39 +44,22 @@ export class FormTaller implements OnInit {
   }
 
   /**
-   * Inicializa el formulario y mapea los datos si existe un taller para editar.
+   * Ciclo de vida: Inicia la carga de datos en el formulario si se recibe un objeto para editar.
    */
   ngOnInit(): void {
     if (this.tallerParaEditar) {
-      const fechaInicioFormateada = this.datePipe.transform(this.tallerParaEditar.fechaInicio, 'yyyy-MM-dd');
-      const fechaFinFormateada = this.datePipe.transform(this.tallerParaEditar.fechaFin, 'yyyy-MM-dd');
-
-      const profesorEncontrado = this.profesores.find(p => 
-        (`${p.nombre} ${p.apellidos}`) === this.tallerParaEditar.nombreCompletoProfesor
-      );
-
-      const idProfesorAsignado = profesorEncontrado ? profesorEncontrado.idUsuario : null;
-
-      this.tallerForm.patchValue({
-        nombre: this.tallerParaEditar.nombre,
-        descripcion: this.tallerParaEditar.descripcion,
-        fechaInicio: fechaInicioFormateada,
-        fechaFin: fechaFinFormateada,
-        plazasMaximas: this.tallerParaEditar.plazasMaximas,
-        precio: this.tallerParaEditar.precio,
-        idProfesor: idProfesorAsignado
-      });
-
-      if (this.tallerParaEditar.fotoRuta) {
-        this.fotoPreview = '/talleres/' + this.tallerParaEditar.fotoRuta;
-      }
+      this.cargarDatosEdicion();
     }
   }
 
+  // ===========================================================================
+  // --- CONFIGURACIÓN Y CARGA ---
+  // ===========================================================================
+
   /**
-   * Define la estructura y validaciones del formulario.
+   * Define la estructura base y las reglas de validación del formulario.
    */
-  private initForm() {
+  private initForm(): void {
     this.tallerForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(5)]],
       descripcion: ['', [Validators.required, Validators.minLength(20)]],
@@ -83,16 +68,43 @@ export class FormTaller implements OnInit {
       plazasMaximas: [20, [Validators.required, Validators.min(1)]],
       precio: [0, [Validators.required, Validators.min(0)]],
       idProfesor: [null]
-    }, {
-      validators: [Validator.validarFechas]
-    });
+    }, { validators: [Validator.validarFechas] });
   }
 
   /**
-   * Gestiona la selección de imagen y genera su previsualización.
-   * @param event Evento de selección de archivos.
+   * Mapea los valores del taller seleccionado a los controles del formulario.
    */
-  onFileSelected(event: any) {
+  private cargarDatosEdicion(): void {
+    const fechaInicioFormateada = this.datePipe.transform(this.tallerParaEditar.fechaInicio, 'yyyy-MM-dd');
+    const fechaFinFormateada = this.datePipe.transform(this.tallerParaEditar.fechaFin, 'yyyy-MM-dd');
+
+    const profesorEncontrado = this.profesores.find(p => 
+      (`${p.nombre} ${p.apellidos}`) === this.tallerParaEditar.nombreCompletoProfesor
+    );
+
+    this.tallerForm.patchValue({
+      nombre: this.tallerParaEditar.nombre,
+      descripcion: this.tallerParaEditar.descripcion,
+      fechaInicio: fechaInicioFormateada,
+      fechaFin: fechaFinFormateada,
+      plazasMaximas: this.tallerParaEditar.plazasMaximas,
+      precio: this.tallerParaEditar.precio,
+      idProfesor: profesorEncontrado ? profesorEncontrado.idUsuario : null
+    });
+
+    if (this.tallerParaEditar.fotoRuta) {
+      this.fotoPreview = '/talleres/' + this.tallerParaEditar.fotoRuta;
+    }
+  }
+
+  // ===========================================================================
+  // --- GESTIÓN DE ARCHIVOS Y ENVÍO ---
+  // ===========================================================================
+
+  /**
+   * Procesa la imagen seleccionada y genera la vista previa local.
+   */
+  onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
       this.archivoSeleccionado = file;
@@ -105,31 +117,28 @@ export class FormTaller implements OnInit {
   }
 
   /**
-   * Valida el formulario y construye el FormData para el envío multiparte.
+   * Empaqueta los datos en un FormData para soportar la subida de archivos y emite el resultado.
    */
-  enviar() {
+  enviar(): void {
     if (this.tallerForm.invalid) {
       this.tallerForm.markAllAsTouched();
       return;
     }
 
     const formData = new FormData();
-    const formValues = this.tallerForm.value;
-
-    const tallerData: any = {
-      nombre: formValues.nombre,
-      descripcion: formValues.descripcion,
-      plazasMaximas: formValues.plazasMaximas,
-      precio: formValues.precio,
-      fechaInicio: formValues.fechaInicio,
-      fechaFin: formValues.fechaFin,
-      idProfesor: formValues.idProfesor ? Number(formValues.idProfesor) : null
+    const v = this.tallerForm.value;
+    
+    const tallerData = {
+      nombre: v.nombre,
+      descripcion: v.descripcion,
+      plazasMaximas: v.plazasMaximas,
+      precio: v.precio,
+      fechaInicio: v.fechaInicio,
+      fechaFin: v.fechaFin,
+      idProfesor: v.idProfesor ? Number(v.idProfesor) : null
     };
 
-    const tallerBlob = new Blob([JSON.stringify(tallerData)], {
-      type: 'application/json'
-    });
-
+    const tallerBlob = new Blob([JSON.stringify(tallerData)], { type: 'application/json' });
     formData.append('taller', tallerBlob, 'taller.json');
 
     if (this.archivoSeleccionado) {

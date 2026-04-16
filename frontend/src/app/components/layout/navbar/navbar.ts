@@ -9,7 +9,7 @@ import { UsuarioResponse } from '../../../interfaces/Usuario.Interface';
  * COMPONENTE ESTRUCTURAL: Navegación Principal (Navbar).
  * * Este componente gestiona la persistencia visual y operativa de la sesión:
  * 1. Sincronización de Sesión: Valida el estado del JWT en el ciclo de inicialización.
- * 2. Hidratación de Perfil: Recupera los datos del usuario en tiempo real tras el login.
+ * 2. Recarga de Perfil: Recupera los datos del usuario en tiempo real tras el login.
  * 3. Control de UI: Gestiona menús contextuales y flujos de salida del sistema.
  */
 @Component({
@@ -22,9 +22,9 @@ import { UsuarioResponse } from '../../../interfaces/Usuario.Interface';
 export class Navbar implements OnInit {
 
   // --- Propiedades de Estado y Sesión ---
-  isLogged: boolean = false;                  // Flag de control para vistas condicionales
-  mostrarDropdown: boolean = false;           // Toggle de estado para el menú de perfil
-  usuarioData?: UsuarioResponse;              // DTO con la información del usuario activo
+  isLogged: boolean = false;        // Flag de control para vistas condicionales
+  mostrarDropdown: boolean = false; // Toggle de estado para el menú de perfil
+  usuarioData?: UsuarioResponse;    // DTO con la información del usuario activo
 
   /**
    * @param router Gestión de redirección hacia pasarelas de acceso.
@@ -56,7 +56,7 @@ export class Navbar implements OnInit {
 
   /**
    * Recupera la identidad completa del usuario a partir del ID codificado en el token.
-   * * Se emplea detectChanges para mitigar latencias en la actualización
+   * * TÉCNICA: Se emplea detectChanges para mitigar latencias en la actualización
    * de la cabecera cuando los datos llegan tras el renderizado inicial.
    */
   private cargarDatos(): void {
