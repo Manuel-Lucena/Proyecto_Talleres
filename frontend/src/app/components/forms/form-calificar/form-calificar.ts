@@ -7,7 +7,7 @@ import { ArchivoService } from '../../../services/Archivo.Service';
 import { FormErrorService } from '../../../services/FormError.Service';
 
 /**
- * Componente para la calificación de entregas de tareas por parte del profesor.
+ * GESTOR DE CALIFICACIONES: Formulario para la evaluación de entregas y feedback del profesor.
  */
 @Component({
   selector: 'app-form-calificar',
@@ -17,29 +17,28 @@ import { FormErrorService } from '../../../services/FormError.Service';
   styleUrl: './form-calificar.scss'
 })
 export class FormCalificar implements OnInit {
-  
-  @Input() entrega: any; // Datos de la entrega a calificar
-  @Output() cerrar = new EventEmitter<void>(); // Notifica el cierre del modal
-  @Output() guardado = new EventEmitter<void>(); // Notifica éxito en la persistencia
 
-  cargando = false; // Estado de carga para feedback visual
-  archivosAlumno: any[] = []; // Archivos adjuntos del alumno
+  // --- Propiedades de Entrada y Salida ---
+  @Input() entrega: any;                         // Datos de la entrega para calificar
+  @Output() cerrar = new EventEmitter<void>();    // Notificador de cierre de modal
+  @Output() guardado = new EventEmitter<void>();  // Notificador de éxito en la operación
 
-  /** Estructura del formulario con validaciones */
+  // --- Propiedades de Datos y UI ---
+  cargando: boolean = false;                      // Flag de control para el estado de envío
+  archivosAlumno: any[] = [];                     // Metadatos de los adjuntos del estudiante
+
+  /** Estructura reactiva con reglas de evaluación */
   form = new FormGroup({
-    calificacion: new FormControl('', { 
-      validators: [Validators.required, Validators.min(0), Validators.max(10)], 
-      updateOn: 'blur' 
-    }),
+    calificacion: new FormControl('', { validators: [Validators.required, Validators.min(0), Validators.max(10)], updateOn: 'blur' }),
     comentarioProfesor: new FormControl('', { updateOn: 'blur' })
   });
 
   /**
-   * @param entregaService Operaciones para calificar entregas.
-   * @param archivoEntregaService Listado de metadatos de archivos.
-   * @param archivoService Descarga física de archivos (Blobs).
-   * @param errorService Gestión de errores en el template.
-   * @param cdr Detección de cambios para actualizaciones asíncronas.
+   * @param entregaService Operaciones de persistencia para notas y comentarios.
+   * @param archivoEntregaService Obtención de referencias de archivos del alumno.
+   * @param archivoService Servicio de descarga de recursos binarios.
+   * @param errorService Gestor de mensajes de validación para la vista.
+   * @param cdr Trigger manual para sincronizar la vista tras cargas asíncronas.
    */
   constructor(
     private entregaService: EntregaService,
@@ -50,35 +49,50 @@ export class FormCalificar implements OnInit {
   ) {}
 
   /**
-   * Carga los datos iniciales de la entrega y recupera los archivos adjuntos.
+   * Ciclo de vida: Inicia la carga de datos en el formulario y recupera los adjuntos del alumno.
    */
   ngOnInit(): void {
     if (this.entrega) {
-      this.form.patchValue({
-        calificacion: this.entrega.calificacion?.toString() || '',
-        comentarioProfesor: this.entrega.comentarioProfesor || ''
-      });
+      this.cargarDatosContexto();
       this.cargarArchivosAlumno();
     }
   }
 
+  // ===========================================================================
+  // --- CARGA Y CONFIGURACIÓN ---
+  // ===========================================================================
+
   /**
-   * Obtiene la lista de archivos subidos por el alumno.
+   * Mapea los valores previos de la entrega a los controles del formulario.
    */
-  cargarArchivosAlumno(): void {
-    const id = this.entrega.idEntrega || this.entrega.id;
-    if (!id) return;
-    this.archivoEntregaService.listarPorEntrega(id).subscribe({
-      next: (resp) => {
-        this.archivosAlumno = resp.data || [];
-        this.cdr.detectChanges(); 
-      }
+  private cargarDatosContexto(): void {
+    this.form.patchValue({
+      calificacion: this.entrega.calificacion?.toString() || '',
+      comentarioProfesor: this.entrega.comentarioProfesor || ''
     });
   }
 
   /**
-   * Gestiona la descarga de archivos convirtiéndolos en URL local.
-   * @param archivo Metadatos del archivo a descargar.
+   * Obtiene la lista de archivos asociados a la entrega para su revisión.
+   */
+  cargarArchivosAlumno(): void {
+    const id = this.entrega.idEntrega || this.entrega.id;
+    if (!id) return;
+
+    this.archivoEntregaService.listarPorEntrega(id).subscribe({
+      next: (resp) => {
+        this.archivosAlumno = resp.data || [];
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // ===========================================================================
+  // --- GESTIÓN DE RECURSOS Y ENVÍO ---
+  // ===========================================================================
+
+  /**
+   * Procesa la descarga física de archivos mediante la generación de URLs locales.
    */
   descargarArchivo(archivo: any): void {
     this.archivoService.obtenerBlob('entrega', archivo.id).subscribe({
@@ -94,7 +108,7 @@ export class FormCalificar implements OnInit {
   }
 
   /**
-   * Valida y envía la calificación al servidor.
+   * Valida la calificación y persiste los cambios en el servidor.
    */
   guardarNota(): void {
     if (this.form.invalid) {

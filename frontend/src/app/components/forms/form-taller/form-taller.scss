@@ -92,18 +92,17 @@
     }
 
     .error-container {
-        min-height: 18px; // Reserva espacio para que el formulario no "salte" al aparecer el error
+        min-height: 18px;
         margin-top: 2px;
 
         .error-message {
-            color: v.$color-secundario-calido-1; // El naranja/rojo de error
+            color: v.$color-secundario-calido-1;
             font-size: 0.7rem;
             font-weight: 700;
             font-family: v.$fuente-lectura;
         }
     }
 
-    // Estilo para el error de validación cruzada (fechas)
     .error-container-global {
         padding: 8px;
         background: rgba(v.$color-secundario-calido-1, 0.1);
@@ -143,6 +142,7 @@
         color: v.$color-superficie-suave;
         text-transform: uppercase;
         letter-spacing: 1px;
+        margin-bottom: 0.5rem;
     }
 }
 
@@ -150,15 +150,30 @@
     @include m.card-elevada;
     background: white;
     pointer-events: none;
+    border-radius: 12px;
+    overflow: hidden;
 
     .img-contenedor {
         height: 160px;
         background: #eee;
+        position: relative;
 
         img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        .badge-profesor {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(v.$color-secundario-frio-2, 0.9);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
         }
     }
 

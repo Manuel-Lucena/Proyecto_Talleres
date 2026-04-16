@@ -1,14 +1,14 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgSelectModule } from '@ng-select/ng-select'; 
+import { NgSelectModule } from '@ng-select/ng-select';
 import { TallerService } from '../../../services/Taller.Service';
 import { UsuarioService } from '../../../services/Usuario.Service';
 import { TallerResponse } from '../../../interfaces/Taller.Interface';
 import { UsuarioResponse } from '../../../interfaces/Usuario.Interface';
 
 /**
- * Componente de formulario para que el administrador gestione inscripciones manualmente.
+ * GESTOR DE INSCRIPCIONES MANUALES: Formulario para la matriculación administrativa de alumnos.
  */
 @Component({
   selector: 'app-form-inscripcion-admin',
@@ -18,20 +18,22 @@ import { UsuarioResponse } from '../../../interfaces/Usuario.Interface';
   styleUrl: './form-inscripcion-admin.scss'
 })
 export class FormInscripcionAdmin implements OnInit {
-  @Input() tallerParaInscribir: any = null; // Taller preseleccionado por contexto
-  @Input() usuarioParaInscribir: any = null; // Alumno preseleccionado por contexto
-  
-  @Output() guardado = new EventEmitter<any>(); // Emite los datos de la nueva inscripción
-  @Output() cerrar = new EventEmitter<void>(); // Notifica el cierre del modal
 
-  inscripcionForm!: FormGroup; // Formulario reactivo de inscripción
-  usuarios: UsuarioResponse[] = []; // Listado de alumnos disponibles
-  talleres: TallerResponse[] = []; // Listado de talleres disponibles
+  // --- Propiedades de Entrada y Salida ---
+  @Input() tallerParaInscribir: any = null;  // Taller preseleccionado por contexto
+  @Input() usuarioParaInscribir: any = null; // Alumno preseleccionado por contexto
+  @Output() guardado = new EventEmitter<any>(); // Emisión de datos de inscripción al padre
+  @Output() cerrar = new EventEmitter<void>();   // Notificador de cierre de modal
+
+  // --- Propiedades de Datos y UI ---
+  inscripcionForm!: FormGroup;               // Instancia del formulario reactivo
+  usuarios: UsuarioResponse[] = [];          // Listado de alumnos para el selector
+  talleres: TallerResponse[] = [];           // Listado de talleres para el selector
 
   /**
-   * @param fb Constructor de formularios reactivos.
-   * @param tallerService Servicio para la obtención de talleres.
-   * @param usuarioService Servicio para la gestión de usuarios/alumnos.
+   * @param fb Constructor de la estructura de controles.
+   * @param tallerService Servicio para la obtención del catálogo de talleres.
+   * @param usuarioService Servicio para la gestión y filtrado de alumnos.
    */
   constructor(
     private fb: FormBuilder,
@@ -42,7 +44,7 @@ export class FormInscripcionAdmin implements OnInit {
   }
 
   /**
-   * Ejecuta la carga de datos maestros, aplica el contexto recibido y genera el ID de orden.
+   * Ciclo de vida: Carga los datos maestros, aplica el contexto de entrada y genera el ID de orden.
    */
   ngOnInit(): void {
     this.cargarDatosIniciales();
@@ -50,10 +52,14 @@ export class FormInscripcionAdmin implements OnInit {
     this.generarOrderId();
   }
 
+  // ===========================================================================
+  // --- CONFIGURACIÓN Y CARGA ---
+  // ===========================================================================
+
   /**
-   * Inicializa la estructura del formulario con sus validaciones básicas.
+   * Inicializa la estructura del formulario con sus reglas de validación.
    */
-  private initForm() {
+  private initForm(): void {
     this.inscripcionForm = this.fb.group({
       idUsuario: [null, [Validators.required]],
       idTaller: [null, [Validators.required]],
@@ -63,9 +69,29 @@ export class FormInscripcionAdmin implements OnInit {
   }
 
   /**
-   * Aplica al formulario los valores recibidos mediante @Input si existen.
+   * Carga desde la API los listados necesarios para los selectores si no vienen predefinidos.
    */
-  private aplicarContexto() {
+  private cargarDatosIniciales(): void {
+    if (!this.tallerParaInscribir) {
+      this.tallerService.listarTodos().subscribe({
+        next: (res) => this.talleres = res.data
+      });
+    }
+
+    if (!this.usuarioParaInscribir) {
+      this.usuarioService.listarPorRol(3).subscribe({
+        next: (res) => {
+          this.usuarios = res.data.filter(u => u.nombreRol === 'ALUMNO');
+        },
+        error: (err) => console.error('ERROR: Fallo al cargar alumnos', err)
+      });
+    }
+  }
+
+  /**
+   * Mapea los valores recibidos por Input directamente a los controles del formulario.
+   */
+  private aplicarContexto(): void {
     if (this.tallerParaInscribir) {
       this.inscripcionForm.patchValue({
         idTaller: this.tallerParaInscribir.idTaller,
@@ -80,39 +106,24 @@ export class FormInscripcionAdmin implements OnInit {
     }
   }
 
-  /**
-   * Carga desde la API los talleres y alumnos necesarios para los selectores.
-   */
-  cargarDatosIniciales() {
-    if (!this.tallerParaInscribir) {
-      this.tallerService.listarTodos().subscribe({
-        next: (res) => this.talleres = res.data
-      });
-    }
-
-    if (!this.usuarioParaInscribir) {
-      this.usuarioService.listarPorRol(3).subscribe({
-        next: (res) => {
-          this.usuarios = res.data.filter(u => u.nombreRol === 'ALUMNO');
-        },
-        error: (err) => console.error('Error al cargar alumnos', err)
-      });
-    }
-  }
+  // ===========================================================================
+  // --- LÓGICA DE NEGOCIO Y ENVÍO ---
+  // ===========================================================================
 
   /**
-   * Genera un identificador de orden único con prefijo administrativo.
+   * Genera una referencia de pago única con prefijo administrativo.
    */
-  generarOrderId() {
+  generarOrderId(): void {
+    const randomSuffix = Math.random().toString(36).toUpperCase().substring(2, 10);
     this.inscripcionForm.patchValue({ 
-      orderId: 'ADM-' + Math.random().toString(36).toUpperCase().substring(2, 10) 
+      orderId: 'ADM-' + randomSuffix 
     });
   }
 
   /**
-   * Valida y emite los datos hacia el componente padre.
+   * Valida la integridad del formulario y emite los datos para su persistencia.
    */
-  enviar() {
+  enviar(): void {
     if (this.inscripcionForm.valid) {
       this.guardado.emit(this.inscripcionForm.value);
     }

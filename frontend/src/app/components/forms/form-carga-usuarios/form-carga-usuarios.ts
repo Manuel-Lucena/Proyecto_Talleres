@@ -18,7 +18,7 @@ interface UsuarioImportar {
 }
 
 /**
- * Componente para la importación masiva de usuarios mediante archivos CSV.
+ * IMPORTADOR MASIVO: Gestión de carga de usuarios mediante archivos CSV y validación previa.
  */
 @Component({
   selector: 'app-form-carga-usuarios',
@@ -28,19 +28,24 @@ interface UsuarioImportar {
   styleUrl: './form-carga-usuarios.scss'
 })
 export class FormCargaUsuarios {
-  @Output() cerrar = new EventEmitter<void>(); // Notifica el cierre del modal
-  @Output() guardado = new EventEmitter<any[]>(); // Emite los usuarios creados con éxito
 
-  archivoNombre: string = ''; // Nombre visible del archivo
-  archivoFile: File | null = null; // Referencia al archivo en memoria
-  fase: 'subida' | 'previa' = 'subida'; // Controla el paso actual del flujo
-  procesando: boolean = false; // Flag para bloquear la UI durante procesos
-  usuariosPrevia: UsuarioImportar[] = []; // Lista de usuarios extraídos del CSV
+  // --- Propiedades de Salida ---
+  @Output() cerrar = new EventEmitter<void>();        // Notificador de cierre de modal
+  @Output() guardado = new EventEmitter<any[]>();     // Emisión de registros creados con éxito
+
+  // --- Propiedades de Datos y Archivo ---
+  archivoNombre: string = '';                         // Etiqueta visual del fichero seleccionado
+  archivoFile: File | null = null;                    // Referencia física del archivo en memoria
+  usuariosPrevia: UsuarioImportar[] = [];             // Colección de registros extraídos para revisión
+
+  // --- Propiedades de Estado y UI ---
+  fase: 'subida' | 'previa' = 'subida';               // Control del flujo del asistente
+  procesando: boolean = false;                        // Bloqueo de UI durante tareas asíncronas
 
   /**
-   * @param cdr Servicio para forzar la detección de cambios en procesos asíncronos.
-   * @param usuarioService Servicio para la persistencia de datos de usuarios.
-   * @param notificacion Servicio para la gestión de modales y alertas globales.
+   * @param cdr Trigger manual para asegurar la paridad vista-modelo tras procesos de lectura.
+   * @param usuarioService Servicio de dominio para la persistencia masiva.
+   * @param notificacion Gestor de diálogos y alertas del sistema.
    */
   constructor(
     private cdr: ChangeDetectorRef,
@@ -48,9 +53,12 @@ export class FormCargaUsuarios {
     private notificacion: NotificacionService
   ) { }
 
+  // ===========================================================================
+  // --- CARGA Y PROCESAMIENTO ---
+  // ===========================================================================
+
   /**
-   * Captura el archivo seleccionado del input.
-   * @param event Evento nativo del input file.
+   * Captura el archivo del input y lo prepara para el procesamiento.
    */
   onFileSelected(event: any): void {
     const file = event.target.files[0];
@@ -61,56 +69,47 @@ export class FormCargaUsuarios {
   }
 
   /**
-   * Inicia la lectura del CSV y activa la fase de previsualización.
+   * Inicia la lectura del contenido del archivo y activa la vista de revisión.
    */
   procesarArchivo(): void {
     if (!this.archivoFile) return;
     this.procesando = true;
 
     const reader = new FileReader();
-
     reader.onload = (e: any) => {
       this.parsearCSV(e.target.result);
       this.fase = 'previa';
       this.procesando = false;
       this.cdr.detectChanges();
     };
-
     reader.onerror = () => {
-      this.notificacion.mostrar({
-        titulo: 'Error',
-        mensaje: 'No se pudo leer el archivo CSV.',
-        tipo: 'error'
-      });
+      this.notificacion.mostrar({ titulo: 'Error', mensaje: 'No se pudo leer el archivo.', tipo: 'error' });
       this.procesando = false;
       this.cdr.detectChanges();
     };
-
     reader.readAsText(this.archivoFile);
   }
 
   /**
-   * Transforma el contenido del CSV en una lista de objetos validados.
-   * @param texto Contenido bruto del archivo.
+   * Transforma el texto plano en objetos tipados y ejecuta la validación de cada fila.
    */
   private parsearCSV(texto: string): void {
     const lineas = texto.split(/\r?\n/);
     const filasDato = lineas.slice(1).filter(l => l.trim() !== '');
 
     this.usuariosPrevia = filasDato.map(linea => {
-      const columnas = linea.split(',').map(c => c.trim());
+      const col = linea.split(',').map(c => c.trim());
       const u: UsuarioImportar = {
-        dni: columnas[0] || '',
-        nombre: columnas[1] || '',
-        apellidos: columnas[2] || '',
-        email: columnas[3] || '',
-        rol: (columnas[4] as 'Alumno' | 'Profesor') || 'Alumno',
+        dni: col[0] || '',
+        nombre: col[1] || '',
+        apellidos: col[2] || '',
+        email: col[3] || '',
+        rol: (col[4] as 'Alumno' | 'Profesor') || 'Alumno',
         seleccionado: false,
         errores: [],
         dniError: false,
         emailError: false
       };
-
       this.validarFila(u);
       if (u.errores.length === 0) u.seleccionado = true;
       return u;
@@ -118,8 +117,7 @@ export class FormCargaUsuarios {
   }
 
   /**
-   * Valida la integridad de una fila y marca los errores específicos.
-   * @param u Objeto del usuario a validar.
+   * Comprueba la integridad de los datos según las reglas de negocio.
    */
   validarFila(u: UsuarioImportar): void {
     u.errores = [];
@@ -129,37 +127,25 @@ export class FormCargaUsuarios {
     if (u.dniError) u.errores.push('DNI/NIE inválido');
     if (!Validator.hasMinLength(u.nombre, 2)) u.errores.push('Nombre corto');
     if (u.emailError) u.errores.push('Email inválido');
-
+    
     if (u.errores.length > 0) u.seleccionado = false;
   }
 
-  /**
-   * @returns El total de registros marcados para importar.
-   */
-  totalSeleccionados(): number {
-    return this.usuariosPrevia.filter(u => u.seleccionado).length;
-  }
+  // ===========================================================================
+  // --- ACCIONES Y ENVÍO ---
+  // ===========================================================================
 
   /**
-   * @returns true si hay usuarios listos para ser guardados.
-   */
-  haySeleccionados(): boolean {
-    return this.totalSeleccionados() > 0;
-  }
-
-  /**
-   * Solicita confirmación y ejecuta la carga masiva hacia el servidor.
+   * Coordina el envío de los usuarios seleccionados hacia el servidor.
    */
   async confirmarCarga(): Promise<void> {
     const seleccionados = this.usuariosPrevia.filter(u => u.seleccionado);
-
-    const ok = await this.notificacion.confirmar({
-      titulo: 'Confirmar carga',
-      mensaje: `¿Deseas importar ${seleccionados.length} usuarios?`
+    const ok = await this.notificacion.confirmar({ 
+      titulo: 'Confirmar carga', 
+      mensaje: `¿Deseas importar ${seleccionados.length} usuarios?` 
     });
 
     if (!ok) return;
-
     this.procesando = true;
 
     const data = seleccionados.map(u => ({
@@ -173,28 +159,34 @@ export class FormCargaUsuarios {
 
     this.usuarioService.crearVariosUsuarios(data).subscribe({
       next: (res) => {
-        this.notificacion.mostrar({
-          titulo: 'Éxito',
-          mensaje: 'Usuarios importados correctamente.',
-          tipo: 'exito'
-        });
+        this.notificacion.mostrar({ titulo: 'Éxito', mensaje: 'Importación completada.', tipo: 'exito' });
         this.guardado.emit(res.data);
         this.cerrar.emit();
       },
       error: () => {
         this.procesando = false;
-        this.notificacion.mostrar({
-          titulo: 'Error',
-          mensaje: 'Fallo en la importación. Revisa duplicados.',
-          tipo: 'error'
-        });
+        this.notificacion.mostrar({ titulo: 'Error', mensaje: 'Fallo en la carga masiva.', tipo: 'error' });
         this.cdr.detectChanges();
       }
     });
   }
 
   /**
-   * Reinicia el componente para permitir una nueva selección de archivo.
+   * @returns Total de registros marcados para procesar.
+   */
+  totalSeleccionados(): number {
+    return this.usuariosPrevia.filter(u => u.seleccionado).length;
+  }
+
+  /**
+   * @returns True si existe al menos un usuario seleccionado para importar.
+   */
+  haySeleccionados(): boolean {
+    return this.totalSeleccionados() > 0;
+  }
+
+  /**
+   * Reinicia el estado del componente para una nueva carga.
    */
   volver(): void {
     this.fase = 'subida';

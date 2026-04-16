@@ -1,22 +1,18 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
   <div class="modal-body" (click)="$event.stopPropagation()">
-
     <header class="cabecera-modal">
       <h2>{{ tallerParaEditar ? 'Editar Taller' : 'Nuevo Taller' }}</h2>
       <button class="btn-close" (click)="cerrar.emit()">&times;</button>
     </header>
 
     <form [formGroup]="tallerForm" (ngSubmit)="enviar()" class="noticia-grid-container">
-
       <div class="noticia-form-col">
         <div class="campo-taller">
           <label>Nombre del Taller</label>
-          <input type="text" formControlName="nombre" 
-                 [class.is-invalid]="errorService.mostrarError(tallerForm, 'nombre')"
-                 placeholder="Ej: Taller de Acuarela Avanzada">
+          <input type="text" formControlName="nombre" [class.is-invalid]="errorService.mostrarError(tallerForm, 'nombre')" placeholder="Ej: Taller de Acuarela Avanzada">
           <div class="error-container">
-            @if (errorService.mostrarError(tallerForm, 'nombre')) { 
-              <span class="error-message">{{ errorService.getErrorMessage(tallerForm, 'nombre') }}</span> 
+            @if (errorService.mostrarError(tallerForm, 'nombre')) {
+              <span class="error-message">{{ errorService.getErrorMessage(tallerForm, 'nombre') }}</span>
             }
           </div>
         </div>
@@ -24,48 +20,44 @@
         <div class="fila-formulario">
           <div class="campo-taller">
             <label>Fecha Inicio</label>
-            <input type="date" formControlName="fechaInicio"
-                   [class.is-invalid]="errorService.mostrarError(tallerForm, 'fechaInicio')">
+            <input type="date" formControlName="fechaInicio" [class.is-invalid]="errorService.mostrarError(tallerForm, 'fechaInicio')">
             <div class="error-container">
-              @if (errorService.mostrarError(tallerForm, 'fechaInicio')) { 
-                <span class="error-message">{{ errorService.getErrorMessage(tallerForm, 'fechaInicio') }}</span> 
+              @if (errorService.mostrarError(tallerForm, 'fechaInicio')) {
+                <span class="error-message">{{ errorService.getErrorMessage(tallerForm, 'fechaInicio') }}</span>
               }
             </div>
           </div>
           <div class="campo-taller">
             <label>Fecha Fin</label>
-            <input type="date" formControlName="fechaFin"
-                   [class.is-invalid]="errorService.mostrarError(tallerForm, 'fechaFin')">
+            <input type="date" formControlName="fechaFin" [class.is-invalid]="errorService.mostrarError(tallerForm, 'fechaFin')">
             <div class="error-container">
-              @if (errorService.mostrarError(tallerForm, 'fechaFin')) { 
-                <span class="error-message">{{ errorService.getErrorMessage(tallerForm, 'fechaFin') }}</span> 
+              @if (errorService.mostrarError(tallerForm, 'fechaFin')) {
+                <span class="error-message">{{ errorService.getErrorMessage(tallerForm, 'fechaFin') }}</span>
               }
             </div>
           </div>
         </div>
 
         <div class="error-container-global" *ngIf="tallerForm.hasError('fechaInvalida') && tallerForm.get('fechaFin')?.touched">
-            <span class="error-message">La fecha de fin no puede ser anterior a la de inicio</span>
+          <span class="error-message">La fecha de fin no puede ser anterior a la de inicio</span>
         </div>
 
         <div class="fila-formulario">
           <div class="campo-taller">
             <label>Plazas Máximas</label>
-            <input type="number" formControlName="plazasMaximas"
-                   [class.is-invalid]="errorService.mostrarError(tallerForm, 'plazasMaximas')">
+            <input type="number" formControlName="plazasMaximas" [class.is-invalid]="errorService.mostrarError(tallerForm, 'plazasMaximas')">
             <div class="error-container">
-              @if (errorService.mostrarError(tallerForm, 'plazasMaximas')) { 
-                <span class="error-message">{{ errorService.getErrorMessage(tallerForm, 'plazasMaximas') }}</span> 
+              @if (errorService.mostrarError(tallerForm, 'plazasMaximas')) {
+                <span class="error-message">{{ errorService.getErrorMessage(tallerForm, 'plazasMaximas') }}</span>
               }
             </div>
           </div>
           <div class="campo-taller">
             <label>Precio (€)</label>
-            <input type="number" formControlName="precio"
-                   [class.is-invalid]="errorService.mostrarError(tallerForm, 'precio')">
+            <input type="number" formControlName="precio" [class.is-invalid]="errorService.mostrarError(tallerForm, 'precio')">
             <div class="error-container">
-              @if (errorService.mostrarError(tallerForm, 'precio')) { 
-                <span class="error-message">{{ errorService.getErrorMessage(tallerForm, 'precio') }}</span> 
+              @if (errorService.mostrarError(tallerForm, 'precio')) {
+                <span class="error-message">{{ errorService.getErrorMessage(tallerForm, 'precio') }}</span>
               }
             </div>
           </div>
@@ -73,8 +65,7 @@
 
         <div class="campo-taller">
           <label>Profesor Asignado</label>
-          <ng-select formControlName="idProfesor" [items]="profesores" bindLabel="nombre" bindValue="idUsuario"
-            class="custom-ng-select" placeholder="Seleccionar profesor...">
+          <ng-select formControlName="idProfesor" [items]="profesores" bindLabel="nombre" bindValue="idUsuario" class="custom-ng-select" placeholder="Seleccionar profesor...">
             <ng-template ng-option-tmp let-item="item">
               <strong>{{ item.nombre }} {{ item.apellidos }}</strong><br>
               <small>{{ item.email }}</small>
@@ -84,12 +75,10 @@
 
         <div class="campo-taller">
           <label>Descripción</label>
-          <textarea formControlName="descripcion" 
-                    [class.is-invalid]="errorService.mostrarError(tallerForm, 'descripcion')"
-                    placeholder="¿Qué aprenderán los alumnos?"></textarea>
+          <textarea formControlName="descripcion" [class.is-invalid]="errorService.mostrarError(tallerForm, 'descripcion')" placeholder="¿Qué aprenderán los alumnos?"></textarea>
           <div class="error-container">
-            @if (errorService.mostrarError(tallerForm, 'descripcion')) { 
-              <span class="error-message">{{ errorService.getErrorMessage(tallerForm, 'descripcion') }}</span> 
+            @if (errorService.mostrarError(tallerForm, 'descripcion')) {
+              <span class="error-message">{{ errorService.getErrorMessage(tallerForm, 'descripcion') }}</span>
             }
           </div>
         </div>
@@ -103,13 +92,58 @@
 
       <aside class="noticia-preview-col">
         <span class="label-preview">Vista Previa</span>
+        
+        <div class="vista-previa-tarjeta">
+            <div class="img-contenedor">
+                <img [src]="fotoPreview || 'assets/images/placeholder-taller.jpg'" alt="Portada">
+                <div class="badge-profesor">
+                    {{ obtenerNombreProfesor() || 'Profesor no asignado' }}
+                </div>
+            </div>
+            
+            <div class="p-3-preview">
+                <div class="preview-date">
+                    <i class="bi bi-calendar-range"></i> 
+                    @if (tallerForm.get('fechaInicio')?.value) {
+                        {{ tallerForm.get('fechaInicio')?.value | date:'dd MMM' }}
+                        @if (tallerForm.get('fechaFin')?.value) {
+                             - {{ tallerForm.get('fechaFin')?.value | date:'dd MMM, yyyy' }}
+                        }
+                    } @else {
+                        Fechas por definir
+                    }
+                </div>
+                
+                <h3 class="preview-title">
+                    {{ tallerForm.get('nombre')?.value || 'Nombre del Taller...' }}
+                </h3>
+                
+                <p class="preview-text">
+                    {{ tallerForm.get('descripcion')?.value || 'Escribe una descripción para verla aquí...' }}
+                </p>
+            </div>
+
+            <div class="preview-footer-card">
+                <div class="detalles-tecnicos">
+                    <span class="info-item">
+                        <i class="bi bi-people"></i> 
+                        {{ tallerForm.get('plazasMaximas')?.value || '0' }} plazas
+                    </span>
+                </div>
+                <div class="precio-inscripcion">
+                    <span class="precio-item">
+                        {{ tallerForm.get('precio')?.value || '0' }}€
+                    </span>
+                </div>
+            </div>
+        </div>
+
         <div class="acciones-finales">
           <button type="submit" [disabled]="tallerForm.invalid">
             {{ tallerParaEditar ? 'Guardar Cambios' : 'Publicar Taller' }}
           </button>
         </div>
       </aside>
-
     </form>
   </div>
 </div>

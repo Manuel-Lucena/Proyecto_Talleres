@@ -1,20 +1,22 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
   <div class="modal-body" (click)="$event.stopPropagation()">
-    
+
     <button class="btn-close" (click)="cerrar.emit()">&times;</button>
 
     <div class="checkout-layout">
-      
+
       <aside class="resumen-checkout-taller" *ngIf="tallerParaInscribir">
         <div class="mini-card-info">
-          <img [src]="tallerParaInscribir.fotoRuta || 'assets/images/placeholder-taller.jpg'" class="img-preview" alt="Miniatura taller">
-          
+          <img
+            [src]="tallerParaInscribir.fotoRuta ? '/talleres/' + tallerParaInscribir.fotoRuta : 'assets/images/placeholder-taller.jpg'"
+            class="img-preview" alt="Miniatura taller">
+
           <span class="etiqueta-pago">Tu suscripción</span>
           <h4 class="nombre-taller">{{ tallerParaInscribir.nombre }}</h4>
           <p class="profesor-taller">Impartido por Prof. {{ tallerParaInscribir.nombreCompletoProfesor }}</p>
-          
+
           <div class="separador-puntos"></div>
-          
+
           <div class="fila-total">
             <span>Importe Total</span>
             <span class="precio-destacado">{{ tallerParaInscribir.precio }}€</span>
@@ -40,8 +42,8 @@
           <div class="campo-formulario">
             <label>Monto a cargar en cuenta</label>
             <div class="input-checkout-grande">
-                <span>{{ tallerParaInscribir?.precio }}</span>
-                <small>EUR</small>
+              <span>{{ tallerParaInscribir?.precio }}</span>
+              <small>EUR</small>
             </div>
           </div>
 
@@ -49,15 +51,15 @@
             <button type="submit" class="btn-pagar-checkout" [disabled]="inscripcionForm.invalid">
               Confirmar e Inscribirme
             </button>
-            
+
             <p class="text-center mt-4 text-muted small">
-              Al hacer clic, confirmas tu inscripción en el taller seleccionado. 
+              Al hacer clic, confirmas tu inscripción en el taller seleccionado.
               <br><strong>Aula Viva &copy; 2026</strong>
             </p>
           </div>
         </form>
       </section>
-      
+
     </div>
   </div>
 </div>

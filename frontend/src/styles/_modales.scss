@@ -1,0 +1,58 @@
+@use 'variables' as v;
+
+// 1. Bloqueo de scroll
+// Usamos el selector de atributo para que tenga peso sin !important
+html:has(body .modal-overlay) {
+    overflow: hidden;
+    
+    body {
+        position: fixed; 
+        width: 100%;
+        height: 100%;
+    }
+}
+
+// 2. El contenedor oscuro
+// Al poner 'body .modal-overlay' ganamos a casi cualquier estilo de componente
+body .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+    
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(5px);
+    z-index: 999999;
+}
+
+// 3. El cuadro blanco
+body .modal-body {
+    position: relative;
+    background: v.$color-neutro-max;
+    border-radius: 12px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    
+    max-height: 90vh;
+    width: auto;
+    min-width: 300px;
+    
+    margin: 0;
+    // Quitamos transformaciones por si algún mixin las metió
+    transform: none;
+    
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+// 4. Scroll interno para el contenido
+body .modal-body > * {
+    overflow-y: auto;
+}

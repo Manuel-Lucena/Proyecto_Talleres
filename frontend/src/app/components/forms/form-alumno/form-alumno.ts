@@ -2,11 +2,11 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { UsuarioRequest } from '../../../interfaces/Usuario.Interface';
-import { Validator } from '../../../validators/Validator'; 
+import { Validator } from '../../../validators/Validator';
 import { FormErrorService } from '../../../services/FormError.Service';
 
 /**
- * Componente de formulario para la creación y edición de alumnos.
+ * GESTOR DE ALUMNOS: Formulario para el alta, edición y gestión de perfiles de estudiantes.
  */
 @Component({
   selector: 'app-form-alumno',
@@ -16,46 +16,65 @@ import { FormErrorService } from '../../../services/FormError.Service';
   styleUrl: './form-alumno.scss',
 })
 export class FormAlumno implements OnInit {
-  @Input() usuarioParaEditar: any | null = null; // Datos para modo edición
-  @Output() usuarioGuardado = new EventEmitter<FormData>(); // Emite el formulario al padre
-  @Output() cerrar = new EventEmitter<void>(); // Notifica el cierre del modal
 
-  fileSeleccionado: File | null = null; // Archivo de imagen de perfil
-  verPassword = false; // Control de visibilidad de contraseña
+  // --- Propiedades de Entrada y Salida ---
+  @Input() usuarioParaEditar: any | null = null;    // Datos para la carga en modo edición
+  @Output() usuarioGuardado = new EventEmitter<FormData>(); // Emisión de datos hacia el componente padre
+  @Output() cerrar = new EventEmitter<void>();      // Notificador de cierre para el modal
 
-  /**
-   * @param errorService Servicio para gestionar la visualización de errores de validación.
-   */
-  constructor(public errorService: FormErrorService) {}
+  // --- Propiedades de Estado y UI ---
+  fileSeleccionado: File | null = null;             // Referencia al archivo de imagen en memoria
+  verPassword: boolean = false;                     // Flag de control para visibilidad de campos de texto
 
-  /** Definición del formulario reactivo con sus validadores */
+  /** Estructura reactiva con validaciones de identidad y seguridad */
   form = new FormGroup({
     dni: new FormControl('', { validators: [Validators.required, Validator.dni], updateOn: 'blur' }),
     nombre: new FormControl('', { validators: [Validators.required], updateOn: 'blur' }),
     apellidos: new FormControl('', { validators: [Validators.required], updateOn: 'blur' }),
     email: new FormControl('', { validators: [Validators.required, Validators.email], updateOn: 'blur' }),
     telefono: new FormControl('', { validators: [Validator.telefono], updateOn: 'blur' }),
-    direccion: new FormControl('', { updateOn: 'blur' }), 
+    direccion: new FormControl('', { updateOn: 'blur' }),
     password: new FormControl('', { validators: [Validators.required, Validators.minLength(6)], updateOn: 'blur' }),
     repetirPassword: new FormControl('', { validators: [Validators.required], updateOn: 'blur' }),
     idRol: new FormControl(3)
   }, { validators: Validator.passwordMatch });
 
   /**
-   * Carga los datos si es edición y ajusta validaciones de contraseña.
+   * @param errorService Gestor de mensajes de validación para el template.
+   */
+  constructor(public errorService: FormErrorService) {}
+
+  /**
+   * Ciclo de vida: Inicia la carga de datos y ajusta los requisitos de seguridad según el modo.
    */
   ngOnInit(): void {
     if (this.usuarioParaEditar) {
-      this.form.patchValue(this.usuarioParaEditar);
-      this.form.get('password')?.clearValidators();
-      this.form.get('repetirPassword')?.clearValidators();
-      this.form.updateValueAndValidity();
+      this.cargarDatosEdicion();
     }
   }
 
+  // ===========================================================================
+  // --- CARGA Y CONFIGURACIÓN ---
+  // ===========================================================================
+
   /**
-   * Captura el archivo seleccionado del input.
-   * @param event Evento de selección de archivos.
+   * Mapea los valores del alumno seleccionado y flexibiliza los validadores de clave.
+   */
+  private cargarDatosEdicion(): void {
+    this.form.patchValue(this.usuarioParaEditar);
+    
+    // En edición, la contraseña es opcional; se eliminan validadores obligatorios
+    this.form.get('password')?.clearValidators();
+    this.form.get('repetirPassword')?.clearValidators();
+    this.form.updateValueAndValidity();
+  }
+
+  // ===========================================================================
+  // --- GESTIÓN DE ARCHIVOS Y ENVÍO ---
+  // ===========================================================================
+
+  /**
+   * Captura el archivo del input para su posterior empaquetado.
    */
   onFileSelected(event: any): void {
     const file = event.target.files[0];
@@ -63,7 +82,7 @@ export class FormAlumno implements OnInit {
   }
 
   /**
-   * Valida y emite los datos del alumno en formato FormData.
+   * Valida la integridad del perfil y emite el FormData para el envío multiparte.
    */
   enviar(): void {
     if (this.form.invalid) {
@@ -72,29 +91,36 @@ export class FormAlumno implements OnInit {
     }
 
     const formData = new FormData();
-    const rawValues = this.form.getRawValue();
+    const raw = this.form.getRawValue();
 
     const usuarioDTO: UsuarioRequest = {
-      dni: rawValues.dni!,
-      nombre: rawValues.nombre!,
-      apellidos: rawValues.apellidos!,
-      email: rawValues.email!,
-      telefono: rawValues.telefono!,
-      direccion: rawValues.direccion!, 
-      password: rawValues.password || undefined,
-      idRol: rawValues.idRol || 3
+      dni: raw.dni!,
+      nombre: raw.nombre!,
+      apellidos: raw.apellidos!,
+      email: raw.email!,
+      telefono: raw.telefono!,
+      direccion: raw.direccion!,
+      password: raw.password || undefined,
+      idRol: raw.idRol || 3
     };
 
     formData.append('usuario', new Blob([JSON.stringify(usuarioDTO)], { type: 'application/json' }));
-    if (this.fileSeleccionado) formData.append('archivo', this.fileSeleccionado);
+
+    if (this.fileSeleccionado) {
+      formData.append('archivo', this.fileSeleccionado);
+    }
 
     this.usuarioGuardado.emit(formData);
   }
 
+  // ===========================================================================
+  // --- NAVEGACIÓN ---
+  // ===========================================================================
+
   /**
-   * Emite el evento para cerrar el modal.
+   * Solicita el cierre del componente.
    */
-  cerrarModal(): void { 
-    this.cerrar.emit(); 
+  cerrarModal(): void {
+    this.cerrar.emit();
   }
 }

@@ -5,7 +5,7 @@ import { FormErrorService } from '../../../services/FormError.Service';
 import { Validator } from '../../../validators/Validator';
 
 /**
- * Componente de formulario para la creación y edición de horarios de talleres.
+ * GESTOR DE HORARIOS: Formulario para la planificación de sesiones semanales en talleres.
  */
 @Component({
   selector: 'app-form-horario',
@@ -15,16 +15,17 @@ import { Validator } from '../../../validators/Validator';
   styleUrl: './form-horario.scss',
 })
 export class FormHorario implements OnInit {
-  @Input() tallerId!: number; // ID del taller al que pertenece el horario
-  @Input() diaPreseleccionado: string = 'Lunes'; // Día por defecto al abrir el formulario
-  @Output() cerrar = new EventEmitter<void>(); // Notifica el cierre del modal
-  @Output() guardado = new EventEmitter<any>(); // Emite los datos del horario para su persistencia
 
-  dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']; // Opciones de la semana
+  // --- Propiedades de Entrada y Salida ---
+  @Input() tallerId!: number;                 // ID del taller para el vínculo de persistencia
+  @Input() diaPreseleccionado: string = 'Lunes'; // Valor inicial para el selector de día
+  @Output() cerrar = new EventEmitter<void>();   // Notificador de cierre para el modal
+  @Output() guardado = new EventEmitter<any>();  // Emisión de los datos del horario al padre
 
-  /**
-   * Estructura del formulario reactivo con validación personalizada de rango horario.
-   */
+  // --- Propiedades de Datos y UI ---
+  dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
+  /** Estructura reactiva con validación de rango horario */
   form = new FormGroup({
     diaSemana: new FormControl('', [Validators.required]),
     fechaInicio: new FormControl('', { validators: [Validators.required], updateOn: 'blur' }),
@@ -34,19 +35,23 @@ export class FormHorario implements OnInit {
   });
 
   /**
-   * @param errorService Servicio para la gestión de mensajes de error en los campos.
+   * @param errorService Gestor de mensajes de validación para la interfaz.
    */
   constructor(public errorService: FormErrorService) {}
 
   /**
-   * Inicializa el formulario aplicando el día de la semana preseleccionado.
+   * Ciclo de vida: Configura el estado inicial del formulario aplicando el día recibido por Input.
    */
   ngOnInit(): void {
     this.form.patchValue({ diaSemana: this.diaPreseleccionado });
   }
 
+  // ===========================================================================
+  // --- LÓGICA DE NEGOCIO Y ENVÍO ---
+  // ===========================================================================
+
   /**
-   * Valida el formulario y emite los datos del horario hacia el componente padre.
+   * Valida la integridad del horario y emite el objeto procesado para su guardado.
    */
   enviar(): void {
     if (this.form.invalid) {
