@@ -6,9 +6,10 @@ import { TokenService } from '../../../../services/Token.Service';
 import { ActivatedRoute, Router } from '@angular/router';
 
 /**
- * Componente del Aula Virtual dedicado a la gestión y listado de tareas.
- * Diferencia la lógica de visualización entre profesores (todas las tareas) 
- * y alumnos (solo tareas publicadas y estado de sus entregas).
+ * COMPONENTE DE GESTIÓN ACADÉMICA: Listado de Actividades.
+ * * Este componente implementa un patrón de "Vista Dual" basado en Roles:
+ * 1. Profesores/Admin: Acceso total para supervisar tareas y entregas globales.
+ * 2. Alumnos: Seguimiento de progreso personal y visualización de tareas publicadas.
  */
 @Component({
   selector: 'app-aula-tareas',
@@ -18,16 +19,20 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrl: './aula-tareas.scss',
 })
 export class AulaTareas implements OnInit {
-  tareas: TareaResponse[] = []; // Listado de actividades académicas recuperadas
-  cargando: boolean = true; // Flag de control para el estado de carga de la lista
-  esProfesor: boolean = false; // Flag de permisos basado en el rol del usuario actual
+
+  // --- Propiedades de Datos ---
+  tareas: TareaResponse[] = [];               // Colección de actividades con metadatos de entrega
+
+  // --- Propiedades de Estado y UI ---
+  cargando: boolean = true;                   // Control de visibilidad para Skeleton/Loader
+  esProfesor: boolean = false;                // Flag de autorización para herramientas de gestión
 
   /**
-   * @param tareaService Operaciones CRUD y de consulta para el módulo de tareas.
-   * @param tokenService Extracción de identidad y rol desde el token de sesión.
-   * @param route Acceso a parámetros de la ruta padre (ID del taller).
-   * @param cdr Detección de cambios manual para asegurar la sincronía de la UI.
-   * @param router Gestión de navegación hacia el detalle de la tarea.
+   * @param tareaService Lógica de persistencia y consulta para la entidad Tarea.
+   * @param tokenService Proveedor de identidad y extracción de claims (ID, Rol).
+   * @param route Acceso a la jerarquía de rutas para recuperar el ID del taller padre.
+   * @param cdr Trigger manual para asegurar la sincronía de la UI tras procesos asíncronos.
+   * @param router Motor de navegación para profundizar en el detalle del recurso.
    */
   constructor(
     private tareaService: TareaService,
@@ -38,29 +43,35 @@ export class AulaTareas implements OnInit {
   ) { }
 
   /**
-   * Inicializa el componente validando el rol del usuario y recuperando el ID del taller.
+   * Ciclo de vida: Inicializa los permisos y resuelve el contexto del taller 
+   * accediendo a la ruta padre para obtener el identificador único.
    */
   ngOnInit(): void {
     const rol = this.tokenService.getRol();
     this.esProfesor = (rol === 'PROFESOR' || rol === 'ADMIN');
 
+    // El ID del taller reside en la ruta padre /aula-virtual/:id
     const idTaller = this.route.parent?.snapshot.paramMap.get('id');
+    
     if (idTaller) {
       this.listarTareas(Number(idTaller));
     }
   }
 
+  // ===========================================================================
+  // --- FLUJO DE DATOS Y AUTORIZACIÓN ---
+  // ===========================================================================
+
   /**
-   * Recupera las tareas del taller aplicando filtros según el rol del usuario.
-   * @param id Identificador único del taller.
+   * Orquestador de carga de actividades con bifurcación lógica según perfil.
+   * @param id Identificador único del Taller.
    */
   listarTareas(id: number): void {
     this.cargando = true;
     const idAlumno = this.tokenService.getId();
 
-    // Discriminación de fuente de datos según permisos
-    const obs = this.esProfesor
-      ? this.tareaService.listarPorTaller(id)
+    const obs = this.esProfesor 
+      ? this.tareaService.listarPorTaller(id) 
       : this.tareaService.listarVisibles(id, idAlumno!);
 
     obs.subscribe({
@@ -70,20 +81,22 @@ export class AulaTareas implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error al cargar tareas:', err);
+        console.error('Error crítico al recuperar tareas:', err);
         this.cargando = false;
         this.cdr.detectChanges();
       }
     });
   }
 
+  // ===========================================================================
+  // --- NAVEGACIÓN ---
+  // ===========================================================================
+
   /**
-   * Navega a la vista de detalle o entrega de una tarea específica.
-   * @param idTarea Identificador único de la tarea seleccionada.
+   * Transición hacia la vista de detalle mediante navegación relativa.
+   * @param idTarea Clave primaria para la carga del detalle.
    */
   verDetalle(idTarea: number): void {
-    this.router.navigate(['../detalle', 'tarea', idTarea], {
-      relativeTo: this.route
-    });
+    this.router.navigate(['../detalle', 'tarea', idTarea], { relativeTo: this.route });
   }
 }

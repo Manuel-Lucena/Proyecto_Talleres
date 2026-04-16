@@ -5,6 +5,13 @@ import { TokenService } from '../../../services/Token.Service';
 import { UsuarioService } from '../../../services/Usuario.Service';
 import { UsuarioResponse } from '../../../interfaces/Usuario.Interface';
 
+/**
+ * COMPONENTE ESTRUCTURAL: Navegación Principal (Navbar).
+ * * Este componente gestiona la persistencia visual y operativa de la sesión:
+ * 1. Sincronización de Sesión: Valida el estado del JWT en el ciclo de inicialización.
+ * 2. Hidratación de Perfil: Recupera los datos del usuario en tiempo real tras el login.
+ * 3. Control de UI: Gestiona menús contextuales y flujos de salida del sistema.
+ */
 @Component({
   selector: 'app-navbar',
   standalone: true,
@@ -14,10 +21,17 @@ import { UsuarioResponse } from '../../../interfaces/Usuario.Interface';
 })
 export class Navbar implements OnInit {
 
-  public isLogged = false;
-  public mostrarDropdown = false;
-  public usuarioData?: UsuarioResponse;
+  // --- Propiedades de Estado y Sesión ---
+  isLogged: boolean = false;                  // Flag de control para vistas condicionales
+  mostrarDropdown: boolean = false;           // Toggle de estado para el menú de perfil
+  usuarioData?: UsuarioResponse;              // DTO con la información del usuario activo
 
+  /**
+   * @param router Gestión de redirección hacia pasarelas de acceso.
+   * @param tokenService Interfaz de acceso a la persistencia local del JWT.
+   * @param usuarioService Servicio de dominio para la gestión de cuentas.
+   * @param cdr Trigger manual para asegurar la paridad vista-modelo en cargas asíncronas.
+   */
   constructor(
     private router: Router,
     public tokenService: TokenService,
@@ -25,39 +39,61 @@ export class Navbar implements OnInit {
     private cdr: ChangeDetectorRef
   ) { }
 
+  /**
+   * Ciclo de vida: Evalúa la integridad de la sesión y dispara la carga de perfil 
+   * si el motor de tokens confirma una identidad válida en el almacenamiento.
+   */
   ngOnInit(): void {
-    // Verificamos el login justo al cargar
     this.isLogged = this.tokenService.isLogged();
     if (this.isLogged) {
       this.cargarDatos();
     }
   }
 
+  // ===========================================================================
+  // --- CAPA DE DATOS Y PERFIL ---
+  // ===========================================================================
+
+  /**
+   * Recupera la identidad completa del usuario a partir del ID codificado en el token.
+   * * Se emplea detectChanges para mitigar latencias en la actualización
+   * de la cabecera cuando los datos llegan tras el renderizado inicial.
+   */
   private cargarDatos(): void {
     const userId = this.tokenService.getId();
-
     if (userId) {
       this.usuarioService.obtenerPorId(userId).subscribe({
         next: (res) => {
-
           this.usuarioData = res.data;
-          this.cdr.detectChanges(); 
+          this.cdr.detectChanges();
         },
         error: (err) => {
-          console.error("Error en Navbar al traer datos por ID", err);
+          console.error("ERROR: Fallo al sincronizar datos de perfil en Navbar", err);
         }
       });
-    } else {
-      console.warn("No se pudo obtener el ID del token para el Navbar");
     }
   }
 
+  // ===========================================================================
+  // --- GESTIÓN DE INTERFAZ Y FLUJOS ---
+  // ===========================================================================
+
+  /**
+   * Controla la apertura y cierre del menú desplegable del usuario.
+   * Se detiene la propagación para evitar conflictos con listeners globales del DOM.
+   */
   public toggleDropdown(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
     this.mostrarDropdown = !this.mostrarDropdown;
   }
 
+  /**
+   * Orquestador de cierre de sesión:
+   * 1. Invalida las credenciales en el storage local.
+   * 2. Resetea el estado interno del componente para seguridad de datos.
+   * 3. Expulsa al usuario hacia la vista de login.
+   */
   public logout(): void {
     this.tokenService.logOut();
     this.isLogged = false;

@@ -11,8 +11,9 @@ import { Notificacion } from "../../../../components/dialogs/mensaje/notificacio
 import { Router } from '@angular/router';
 
 /**
- * Componente para la gestión administrativa de usuarios.
- * Permite listar, filtrar, crear, editar, eliminar y gestionar el estado de los usuarios.
+ * Componente de gestión administrativa para el control de usuarios.
+ * Proporciona funcionalidades de listado, búsqueda avanzada, filtrado por roles,
+ * alta masiva y gestión de estados (activo/inactivo).
  */
 @Component({
   selector: 'app-admin-usuarios',
@@ -22,20 +23,25 @@ import { Router } from '@angular/router';
   styleUrl: './admin-usuarios.scss'
 })
 export class AdminUsuarios implements OnInit {
-  usuarios: UsuarioResponse[] = []; // Listado completo de usuarios
-  busqueda: string = ''; // Término de búsqueda actual
-  filtroRol: string = ''; // Rol seleccionado para filtrar
-  criterioBusqueda: string = 'todos'; // Campo por el cual filtrar (nombre, dni, email)
 
-  mostrarModal: boolean = false; // Control del modal de creación/edición
-  mostrarModalCarga: boolean = false; // Control del modal de carga masiva
-  usuarioSeleccionado: UsuarioResponse | null = null; // Usuario activo para edición
+  // --- Propiedades de Datos ---
+  usuarios: UsuarioResponse[] = []; // Colección maestra de usuarios desde el backend
+
+  // --- Estado de Filtros y Búsqueda ---
+  busqueda: string = '';           // Texto introducido en el buscador
+  filtroRol: string = '';          // Rol seleccionado (ADMIN, PROFESOR, ALUMNO o vacío)
+  criterioBusqueda: string = 'todos'; // Selector de campo (nombre, dni, email)
+
+  // --- Gestión de UI y Modales ---
+  mostrarModal: boolean = false;         // Control de visibilidad del formulario de usuario
+  mostrarModalCarga: boolean = false;    // Control de visibilidad para carga masiva
+  usuarioSeleccionado: UsuarioResponse | null = null; // Buffer para edición
 
   /**
-   * @param usuarioService Operaciones de persistencia de usuarios.
-   * @param notificacionService Gestión de diálogos y alertas globales.
-   * @param router Servicio de navegación para acceso a inscripciones.
-   * @param cdr Detección manual de cambios para actualizaciones asíncronas.
+   * @param usuarioService Operaciones de comunicación con la API de usuarios.
+   * @param notificacionService Servicio para lanzar diálogos de confirmación y alertas.
+   * @param router Gestión de rutas para navegación interna.
+   * @param cdr Forzado de detección de cambios para procesos asíncronos complejos.
    */
   constructor(
     private usuarioService: UsuarioService,
@@ -45,14 +51,14 @@ export class AdminUsuarios implements OnInit {
   ) { }
 
   /**
-   * Inicializa el listado de usuarios al cargar el componente.
+   * Ciclo de vida: Carga la lista inicial de usuarios al montar el componente.
    */
   ngOnInit(): void {
     this.cargarUsuarios();
   }
 
   /**
-   * Obtiene la colección actualizada de usuarios desde el servidor.
+   * Solicita al servidor el listado completo de usuarios.
    */
   cargarUsuarios(): void {
     this.usuarioService.listar().subscribe({
@@ -63,31 +69,40 @@ export class AdminUsuarios implements OnInit {
     });
   }
 
+  // ===========================================================================
+  // --- LÓGICA DE FILTRADO DINÁMICO ---
+  // ===========================================================================
+
   /**
-   * Getter que aplica los filtros de búsqueda y rol sobre la lista de usuarios.
+   * Getter reactivo que devuelve la lista de usuarios procesada.
+   * Se ejecuta automáticamente cuando cambian los inputs de búsqueda o filtros.
    */
   get usuariosFiltrados() {
     const term = this.busqueda.toLowerCase().trim();
+
     return this.usuarios.filter(u => {
+      // 1. Filtro por Rol
       const cumpleRol = this.filtroRol === '' || u.nombreRol === this.filtroRol;
       if (!cumpleRol) return false;
+
+      // 2. Filtro por Término de Búsqueda
       if (!term) return true;
 
       switch (this.criterioBusqueda) {
-        case 'nombre':
+        case 'nombre': 
           return (u.nombre + ' ' + u.apellidos).toLowerCase().includes(term);
-        case 'dni':
+        case 'dni': 
           return u.dni.toLowerCase().includes(term);
-        case 'email':
+        case 'email': 
           return u.email.toLowerCase().includes(term);
-        default:
+        default: // Búsqueda global en todos los campos
           return (u.nombre + u.apellidos + u.dni + u.email).toLowerCase().includes(term);
       }
     });
   }
 
   /**
-   * Genera el texto de sugerencia para el buscador según el criterio.
+   * Ajusta el placeholder del buscador según el criterio de filtrado seleccionado.
    */
   getPlaceholder() {
     switch (this.criterioBusqueda) {
@@ -98,8 +113,12 @@ export class AdminUsuarios implements OnInit {
     }
   }
 
+  // ===========================================================================
+  // --- OPERACIONES DE GESTIÓN (CRUD) ---
+  // ===========================================================================
+
   /**
-   * Prepara el estado para la creación de un nuevo usuario.
+   * Inicializa el flujo para crear un nuevo usuario.
    */
   abrirCrear() {
     this.usuarioSeleccionado = null;
@@ -107,8 +126,8 @@ export class AdminUsuarios implements OnInit {
   }
 
   /**
-   * Carga un usuario en el modal para su edición.
-   * @param u Usuario seleccionado.
+   * Prepara el formulario para editar un usuario existente.
+   * @param u El usuario cargado desde la fila de la tabla.
    */
   abrirEditar(u: UsuarioResponse) {
     this.usuarioSeleccionado = JSON.parse(JSON.stringify(u));
@@ -116,14 +135,15 @@ export class AdminUsuarios implements OnInit {
   }
 
   /**
-   * Procesa el guardado de datos (creación o edición) y gestiona la respuesta.
-   * @param fd FormData con el DTO del usuario y posible archivo de imagen.
+   * Procesa la persistencia de datos (Creación o Actualización).
+   * @param fd FormData que contiene el DTO del usuario y la imagen opcional.
    */
   ejecutarGuardado(fd: FormData): void {
     const esEdicion = !!this.usuarioSeleccionado;
-
-    const peticion$ = (esEdicion
-      ? this.usuarioService.actualizarUsuario(this.usuarioSeleccionado!.idUsuario, fd)
+    
+    // Selección dinámica de la petición según el contexto
+    const peticion$ = (esEdicion 
+      ? this.usuarioService.actualizarUsuario(this.usuarioSeleccionado!.idUsuario, fd) 
       : this.usuarioService.crearUsuario(fd)) as import('rxjs').Observable<any>;
 
     peticion$.subscribe({
@@ -144,18 +164,20 @@ export class AdminUsuarios implements OnInit {
   }
 
   /**
-   * Alterna el estado activo/inactivo de un usuario previa confirmación.
+   * Realiza un "soft delete" o reactivación cambiando el flag 'activo' del usuario.
    * @param u Usuario a modificar.
    */
   toggleEstado(u: UsuarioResponse) {
     this.notificacionService.confirmar({
       titulo: u.activo ? 'Dar de baja' : 'Reactivar',
-      mensaje: `¿Cambiar estado de ${u.nombre}?`,
+      mensaje: `¿Deseas cambiar el estado de ${u.nombre}?`,
     }).then((confirmado) => {
       if (confirmado) {
         const fd = new FormData();
         const dto = { ...u, activo: !u.activo, idRol: (u as any).idRol || 3 };
+        
         fd.append('usuario', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
+        
         this.usuarioService.actualizarUsuario(u.idUsuario, fd).subscribe({
           next: () => {
             this.notificacionService.mostrar({ titulo: 'Éxito', mensaje: 'Estado actualizado', tipo: 'exito' });
@@ -167,13 +189,13 @@ export class AdminUsuarios implements OnInit {
   }
 
   /**
-   * Solicita confirmación y elimina un usuario de forma definitiva.
-   * @param id Identificador único del usuario.
+   * Ejecuta la eliminación definitiva de un registro en la base de datos.
+   * @param id ID único del usuario.
    */
   eliminarUsuario(id: number) {
     this.notificacionService.confirmar({
       titulo: '¿Eliminar?',
-      mensaje: 'Esta acción no se puede deshacer.',
+      mensaje: 'Esta acción es irreversible y eliminará todos los datos asociados.',
     }).then((conf) => {
       if (conf) {
         this.usuarioService.eliminar(id).subscribe({
@@ -187,8 +209,7 @@ export class AdminUsuarios implements OnInit {
   }
 
   /**
-   * Navega a la vista de inscripciones detallada de un usuario.
-   * @param idUsuario Identificador del usuario.
+   * Redirige a la vista detallada de inscripciones del usuario seleccionado.
    */
   verInscripciones(idUsuario: number) {
     this.router.navigate(['/panel-admin/usuarios', idUsuario, 'inscripciones']);

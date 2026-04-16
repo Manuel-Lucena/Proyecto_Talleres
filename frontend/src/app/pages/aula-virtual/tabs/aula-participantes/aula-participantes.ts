@@ -5,9 +5,11 @@ import { UsuarioService } from '../../../../services/Usuario.Service';
 import { UsuarioResponse } from '../../../../interfaces/Usuario.Interface';
 
 /**
- * Componente del Aula Virtual para visualizar el listado de participantes.
- * Organiza y separa a los usuarios inscritos en categorías de profesores y alumnos
- * basándose en su rol asignado.
+ * VISTA DE GESTIÓN DE COMUNIDAD: Listado de Participantes.
+ * * Este componente orquesta la visualización de la estructura humana del taller:
+ * 1. Resolución de Contexto: Accede al ID del taller mediante la jerarquía de rutas (Parent Route).
+ * 2. Clasificación de Datos: Segmenta el DTO de respuesta en colecciones tipadas por Rol.
+ * 3. Gestión de Estado Síncrono: Controla el ciclo de vida de la carga para evitar inconsistencias visuales.
  */
 @Component({
   selector: 'app-aula-participantes',
@@ -17,15 +19,19 @@ import { UsuarioResponse } from '../../../../interfaces/Usuario.Interface';
   styleUrl: './aula-participantes.scss',
 })
 export class AulaParticipantes implements OnInit {
-  idTaller!: number; // Identificador del taller recuperado de la ruta padre
-  profesores: UsuarioResponse[] = []; // Colección de usuarios con rol de profesor
-  alumnos: UsuarioResponse[] = []; // Colección de usuarios con rol de alumno
-  cargando: boolean = true; // Estado de carga para la visualización de skeletons o spinners
+
+  // --- Propiedades de Datos ---
+  idTaller!: number;                          // Identificador único recuperado del Snapshot
+  profesores: UsuarioResponse[] = [];         // Colección filtrada de personal docente
+  alumnos: UsuarioResponse[] = [];            // Colección filtrada de usuarios discentes
+
+  // --- Propiedades de Estado y UI ---
+  cargando: boolean = true;                   // Flag de control para el estado de hidratación de la vista
 
   /**
-   * @param route Acceso a los parámetros de la ruta padre para obtener el ID del taller.
-   * @param usuarioService Servicio para la recuperación de participantes del taller.
-   * @param cdr Referencia para la detección manual de cambios tras procesos asíncronos.
+   * @param route Inyección de la ruta activa para la captura de parámetros de la URL.
+   * @param usuarioService Abstracción de la API para la recuperación de inscritos.
+   * @param cdr Servicio de detección de cambios para forzar el renderizado tras procesos asíncronos.
    */
   constructor(
     private route: ActivatedRoute,
@@ -34,7 +40,9 @@ export class AulaParticipantes implements OnInit {
   ) { }
 
   /**
-   * Inicializa el componente capturando el contexto del taller e iniciando la carga.
+   * Inicialización del componente:
+   * Implementa la captura del parámetro 'id' desde el 'parent snapshot', asegurando 
+   * que el componente hijo tenga acceso al contexto del aula virtual.
    */
   ngOnInit(): void {
     const idParam = this.route.parent?.snapshot.paramMap.get('id');
@@ -44,9 +52,14 @@ export class AulaParticipantes implements OnInit {
     }
   }
 
+  // ===========================================================================
+  // --- CAPA DE SERVICIO Y LÓGICA DE NEGOCIO ---
+  // ===========================================================================
+
   /**
-   * Recupera todos los inscritos en el taller y los clasifica por tipo de rol.
-   * Excluye otros roles administrativos para mantener el enfoque académico del aula.
+   * Ejecuta la petición al servicio de usuarios y aplica la lógica de filtrado reactivo.
+   * * TÉCNICA: Se utiliza el discriminador 'nombreRol' para segregar el payload 
+   * y alimentar las listas específicas de la interfaz de usuario.
    */
   cargarParticipantes(): void {
     this.cargando = true;
@@ -56,7 +69,6 @@ export class AulaParticipantes implements OnInit {
       next: (resp) => {
         const participantes = resp.data || [];
 
-        // Clasificación por roles específicos
         this.profesores = participantes.filter(u => u.nombreRol === 'PROFESOR');
         this.alumnos = participantes.filter(u => u.nombreRol === 'ALUMNO');
 
@@ -64,7 +76,7 @@ export class AulaParticipantes implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error al cargar participantes:', err);
+        console.error('CRITICAL: Fallo en la recuperación de participantes del taller:', err);
         this.cargando = false;
         this.cdr.detectChanges();
       }

@@ -45,6 +45,19 @@ public class InscripcionController {
         return ApiResponse.success(inscripcionService.inscribir(dto), "Inscripción realizada con éxito");
     }
 
+    /**
+     * Registra múltiples inscripciones de forma masiva.
+     * Útil para importar alumnos desde un CSV.
+     *
+     * @param dtos Lista de inscripciones a procesar.
+     * @return ApiResponse con la lista de inscripciones creadas.
+     */
+    @PostMapping("/masivo")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<List<InscripcionResponseDTO>> inscribirMasivo(
+            @Valid @RequestBody List<InscripcionRequestDTO> dtos) {
+        return ApiResponse.success(inscripcionService.inscribirMasivo(dtos), "Importación masiva completada con éxito");
+    }
     // --- MÉTODOS GET ---
 
     /**

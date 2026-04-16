@@ -20,25 +20,21 @@
         <h3>Filtrar talleres</h3>
         <p class="nota-sidebar">Configura tus preferencias.</p>
       </div>
-
       <form [formGroup]="filtroForm" class="form-filtros">
         <div class="grupo-filtro">
           <label><i class="bi bi-search"></i> Buscar</label>
           <input type="text" formControlName="texto" placeholder="Nombre..." class="form-control">
         </div>
-
         <div class="grupo-filtro">
           <label><i class="bi bi-currency-euro"></i> Precio Máx: {{filtroForm.get('precioMax')?.value}}€</label>
           <input type="range" formControlName="precioMax" min="0" max="500" step="10" class="form-range">
         </div>
-
         <div class="grupo-filtro">
           <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" formControlName="soloDisponibles" id="checkP">
             <label class="form-check-label" for="checkP">Solo con plazas</label>
           </div>
         </div>
-
         <button type="button" class="btn-limpiar" (click)="limpiarFiltros()">Limpiar filtros</button>
       </form>
     </aside>
@@ -50,7 +46,6 @@
       </div>
 
       <div class="card-curso-horizontal" *ngFor="let taller of talleresFiltrados">
-
         <div class="dropdown admin-dropdown" *ngIf="puedeGestionar">
           <button class="btn-kebab" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-three-dots-vertical"></i>
@@ -80,8 +75,7 @@
         <div class="contenido-curso">
           <div class="cuerpo-superior">
             <div class="periodo-curso">
-              <i class="bi bi-calendar-range"></i>
-              {{ taller.fechaInicio | date:'dd MMM' }} - {{ taller.fechaFin | date:'dd MMM, yyyy' }}
+              <i class="bi bi-calendar-range"></i> {{ taller.fechaInicio | date:'dd MMM' }} - {{ taller.fechaFin | date:'dd MMM, yyyy' }}
             </div>
             <h3 class="titulo-curso">{{ taller.nombre }}</h3>
             <p class="descripcion-curso">{{ taller.descripcion }}</p>
@@ -95,9 +89,19 @@
             </div>
             <div class="precio-inscripcion">
               <span class="moneda">{{ taller.precio }}€</span>
-              <button class="btn-inscripcion" [disabled]="taller.plazasDisponibles === 0"
-                (click)="abrirInscripcion(taller)">
-                {{ taller.plazasDisponibles > 0 ? 'Inscribirme ahora' : 'Agotado' }}
+              
+              <button class="btn-inscripcion" 
+                      [disabled]="taller.plazasDisponibles === 0 || estaInscrito(taller.idTaller)" 
+                      [class.ya-inscrito]="estaInscrito(taller.idTaller)"
+                      (click)="abrirInscripcion(taller)">
+                
+                <ng-container *ngIf="estaInscrito(taller.idTaller)">
+                   <i class="bi bi-check-circle-fill"></i> Ya inscrito
+                </ng-container>
+
+                <ng-container *ngIf="!estaInscrito(taller.idTaller)">
+                   {{ taller.plazasDisponibles > 0 ? 'Inscribirme ahora' : 'Agotado' }}
+                </ng-container>
               </button>
             </div>
           </div>
@@ -107,10 +111,8 @@
   </div>
 </div>
 
-<app-form-taller *ngIf="mostrarModalForm" [tallerParaEditar]="tallerSeleccionado" (cerrar)="mostrarModalForm = false"
-  (guardado)="guardarCambios($event)"></app-form-taller>
-<app-form-inscripcion *ngIf="mostrarModalInscripcion" [tallerParaInscribir]="tallerSeleccionado"
-  (cerrar)="mostrarModalInscripcion = false" (guardado)="finalizarInscripcion($event)"></app-form-inscripcion>
+<app-form-taller *ngIf="mostrarModalForm" [tallerParaEditar]="tallerSeleccionado" (cerrar)="mostrarModalForm = false" (guardado)="guardarCambios($event)"></app-form-taller>
+<app-form-inscripcion *ngIf="mostrarModalInscripcion" [tallerParaInscribir]="tallerSeleccionado" (cerrar)="mostrarModalInscripcion = false" (guardado)="finalizarInscripcion($event)"></app-form-inscripcion>
 <app-confirmacion></app-confirmacion>
 <app-modal-notificacion></app-modal-notificacion>
 <app-footer></app-footer>

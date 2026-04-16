@@ -8,8 +8,9 @@ import { FormAlumno } from '../../components/forms/form-alumno/form-alumno';
 import { RouterModule } from '@angular/router';
 
 /**
- * Componente encargado de la autenticación de usuarios y acceso al registro.
- * Gestiona el formulario de inicio de sesión y la apertura del modal para nuevos alumnos.
+ * Componente de acceso y puerta de entrada al sistema.
+ * Gestiona el flujo de autenticación de usuarios existentes y proporciona 
+ * el punto de acceso al registro de nuevos alumnos a través de un modal dinámico.
  */
 @Component({
   selector: 'app-login',
@@ -19,20 +20,23 @@ import { RouterModule } from '@angular/router';
   styleUrl: './login.scss'
 })
 export class Login {
-  public verPassword = false; // Control de visibilidad del texto de la contraseña
-  public errorLogin = false; // Flag para mostrar alertas de credenciales incorrectas
-  public mensajeError = ''; // Texto descriptivo del error de autenticación
-  public mostrarModalRegistro = false; // Estado de visibilidad del modal de registro
 
+  // --- Estado de la Interfaz ---
+  public verPassword = false;       // Alterna entre ocultar/mostrar caracteres del password
+  public errorLogin = false;        // Dispara la visualización de alertas de error en el template
+  public mensajeError = '';         // Mensaje amigable para el usuario en caso de fallo
+  public mostrarModalRegistro = false; // Controla la visibilidad del componente de registro (FormAlumno)
+
+  // --- Formulario Reactivo ---
   public loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required])
   });
 
   /**
-   * @param usuarioService Operaciones de autenticación y creación de usuarios.
-   * @param router Gestión de navegación tras login/registro exitoso.
-   * @param cdr Detección de cambios manual para respuestas asíncronas de error.
+   * @param usuarioService Servicio de comunicación con la API de seguridad y usuarios.
+   * @param router Sistema de navegación para redirecciones post-login.
+   * @param cdr Necesario para asegurar que los mensajes de error se pinten tras fallos asíncronos.
    */
   constructor(
     private usuarioService: UsuarioService,
@@ -41,14 +45,14 @@ export class Login {
   ) { }
 
   /**
-   * Alterna el tipo de input del campo contraseña entre 'password' y 'text'.
+   * Mejora la UX permitiendo al usuario revisar la contraseña introducida.
    */
   public togglePassword(): void {
     this.verPassword = !this.verPassword;
   }
 
   /**
-   * Valida el formulario de inicio de sesión e inicia el proceso de autenticación.
+   * Punto de entrada del formulario. Realiza validaciones previas al envío.
    */
   public onSubmit(): void {
     this.errorLogin = false;
@@ -62,7 +66,8 @@ export class Login {
   }
 
   /**
-   * Realiza la petición de login al servidor y redirige al usuario si es exitosa.
+   * Orquestador de la llamada de autenticación.
+   * Si el login es correcto, el servicio se encarga de persistir el token y redirigimos.
    */
   private execLogin(): void {
     const datos: LoginRequest = {
@@ -78,30 +83,28 @@ export class Login {
       error: (err: any) => {
         this.errorLogin = true;
         this.mensajeError = 'Email o contraseña incorrectos';
-        this.cdr.detectChanges();
-        console.error('Detalle técnico:', err);
+        this.cdr.detectChanges(); 
+        console.error('Detalle técnico del error:', err);
       }
     });
   }
 
-  /**
-   * Activa la visibilidad del modal de registro de alumnos.
-   */
+  // ===========================================================================
+  // --- GESTIÓN DE REGISTRO (MODAL) ---
+  // ===========================================================================
+
   public abrirRegistro(): void {
     this.mostrarModalRegistro = true;
   }
 
-  /**
-   * Desactiva la visibilidad del modal de registro de alumnos.
-   */
   public cerrarRegistro(): void {
     this.mostrarModalRegistro = false;
   }
 
   /**
-   * Procesa la creación de un nuevo usuario desde el formulario de registro.
-   * Almacena el token recibido y redirige a la página principal.
-   * @param formData Datos multiparte del nuevo alumno (incluye DTO e imagen).
+   * Callback ejecutado cuando el componente hijo (FormAlumno) emite un nuevo registro.
+   * Maneja el auto-login tras el registro exitoso guardando el token.
+   * @param formData Objeto Multipart con los datos del alumno y su imagen.
    */
   public onAlumnoGuardado(formData: FormData): void {
     this.usuarioService.crearUsuario(formData).subscribe({
@@ -113,7 +116,7 @@ export class Login {
         this.router.navigate(['/landing']);
       },
       error: (err) => {
-        console.error('Error durante el registro:', err);
+        console.error('Error durante el proceso de registro:', err);
       }
     });
   }

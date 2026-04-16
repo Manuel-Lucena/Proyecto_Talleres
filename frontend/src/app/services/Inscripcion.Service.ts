@@ -71,6 +71,15 @@ export class InscripcionService {
   }
 
   /**
+   * Realiza una carga masiva de inscripciones para un taller.
+   * @param datos Array de inscripciones preparadas (idTaller, email, monto, etc).
+   * @returns Observable con el resultado de la operación masiva.
+   */
+  inscribirVarios(datos: any[]): Observable<ApiResponse<InscripcionResponse[]>> {
+    return this.http.post<ApiResponse<InscripcionResponse[]>>(`${this.apiUrl}/masivo`, datos);
+  }
+
+  /**
    * Actualiza los datos de una inscripción existente (ej: cambio de estado o fecha).
    * @param id Identificador único de la inscripción.
    * @param datos Objeto con los nuevos datos de la inscripción.

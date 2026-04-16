@@ -12,8 +12,9 @@ import { Notificacion } from "../../../../components/dialogs/mensaje/notificacio
 import { Router } from '@angular/router';
 
 /**
- * Componente administrativo para la gestión integral de talleres.
- * Permite el control de catálogo, asignación de profesores y navegación a horarios e inscritos.
+ * Componente administrativo para la gestión integral del catálogo de talleres.
+ * Centraliza las funciones de creación, edición, borrado y asignación de personal docente,
+ * además de servir como punto de acceso a la gestión de horarios e inscripciones.
  */
 @Component({
   selector: 'app-admin-talleres',
@@ -23,19 +24,25 @@ import { Router } from '@angular/router';
   styleUrl: './admin-talleres.scss'
 })
 export class AdminTalleres implements OnInit {
-  talleres: TallerResponse[] = []; // Listado maestro de talleres
-  profesores: UsuarioResponse[] = []; // Listado de usuarios con rol de profesor
-  busqueda: string = ''; // Término para el filtrado de la tabla
-  criterioBusqueda: string = 'todos'; // Ámbito de búsqueda (nombre, profesor o ambos)
-  mostrarModal: boolean = false; // Control de visibilidad del formulario dinámico
-  tallerSeleccionado: TallerResponse | null = null; // Taller activo para edición o nulo para creación
+
+  // --- Colecciones de Datos ---
+  talleres: TallerResponse[] = [];     // Listado maestro de talleres obtenidos del servidor
+  profesores: UsuarioResponse[] = [];   // Usuarios con rol de profesor (ID: 2) para el select
+
+  // --- Estado de Búsqueda y Filtros ---
+  busqueda: string = '';               // Texto reactivo del input de búsqueda
+  criterioBusqueda: string = 'todos';    // Ámbito: 'nombre', 'profesor' o 'todos'
+
+  // --- Control de Interfaz (Modales) ---
+  mostrarModal: boolean = false;           // Estado de visibilidad del modal CRUD
+  tallerSeleccionado: TallerResponse | null = null; // Buffer para edición/creación
 
   /**
-   * @param tallerService Operaciones CRUD de talleres.
-   * @param usuarioService Acceso a datos de usuarios y filtrado por rol.
-   * @param notificacionService Gestión de feedback visual y confirmaciones.
-   * @param cdr Detección de cambios manual para flujos asíncronos.
-   * @param router Gestión de navegación hacia vistas de detalle.
+   * @param tallerService Servicios de persistencia de talleres.
+   * @param usuarioService Necesario para cargar el listado de profesores disponibles.
+   * @param notificacionService Feedback visual y diálogos de sistema.
+   * @param cdr Forzado de detección de cambios (importante tras operaciones asíncronas).
+   * @param router Navegación a sub-vistas (Horarios/Inscripciones).
    */
   constructor(
     private tallerService: TallerService,
@@ -46,28 +53,37 @@ export class AdminTalleres implements OnInit {
   ) { }
 
   /**
-   * Inicializa los datos de talleres y profesores al cargar el componente.
+   * Ciclo de vida: Inicializa los datos necesarios para poblar la tabla y los formularios.
    */
   ngOnInit(): void {
     this.cargarTalleres();
     this.cargarProfesores();
   }
 
+  // ===========================================================================
+  // --- CARGA DE DATOS ---
+  // ===========================================================================
+
   /**
-   * Recupera la lista actualizada de talleres desde el servidor.
+   * Recupera todos los talleres registrados en el sistema.
    */
   cargarTalleres(): void {
     this.tallerService.listarTodos().subscribe({
       next: (res) => {
-        this.talleres = [...res.data];
+        this.talleres = [...res.data]; // Spread operator para asegurar nueva referencia
         this.cdr.detectChanges();
       },
-      error: () => this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'No se pudieron cargar los talleres', tipo: 'error' })
+      error: () => this.notificacionService.mostrar({ 
+        titulo: 'Error', 
+        mensaje: 'No se pudieron cargar los talleres', 
+        tipo: 'error' 
+      })
     });
   }
 
   /**
-   * Recupera la lista de usuarios con rol de profesor para los selectores del formulario.
+   * Obtiene exclusivamente los usuarios con Rol de Profesor.
+   * Se utiliza para alimentar el desplegable de asignación en el formulario de taller.
    */
   cargarProfesores(): void {
     this.usuarioService.listarPorRol(2).subscribe({
@@ -78,8 +94,13 @@ export class AdminTalleres implements OnInit {
     });
   }
 
+  // ===========================================================================
+  // --- LÓGICA DE FILTRADO ---
+  // ===========================================================================
+
   /**
-   * Getter que aplica la lógica de filtrado sobre la colección de talleres.
+   * Getter que procesa la colección de talleres según los inputs de la UI.
+   * Filtra por nombre de taller o nombre del profesor asignado.
    */
   get talleresFiltrados() {
     const term = this.busqueda.toLowerCase().trim();
@@ -90,29 +111,30 @@ export class AdminTalleres implements OnInit {
       const nombreProfesor = (t.nombreCompletoProfesor || '').toLowerCase();
 
       switch (this.criterioBusqueda) {
-        case 'nombre':
-          return nombreTaller.includes(term);
-        case 'profesor':
-          return nombreProfesor.includes(term);
-        default:
-          return nombreTaller.includes(term) || nombreProfesor.includes(term);
+        case 'nombre':   return nombreTaller.includes(term);
+        case 'profesor': return nombreProfesor.includes(term);
+        default:         return nombreTaller.includes(term) || nombreProfesor.includes(term);
       }
     });
   }
 
   /**
-   * Genera el placeholder dinámico para el input de búsqueda según el criterio seleccionado.
+   * Ajusta el mensaje de ayuda del buscador basándose en el criterio activo.
    */
   getPlaceholder() {
     switch (this.criterioBusqueda) {
-      case 'nombre': return 'Escribe el nombre del taller...';
+      case 'nombre':   return 'Escribe el nombre del taller...';
       case 'profesor': return 'Escribe el nombre del profesor...';
-      default: return 'Buscar por taller o profesor...';
+      default:         return 'Buscar por taller o profesor...';
     }
   }
 
+  // ===========================================================================
+  // --- OPERACIONES DE GESTIÓN (CRUD) ---
+  // ===========================================================================
+
   /**
-   * Prepara el estado para la creación de un nuevo taller.
+   * Prepara el entorno para el registro de un nuevo taller.
    */
   abrirCrear() {
     this.tallerSeleccionado = null;
@@ -121,8 +143,8 @@ export class AdminTalleres implements OnInit {
   }
 
   /**
-   * Carga los datos de un taller existente para su edición.
-   * @param t Taller seleccionado de la lista.
+   * Prepara la edición cargando una copia profunda del taller para evitar 
+   * mutaciones accidentales en la lista de la tabla.
    */
   abrirEditar(t: TallerResponse) {
     this.tallerSeleccionado = JSON.parse(JSON.stringify(t));
@@ -131,8 +153,8 @@ export class AdminTalleres implements OnInit {
   }
 
   /**
-   * Ejecuta la petición de guardado (creación o actualización) y gestiona la respuesta.
-   * @param fd FormData con la información del taller y el archivo de imagen.
+   * Canaliza la información hacia el servicio correspondiente (Creación o Actualización).
+   * @param fd FormData con los datos binarios y el DTO del taller.
    */
   ejecutarGuardado(fd: FormData): void {
     const id = this.tallerSeleccionado?.idTaller;
@@ -142,7 +164,7 @@ export class AdminTalleres implements OnInit {
       next: () => {
         this.notificacionService.mostrar({ 
           titulo: 'Éxito', 
-          mensaje: id ? 'Taller actualizado' : 'Taller creado', 
+          mensaje: id ? 'Taller actualizado correctamente' : 'Taller creado con éxito', 
           tipo: 'exito' 
         });
         this.mostrarModal = false;
@@ -152,20 +174,24 @@ export class AdminTalleres implements OnInit {
   }
 
   /**
-   * Solicita confirmación y elimina un taller de forma permanente.
+   * Solicita confirmación y ejecuta el borrado físico del taller.
    * @param id Identificador único del taller.
    */
   eliminarTaller(id: number) {
     this.notificacionService.confirmar({
       titulo: '¿Eliminar taller?',
-      mensaje: 'Esta acción es permanente.',
+      mensaje: 'Esta acción eliminará el taller y sus asociaciones. Es irreversible.',
       textoConfirmar: 'Eliminar',
       textoCancelar: 'Cancelar'
     }).then((confirmado) => {
       if (confirmado) {
         this.tallerService.eliminar(id).subscribe({
           next: () => {
-            this.notificacionService.mostrar({ titulo: 'Borrado', mensaje: 'Taller eliminado', tipo: 'exito' });
+            this.notificacionService.mostrar({ 
+              titulo: 'Borrado', 
+              mensaje: 'Taller eliminado del sistema', 
+              tipo: 'exito' 
+            });
             this.cargarTalleres();
           }
         });
@@ -173,17 +199,19 @@ export class AdminTalleres implements OnInit {
     });
   }
 
+  // ===========================================================================
+  // --- NAVEGACIÓN ---
+  // ===========================================================================
+
   /**
-   * Navega a la vista de inscritos para un taller específico.
-   * @param idTaller Identificador del taller.
+   * Redirige al panel detallado de alumnos inscritos en el taller.
    */
   verInscritos(idTaller: number) {
     this.router.navigate(['/panel-admin/talleres', idTaller, 'inscripciones']);
   }
 
   /**
-   * Navega a la vista de gestión de horarios para un taller específico.
-   * @param id Identificador del taller.
+   * Redirige a la gestión de turnos y franjas horarias del taller.
    */
   verHorario(id: number) {
     this.router.navigate(['/panel-admin/talleres', id, 'horario']);

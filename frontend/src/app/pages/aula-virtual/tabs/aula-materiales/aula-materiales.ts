@@ -6,9 +6,11 @@ import { MaterialResponse } from '../../../../interfaces/Material.Interface';
 import { TokenService } from '../../../../services/Token.Service';
 
 /**
- * Componente del Aula Virtual para la gestión y listado de materiales didácticos.
- * Filtra los recursos disponibles basándose en el rol del usuario, permitiendo a los
- * profesores ver todo el contenido y a los alumnos solo el material publicado.
+ * VISTA DE RECURSOS DIDÁCTICOS: Gestor de Materiales.
+ * * Este componente gestiona la visualización de documentos y recursos del taller:
+ * 1. Control de Visibilidad: Filtra el contenido según el rol (Profesor vs Alumno).
+ * 2. Navegación Contextual: Implementa rutas relativas para desacoplar el detalle del recurso.
+ * 3. Gestión de Estado: Sincroniza la carga asíncrona con el ciclo de vida de la UI.
  */
 @Component({
   selector: 'app-aula-materiales',
@@ -18,17 +20,21 @@ import { TokenService } from '../../../../services/Token.Service';
   styleUrl: './aula-materiales.scss'
 })
 export class AulaMateriales implements OnInit {
-  idTaller!: number; // Identificador del taller obtenido de la ruta padre
-  materiales: MaterialResponse[] = []; // Colección de recursos didácticos recuperados
-  cargando: boolean = true; // Estado de carga para la visualización de la interfaz
-  esProfesor: boolean = false; // Flag de permisos derivado del rol del usuario
+
+  // --- Propiedades de Datos ---
+  idTaller!: number;                          // Identificador de contexto del taller padre
+  materiales: MaterialResponse[] = [];        // Colección de recursos educativos recuperados
+
+  // --- Propiedades de Estado y UI ---
+  cargando: boolean = true;                   // Control de visualización para Skeleton/Loader
+  esProfesor: boolean = false;                // Flag de autorización para la gestión de recursos
 
   /**
-   * @param route Acceso a la configuración de la ruta para obtener parámetros contextuales.
-   * @param router Gestión de navegación hacia la vista detallada del material.
-   * @param materialService Operaciones de consulta de materiales educativos.
-   * @param tokenService Servicio de decodificación de JWT para validación de roles.
-   * @param cdr Referencia para la detección de cambios manual en flujos asíncronos.
+   * @param route Captura de parámetros desde la ruta jerárquica superior.
+   * @param router Gestión de navegación hacia el detalle del material.
+   * @param materialService Abstracción de la API para la entidad Material.
+   * @param tokenService Análisis de claims del JWT para validación de privilegios.
+   * @param cdr Trigger manual para la detección de cambios tras la respuesta del servidor.
    */
   constructor(
     private route: ActivatedRoute,
@@ -39,7 +45,8 @@ export class AulaMateriales implements OnInit {
   ) { }
 
   /**
-   * Inicializa el componente determinando el nivel de acceso y capturando el ID del taller.
+   * Ciclo de vida: Establece el nivel de acceso y extrae el identificador del taller 
+   * a través del parent snapshot para garantizar la carga del contexto correcto.
    */
   ngOnInit(): void {
     const rol = this.tokenService.getRol();
@@ -52,13 +59,18 @@ export class AulaMateriales implements OnInit {
     }
   }
 
+  // ===========================================================================
+  // --- CAPA DE DATOS Y AUTORIZACIÓN ---
+  // ===========================================================================
+
   /**
-   * Solicita al servidor los materiales del taller utilizando el endpoint 
-   * correspondiente según los privilegios del usuario.
+   * Ejecuta la recuperación de materiales aplicando la lógica de negocio por rol.
+   * * TÉCNICA: Se utiliza una estrategia de selección de Observable para centralizar 
+   * la suscripción y optimizar el manejo del flujo de datos.
    */
   cargarMateriales(): void {
     this.cargando = true;
-
+    
     const obs = this.esProfesor 
       ? this.materialService.listarPorTaller(this.idTaller) 
       : this.materialService.listarVisibles(this.idTaller);
@@ -69,20 +81,23 @@ export class AulaMateriales implements OnInit {
         this.cargando = false;
         this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
+        console.error('CRITICAL: Error en la carga de recursos didácticos:', err);
         this.cargando = false;
         this.cdr.detectChanges();
       }
     });
   }
 
+  // ===========================================================================
+  // --- NAVEGACIÓN ---
+  // ===========================================================================
+
   /**
-   * Navega hacia la vista de detalle de un material específico.
-   * @param idMaterial Identificador único del recurso seleccionado.
+   * Redirige al usuario al detalle específico del recurso seleccionado.
+   * Emplea 'relativeTo' para asegurar que la navegación sea coherente con la URL del taller.
    */
   verDetalle(idMaterial: number): void {
-    this.router.navigate(['../detalle', 'material', idMaterial], {
-      relativeTo: this.route
-    });
+    this.router.navigate(['../detalle', 'material', idMaterial], { relativeTo: this.route });
   }
 }

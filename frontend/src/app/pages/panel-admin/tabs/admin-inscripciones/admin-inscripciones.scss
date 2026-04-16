@@ -52,6 +52,7 @@
       flex-shrink: 0;
       margin-top: 5px;
       transition: 0.2s;
+
       &:hover {
         border-color: v.$color-marca-principal;
         color: v.$color-marca-principal;
@@ -69,6 +70,7 @@
       margin: 0;
       line-height: 1.1;
     }
+
     .txt-bajada {
       color: v.$color-superficie-suave;
       font-size: 1rem;
@@ -87,7 +89,10 @@
       gap: 0.8rem;
     }
 
-    .btn-primario-aula, .btn-header-pdf {
+    // Estilos base para botones de acción del header
+    .btn-primario-aula, 
+    .btn-header-pdf, 
+    .btn-header-masivo {
       height: 48px;
       border-radius: v.$radio-curvatura;
       font-family: v.$fuente-enfasis;
@@ -126,12 +131,35 @@
       padding: 0 1.5rem;
       box-shadow: v.$sombra-nivel-1;
 
-      i { color: #e11d48; font-size: 1.3rem; }
+      i {
+        color: #e11d48;
+        font-size: 1.3rem;
+      }
 
       &:hover:not(:disabled) {
         background: #f8fafc;
         border-color: #e11d48;
         transform: translateY(-2px);
+      }
+    }
+
+    // --- ESTILO BOTÓN CARGA MASIVA ---
+    .btn-header-masivo {
+      background: #15803d; // Verde Excel / Carga
+      color: white;
+      border: none;
+      padding: 0 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(21, 128, 61, 0.2);
+
+      i {
+        font-size: 1.3rem;
+        color: white;
+      }
+
+      &:hover:not(:disabled) {
+        background: #166534;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(21, 128, 61, 0.3);
       }
     }
   }
@@ -149,7 +177,9 @@
   box-shadow: v.$sombra-nivel-1;
   align-items: center;
 
-  @media (max-width: 768px) { padding: 1rem; }
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
 
   .search-group {
     display: flex;
@@ -175,8 +205,16 @@
       font-size: 0.85rem;
       font-weight: 700;
       color: v.$color-secundario-frio-2;
-      i { color: v.$color-marca-principal; margin-right: 8px; }
-      @media (max-width: 600px) { width: 50px; span { display: none; } }
+
+      i {
+        color: v.$color-marca-principal;
+        margin-right: 8px;
+      }
+
+      @media (max-width: 600px) {
+        width: 50px;
+        span { display: none; }
+      }
     }
 
     .search-box {
@@ -184,7 +222,13 @@
       position: relative;
       display: flex;
       align-items: center;
-      i { position: absolute; left: 15px; color: v.$color-marca-principal; }
+
+      i {
+        position: absolute;
+        left: 15px;
+        color: v.$color-marca-principal;
+      }
+
       .input-aula {
         border: none;
         padding-left: 45px;
@@ -214,8 +258,15 @@
     overflow-x: auto;
     overflow-y: auto;
     flex: 1;
-    &::-webkit-scrollbar { width: 6px; height: 6px; }
-    &::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; }
+
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #e0e0e0;
+      border-radius: 10px;
+    }
   }
 }
 
@@ -230,6 +281,7 @@
     z-index: 10;
     background: #fafafa;
     box-shadow: 0 1px 0 #eee;
+
     th {
       padding: 1.2rem;
       text-align: left;
@@ -250,9 +302,21 @@
     &:last-child { text-align: right; }
   }
 
-  .item-info .main-text { font-weight: 700; font-family: v.$fuente-enfasis; display: block; }
-  .price-tag { font-weight: 800; font-family: v.$fuente-enfasis; }
-  .date-stack .d-main { font-weight: 600; font-size: 0.85rem; }
+  .item-info .main-text {
+    font-weight: 700;
+    font-family: v.$fuente-enfasis;
+    display: block;
+  }
+
+  .price-tag {
+    font-weight: 800;
+    font-family: v.$fuente-enfasis;
+  }
+
+  .date-stack .d-main {
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
 }
 
 // --- BADGES Y ACCIONES ---
@@ -263,9 +327,19 @@
   font-weight: 800;
   text-transform: uppercase;
   display: inline-block;
-  &.success { background: rgba(v.$color-marca-principal, 0.1); color: v.$color-marca-principal; }
-  &.info { background: rgba(v.$color-secundario-frio-1, 0.1); color: v.$color-secundario-frio-1; }
-  &.warning { background: rgba(v.$color-secundario-calido-1, 0.1); color: v.$color-secundario-calido-1; }
+
+  &.success {
+    background: rgba(v.$color-marca-principal, 0.1);
+    color: v.$color-marca-principal;
+  }
+  &.info {
+    background: rgba(v.$color-secundario-frio-1, 0.1);
+    color: v.$color-secundario-frio-1;
+  }
+  &.warning {
+    background: rgba(v.$color-secundario-calido-1, 0.1);
+    color: v.$color-secundario-calido-1;
+  }
 }
 
 .actions-group {
@@ -285,7 +359,10 @@
     justify-content: center;
     transition: 0.2s;
 
-    &:disabled { opacity: 0.5; cursor: not-allowed; }
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);

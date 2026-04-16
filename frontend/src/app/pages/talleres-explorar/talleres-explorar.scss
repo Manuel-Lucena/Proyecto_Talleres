@@ -216,6 +216,23 @@
 
             .btn-inscripcion {
                 @include m.boton-inscripcion-aula;
+
+                // Estilo para cuando el usuario ya es alumno
+                &.ya-inscrito {
+                    background-color: #f0fdf4 !important; // Verde éxito muy clarito
+                    color: #166534 !important;            // Verde bosque
+                    border: 1px solid #bbf7d0 !important;
+                    cursor: default;
+                    transform: none !important;
+                    box-shadow: none !important;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+
+                    i {
+                        font-size: 1.1rem;
+                    }
+                }
             }
         }
     }

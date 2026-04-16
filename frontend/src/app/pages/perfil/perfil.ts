@@ -1,20 +1,19 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-
 import { UsuarioService } from '../../services/Usuario.Service';
 import { TokenService } from '../../services/Token.Service';
 import { NotificacionService } from '../../services/Notificacion.Service';
 import { Validator } from '../../validators/Validator';
-
 import { Navbar } from "../../components/layout/navbar/navbar";
 import { UsuarioResponse } from '../../interfaces/Usuario.Interface';
 import { Confirmacion } from "../../components/dialogs/confirmacion/confirmacion";
 import { Notificacion } from "../../components/dialogs/mensaje/notificacion";
 
 /**
- * Componente para la gestión del perfil del usuario autenticado.
- * Permite visualizar datos personales, actualizar información y cambiar la foto de perfil.
+ * Componente para la gestión integral del perfil del usuario autenticado.
+ * Permite la visualización de datos, actualización de información personal 
+ * y gestión de la imagen de perfil mediante multipart/form-data.
  */
 @Component({
   selector: 'app-perfil',
@@ -24,15 +23,17 @@ import { Notificacion } from "../../components/dialogs/mensaje/notificacion";
   styleUrl: './perfil.scss',
 })
 export class Perfil implements OnInit {
-  usuario: UsuarioResponse | null = null; // Datos del usuario actual
-  perfilForm!: FormGroup; // Formulario reactivo para la edición del perfil
+
+  // --- Propiedades de Datos ---
+  usuario: UsuarioResponse | null = null; // Almacena la entidad del usuario desde la API
+  perfilForm!: FormGroup;                  // Formulario reactivo para la edición de campos
 
   /**
    * @param fb Constructor de formularios reactivos.
-   * @param usuarioService Operaciones CRUD de usuarios.
-   * @param tokenService Gestión de sesión y credenciales.
-   * @param notify Servicio centralizado de alertas.
-   * @param cdr Detección manual de cambios para flujos asíncronos.
+   * @param usuarioService Operaciones CRUD y de archivos para usuarios.
+   * @param tokenService Gestión de JWT y datos de sesión local.
+   * @param notify Servicio centralizado para feedback visual (Snackbars/Modales).
+   * @param cdr Forzado de detección de cambios en respuestas asíncronas.
    */
   constructor(
     private fb: FormBuilder,
@@ -43,7 +44,7 @@ export class Perfil implements OnInit {
   ) { }
 
   /**
-   * Inicializa la estructura del formulario y carga los datos del usuario.
+   * Ciclo de vida: Inicializa la estructura del formulario y solicita los datos al servidor.
    */
   ngOnInit(): void {
     this.initForm();
@@ -51,7 +52,8 @@ export class Perfil implements OnInit {
   }
 
   /**
-   * Configura los controles y validaciones del formulario.
+   * Configura los controles del formulario y sus reglas de validación.
+   * Se utiliza 'updateOn: blur' para optimizar el rendimiento de la validación visual.
    */
   private initForm(): void {
     this.perfilForm = this.fb.group({
@@ -60,12 +62,12 @@ export class Perfil implements OnInit {
       email: ['', { validators: [Validators.required, Validators.email], updateOn: 'blur' }],
       telefono: ['', { validators: [Validator.telefono], updateOn: 'blur' }],
       direccion: ['', { updateOn: 'blur' }],
-      dni: [{ value: '', disabled: true }]
+      dni: [{ value: '', disabled: true }] // El DNI se mantiene bloqueado por seguridad
     });
   }
 
   /**
-   * Recupera la información del usuario autenticado desde el servidor.
+   * Recupera la información completa del perfil del usuario actual usando su ID de sesión.
    */
   cargarDatosUsuario(): void {
     const userId = this.tokenService.getId();
@@ -74,7 +76,7 @@ export class Perfil implements OnInit {
         next: (res) => {
           if (res.data) {
             this.usuario = res.data;
-            this.perfilForm.patchValue(this.usuario);
+            this.perfilForm.patchValue(this.usuario); // Sincroniza datos con el formulario
             this.cdr.detectChanges();
           }
         },
@@ -85,8 +87,13 @@ export class Perfil implements OnInit {
     }
   }
 
+  // ===========================================================================
+  // --- GESTIÓN DE ERRORES DE INTERFAZ ---
+  // ===========================================================================
+
   /**
-   * Helper para validar la visibilidad de errores en el template.
+   * Evalúa si un campo debe mostrar estilos de error.
+   * @param controlName Nombre del control en el formulario.
    */
   mostrarError(controlName: string): boolean {
     const control = this.perfilForm.get(controlName);
@@ -94,19 +101,26 @@ export class Perfil implements OnInit {
   }
 
   /**
-   * Retorna el mensaje de error correspondiente según la validación fallida.
+   * Resuelve el mensaje descriptivo del error para el usuario.
+   * @param controlName Nombre del control a evaluar.
    */
   getErrorMessage(controlName: string): string {
     const control = this.perfilForm.get(controlName);
     if (!control || !control.errors) return '';
+
     if (control.errors['required']) return 'Este campo es obligatorio';
     if (control.errors['email']) return 'Email inválido';
     if (control.errors['invalidTel']) return 'Teléfono no válido';
+    
     return 'Campo inválido';
   }
 
+  // ===========================================================================
+  // --- PROCESAMIENTO DE DATOS Y ARCHIVOS ---
+  // ===========================================================================
+
   /**
-   * Valida y procesa la actualización de los datos del perfil.
+   * Ejecuta la actualización de los datos de texto del perfil.
    */
   actualizarPerfil(): void {
     if (this.perfilForm.valid && this.usuario) {
@@ -118,7 +132,8 @@ export class Perfil implements OnInit {
   }
 
   /**
-   * Gestiona la actualización inmediata del perfil al seleccionar una nueva imagen.
+   * Gestiona el cambio de foto de perfil. Dispara la actualización inmediatamente tras elegir archivo.
+   * @param event Evento de selección de archivo del input type="file".
    */
   onFileSelected(event: any): void {
     const file = event.target.files[0];
@@ -130,22 +145,19 @@ export class Perfil implements OnInit {
   }
 
   /**
-   * Construye el objeto FormData incluyendo el DTO del usuario como Blob JSON.
+   * Centraliza la creación del objeto FormData necesario para peticiones Multipart.
+   * Envía el objeto Usuario como un Blob con tipo application/json.
+   * @returns FormData configurado para el backend.
    */
   private prepararFormData(): FormData {
     const fd = new FormData();
     const valores = this.perfilForm.getRawValue();
 
-    const ROLES_MAP: { [key: string]: number } = {
-      'ADMIN': 1,
-      'PROFESOR': 2,
-      'ALUMNO': 3
-    };
-
+    const ROLES_MAP: { [key: string]: number } = { 'ADMIN': 1, 'PROFESOR': 2, 'ALUMNO': 3 };
     const idRol = ROLES_MAP[this.usuario?.nombreRol || 'ALUMNO'] || 3;
 
     const usuarioDTO = {
-      dni: this.usuario?.dni, 
+      dni: this.usuario?.dni,
       nombre: valores.nombre,
       apellidos: valores.apellidos,
       email: valores.email,
@@ -153,13 +165,14 @@ export class Perfil implements OnInit {
       direccion: valores.direccion,
       idRol: idRol
     };
-
     fd.append('usuario', new Blob([JSON.stringify(usuarioDTO)], { type: 'application/json' }));
+    
     return fd;
   }
 
   /**
-   * Envía la petición de actualización al servidor y gestiona la respuesta.
+   * Realiza la llamada al servicio de actualización y gestiona el refresco de la sesión.
+   * @param fd Datos a enviar al servidor.
    */
   private enviarDatos(fd: FormData): void {
     const id = this.usuario?.idUsuario;
@@ -168,7 +181,9 @@ export class Perfil implements OnInit {
     this.usuarioService.actualizarUsuario(id, fd).subscribe({
       next: (res) => {
         if (res.data) {
+          // Si el servidor emite un nuevo token (por cambio de email/datos), se actualiza localmente
           if (res.data.token) localStorage.setItem('token', res.data.token);
+          
           this.usuario = res.data;
           this.perfilForm.patchValue(this.usuario);
           this.cdr.detectChanges();
@@ -182,13 +197,14 @@ export class Perfil implements OnInit {
   }
 
   /**
-   * Solicita confirmación y cierra la sesión del usuario.
+   * Finaliza la sesión del usuario tras confirmación.
    */
   async logout(): Promise<void> {
-    const confirmar = await this.notify.confirmar({
-      titulo: 'Cerrar Sesión',
-      mensaje: '¿Estás seguro de que deseas salir?'
+    const confirmar = await this.notify.confirmar({ 
+      titulo: 'Cerrar Sesión', 
+      mensaje: '¿Estás seguro de que deseas salir?' 
     });
+
     if (confirmar) {
       this.tokenService.logOut();
       window.location.href = '/login';

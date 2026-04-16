@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
 
-// Servicios e Interfaces
+// --- Capa de Servicios e Interfaces ---
 import { TareaService } from '../../../../services/Tarea.Service';
 import { MaterialService } from '../../../../services/Material.Service';
 import { ArchivoTareaService } from '../../../../services/ArchivoTarea.Service';
@@ -16,52 +16,83 @@ import { TokenService } from '../../../../services/Token.Service';
 import { NotificacionService } from '../../../../services/Notificacion.Service';
 import { UsuarioService } from '../../../../services/Usuario.Service';
 import { TareaAsignadaService } from '../../../../services/TareaAsignada.Service';
-import { FormEntrega } from '../../../../components/forms/form-entrega/form-entrega';
-import { UsuarioResponse } from '../../../../interfaces/Usuario.Interface';
 import { BreadcrumbService } from '../../../../services/Breadcrumb.Service';
+import { UsuarioResponse } from '../../../../interfaces/Usuario.Interface';
+
+// --- Componentes UI / Dialogs ---
+import { FormEntrega } from '../../../../components/forms/form-entrega/form-entrega';
 import { Notificacion } from "../../../../components/dialogs/mensaje/notificacion";
 import { Confirmacion } from "../../../../components/dialogs/confirmacion/confirmacion";
 
 /**
- * Componente para gestionar el detalle de recursos (Tareas o Materiales).
- * Permite la creación, edición, asignación de alumnos y gestión de archivos.
+ * NÚCLEO OPERATIVO: Gestión Detallada de Recursos Educativos.
+ * * Este componente actúa como el controlador maestro para la visualización y edición 
+ * de tareas y materiales didácticos. Gestiona:
+ * 1. La dualidad de tipos de datos (Polimorfismo en UI).
+ * 2. La persistencia compleja (archivos + datos de base).
+ * 3. La lógica de negocio segmentada por roles (Profesor/Alumno).
  */
 @Component({
   selector: 'app-aula-detalle',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, FormEntrega, Notificacion, Confirmacion],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    FormEntrega,
+    Notificacion,
+    Confirmacion
+  ],
   templateUrl: './aula-detalle.html',
   styleUrl: './aula-detalle.scss',
 })
 export class AulaDetalle implements OnInit {
-  recurso: any = null; // Datos del recurso actual
-  tipo: string = ''; // 'tarea' o 'material'
-  cargando: boolean = true; // Estado de carga de la interfaz
-  idTaller: number = 0; // ID del taller actual
 
-  // Modales y Dropdowns
+  // --- Propiedades de Datos y Contexto ---
+  /** Objeto que contiene la información del recurso (Tarea o Material) */
+  recurso: any = null;
+  /** 'tarea' o 'material' - Determina el comportamiento del componente */
+  tipo: string = '';
+  /** ID del taller de procedencia */
+  idTaller: number = 0;
+  /** Grupo de controles para el formulario reactivo */
+  form: FormGroup;
+
+  // --- Propiedades de Estado y UI ---
+  /** Controla el spinner de carga inicial */
+  cargando: boolean = true;
+  /** Indica si se está creando un recurso desde cero */
+  esNuevo: boolean = false;
+  /** Switch de modo lectura / modo edición */
+  editando: boolean = false;
+  /** Visibilidad del modal de entregas para alumnos */
   mostrarModalEntrega: boolean = false;
+  /** Visibilidad del panel de selección de extensiones */
   mostrarDropdownExt: boolean = false;
+  /** Visibilidad del panel de asignación de alumnos */
   mostrarDropdownAlumnos: boolean = false;
 
-  // Gestión de Alumnos y Asignaciones
-  alumnosTaller: UsuarioResponse[] = []; // Alumnos disponibles en el taller
-  alumnosSeleccionadosIds: number[] = []; // IDs de alumnos asignados al recurso
-  filtroAlumno: string = ''; // Texto para filtrar la lista de alumnos
+  // --- Dominio de Alumnos y Asignaciones ---
+  /** Lista total de alumnos inscritos en el taller */
+  alumnosTaller: UsuarioResponse[] = [];
+  /** IDs de los alumnos que tienen la tarea asignada actualmente */
+  alumnosSeleccionadosIds: number[] = [];
+  /** Cadena de búsqueda para filtrar alumnos en el dropdown */
+  filtroAlumno: string = '';
 
-  // Gestión de Archivos (Enunciados/Material)
-  archivosAdjuntos: any[] = []; // Archivos ya subidos
-  archivosParaEliminar: number[] = []; // IDs de archivos a borrar al guardar
-  nuevosArchivos: File[] = []; // Archivos seleccionados pendientes de subida
+  // --- Dominio de Gestión de Archivos ---
+  /** Documentos adjuntos originales del recurso */
+  archivosAdjuntos: any[] = [];
+  /** IDs de archivos marcados para su borrado físico en servidor */
+  archivosParaEliminar: number[] = [];
+  /** Buffer de nuevos archivos seleccionados en el input local */
+  nuevosArchivos: File[] = [];
+  /** Datos de la entrega realizada (solo si el usuario es alumno) */
+  entregaRealizada: any = null;
+  /** Archivos que el alumno adjuntó en su propia entrega */
+  archivosEntregaExistentes: any[] = [];
 
-  // Datos de Entrega (Vista Alumno)
-  entregaRealizada: any = null; // Registro de la entrega del alumno
-  archivosEntregaExistentes: any[] = []; // Archivos de la entrega del alumno
-
-  esNuevo: boolean = false; // Indica si se está creando un recurso
-  editando: boolean = false; // Indica si el formulario de edición está activo
-  form: FormGroup; // Formulario reactivo de edición/creación
-
+  /** Diccionario estático de extensiones para la configuración de tareas */
   extensionesDisponibles = [
     { label: 'Documentos PDF (.pdf)', value: '.pdf' },
     { label: 'Microsoft Word (.doc, .docx)', value: '.doc, .docx' },
@@ -70,6 +101,13 @@ export class AulaDetalle implements OnInit {
     { label: 'Imágenes (.jpg, .png)', value: '.jpg, .png' }
   ];
 
+  /**
+   * @param route Acceso a la ruta activa para capturar IDs.
+   * @param router Servicio de navegación.
+   * @param fb Factoría para formularios.
+   * @param cdr Detección de cambios manual para subidas/descargas.
+   * @param eRef Referencia al DOM para cierres de menús automáticos.
+   */
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -98,7 +136,8 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Cierra los menús desplegables al detectar un click fuera del componente.
+   * Listener global para el cierre de dropdowns al clickear fuera del área del componente.
+   * @param event Objeto del evento de click.
    */
   @HostListener('document:click', ['$event'])
   clickOut(event: any): void {
@@ -109,7 +148,7 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Inicializa el componente recuperando parámetros de ruta e identificando el modo (nuevo/lectura).
+   * Inicialización: Resuelve contexto, roles y dispara la hidratación de datos.
    */
   ngOnInit(): void {
     this.idTaller = Number(this.route.parent?.snapshot.paramMap.get('id'));
@@ -130,8 +169,13 @@ export class AulaDetalle implements OnInit {
     }
   }
 
+  // ===========================================================================
+  // --- GESTIÓN DE LA HIDRATACIÓN DE DATOS ---
+  // ===========================================================================
+
   /**
-   * Carga la lista de alumnos inscritos en el taller.
+   * Recupera la lista de alumnos inscritos en el taller actual desde el servidor.
+   * @private
    */
   private cargarAlumnosDelTaller(): void {
     this.usuarioService.listarPorTaller(this.idTaller).subscribe({
@@ -142,8 +186,8 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Obtiene la información completa del recurso y gestiona la carga de archivos y entregas.
-   * @param id ID del recurso a cargar.
+   * Método orquestador para cargar toda la información del recurso actual.
+   * @param id Identificador único del recurso (Tarea o Material).
    */
   cargarDatos(id: number): void {
     this.cargando = true;
@@ -168,7 +212,9 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Carga los alumnos asignados a una tarea concreta.
+   * Recupera la lista de IDs de alumnos que tienen esta tarea asignada.
+   * @param idTarea ID de la tarea a consultar.
+   * @private
    */
   private cargarAsignaciones(idTarea: number): void {
     this.tareaAsignadaService.listarPorTarea(idTarea).subscribe({
@@ -179,7 +225,9 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Verifica si el alumno actual ya ha realizado una entrega para la tarea.
+   * Lógica para Alumnos: Verifica si existe un envío para esta tarea.
+   * @param idTarea ID de la tarea.
+   * @private
    */
   private verificarEntregaExistente(idTarea: number): void {
     const idUsuario = this.tokenService.getId();
@@ -192,7 +240,6 @@ export class AulaDetalle implements OnInit {
           this.entregaRealizada = entrega;
           this.recurso.entregado = true;
           this.recurso.calificacion = entrega.calificacion;
-
           this.archivoEntregaService.listarPorEntrega(entrega.idEntrega).subscribe({
             next: (archResp) => {
               this.archivosEntregaExistentes = archResp.data || [];
@@ -209,7 +256,9 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Obtiene los archivos adjuntos vinculados al recurso.
+   * Obtiene la colección de archivos adjuntos del recurso actual.
+   * @param id ID del recurso.
+   * @private
    */
   private obtenerArchivos(id: number): void {
     const service: any = this.tipo === 'tarea' ? this.archivoTareaService : this.archivoMaterialService;
@@ -228,15 +277,20 @@ export class AulaDetalle implements OnInit {
     });
   }
 
-  // --- Lógica del Selector de Alumnos ---
+  // ===========================================================================
+  // --- GESTIÓN DE ASIGNACIONES (PROFESOR) ---
+  // ===========================================================================
 
+  /**
+   * Abre o cierra el desplegable de asignación de alumnos.
+   */
   toggleDropdownAlumnos(): void {
     this.mostrarDropdownAlumnos = !this.mostrarDropdownAlumnos;
   }
 
   /**
-   * Gestiona la selección/deselección de alumnos para asignar la tarea.
-   * @param idAlumno ID del alumno seleccionado.
+   * Añade o quita un alumno del buffer de asignación.
+   * @param idAlumno ID del alumno a conmutar.
    */
   onAlumnoToggle(idAlumno: number): void {
     const index = this.alumnosSeleccionadosIds.indexOf(idAlumno);
@@ -248,29 +302,36 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Filtra la lista de alumnos basándose en el nombre o apellidos.
+   * Filtra la lista de alumnos basándose en el input de búsqueda.
+   * @returns Lista de alumnos filtrada.
    */
   get alumnosFiltrados(): UsuarioResponse[] {
     if (!this.filtroAlumno) return this.alumnosTaller;
     const busqueda = this.filtroAlumno.toLowerCase();
-    return this.alumnosTaller.filter(a =>
+    return this.alumnosTaller.filter(a => 
       (a.nombre + ' ' + a.apellidos).toLowerCase().includes(busqueda)
     );
   }
 
-  // --- Lógica de Formularios y Archivos ---
+  // ===========================================================================
+  // --- LÓGICA DE FORMULARIOS Y COMMITS ---
+  // ===========================================================================
 
-  toggleDropdownExt(): void { 
-    this.mostrarDropdownExt = !this.mostrarDropdownExt; 
+  /**
+   * Abre o cierra el desplegable de extensiones permitidas.
+   */
+  toggleDropdownExt(): void {
+    this.mostrarDropdownExt = !this.mostrarDropdownExt;
   }
 
   /**
-   * Actualiza el string de extensiones permitidas según los checkboxes seleccionados.
+   * Gestiona la selección múltiple de extensiones y actualiza el campo del formulario.
+   * @param event Evento de cambio del checkbox.
    */
   onExtensionChange(event: any): void {
     const value = event.target.value;
-    let seleccionadas = this.form.get('extensionesPermitidas')?.value
-      ? this.form.get('extensionesPermitidas')?.value.split(',').map((s: string) => s.trim()).filter((s: string) => s !== "")
+    let seleccionadas = this.form.get('extensionesPermitidas')?.value 
+      ? this.form.get('extensionesPermitidas')?.value.split(',').map((s: string) => s.trim()).filter((s: string) => s !== "") 
       : [];
 
     if (event.target.checked) {
@@ -282,7 +343,9 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Comprueba si una extensión está dentro de la lista permitida para mostrar el checkbox activo.
+   * Verifica si una extensión está en la lista de seleccionadas para marcar el check.
+   * @param value Extensión a verificar.
+   * @returns Booleano resultante.
    */
   estaMarcada(value: string): boolean {
     const current = this.form.get('extensionesPermitidas')?.value || '';
@@ -290,7 +353,8 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Valida si el usuario actual tiene rol de Profesor o Administrador.
+   * Determina si el usuario logueado tiene rol administrativo o docente.
+   * @returns True si es Profesor/Admin.
    */
   esProfesor(): boolean {
     const rol = this.tokenService.getRol();
@@ -298,7 +362,7 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Activa el modo edición cargando los valores actuales en el formulario reactivo.
+   * Activa el modo edición y precarga el formulario con los datos actuales del recurso.
    */
   activarEdicion(): void {
     this.editando = true;
@@ -311,7 +375,8 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Captura los archivos seleccionados por el usuario para su posterior subida.
+   * Captura los archivos seleccionados por el usuario y los guarda en el buffer local.
+   * @param event Evento del input file.
    */
   onFileChange(event: any): void {
     if (event.target.files.length > 0) {
@@ -321,14 +386,16 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Quita un archivo de la lista de pendientes por subir.
+   * Elimina un archivo del buffer temporal de subida.
+   * @param index Posición en el array.
    */
-  quitarNuevoArchivo(index: number): void { 
-    this.nuevosArchivos.splice(index, 1); 
+  quitarNuevoArchivo(index: number): void {
+    this.nuevosArchivos.splice(index, 1);
   }
 
   /**
-   * Marca un archivo existente en el servidor para ser eliminado al guardar.
+   * Registra un archivo existente para su eliminación física al confirmar cambios.
+   * @param id ID del archivo.
    */
   marcarParaEliminar(id: number): void {
     this.archivosParaEliminar.push(id);
@@ -336,14 +403,19 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Realiza el guardado integral: Crea/Actualiza el recurso, asigna alumnos y gestiona archivos.
+   * PROCEDIMIENTO CRÍTICO: Guarda los cambios del recurso, gestiona asignaciones 
+   * y procesa la cola de archivos (borrado y subida).
    */
   async guardarTodo(): Promise<void> {
     if (this.form.invalid) return;
     this.cargando = true;
 
     const v = this.form.value;
-    const payload: any = { titulo: v.titulo, idTaller: this.idTaller, visible: this.recurso.visible ?? true };
+    const payload: any = { 
+      titulo: v.titulo, 
+      idTaller: this.idTaller, 
+      visible: this.recurso.visible ?? true 
+    };
 
     if (this.tipo === 'material') {
       payload.contenido = v.descripcion;
@@ -377,45 +449,35 @@ export class AulaDetalle implements OnInit {
       },
       error: () => {
         this.cargando = false;
-        this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'No se pudo guardar el recurso', tipo: 'error' });
+        this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'No se pudo guardar', tipo: 'error' });
       }
     });
   }
 
   /**
-   * Elimina el recurso actual tras la confirmación del usuario.
+   * Dispara un diálogo de confirmación y elimina el recurso si el usuario acepta.
    */
   eliminarRecurso(): void {
     const esTarea = this.tipo === 'tarea';
     const idRecurso = esTarea ? this.recurso.idTarea : this.recurso.id;
-    const tituloRecurso = this.recurso.titulo;
 
     this.notificacionService.confirmar({
       titulo: `¿Eliminar ${this.tipo}?`,
-      mensaje: `Estás a punto de borrar permanentemente "${tituloRecurso}" y sus entregas.`,
+      mensaje: `Se borrará permanentemente "${this.recurso.titulo}".`,
       textoConfirmar: 'Eliminar',
       textoCancelar: 'Cancelar'
     }).then((confirmado) => {
       if (confirmado) {
         this.cargando = true;
         const service: any = esTarea ? this.tareaService : this.materialService;
-
         service.eliminar(idRecurso).subscribe({
           next: () => {
-            this.notificacionService.mostrar({ 
-              titulo: 'Eliminado', 
-              mensaje: `El ${this.tipo} ha sido borrado correctamente`, 
-              tipo: 'exito' 
-            });
+            this.notificacionService.mostrar({ titulo: 'Eliminado', mensaje: `Correctamente`, tipo: 'exito' });
             this.volver();
           },
           error: () => {
             this.cargando = false;
-            this.notificacionService.mostrar({ 
-              titulo: 'Error', 
-              mensaje: `No se pudo eliminar el ${this.tipo}`, 
-              tipo: 'error' 
-            });
+            this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'No se pudo eliminar', tipo: 'error' });
           }
         });
       }
@@ -423,7 +485,7 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Cambia el estado de visibilidad del recurso sin entrar en modo edición.
+   * Cambia la visibilidad pública del recurso de forma inmediata en el backend.
    */
   toggleVisibilidadRapida(): void {
     const id = this.recurso.idTarea || this.recurso.id;
@@ -438,10 +500,13 @@ export class AulaDetalle implements OnInit {
     });
   }
 
-  // --- Lógica de Descargas ---
+  // ===========================================================================
+  // --- LÓGICA DE DESCARGAS (BLOBS) ---
+  // ===========================================================================
 
   /**
-   * Obtiene y descarga un archivo adjunto del recurso.
+   * Gestiona la petición del archivo al servidor y dispara la descarga del Blob.
+   * @param archivo Objeto con los metadatos del archivo.
    */
   descargarAdjunto(archivo: any): void {
     if (this.editando) return;
@@ -451,7 +516,8 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Obtiene y descarga un archivo perteneciente a la entrega de un alumno.
+   * Descarga un archivo perteneciente a la entrega de un alumno.
+   * @param archivo Metadatos del archivo de entrega.
    */
   descargarArchivoAlumno(archivo: any): void {
     this.archivoService.obtenerBlob('entrega', archivo.id).subscribe({
@@ -460,25 +526,33 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Ejecuta la descarga física del archivo en el navegador.
+   * Técnica de descarga: Crea un enlace invisible en el DOM para forzar la bajada del archivo.
+   * @param blob Contenido binario.
+   * @param nombre Nombre del archivo resultante.
+   * @private
    */
   private ejecutarDescarga(blob: Blob, nombre: string): void {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = nombre; a.click();
+    a.href = url;
+    a.download = nombre;
+    a.click();
     window.URL.revokeObjectURL(url);
   }
 
-  // --- Navegación ---
+  // ===========================================================================
+  // --- NAVEGACIÓN Y UTILIDADES ---
+  // ===========================================================================
 
   /**
-   * Finaliza el proceso de guardado limpiando el estado y navegando si es necesario.
+   * Finaliza el flujo de guardado, limpia los buffers y actualiza la ruta si es necesario.
+   * @param id ID del recurso guardado.
+   * @private
    */
   private finalizarGuardado(id: number): void {
     this.editando = false;
     this.nuevosArchivos = [];
     this.archivosParaEliminar = [];
-
     if (this.esNuevo) {
       this.router.navigate(['/aula-virtual', this.idTaller, this.tipo === 'tarea' ? 'tareas' : 'recursos', id], { replaceUrl: true })
         .then(() => this.cargarDatos(id));
@@ -488,7 +562,7 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Cancela la edición o creación del recurso.
+   * Revierte los cambios no guardados o vuelve atrás si es una creación.
    */
   cancelar(): void {
     if (this.esNuevo) this.volver();
@@ -498,20 +572,23 @@ export class AulaDetalle implements OnInit {
     }
   }
 
-  abrirModalEntrega(): void { 
-    this.mostrarModalEntrega = true; 
+  /**
+   * Muestra el modal para que el alumno pueda subir su trabajo.
+   */
+  abrirModalEntrega(): void {
+    this.mostrarModalEntrega = true;
   }
 
   /**
-   * Recarga la información cuando se confirma que una entrega ha sido guardada.
+   * Callback ejecutado cuando el componente hijo de entrega confirma éxito.
    */
   onEntregaGuardada(): void {
-    this.notificacionService.mostrar({ titulo: '¡Hecho!', mensaje: 'Entrega procesada correctamente', tipo: 'exito' });
+    this.notificacionService.mostrar({ titulo: 'Hecho', mensaje: 'Entrega enviada', tipo: 'exito' });
     this.cargarDatos(this.recurso.idTarea || this.recurso.id);
   }
 
   /**
-   * Navega a la vista de seguimiento y corrección de la tarea.
+   * Navega a la vista de seguimiento (corrección de entregas) de la tarea.
    */
   irASeguimiento(): void {
     const idTarea = this.recurso.idTarea || this.recurso.id;
@@ -519,22 +596,24 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Regresa al listado principal de recursos del aula.
+   * Navega de vuelta al listado principal.
    */
   volver(): void {
     this.router.navigate(['/aula-virtual', this.idTaller, this.tipo === 'tarea' ? 'tareas' : 'recursos']);
   }
 
   /**
-   * Redirige al muro en caso de error crítico al cargar datos.
+   * Gestión de errores en la carga: Redirección de seguridad.
+   * @private
    */
   private redirigirPorError(): void {
     this.router.navigate(['/aula-virtual', this.idTaller, 'muro']);
   }
 
   /**
-   * Calcula el tiempo restante hasta la fecha de entrega.
-   * @returns Texto descriptivo del tiempo restante.
+   * Formatea el tiempo remanente de una tarea para su visualización humana.
+   * @param fechaFin Fecha en formato string.
+   * @returns String formateado (ej: "2 días y 3 horas restantes").
    */
   calcularTiempo(fechaFin: string): string {
     if (!fechaFin) return 'Sin fecha límite';

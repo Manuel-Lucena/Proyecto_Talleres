@@ -7,8 +7,9 @@ import { Footer } from "../../components/layout/footer/footer";
 import { Navbar } from "../../components/layout/navbar/navbar";
 
 /**
- * Componente que gestiona la agenda semanal personalizada del usuario.
- * Permite visualizar los horarios de los talleres en los que está inscrito y filtrarlos dinámicamente.
+ * Componente de visualización de agenda personal para el alumno.
+ * Organiza los horarios de los talleres en una estructura de calendario semanal,
+ * permitiendo el filtrado por curso específico y la exportación de la agenda a PDF.
  */
 @Component({
   selector: 'app-calendario',
@@ -18,16 +19,19 @@ import { Navbar } from "../../components/layout/navbar/navbar";
   styleUrl: './calendario.scss',
 })
 export class Calendario implements OnInit {
-  todasMisInscripciones: HorarioResponse[] = []; // Cache completa de horarios del usuario
-  horariosParaMostrar: HorarioResponse[] = []; // Lista filtrada vinculada a la vista
-  diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']; // Columnas del calendario
-  talleresDisponibles: string[] = []; // Nombres únicos de talleres para el selector de filtro
-  cargando = true; // Estado de carga inicial de los datos
 
+  // --- Colecciones de Datos ---
+  todasMisInscripciones: HorarioResponse[] = []; // Fuente de verdad (cache local)
+  horariosParaMostrar: HorarioResponse[] = [];   // Datos vinculados al renderizado de la tabla
+  talleresDisponibles: string[] = [];            // Etiquetas únicas para el dropdown de filtros
+
+  // --- Configuración y Estado ---
+  diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  cargando = true; 
   /**
-   * @param horarioService Servicio para la obtención de la agenda por usuario.
-   * @param tokenService Gestión de sesión para identificar al usuario actual.
-   * @param cdr Referencia para la detección manual de cambios tras procesos asíncronos.
+   * @param horarioService Acceso a los endpoints de agenda y exportación PDF.
+   * @param tokenService Identificación del usuario activo mediante el JWT.
+   * @param cdr Forzado de detección de cambios para procesos asíncronos y ordenación manual.
    */
   constructor(
     private horarioService: HorarioService,
@@ -36,42 +40,48 @@ export class Calendario implements OnInit {
   ) { }
 
   /**
-   * Inicializa la carga de la agenda personal al montar el componente.
+   * Ciclo de vida: Carga la configuración horaria completa del alumno al inicio.
    */
   ngOnInit(): void {
     this.cargarDatos();
   }
 
   /**
-   * Recupera los horarios del usuario desde el servidor y extrae los nombres de los talleres inscritos.
+   * Recupera los horarios y pre-procesa la lista de talleres únicos para el filtro.
    */
   cargarDatos(): void {
     const idUser = this.tokenService.getId();
-
+    
     this.horarioService.listarPorUsuario(idUser).subscribe({
       next: (resp) => {
         this.todasMisInscripciones = resp.data;
         this.horariosParaMostrar = [...this.todasMisInscripciones];
-
-        // Generación de lista única de nombres para el filtro
+        
+        // Utilizamos Set para garantizar que cada taller aparezca una sola vez en el filtro.
         this.talleresDisponibles = [...new Set(this.todasMisInscripciones.map(h => h.nombreTaller))];
-
+        
         this.cargando = false;
         this.cdr.detectChanges();
       },
       error: () => {
         this.cargando = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
+  // ===========================================================================
+  // --- GESTIÓN DE FILTROS Y RENDIMIENTO ---
+  // ===========================================================================
+
   /**
-   * Actualiza la visualización del calendario según el taller seleccionado en la interfaz.
-   * @param event Evento del cambio en el select del DOM.
+   * Filtra la colección local basándose en la selección del usuario.
+   * Evita llamadas innecesarias al servidor al operar sobre la cache 'todasMisInscripciones'.
+   * @param event Evento de cambio del elemento <select>.
    */
   onFiltroChange(event: any): void {
     const tallerSeleccionado = event.target.value;
-
+    
     if (!tallerSeleccionado) {
       this.horariosParaMostrar = [...this.todasMisInscripciones];
     } else {
@@ -82,9 +92,9 @@ export class Calendario implements OnInit {
   }
 
   /**
-   * Filtra y ordena cronológicamente los horarios correspondientes a un día concreto.
-   * @param dia Nombre del día de la semana.
-   * @returns Colección de horarios filtrados y ordenados por hora de inicio.
+   * Orquestador de celdas por día.
+   * Realiza un filtrado por día y una ordenación cronológica ascendente (horaInicio).
+   * @param dia Día de la semana a procesar.
    */
   filtrarPorDia(dia: string): HorarioResponse[] {
     return this.horariosParaMostrar
@@ -92,9 +102,12 @@ export class Calendario implements OnInit {
       .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
   }
 
+  // ===========================================================================
+  // --- EXPORTACIÓN ---
+  // ===========================================================================
 
   /**
-   * Ejecuta la descarga de la agenda semanal en formato PDF.
+   * Solicita el flujo binario (Blob) del PDF y gestiona la descarga en el navegador.
    */
   descargarAgenda(): void {
     const idUser = this.tokenService.getId();
@@ -105,15 +118,15 @@ export class Calendario implements OnInit {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-
         const fecha = new Date().toLocaleDateString().replace(/\//g, '-');
         link.download = `Mi_Agenda_${fecha}.pdf`;
-
         link.click();
+        
+        // Liberación de memoria tras la descarga
         window.URL.revokeObjectURL(url);
       },
       error: (err) => {
-        console.error('Error al descargar el PDF:', err);
+        console.error('Error al generar el documento de agenda:', err);
       }
     });
   }

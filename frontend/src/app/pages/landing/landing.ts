@@ -8,9 +8,10 @@ import { NoticiaResponse } from '../../interfaces/Noticia.Interface';
 import { FormNoticia } from '../../components/forms/form-noticia/form-noticia';
 
 /**
- * Componente de la página de inicio (Landing Page).
- * Gestiona la visualización de las últimas noticias y permite a los administradores
- * realizar acciones rápidas de creación y edición de contenido informativo.
+ * Componente principal de la aplicación (Página de Inicio).
+ * Presenta la propuesta de valor y las últimas novedades del centro.
+ * Implementa una funcionalidad de "Edición Rápida" para usuarios con rol administrativo,
+ * permitiendo gestionar el tablón de anuncios sin abandonar la vista principal.
  */
 @Component({
   selector: 'app-landing',
@@ -20,14 +21,18 @@ import { FormNoticia } from '../../components/forms/form-noticia/form-noticia';
   styleUrl: './landing.scss',
 })
 export class Landing implements OnInit {
-  listaNoticias: NoticiaResponse[] = []; // Listado de noticias destacadas para la vista
-  noticiaSeleccionada: NoticiaResponse | null = null; // Clon de la noticia activa para edición
-  mostrarModal: boolean = false; // Control de visibilidad del modal de gestión
+
+  // --- Propiedades de Datos ---
+  listaNoticias: NoticiaResponse[] = []; // Subconjunto de noticias destacadas
+
+  // --- Gestión de UI y Modales ---
+  noticiaSeleccionada: NoticiaResponse | null = null; // Buffer para edición (Deep Copy)
+  mostrarModal: boolean = false; // Control de renderizado para el componente FormNoticia
 
   /**
-   * @param noticiaService Operaciones de consulta y persistencia de noticias.
-   * @param tokenService Gestión de identidad y permisos de usuario.
-   * @param cdr Detección de cambios manual para asegurar la sincronía de la UI.
+   * @param noticiaService Acceso a la API de contenidos informativos.
+   * @param tokenService Determina si el usuario tiene permisos para ver botones de edición.
+   * @param cdr Sincronizador de la vista ante actualizaciones asíncronas de datos.
    */
   constructor(
     private noticiaService: NoticiaService,
@@ -36,28 +41,33 @@ export class Landing implements OnInit {
   ) { }
 
   /**
-   * Inicializa el componente recuperando las noticias más recientes.
+   * Ciclo de vida: Carga inicial de contenidos destacados.
    */
   ngOnInit(): void {
     this.cargarNoticias();
   }
 
   /**
-   * Obtiene las últimas noticias (máximo 6) y actualiza la referencia de la lista.
+   * Recupera las noticias y limita la visualización a las 6 más recientes 
+   * para mantener una estética de landing page limpia.
    */
   cargarNoticias(): void {
     this.noticiaService.listar().subscribe({
       next: (res) => {
-        // Aseguramos la inmutabilidad para activar la detección de cambios
+        // Inmutabilidad: Creamos una nueva referencia de array para asegurar el refresco en el HTML
         this.listaNoticias = [...res.data.slice(0, 6)];
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error al cargar noticias:', err)
+      error: (err) => console.error('Error al cargar noticias en el front:', err)
     });
   }
 
+  // ===========================================================================
+  // --- FLUJO DE GESTIÓN RÁPIDA (Solo Administradores) ---
+  // ===========================================================================
+
   /**
-   * Configura el entorno para la creación de una nueva noticia.
+   * Inicializa el flujo para añadir un nuevo anuncio al tablón.
    */
   abrirCrear(): void {
     this.noticiaSeleccionada = null;
@@ -66,8 +76,8 @@ export class Landing implements OnInit {
   }
 
   /**
-   * Clona una noticia existente para su edición sin afectar al listado principal.
-   * @param noticia Objeto noticia seleccionado desde la interfaz.
+   * Prepara la edición de una noticia mediante clonación profunda (JSON parse/stringify)
+   * para evitar que cambios temporales en el formulario se reflejen en la UI antes de guardar.
    */
   abrirEditar(noticia: NoticiaResponse): void {
     this.noticiaSeleccionada = JSON.parse(JSON.stringify(noticia));
@@ -76,28 +86,27 @@ export class Landing implements OnInit {
   }
 
   /**
-   * Procesa el guardado (creación o actualización) de una noticia y refresca la vista.
-   * @param datos Objeto FormData con los campos de la noticia e imagen adjunta.
+   * Canaliza la información hacia el servicio de noticias.
+   * @param datos Objeto FormData que incluye el cuerpo de la noticia y el archivo binario.
    */
   onPublicarNoticia(datos: FormData): void {
-    const accion = this.noticiaSeleccionada
-      ? this.noticiaService.actualizar(this.noticiaSeleccionada.idNoticia, datos)
+    const accion = this.noticiaSeleccionada 
+      ? this.noticiaService.actualizar(this.noticiaSeleccionada.idNoticia, datos) 
       : this.noticiaService.crear(datos);
 
     accion.subscribe({
       next: () => {
         this.cerrarModal();
-        // Delay técnico para permitir la sincronización de archivos en el servidor
         setTimeout(() => {
           this.cargarNoticias();
         }, 800);
       },
-      error: (err) => console.error("Error al guardar noticia:", err)
+      error: (err) => console.error("Error en la persistencia de noticia:", err)
     });
   }
 
   /**
-   * Cierra el modal de gestión y limpia la selección actual.
+   * Resetea el estado del modal y limpia referencias.
    */
   cerrarModal(): void {
     this.mostrarModal = false;

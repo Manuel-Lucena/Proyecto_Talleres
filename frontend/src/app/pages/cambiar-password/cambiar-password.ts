@@ -6,6 +6,11 @@ import { UsuarioService } from '../../services/Usuario.Service';
 import { NotificacionService } from '../../services/Notificacion.Service';
 import { PasswordChangeRequest } from '../../interfaces/Auth.Interface';
 
+/**
+ * Componente para el restablecimiento de credenciales.
+ * Gestiona el paso final del flujo de "Olvidé mi contraseña", validando el token
+ * enviado por correo y permitiendo al usuario definir una nueva clave de acceso.
+ */
 @Component({
   selector: 'app-cambiar-password',
   standalone: true,
@@ -14,23 +19,36 @@ import { PasswordChangeRequest } from '../../interfaces/Auth.Interface';
   styleUrl: './cambiar-password.scss'
 })
 export class CambiarPassword implements OnInit {
-  public verPassword = false;
-  public loading = false;
-  public mensajeError = '';
-  public token: string = '';
 
+  // --- Estado de la Interfaz ---
+  public verPassword = false;      // Permite alternar la visibilidad de los caracteres
+  public loading = false;          // Estado de carga para bloquear el botón durante la petición
+  public mensajeError = '';        // Feedback de validaciones locales (no coincide, token vacío)
+  public token: string = '';       // Token de seguridad recuperado de la Query String
+
+  // --- Formulario Reactivo ---
   public resetForm = new FormGroup({
     password: new FormControl('', [Validators.required, Validators.minLength(6)]),
     confirmPassword: new FormControl('', [Validators.required])
   });
 
+  /**
+   * @param route Servicio para interceptar parámetros de la URL.
+   * @param usuarioService Operaciones de seguridad y cambio de credenciales.
+   * @param notificacionService Diálogos globales para feedback de éxito/error.
+   * @param router Redirección al login tras completar el flujo.
+   */
   constructor(
     private route: ActivatedRoute,
     private usuarioService: UsuarioService,
-    public notificacionService: NotificacionService, // Cambiado a public por si lo necesitas en el HTML
+    public notificacionService: NotificacionService,
     private router: Router
   ) {}
 
+  /**
+   * Ciclo de vida: Al arrancar, extrae el token de la URL (ej: ?token=abc...).
+   * Si no existe, invalida el proceso inmediatamente.
+   */
   ngOnInit(): void {
     this.token = this.route.snapshot.queryParamMap.get('token') || '';
     if (!this.token) {
@@ -38,6 +56,9 @@ export class CambiarPassword implements OnInit {
     }
   }
 
+  /**
+   * Ejecuta el proceso de cambio de contraseña previo filtrado de errores comunes.
+   */
   public onSubmit(): void {
     if (this.resetForm.invalid || !this.token) {
       this.resetForm.markAllAsTouched();
@@ -62,24 +83,23 @@ export class CambiarPassword implements OnInit {
         this.notificacionService.mostrar({
           titulo: '¡Éxito!',
           mensaje: 'Tu contraseña ha sido actualizada correctamente. Ahora puedes iniciar sesión.',
-          tipo: 'exito' // Asumo que 'exito' es uno de tus tipos en ModalConfig
+          tipo: 'exito'
         });
 
-        // Redirigimos tras un breve delay para que vean el modal
         setTimeout(() => {
-          this.notificacionService.cerrar(); // Cerramos el modal antes de irnos
+          this.notificacionService.cerrar();
           this.router.navigate(['/login']);
         }, 4000);
       },
       error: (err) => {
         this.loading = false;
         this.mensajeError = 'El enlace ha expirado o no es válido.';
-        
         this.notificacionService.mostrar({
           titulo: 'Error',
           mensaje: 'No se pudo restablecer la contraseña. Inténtalo de nuevo.',
           tipo: 'error'
         });
+        console.error('Error Reset Password:', err);
       }
     });
   }

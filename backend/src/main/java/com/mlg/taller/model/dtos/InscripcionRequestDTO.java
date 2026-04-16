@@ -1,5 +1,6 @@
 package com.mlg.taller.model.dtos;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -17,6 +18,10 @@ public class InscripcionRequestDTO {
     /** Identificador del taller seleccionado. */
     @NotNull(message = "El ID de taller es obligatorio")
     private Long idTaller;
+
+    /** Email del Usuario */
+    @Email(message = "El formato del email no es válido")
+    private String emailUsuario;
 
     /** Cantidad económica abonada por el usuario. */
     @NotNull(message = "El monto es obligatorio")

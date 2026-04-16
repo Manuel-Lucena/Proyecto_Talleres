@@ -16,7 +16,13 @@
         <i [class]="descargandoLista ? 'bi bi-arrow-repeat spin' : 'bi bi-file-earmark-pdf'"></i>
         <span class="btn-text">{{ descargandoLista ? 'Generando...' : 'Descargar Lista' }}</span>
       </button>
+
+      <button class="btn-header-masivo" (click)="abrirInscripcionMasiva()" title="Carga masiva desde CSV">
+        <i class="bi bi-file-earmark-spreadsheet"></i>
+        <span class="btn-text">Carga Masiva</span>
+      </button>
       }
+
       <button class="btn-primario-aula" (click)="abrirInscripcion()">
         <i class="bi bi-plus-lg"></i>
         <span class="btn-text">Nueva Inscripción</span>
@@ -112,8 +118,22 @@
 </div>
 
 @if (mostrarModal) {
-<app-form-inscripcion-admin [tallerParaInscribir]="tallerContexto" [usuarioParaInscribir]="usuarioContexto" (cerrar)="cerrarModal()" (guardado)="guardarInscripcion($event)">
+<app-form-inscripcion-admin 
+  [tallerParaInscribir]="tallerContexto" 
+  [usuarioParaInscribir]="usuarioContexto" 
+  (cerrar)="cerrarModal()" 
+  (guardado)="guardarInscripcion($event)">
 </app-form-inscripcion-admin>
 }
+
+@if (mostrarModalMasivo) {
+<app-form-carga-inscripciones 
+  [idTaller]="idTaller!" 
+  [nombreTaller]="tallerContexto?.nombre"
+  (cerrar)="cerrarModalMasivo()" 
+  (guardado)="onMasivoGuardado()">
+</app-form-carga-inscripciones>
+}
+
 <app-confirmacion></app-confirmacion>
 <app-modal-notificacion></app-modal-notificacion>

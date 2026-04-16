@@ -9,8 +9,9 @@ import { TallerResponse } from '../../interfaces/Taller.Interface';
 import { HorarioTaller } from "../../components/dialogs/horario-taller/horario-taller";
 
 /**
- * Componente para que el alumno visualice los talleres en los que está inscrito.
- * Ofrece acceso al aula virtual, materiales, tareas y consulta de horarios.
+ * Componente de vista de usuario (Alumno).
+ * Centraliza el acceso a los talleres donde el alumno está matriculado, 
+ * actuando como lanzador hacia las diferentes secciones del Aula Virtual.
  */
 @Component({
   selector: 'app-mis-talleres',
@@ -20,18 +21,21 @@ import { HorarioTaller } from "../../components/dialogs/horario-taller/horario-t
   styleUrl: './mis-talleres.scss'
 })
 export class MisTalleres implements OnInit {
-  talleres: TallerResponse[] = []; // Colección de talleres asociados al alumno
-  cargando: boolean = true; // Flag de control para el estado de carga de la interfaz
 
-  mostrarModalHorario: boolean = false; // Control de visibilidad del diálogo de horarios
-  idTallerSeleccionado!: number; // ID del taller para la consulta de horarios
-  nombreTallerSeleccionado: string = ''; // Nombre del taller para el encabezado del modal
+  // --- Estado de Datos ---
+  talleres: TallerResponse[] = []; // Almacena los talleres vinculados al perfil del alumno
+  cargando: boolean = true;        // Gestiona el estado de espera (Skeleton o Spinner en el HTML)
+
+  // --- Estado de UI (Modales) ---
+  mostrarModalHorario: boolean = false;  // Controla el renderizado condicional del modal de horarios
+  idTallerSeleccionado!: number;         // Contexto de ID para el componente hijo (HorarioTaller)
+  nombreTallerSeleccionado: string = ''; // Contexto de nombre para el encabezado del modal
 
   /**
-   * @param tallerService Servicio para la recuperación de talleres por usuario.
-   * @param tokenService Gestión de identidad para obtener el ID del usuario actual.
-   * @param router Servicio de navegación hacia el aula virtual.
-   * @param cdr Detección manual de cambios para asegurar la actualización de la UI.
+   * @param tallerService Consultas específicas de talleres (filtrado por usuario).
+   * @param tokenService Extracción de metadatos del JWT (ID del usuario).
+   * @param router Gestión de rutas hacia el entorno de aprendizaje.
+   * @param cdr Forzado de detección de cambios (crucial para estados de carga asíncronos).
    */
   constructor(
     private tallerService: TallerService,
@@ -41,7 +45,8 @@ export class MisTalleres implements OnInit {
   ) { }
 
   /**
-   * Inicializa el componente recuperando la identidad del usuario y sus talleres.
+   * Ciclo de vida: Al inicializar, obtiene el ID del usuario desde el token de sesión.
+   * Si no hay sesión, detiene la carga para mostrar el estado vacío o redirigir.
    */
   ngOnInit(): void {
     const idUsuario = this.tokenService.getId();
@@ -54,8 +59,8 @@ export class MisTalleres implements OnInit {
   }
 
   /**
-   * Solicita al servidor la lista de talleres donde el usuario figura como alumno.
-   * @param id Identificador único del usuario.
+   * Recupera del backend la colección de talleres activos para el alumno actual.
+   * @param id Identificador numérico extraído del TokenService.
    */
   cargarMisTalleres(id: number): void {
     this.cargando = true;
@@ -73,9 +78,13 @@ export class MisTalleres implements OnInit {
     });
   }
 
+  // ===========================================================================
+  // --- GESTIÓN DE INTERACCIÓN Y MODALES ---
+  // ===========================================================================
+
   /**
-   * Activa el modal de horario configurando el contexto del taller seleccionado.
-   * @param item Objeto del taller del cual se desea ver la planificación.
+   * Prepara los datos necesarios para inyectarlos en el modal de horarios.
+   * @param item Objeto TallerResponse obtenido de la iteración en el template.
    */
   verHorario(item: TallerResponse): void {
     this.idTallerSeleccionado = item.idTaller;
@@ -84,25 +93,26 @@ export class MisTalleres implements OnInit {
     this.cdr.detectChanges();
   }
 
+  // ===========================================================================
+  // --- NAVEGACIÓN AULA VIRTUAL ---
+  // ===========================================================================
+
   /**
-   * Navega a la vista principal del aula virtual del taller.
-   * @param idTaller Identificador del taller.
+   * Acceso general al Dashboard del taller.
    */
   entrarAlAula(idTaller: number): void {
     this.router.navigate(['/aula-virtual', idTaller]);
   }
 
   /**
-   * Navega directamente a la sección de tareas del taller.
-   * @param idTaller Identificador del taller.
+   * Acceso directo al submódulo de entregas y actividades.
    */
   verTareas(idTaller: number): void {
     this.router.navigate(['/aula-virtual', idTaller, 'tareas']);
   }
 
   /**
-   * Navega directamente a la sección de materiales y recursos del taller.
-   * @param idTaller Identificador del taller.
+   * Acceso directo al repositorio de archivos y documentos del profesor.
    */
   verRecursos(idTaller: number): void {
     this.router.navigate(['/aula-virtual', idTaller, 'recursos']);

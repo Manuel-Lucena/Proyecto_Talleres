@@ -7,9 +7,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 /**
- * Componente principal del tablón o "muro" del Aula Virtual.
- * Unifica cronológicamente las tareas y materiales didácticos, aplicando filtros
- * de visibilidad según el rol del usuario (Profesor/Alumno).
+ * COMPONENTE DE AGREGACIÓN: Muro de Actividades (Timeline).
+ * * Este componente actúa como el "Feed" principal del Aula Virtual:
+ * 1. Orquestación Concurrente: Utiliza forkJoin para unificar flujos de tareas y materiales.
+ * 2. Normalización de Tipos: Transforma DTOs heterogéneos en un modelo unificado para la UI.
+ * 3. Ordenación Cronológica: Implementa un algoritmo de clasificación por fecha descendente.
  */
 @Component({
   selector: 'app-aula-muro',
@@ -19,17 +21,21 @@ import { forkJoin } from 'rxjs';
   styleUrl: './aula-muro.scss',
 })
 export class AulaMuro implements OnInit {
-  actividades: any[] = []; // Colección unificada de tareas y materiales ordenados por fecha
-  cargando: boolean = true; // Estado de carga para la sincronización de flujos de datos
-  esProfesor: boolean = false; // Flag de permisos basado en el rol extraído del JWT
+
+  // --- Propiedades de Datos ---
+  actividades: any[] = [];                    // Colección híbrida (Tareas + Materiales)
+
+  // --- Propiedades de Estado y UI ---
+  cargando: boolean = true;                   // Flag de control para la sincronización de flujos
+  esProfesor: boolean = false;                // Determinador de privilegios para filtros de visibilidad
 
   /**
-   * @param tareaService Servicio para la recuperación de actividades evaluables.
-   * @param materialService Servicio para la recuperación de recursos didácticos.
-   * @param tokenService Gestión de sesión para validar identidad y privilegios.
-   * @param route Acceso a los parámetros de la ruta padre (ID del taller).
-   * @param cdr Detección de cambios manual para asegurar la consistencia de la UI.
-   * @param router Gestión de navegación hacia el detalle de los recursos.
+   * @param tareaService Consumo de la API para actividades evaluables.
+   * @param materialService Consumo de la API para recursos didácticos.
+   * @param tokenService Análisis del JWT para validación de claims y seguridad.
+   * @param route Captura del ID del taller desde el contexto jerárquico.
+   * @param cdr Sincronización manual del ciclo de vida de la vista.
+   * @param router Motor de navegación para el drill-down hacia detalles.
    */
   constructor(
     private tareaService: TareaService,
@@ -41,7 +47,8 @@ export class AulaMuro implements OnInit {
   ) { }
 
   /**
-   * Inicializa el componente validando el rol del usuario e iniciando la carga paralela del muro.
+   * Ciclo de vida: Inicializa permisos de rol y captura el identificador del taller 
+   * a través del parent snapshot para disparar la hidratación del muro.
    */
   ngOnInit(): void {
     const rol = this.tokenService.getRol();
@@ -53,69 +60,67 @@ export class AulaMuro implements OnInit {
     }
   }
 
+  // ===========================================================================
+  // --- LÓGICA DE UNIFICACIÓN Y NORMALIZACIÓN ---
+  // ===========================================================================
+
   /**
-   * Coordina la carga de tareas y materiales mediante forkJoin para una experiencia síncrona.
-   * Transforma y ordena los resultados cronológicamente para su visualización en el muro.
-   * @param idTaller Identificador único del taller activo.
+   * Coordina la carga paralela y la fusión de recursos didácticos.
+   * * TÉCNICA: Implementa una transformación de datos para inyectar un discriminador 
+   * de tipo ('TAREA' vs 'MATERIAL') y una propiedad de fecha común (fechaMuro).
    */
   cargarMuro(idTaller: number): void {
     this.cargando = true;
     const idAlumno = this.tokenService.getId();
-   
-    // Definición de observables según el contexto de permisos
-    const tareasObs = this.esProfesor
-      ? this.tareaService.listarPorTaller(idTaller)
+
+    const tareasObs = this.esProfesor 
+      ? this.tareaService.listarPorTaller(idTaller) 
       : this.tareaService.listarVisibles(idTaller, idAlumno!);
 
-    const materialesObs = this.esProfesor
-      ? this.materialService.listarPorTaller(idTaller)
+    const materialesObs = this.esProfesor 
+      ? this.materialService.listarPorTaller(idTaller) 
       : this.materialService.listarVisibles(idTaller);
 
-    forkJoin({
-      tareas: tareasObs,
-      materiales: materialesObs
-    }).subscribe({
+    forkJoin({ tareas: tareasObs, materiales: materialesObs }).subscribe({
       next: (res) => {
-        // Mapeo y normalización de TAREAS
         const tareasMapped = res.tareas.data.map(t => ({
           ...t,
           tipo: 'TAREA',
           fechaMuro: new Date(t.fechaPublicacion || (t as any).createdAt || new Date())
         }));
 
-        // Mapeo y normalización de MATERIALES
         const materialesMapped = res.materiales.data.map(m => ({
           ...m,
           tipo: 'MATERIAL',
           fechaMuro: new Date((m as any).fechaSubida || (m as any).createdAt || new Date())
         }));
 
-        // Mezcla y ordenación descendente (más reciente primero)
-        this.actividades = [...tareasMapped, ...materialesMapped].sort((a, b) =>
-          b.fechaMuro.getTime() - a.fechaMuro.getTime()
+        this.actividades = [...tareasMapped, ...materialesMapped].sort(
+          (a, b) => b.fechaMuro.getTime() - a.fechaMuro.getTime()
         );
 
         this.cargando = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error al cargar el muro:', err);
+        console.error('CRITICAL: Error en la orquestación del muro:', err);
         this.cargando = false;
         this.cdr.detectChanges();
       }
     });
   }
 
+  // ===========================================================================
+  // --- NAVEGACIÓN ---
+  // ===========================================================================
+
   /**
-   * Redirige al usuario a la vista de detalle específica según el tipo de recurso seleccionado.
-   * @param item Objeto normalizado del muro (Tarea o Material).
+   * Redirige al detalle del recurso basándose en el discriminador de tipo.
+   * Utiliza navegación relativa para mantener la consistencia del path del taller.
    */
   verDetalle(item: any): void {
     const idRecurso = item.tipo === 'TAREA' ? item.idTarea : item.id;
     const tipoUrl = item.tipo.toLowerCase();
-
-    this.router.navigate(['../detalle', tipoUrl, idRecurso], {
-      relativeTo: this.route
-    });
+    this.router.navigate(['../detalle', tipoUrl, idRecurso], { relativeTo: this.route });
   }
 }

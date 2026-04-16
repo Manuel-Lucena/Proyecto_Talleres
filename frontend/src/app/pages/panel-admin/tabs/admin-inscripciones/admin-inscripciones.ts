@@ -8,52 +8,58 @@ import { InscripcionResponse } from '../../../../interfaces/Inscripcion.Interfac
 import { Confirmacion } from "../../../../components/dialogs/confirmacion/confirmacion";
 import { Notificacion } from "../../../../components/dialogs/mensaje/notificacion";
 import { FormInscripcionAdmin } from '../../../../components/forms/form-inscripcion-admin/form-inscripcion-admin';
+import { FormCargaInscripciones } from '../../../../components/forms/form-carga-inscripciones/form-carga-inscripciones';
 
 /**
- * Componente administrativo para la gestión de inscripciones.
- * Soporta vistas contextuales: inscritos por taller o talleres por usuario.
+ * Componente administrativo polivalente para la gestión de inscripciones.
+ * Funciona en dos modos:
+ * 1. Vista de Taller: Muestra todos los alumnos inscritos en un taller específico.
+ * 2. Vista de Usuario: Muestra todos los talleres en los que participa un alumno.
  */
 @Component({
   selector: 'app-admin-inscripciones',
   standalone: true,
-  imports: [CommonModule, FormsModule, Confirmacion, Notificacion, FormInscripcionAdmin],
+  imports: [
+    CommonModule, FormsModule, Confirmacion, Notificacion, 
+    FormInscripcionAdmin, FormCargaInscripciones
+  ],
   templateUrl: './admin-inscripciones.html',
   styleUrl: './admin-inscripciones.scss',
 })
 export class AdminInscripciones implements OnInit {
-  inscripciones: InscripcionResponse[] = []; // Listado de inscripciones recuperadas
-  cargando = true; // Estado de carga de la petición de datos
-  mostrarModal = false; // Control de visibilidad para el formulario de inscripción
-  busqueda: string = ''; // Término para el filtrado dinámico en la tabla
-  tallerContexto: any = null; // Información resumida del taller si la vista es por taller
-  usuarioContexto: any = null; // Información resumida del usuario si la vista es por usuario
-  idTaller?: number; // Identificador del taller extraído de la URL
-  idUsuario?: number; // Identificador del usuario extraído de la URL
-  esVistaTaller = false; // Flag para determinar el modo de visualización
-  titulo = ''; // Título dinámico del encabezado
-  subtitulo = ''; // Subtítulo dinámico del encabezado
 
-  // Flags para feedback de descarga
-  descargandoLista = false;
-  descargandoFacturaId: number | null = null;
+  // --- Propiedades de Datos y Colecciones ---
+  inscripciones: InscripcionResponse[] = []; // Listado de registros según contexto
+  tallerContexto: any = null;                // Datos del taller (si estamos en vista taller)
+  usuarioContexto: any = null;               // Datos del usuario (si estamos en vista usuario)
+  
+  // --- Estado de la Ruta y Parámetros ---
+  idTaller?: number;
+  idUsuario?: number;
+  esVistaTaller = false; // Flag para conmutar la lógica de la UI y peticiones
 
-  /**
-   * @param route Servicio para acceder a los parámetros de la ruta activa.
-   * @param location Servicio para gestionar la navegación hacia atrás en el historial.
-   * @param inscripcionService Operaciones de persistencia y consulta de inscripciones.
-   * @param notificacionService Gestión de alertas y diálogos de confirmación.
-   * @param cdr Detección de cambios manual para actualizaciones asíncronas.
-   */
+  // --- UI, Mensajes y Modales ---
+  cargando = true;
+  mostrarModal = false;           // Modal para inscripción individual
+  mostrarModalMasivo = false;     // Modal para carga mediante CSV/Excel
+  busqueda: string = '';          // Filtro de texto para la tabla
+  titulo = '';                    // Título dinámico de la página
+  subtitulo = '';                 // Subtítulo dinámico de la página
+
+  // --- Flags de Procesos de Descarga ---
+  descargandoLista = false;               // Estado para el PDF de lista de alumnos
+  descargandoFacturaId: number | null = null; // ID específico para el spinner de factura
+
   constructor(
     private route: ActivatedRoute,
     private location: Location,
     private inscripcionService: InscripcionService,
     private notificacionService: NotificacionService,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
   /**
-   * Identifica el contexto de la vista (taller o usuario) mediante los parámetros de la URL.
+   * Ciclo de vida: Analiza los parámetros de la URL para determinar el modo de funcionamiento.
    */
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -70,16 +76,21 @@ export class AdminInscripciones implements OnInit {
   }
 
   /**
-   * Carga la lista de inscripciones y configura el objeto de contexto correspondiente.
-   * @param tipo Discriminador entre taller o usuario.
-   * @param id Identificador único de la entidad.
+   * Recupera la información desde el servidor basándose en el tipo de contexto.
+   * @param tipo Identifica si buscamos por 'taller' o por 'usuario'.
+   * @param id Identificador único correspondiente.
    */
   cargarDatos(tipo: 'taller' | 'usuario', id: number) {
     this.cargando = true;
-    const peticion = tipo === 'taller' ? this.inscripcionService.listarPorTaller(id) : this.inscripcionService.listarPorUsuario(id);
+    const peticion = tipo === 'taller' 
+      ? this.inscripcionService.listarPorTaller(id) 
+      : this.inscripcionService.listarPorUsuario(id);
+
     peticion.subscribe({
       next: (res) => {
         this.inscripciones = res.data || [];
+        
+        // Sincronización de contextos para mostrar info en las cabeceras
         if (tipo === 'taller') {
           this.usuarioContexto = null;
           this.tallerContexto = {
@@ -94,6 +105,7 @@ export class AdminInscripciones implements OnInit {
             email: this.inscripciones.length > 0 ? this.inscripciones[0].emailUsuario : 'Usuario'
           };
         }
+        
         this.configurarTextos();
         this.cargando = false;
         this.cdr.detectChanges();
@@ -103,54 +115,53 @@ export class AdminInscripciones implements OnInit {
   }
 
   /**
-   * Getter que filtra las inscripciones basándose en el email del usuario o nombre del taller.
+   * Getter que filtra la tabla dinámicamente según el contexto (por email o por nombre de taller).
    */
   get inscripcionesFiltradas() {
     const term = this.busqueda?.toLowerCase().trim();
     if (!term) return this.inscripciones;
+
     return this.inscripciones.filter(ins => {
-      if (this.esVistaTaller) {
-        return ins.emailUsuario?.toLowerCase().includes(term);
-      } else {
-        return ins.nombreTaller?.toLowerCase().includes(term);
-      }
+      // En vista taller buscamos por el email del alumno, en vista usuario por el nombre del taller
+      return this.esVistaTaller 
+        ? ins.emailUsuario?.toLowerCase().includes(term)
+        : ins.nombreTaller?.toLowerCase().includes(term);
     });
   }
 
   /**
-   * Ajusta los textos de la interfaz según el contexto actual de navegación.
+   * Ajusta los títulos de la interfaz para que el administrador sepa qué está gestionando.
    */
   configurarTextos() {
     if (this.esVistaTaller) {
       this.titulo = "Gestión de Alumnos";
-      this.subtitulo = this.inscripciones.length > 0 ? `Inscritos en ${this.inscripciones[0].nombreTaller}` : "Lista de alumnos";
+      this.subtitulo = this.inscripciones.length > 0 
+        ? `Inscritos en ${this.inscripciones[0].nombreTaller}` 
+        : "Lista de alumnos";
     } else {
       this.titulo = "Talleres del Usuario";
-      this.subtitulo = this.inscripciones.length > 0 ? `Cursos de ${this.inscripciones[0].emailUsuario}` : "Inscripciones del usuario";
+      this.subtitulo = this.inscripciones.length > 0 
+        ? `Cursos de ${this.inscripciones[0].emailUsuario}` 
+        : "Inscripciones del usuario";
     }
   }
 
-  /**
-   * Muestra el modal para realizar una nueva inscripción administrativa.
-   */
-  abrirInscripcion() { this.mostrarModal = true; }
+  // ===========================================================================
+  // --- GESTIÓN DE INSCRIPCIONES (MODALES) ---
+  // ===========================================================================
 
-  /**
-   * Oculta el modal de inscripción.
-   */
+  abrirInscripcion() { this.mostrarModal = true; }
   cerrarModal() { this.mostrarModal = false; }
 
   /**
-   * Envía los datos de una nueva inscripción al servidor y refresca la lista.
-   * @param datos DTO con la información de inscripción y pago.
+   * Persiste una inscripción manual realizada por el administrador.
    */
   guardarInscripcion(datos: any) {
     this.inscripcionService.inscribir(datos).subscribe({
       next: () => {
         this.notificacionService.mostrar({ titulo: 'Éxito', mensaje: 'Registrado correctamente', tipo: 'exito' });
         this.cerrarModal();
-        if (this.idTaller) this.cargarDatos('taller', this.idTaller);
-        else if (this.idUsuario) this.cargarDatos('usuario', this.idUsuario);
+        this.refrescarDatos();
       },
       error: (err) => {
         this.notificacionService.mostrar({ titulo: 'Error', mensaje: err.error?.message || 'Error al inscribir', tipo: 'error' });
@@ -159,8 +170,29 @@ export class AdminInscripciones implements OnInit {
   }
 
   /**
-   * Descarga la factura de una inscripción específica con feedback visual.
-   * @param idInscripcion ID de la inscripción.
+   * Abre el flujo de carga masiva de inscripciones (solo disponible en vista de taller).
+   */
+  abrirInscripcionMasiva() {
+    if (this.esVistaTaller && this.idTaller) {
+      this.mostrarModalMasivo = true;
+    }
+  }
+
+  cerrarModalMasivo() { this.mostrarModalMasivo = false; }
+  onMasivoGuardado() { this.refrescarDatos(); }
+
+  private refrescarDatos() {
+    if (this.idTaller) this.cargarDatos('taller', this.idTaller);
+    else if (this.idUsuario) this.cargarDatos('usuario', this.idUsuario);
+  }
+
+  // ===========================================================================
+  // --- DESCARGAS Y EXPORTACIÓN ---
+  // ===========================================================================
+
+  /**
+   * Gestiona la descarga del PDF de factura de una inscripción concreta.
+   * Utiliza window.URL.createObjectURL para procesar el Blob devuelto por el servidor.
    */
   descargarFactura(idInscripcion: number) {
     this.descargandoFacturaId = idInscripcion;
@@ -172,7 +204,7 @@ export class AdminInscripciones implements OnInit {
         a.download = `Factura_${idInscripcion}.pdf`;
         document.body.appendChild(a);
         a.click();
-        window.URL.revokeObjectURL(url);
+        window.URL.revokeObjectURL(url); // Liberación de memoria
         a.remove();
         this.descargandoFacturaId = null;
         this.cdr.detectChanges();
@@ -186,11 +218,12 @@ export class AdminInscripciones implements OnInit {
   }
 
   /**
-   * Descarga la lista completa de alumnos del taller actual con feedback visual.
+   * Exporta la lista completa de alumnos de un taller en formato PDF.
    */
   descargarLista() {
     if (!this.idTaller) return;
     this.descargandoLista = true;
+    
     this.inscripcionService.descargarListaPdf(this.idTaller).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
@@ -213,9 +246,12 @@ export class AdminInscripciones implements OnInit {
     });
   }
 
+  // ===========================================================================
+  // --- ACCIONES DE TABLA ---
+  // ===========================================================================
+
   /**
-   * Cambia el estado de activación de una inscripción específica.
-   * @param id Identificador único de la inscripción.
+   * Cambia el estado (activa/inactiva) de una inscripción sin necesidad de recargar toda la lista.
    */
   alternarEstado(id: number) {
     this.inscripcionService.cambiarEstado(id).subscribe({
@@ -230,11 +266,15 @@ export class AdminInscripciones implements OnInit {
   }
 
   /**
-   * Solicita confirmación y elimina un registro de inscripción de forma permanente.
-   * @param id Identificador único de la inscripción.
+   * Elimina un registro de inscripción de forma definitiva.
    */
   eliminar(id: number) {
-    this.notificacionService.confirmar({ titulo: '¿Eliminar inscripción?', mensaje: 'Esta acción borrará el registro de forma permanente.', textoConfirmar: 'Eliminar', textoCancelar: 'Cancelar' }).then(confirmado => {
+    this.notificacionService.confirmar({
+      titulo: '¿Eliminar inscripción?',
+      mensaje: 'Esta acción borrará el registro de forma permanente.',
+      textoConfirmar: 'Eliminar',
+      textoCancelar: 'Cancelar'
+    }).then(confirmado => {
       if (confirmado) {
         this.inscripcionService.eliminar(id).subscribe({
           next: () => {
@@ -251,7 +291,9 @@ export class AdminInscripciones implements OnInit {
   }
 
   /**
-   * Regresa a la página anterior utilizando el historial del navegador.
+   * Navega a la pantalla anterior utilizando el servicio de Location.
    */
-  volver() { this.location.back(); }
+  volver() {
+    this.location.back();
+  }
 }

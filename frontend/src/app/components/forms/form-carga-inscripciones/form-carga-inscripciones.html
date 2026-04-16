@@ -1,0 +1,80 @@
+<div class="modal-overlay" (click)="cerrar.emit()">
+    <div class="modal-body modal-body-wide" (click)="$event.stopPropagation()">
+        <button class="btn-close" (click)="cerrar.emit()"><i class="bi bi-x"></i></button>
+
+        <div class="modal-header-simple">
+            <h2 class="titulo-formulario">Inscripción Masiva: {{ nombreTaller }}</h2>
+            <p class="subtitulo">Sube un CSV con los correos de los alumnos. El sistema los vinculará automáticamente al
+                taller.</p>
+        </div>
+
+        <div class="barra-carga">
+            <div class="input-file-wrapper">
+                <i class="bi bi-file-earmark-arrow-up"></i>
+                <input type="file" (change)="onFileSelected($event)" accept=".csv">
+                <span class="file-custom">{{ archivoNombre || 'Seleccionar CSV (Email, Nombre, Monto, Metodo)...'
+                    }}</span>
+            </div>
+            <button class="btn-procesar" [disabled]="!archivoNombre" (click)="procesarArchivo()">
+                <i class="bi bi-gear-wide-connected"></i> Analizar Inscripciones
+            </button>
+        </div>
+
+        <div class="contenedor-editor" *ngIf="inscripcionesPrevia.length > 0">
+            <div class="scroll-tabla">
+                <table class="tabla-editable">
+                    <thead>
+                        <tr>
+                            <th class="col-check"></th>
+                            <th>Email Alumno</th>
+                            <th>Nombre</th>
+                            <th>Monto (€)</th>
+                            <th>Método Pago</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let i of inscripcionesPrevia" [class.row-invalid]="i.errores.length > 0">
+                            <td class="col-check">
+                                <input type="checkbox" [(ngModel)]="i.seleccionado" [disabled]="i.errores.length > 0">
+                            </td>
+                            <td>
+                                <input type="email" [(ngModel)]="i.email" (input)="validarFila(i)"
+                                    [class.input-error]="i.emailError">
+                            </td>
+                            <td><input type="text" [(ngModel)]="i.nombre"></td>
+                            <td>
+                                <input type="number" [(ngModel)]="i.monto" (input)="validarFila(i)"
+                                    [class.input-error]="i.montoError">
+                            </td>
+                            <td>
+                                <select [(ngModel)]="i.metodoPago" (change)="validarFila(i)">
+                                    <option value="TRANSFERENCIA">Transferencia</option>
+                                    <option value="TARJETA">Tarjeta</option>
+                                    <option value="EFECTIVO">Efectivo</option>
+                                </select>
+                            </td>
+                            <td class="col-errores">
+                                <div class="error-tag" *ngFor="let err of i.errores">
+                                    <i class="bi bi-exclamation-circle"></i> {{err}}
+                                </div>
+                                <span class="ok-tag" *ngIf="i.errores.length === 0">
+                                    <i class="bi bi-check-circle"></i> Listo
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="acciones-form">
+            <button type="button" class="btn-cancelar" (click)="cerrar.emit()">Cancelar</button>
+            <button type="button" class="btn-guardar" [disabled]="!haySeleccionados() || procesando"
+                (click)="confirmarCarga()">
+                <span *ngIf="!procesando">Inscribir {{ totalSeleccionados() }} alumnos</span>
+                <span *ngIf="procesando" class="spinner-border spinner-border-sm"></span>
+            </button>
+        </div>
+    </div>
+</div>

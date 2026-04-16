@@ -4,8 +4,9 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { Navbar } from "../../components/layout/navbar/navbar";
 
 /**
- * Componente contenedor para la administración del sistema.
- * Gestiona la disposición de la interfaz, incluyendo la barra lateral y el menú móvil.
+ * Componente contenedor (Layout) para el panel de administración.
+ * Gestiona la estructura de la página, la navegación lateral (Sidebar) 
+ * y la adaptabilidad para dispositivos móviles.
  */
 @Component({
   selector: 'app-panel-admin',
@@ -15,23 +16,28 @@ import { Navbar } from "../../components/layout/navbar/navbar";
   styleUrl: './panel-admin.scss',
 })
 export class PanelAdmin {
-  sidebarColapsado = false; // Controla el ancho de la barra lateral en escritorio
-  menuMovilAbierto = false; // Controla la visibilidad del menú en dispositivos móviles
+
+  // --- Propiedades de UI y UX ---
+  sidebarColapsado = false; // Estado de la barra lateral en resoluciones de escritorio
+  menuMovilAbierto = false; // Estado del menú desplegable en resoluciones móviles
 
   /**
-   * Alterna el estado de expansión de la barra lateral.
+   * Alterna el estado de la barra lateral entre expandida y contraída.
+   * Utilizado para maximizar el espacio de trabajo en el contenido principal.
    */
   toggleSidebar(): void {
     this.sidebarColapsado = !this.sidebarColapsado;
   }
 
   /**
-   * Alterna el menú móvil y gestiona el bloqueo del scroll en el cuerpo de la página.
+   * Gestiona la apertura y cierre del menú en móviles.
+   * Implementa una lógica de bloqueo de scroll en el body para evitar el 
+   * desplazamiento de fondo mientras el menú está superpuesto.
    */
   toggleMenuMovil(): void {
     this.menuMovilAbierto = !this.menuMovilAbierto;
 
-    // Bloqueo de scroll preventivo para mejorar la UX en menús superpuestos
+    // --- Lógica de manipulación de Scroll (UX) ---
     if (this.menuMovilAbierto) {
       document.body.style.overflow = 'hidden';
     } else {

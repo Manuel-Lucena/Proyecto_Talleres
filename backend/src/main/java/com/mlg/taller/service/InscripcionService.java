@@ -76,6 +76,38 @@ public class InscripcionService {
                 return response;
         }
 
+        /**
+         * Realiza la inscripción masiva de varios alumnos.
+         * Busca al usuario por su email (que es lo que viene del CSV en el front).
+         * * @param dtos Lista de peticiones de inscripción.
+         * 
+         * @return Lista de inscripciones procesadas.
+         */
+        @Transactional
+        public List<InscripcionResponseDTO> inscribirMasivo(List<InscripcionRequestDTO> dtos) {
+                return dtos.stream().map(dto -> {
+                        Usuario usuario = usuarioRepository.findByEmail(dto.getEmailUsuario())
+                                        .orElseThrow(() -> new ResourceNotFoundException(
+                                                        "Usuario no encontrado: " + dto.getEmailUsuario()));
+
+                        Taller taller = tallerRepository.findById(dto.getIdTaller())
+                                        .orElseThrow(() -> new ResourceNotFoundException(
+                                                        "Taller no encontrado: " + dto.getIdTaller()));
+
+                        Inscripcion inscripcion = inscripcionMapper.toEntity(dto, usuario, taller);
+                        Inscripcion guardada = inscripcionRepository.save(inscripcion);
+
+                        InscripcionResponseDTO response = inscripcionMapper.toResponse(guardada);
+
+                        emailService.enviarCorreo(
+                                        usuario.getEmail(),
+                                        "Confirmación de plaza: " + taller.getNombre(),
+                                        "mail/confirmacion-inscripcion",
+                                        Map.of("usuario", usuario, "taller", taller));
+                        return response;
+                }).collect(Collectors.toList());
+        }
+
         // --- MÉTODOS GET ---
 
         /**

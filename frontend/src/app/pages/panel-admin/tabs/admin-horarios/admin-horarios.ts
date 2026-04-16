@@ -9,29 +9,35 @@ import { Confirmacion } from "../../../../components/dialogs/confirmacion/confir
 import { Notificacion } from "../../../../components/dialogs/mensaje/notificacion";
 
 /**
- * Componente administrativo para la gestión de horarios de un taller específico.
- * Permite visualizar la agenda semanal, añadir nuevas sesiones y eliminar franjas horarias.
+ * Componente administrativo para la gestión de la planificación semanal de un taller.
+ * Permite organizar las franjas horarias por días de la semana, facilitando la 
+ * visualización tipo "agenda" y el control de sesiones.
  */
 @Component({
   selector: 'app-admin-horarios',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormHorario, Confirmacion, Notificacion], 
+  imports: [CommonModule, RouterLink, FormHorario, Confirmacion, Notificacion],
   templateUrl: './admin-horarios.html',
   styleUrl: './admin-horarios.scss',
 })
 export class AdminHorarios implements OnInit {
-  tallerId!: number; // Identificador del taller obtenido de la URL
-  listaHorarios: HorarioResponse[] = []; // Colección de sesiones horarias del taller
-  diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']; // Estructura de la semana
 
-  mostrarModal = false; // Control de visibilidad del formulario de horarios
-  diaSeleccionado = ''; // Almacena el día en el que se desea añadir una sesión
+  // --- Datos de Contexto ---
+  tallerId!: number;                      // ID del taller padre extraído de la ruta
+  listaHorarios: HorarioResponse[] = [];   // Buffer de todas las sesiones del taller
+
+  // --- Configuración de la Vista ---
+  diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+  
+  // --- Estado de UI (Modales) ---
+  mostrarModal = false;        // Control de visibilidad del modal de creación
+  diaSeleccionado = '';        // Almacena el contexto del día al que se añade una sesión
 
   /**
-   * @param route Servicio para extraer parámetros de navegación.
-   * @param horarioService Servicio para operaciones CRUD de horarios.
-   * @param notificacionService Gestión de feedback visual y diálogos de confirmación.
-   * @param cdr Detección de cambios manual para flujos asíncronos.
+   * @param route Extrae parámetros de la URL activa.
+   * @param horarioService Servicio especializado en persistencia de franjas horarias.
+   * @param notificacionService Sistema de alertas y confirmaciones de seguridad.
+   * @param cdr Necesario para sincronizar la UI tras actualizaciones dinámicas del array.
    */
   constructor(
     private route: ActivatedRoute,
@@ -41,7 +47,7 @@ export class AdminHorarios implements OnInit {
   ) { }
 
   /**
-   * Inicializa el componente recuperando el ID del taller y su planificación horaria.
+   * Ciclo de vida: Captura el parámetro 'id' de la URL y dispara la carga de horarios.
    */
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -51,7 +57,7 @@ export class AdminHorarios implements OnInit {
   }
 
   /**
-   * Obtiene la lista actualizada de sesiones horarias para el taller actual.
+   * Recupera desde el servidor todas las sesiones programadas para este taller.
    */
   cargarHorarios(): void {
     this.horarioService.listarPorTaller(this.tallerId).subscribe({
@@ -63,8 +69,8 @@ export class AdminHorarios implements OnInit {
   }
 
   /**
-   * Procesa el guardado de una nueva sesión horaria.
-   * @param datosDelForm Información proveniente del formulario (día, inicio, fin).
+   * Transforma los datos del formulario en un objeto HorarioRequest y lo persiste.
+   * @param datosDelForm Valores emitidos por el componente FormHorario.
    */
   ejecutarGuardado(datosDelForm: any): void {
     const nuevoHorario: HorarioRequest = {
@@ -78,28 +84,28 @@ export class AdminHorarios implements OnInit {
       next: () => {
         this.notificacionService.mostrar({ 
           titulo: 'Éxito', 
-          mensaje: 'Horario programado correctamente', 
+          mensaje: 'Nueva sesión horaria programada', 
           tipo: 'exito' 
         });
         this.mostrarModal = false;
-        this.cargarHorarios();
+        this.cargarHorarios(); 
       },
       error: () => this.notificacionService.mostrar({ 
         titulo: 'Error', 
-        mensaje: 'No se pudo guardar el horario', 
+        mensaje: 'No se pudo guardar la sesión (posible solapamiento)', 
         tipo: 'error' 
       })
     });
   }
 
   /**
-   * Solicita confirmación y elimina una sesión horaria permanente.
-   * @param id Identificador único de la sesión.
+   * Solicita confirmación y ejecuta la eliminación física de una franja horaria.
+   * @param id ID de la sesión (idHorario).
    */
   eliminarSesion(id: number): void {
     this.notificacionService.confirmar({
       titulo: '¿Eliminar sesión?',
-      mensaje: 'Esta acción quitará este horario del taller permanentemente.',
+      mensaje: 'Esta acción es irreversible y afectará a la visualización de los alumnos.',
       textoConfirmar: 'Eliminar',
       textoCancelar: 'Cancelar'
     }).then((confirmado) => {
@@ -108,7 +114,7 @@ export class AdminHorarios implements OnInit {
           next: () => {
             this.notificacionService.mostrar({ 
               titulo: 'Eliminado', 
-              mensaje: 'La sesión ha sido eliminada', 
+              mensaje: 'La franja horaria ha sido eliminada', 
               tipo: 'exito' 
             });
             this.cargarHorarios();
@@ -123,17 +129,21 @@ export class AdminHorarios implements OnInit {
     });
   }
 
+  // ===========================================================================
+  // --- MÉTODOS DE AYUDA PARA LA VISTA (HELPERS) ---
+  // ===========================================================================
+
   /**
-   * Filtra las sesiones correspondientes a un día específico de la semana.
-   * @param dia Nombre del día de la semana.
+   * Filtra las sesiones que pertenecen a un día concreto para pintar la columna de la agenda.
+   * @param dia Nombre del día ('Lunes', 'Martes', etc.)
    */
   getSesionesPorDia(dia: string): HorarioResponse[] {
     return this.listaHorarios.filter(h => h.diaSemana === dia);
   }
 
   /**
-   * Prepara y muestra el modal para añadir una sesión en un día concreto.
-   * @param dia Día de la semana seleccionado.
+   * Abre el modal de creación pre-asignando el día de la semana.
+   * @param dia Día en el que se hizo clic.
    */
   abrirModalSesion(dia: string): void {
     this.diaSeleccionado = dia;

@@ -4,6 +4,10 @@ import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { UsuarioService } from '../../services/Usuario.Service';
 
+/**
+ * Componente para gestionar el primer paso de recuperación de contraseña.
+ * Permite al usuario introducir su email para recibir un token de acceso.
+ */
 @Component({
   selector: 'app-solicitar-recuperacion',
   standalone: true,
@@ -12,9 +16,12 @@ import { UsuarioService } from '../../services/Usuario.Service';
   styleUrl: './solicitar-recuperacion.scss'
 })
 export class SolicitarRecuperacion {
-  public loading = false;
-  public enviado = false;
 
+  // --- Propiedades de Estado ---
+  public loading = false;   // Controla el estado visual de carga (spinners, bloqueo de botón)
+  public enviado = false;   // Indica si la petición se ha procesado (muestra mensaje de éxito)
+
+  // --- Formulario Reactivo ---
   public recoveryForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email])
   });
@@ -23,6 +30,10 @@ export class SolicitarRecuperacion {
     private usuarioService: UsuarioService
   ) {}
 
+  /**
+   * Procesa el envío del formulario.
+   * Valida el email y solicita al backend el envío del correo de recuperación.
+   */
   public onSubmit(): void {
     if (this.recoveryForm.valid) {
       this.loading = true;
@@ -31,19 +42,27 @@ export class SolicitarRecuperacion {
       this.usuarioService.solicitarRecuperacion(email).subscribe({
         next: () => this.finalizarProceso(),
         error: (err) => {
+          // LÓGICA DE SEGURIDAD: 
+          // Se muestra éxito incluso si el correo no existe para evitar enumeración de usuarios.
           console.warn('Error controlado por seguridad', err);
           this.finalizarProceso();
         }
       });
     } else {
+      // Si el formulario es inválido, marcamos los campos para mostrar los errores visuales
       this.recoveryForm.markAllAsTouched();
     }
   }
 
+  /**
+   * Finaliza la interacción de la vista una vez recibida la respuesta del servidor.
+   * Bloquea el formulario para evitar re-envíos innecesarios.
+   */
   private finalizarProceso(): void {
     this.loading = false;
     this.enviado = true;
-    // Opcional: Bloquear el input tras éxito
+    
+    // Deshabilitamos el input de email para confirmar visualmente el fin del proceso
     this.recoveryForm.get('email')?.disable();
   }
 }

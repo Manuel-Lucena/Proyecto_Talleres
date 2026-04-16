@@ -7,9 +7,11 @@ import { TokenService } from '../../../../services/Token.Service';
 import { MensajeResponse, MensajeRequest } from '../../../../interfaces/Mensaje.Interface';
 
 /**
- * Componente del Aula Virtual que gestiona el foro de discusión del taller.
- * Permite la visualización de mensajes en tiempo real y la publicación de nuevas
- * intervenciones por parte de alumnos y profesores.
+ * COMPONENTE DE INTERACCIÓN: Foro de Discusión.
+ * * Este componente gestiona la comunicación asíncrona dentro del taller:
+ * 1. Persistencia Mensajería: Implementa el envío y recuperación de intervenciones.
+ * 2. Inserción Optimista: Actualiza el estado local de la lista para feedback inmediato.
+ * 3. Gestión de Identidad: Vincula automáticamente cada mensaje al ID del usuario en sesión.
  */
 @Component({
   selector: 'app-aula-foro',
@@ -19,16 +21,20 @@ import { MensajeResponse, MensajeRequest } from '../../../../interfaces/Mensaje.
   styleUrl: './aula-foro.scss',
 })
 export class AulaForo implements OnInit {
-  idTaller!: number; // Identificador del taller recuperado de la ruta padre
-  mensajes: MensajeResponse[] = []; // Historial de mensajes del foro
-  nuevoMensaje: string = ''; // Modelo vinculado al área de texto para nuevos envíos
-  cargando: boolean = false; // Estado de control para la carga inicial de datos
+
+  // --- Propiedades de Datos ---
+  idTaller!: number;                          // Identificador de contexto del taller padre
+  mensajes: MensajeResponse[] = [];           // Historial cronológico de la conversación
+  nuevoMensaje: string = '';                  // Buffer vinculado al Two-Way Binding del input
+
+  // --- Propiedades de Estado y UI ---
+  cargando: boolean = false;                  // Flag para el control de la hidratación inicial
 
   /**
-   * @param route Acceso a parámetros de la ruta para obtener el contexto del taller.
-   * @param mensajeService Servicio para la persistencia y consulta de mensajes.
-   * @param tokenService Extracción de identidad del usuario desde la sesión.
-   * @param cdr Referencia para la detección manual de cambios tras actualizaciones asíncronas.
+   * @param route Captura de parámetros desde el contexto superior de la ruta.
+   * @param mensajeService Abstracción de la API para operaciones de mensajería.
+   * @param tokenService Proveedor de identidad para el tracking de autoría.
+   * @param cdr Trigger manual para asegurar la consistencia del DOM tras envíos rápidos.
    */
   constructor(
     private route: ActivatedRoute,
@@ -38,7 +44,8 @@ export class AulaForo implements OnInit {
   ) {}
 
   /**
-   * Inicializa el componente capturando el contexto del taller e iniciando la carga del foro.
+   * Ciclo de vida: Inicializa el componente resolviendo el ID del taller mediante 
+   * el parent snapshot para disparar la carga del historial.
    */
   ngOnInit(): void {
     const idParam = this.route.parent?.snapshot.paramMap.get('id');
@@ -48,8 +55,12 @@ export class AulaForo implements OnInit {
     }
   }
 
+  // ===========================================================================
+  // --- GESTIÓN DE LA PERSISTENCIA ---
+  // ===========================================================================
+
   /**
-   * Recupera la lista completa de mensajes asociados al taller actual.
+   * Recupera el histórico de intervenciones asociadas al taller.
    */
   cargarMensajes(): void {
     this.cargando = true;
@@ -59,7 +70,8 @@ export class AulaForo implements OnInit {
         this.cargando = false;
         this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
+        console.error('CRITICAL: Error al recuperar el historial del foro:', err);
         this.cargando = false;
         this.cdr.detectChanges();
       }
@@ -67,8 +79,9 @@ export class AulaForo implements OnInit {
   }
 
   /**
-   * Procesa y envía un nuevo mensaje al foro.
-   * Al recibir confirmación, inserta el mensaje al inicio de la lista para feedback inmediato.
+   * Procesa el envío de una nueva intervención.
+   * * TÉCNICA: Se utiliza un modelo de 'unshift' tras la confirmación del servidor 
+   * para inyectar el nuevo objeto en la cabecera del array sin re-petición del listado.
    */
   enviarMensaje(): void {
     if (!this.nuevoMensaje.trim()) return;
@@ -82,11 +95,12 @@ export class AulaForo implements OnInit {
     this.mensajeService.enviar(request).subscribe({
       next: (resp) => {
         if (resp.data) {
-          this.mensajes.unshift(resp.data); 
+          this.mensajes.unshift(resp.data);
           this.nuevoMensaje = '';
           this.cdr.detectChanges();
         }
-      }
+      },
+      error: (err) => console.error('Error al persistir el mensaje:', err)
     });
   }
 }
