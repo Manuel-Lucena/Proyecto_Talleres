@@ -21,7 +21,7 @@
         transform: none; // Evitamos elevación extra para mantener usabilidad
     }
 
-    // Título del formulario con línea decorativa lateral
+    // Título del formulario con línea decorativa lateral dinámica
     .titulo-formulario {
         font-family: $fuente-enfasis;
         font-size: $tamaño-titular-md;
@@ -41,7 +41,7 @@
         }
     }
 
-    // Layout de filas: Se vuelve columna en dispositivos móviles
+    // Layout de filas: Adaptativo para móviles
     .fila-formulario {
         display: flex;
         gap: 1.5rem;
@@ -67,16 +67,13 @@
             text-transform: uppercase; // Estilo minimalista y profesional
         }
 
-        input,
-        select,
-        textarea {
+        input, select, textarea {
             @include estilo-input-base; // Mixin definido en _mixins.scss
         }
     }
 
     .btn-guardar {
         @include boton-primario;
-
         &:hover {
             transform: none;
         }
@@ -130,7 +127,7 @@
 
         i {
             color: $color-marca-principal;
-            transform: translateY(-3px); // Pequeña animación de "salto"
+            transform: translateY(-3px); // Animación sutil de "salto"
         }
     }
 
@@ -140,6 +137,9 @@
         border-color: #27ae60;
         background-color: rgba(39, 174, 96, 0.02);
         color: #27ae60;
-        i { color: #27ae60; }
+
+        i {
+            color: #27ae60;
+        }
     }
 }

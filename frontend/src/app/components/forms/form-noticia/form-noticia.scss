@@ -1,13 +1,18 @@
+/* ==========================================================================
+   SISTEMA DE MODALES: PANEL DE REDACCIÓN DE NOTICIAS.
+   ========================================================================== */
+
 @use '../../../../styles/variables' as v;
 @use '../../../../styles/mixins' as m;
 @use '../../../../styles/formularios' as f;
 
+// 1. CAPA DE FONDO (OVERLAY)
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(v.$color-secundario-frio-2, 0.7); 
+    background: rgba(v.$color-secundario-frio-2, 0.7);
     backdrop-filter: blur(4px);
-    z-index: 99999; 
+    z-index: 99999;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -15,11 +20,12 @@
     @include m.animacion-entrada;
 }
 
+// 2. CONTENEDOR DEL MODAL (ESTILO FORMULARIO)
 .modal-body {
     @include f.estilo-contenedor-formulario;
     width: 100%;
     max-width: 1100px;
-    max-height: 90vh; 
+    max-height: 90vh;
     padding: 0; 
     display: flex;
     flex-direction: column;
@@ -29,25 +35,34 @@
     border: none;
     position: relative;
 
-    &:hover { transform: none; box-shadow: v.$sombra-nivel-3; } 
+    // Anulamos efectos de hover de la card base si los tuviera
+    &:hover {
+        transform: none;
+        box-shadow: v.$sombra-nivel-3;
+    }
 }
 
+// Botón de cierre superior 
 .btn-close {
     @include m.boton-cerrar-circular;
 }
 
+// 3. GRID DE REDACCIÓN
 .noticia-grid-container {
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
+    grid-template-columns: 1.2fr 0.8fr; 
     height: 100%;
     overflow: hidden;
 
-    @media (max-width: 900px) { 
+    @media (max-width: 900px) {
         grid-template-columns: 1fr;
         overflow-y: auto;
     }
 }
 
+// --------------------------------------------------------------------------
+// 4. COLUMNA DE EDICIÓN / FORMULARIO (Izquierda)
+// --------------------------------------------------------------------------
 .noticia-form-col {
     padding: 2.5rem;
     overflow-y: auto;
@@ -84,17 +99,18 @@
         }
     }
 
+    // Área de redacción extendida
     textarea.input-personalizado {
-        height: 250px; 
+        height: 250px;
         line-height: 1.6;
         resize: none;
     }
 }
 
+// Feedback de errores
 .error-container {
     min-height: 20px;
     margin-top: 2px;
-
     .error-message {
         color: v.$color-secundario-calido-1;
         font-size: 0.75rem;
@@ -103,6 +119,7 @@
     }
 }
 
+// Zona de carga de imagen de cabecera
 .zona-subida-noticia {
     @include m.input-group-personalizado;
     background: v.$color-fondo-pagina;
@@ -113,9 +130,13 @@
     cursor: pointer;
     border: 2px dashed v.$color-superficie-suave;
     margin-top: 0.5rem;
-    
+
     i { color: v.$color-marca-principal; font-size: 1.2rem; }
-    span { font-size: 0.9rem; font-weight: 600; color: v.$color-secundario-frio-2; }
+    span { 
+        font-size: 0.9rem; 
+        font-weight: 600; 
+        color: v.$color-secundario-frio-2; 
+    }
 
     &:hover {
         border-color: v.$color-marca-principal;
@@ -124,6 +145,9 @@
     }
 }
 
+// --------------------------------------------------------------------------
+// 5. COLUMNA DE VISTA PREVIA (Derecha)
+// --------------------------------------------------------------------------
 .noticia-preview-col {
     background: v.$color-fondo-pagina;
     padding: 2.5rem;
@@ -142,12 +166,13 @@
     }
 }
 
+// Simulación de la noticia en el feed
 .vista-previa-tarjeta {
     background: white;
     border-radius: v.$radio-curvatura;
     overflow: hidden;
     box-shadow: v.$sombra-nivel-1;
-    pointer-events: none; 
+    pointer-events: none;
     user-select: none;
 
     .img-contenedor {
@@ -156,26 +181,25 @@
         img { width: 100%; height: 100%; object-fit: cover; }
     }
 
-    .p-3 { 
-        padding: 1.5rem; 
-        
-        h5 { 
-            font-family: v.$fuente-enfasis; 
-            font-size: 1.1rem; 
+    .p-3 {
+        padding: 1.5rem;
+        h5 {
+            font-family: v.$fuente-enfasis;
+            font-size: 1.1rem;
             color: v.$color-secundario-frio-2;
             margin-bottom: 12px;
             font-weight: 800;
         }
-
-        p { 
-            font-size: 0.85rem; 
-            color: v.$color-superficie-suave; 
+        p {
+            font-size: 0.85rem;
+            color: v.$color-superficie-suave;
             line-height: 1.5;
             @include m.limitar-lineas(4);
         }
     }
 }
 
+// 6. PIE DE FORMULARIO / ACCIONES
 .acciones-finales {
     margin-top: auto;
     padding-top: 2rem;

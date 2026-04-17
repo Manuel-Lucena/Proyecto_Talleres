@@ -1,69 +1,96 @@
+/* ==========================================================================
+   PÁGINA: ACCESO DENEGADO (403 / RESTRICTED)
+   Interfaz de seguridad para usuarios sin permisos suficientes.
+   ========================================================================== */
+
+@use '../../../styles/variables' as v;
+@use '../../../styles/mixins' as m;
+
 .denied-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 80vh;
-  background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background-color: #f8f9fa;
 
-  .content {
-    text-align: center;
-    background: white;
-    padding: 3rem;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-    max-width: 500px;
-    width: 90%;
+    .content {
+        text-align: center;
+        background: white;
+        padding: 3rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        max-width: 500px;
+        width: 90%;
+        @include m.animacion-entrada;
 
-    .icon-circle {
-      font-size: 4rem;
-      margin-bottom: 1.5rem;
-      background: #fff5f5;
-      width: 100px;
-      height: 100px;
-      line-height: 100px;
-      border-radius: 50%;
-      margin: 0 auto 1.5rem;
+        // 1. ICONO DE ADVERTENCIA
+        .icon-circle {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            background: #fff5f5;
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff7675;
+        }
+
+        // 2. TEXTOS INFORMATIVOS
+        h1 {
+            font-family: v.$fuente-enfasis;
+            color: #2d3436;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .divider {
+            height: 4px;
+            width: 50px;
+            background: #ff7675; 
+            margin: 1rem auto;
+            border-radius: 2px;
+        }
+
+        p {
+            color: #636e72;
+            font-size: 1.1rem;
+            line-height: 1.5;
+
+            &.instruction {
+                font-size: 0.9rem;
+                margin-top: 1rem;
+                color: #b2bec3; 
+            }
+        }
+
+        // 3. BOTÓN DE RETORNO (CALL TO ACTION)
+        .btn-home {
+            margin-top: 2rem;
+            padding: 12px 30px;
+            background-color: #0984e3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: v.$fuente-enfasis;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+
+            &:hover {
+                background-color: #74b9ff;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(9, 132, 227, 0.3);
+            }
+
+            &:active {
+                transform: translateY(0);
+            }
+        }
     }
-
-    h1 {
-      color: #2d3436;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-
-    .divider {
-      height: 4px;
-      width: 50px;
-      background: #ff7675;
-      margin: 1rem auto;
-      border-radius: 2px;
-    }
-
-    p {
-      color: #636e72;
-      font-size: 1.1rem;
-      &.instruction {
-        font-size: 0.9rem;
-        margin-top: 1rem;
-        color: #b2bec3;
-      }
-    }
-
-    .btn-home {
-      margin-top: 2rem;
-      padding: 12px 30px;
-      background-color: #0984e3;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-
-      &:hover {
-        background-color: #74b9ff;
-        transform: translateY(-2px);
-      }
-    }
-  }
 }

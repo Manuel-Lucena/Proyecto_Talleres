@@ -1,83 +1,84 @@
+/* ==========================================================================
+   SISTEMA DE MODALES: NOTIFICACIONES DE FEEDBACK (CON ANIMACIÓN)
+   Componente dinámico para mensajes de éxito, error o información.
+   ========================================================================== */
+
 @import '../../../../styles/variables';
+@import '../../../../styles/mixins';
 
 .modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba($color-neutro-min, 0.5);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99999;
+    position: fixed;
+    inset: 0;
+    background: rgba($color-neutro-min, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
 
-  .modal-content {
-    background: $color-neutro-max;
-    padding: 2.5rem;
-    border-radius: $radio-curvatura;
-    width: 100%;
-    max-width: 340px;
-    text-align: center;
-    box-shadow: $sombra-nivel-3;
+    .modal-content {
+        @include animacion-entrada; // <--- Integración de tu mixin de biblioteca
+        background: $color-neutro-max;
+        padding: 2.5rem;
+        border-radius: $radio-curvatura;
+        width: 100%;
+        max-width: 340px;
+        text-align: center;
+        box-shadow: $sombra-nivel-3;
 
-    .text-wrap {
-      margin-bottom: 2rem;
+        // CONTENEDOR DE TEXTO E ICONOGRAFÍA
+        .text-wrap {
+            margin-bottom: 2rem;
 
-      h3 {
-        font-family: $fuente-enfasis;
-        font-size: $tamaño-titular-md;
-        font-weight: 800;
-        margin-bottom: 0.8rem;
+            h3 {
+                font-family: $fuente-enfasis;
+                font-size: $tamaño-titular-md;
+                font-weight: 800;
+                margin-bottom: 0.8rem;
 
-        &.exito {
-          color: $color-marca-principal;
+                // Variantes de color según el estado semántico
+                &.exito { color: $color-marca-principal; }
+                &.error { color: $color-secundario-calido-1; }
+                &.info  { color: $color-secundario-frio-1; }
+            }
+
+            p {
+                font-family: $fuente-lectura;
+                color: #666;
+                font-size: 1rem;
+                line-height: 1.5;
+                margin: 0;
+            }
         }
 
-        &.error {
-          color: $color-secundario-calido-1;
-        }
+        // BOTÓN DE ACCIÓN ÚNICA (Cerrar / Entendido)
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: $radio-curvatura;
+            font-family: $fuente-enfasis;
+            font-weight: 700;
+            color: $color-neutro-max;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
 
-        &.info {
-          color: $color-secundario-frio-1;
-        }
-      }
+            // Colores de fondo sincronizados con el título
+            &.exito { background: $color-marca-principal; }
+            &.error { background: $color-secundario-calido-1; }
+            &.info  { background: $color-secundario-frio-1; }
 
-      p {
-        font-family: $fuente-lectura;
-        color: #666;
-        font-size: 1rem;
-        line-height: 1.5;
-        margin: 0;
-      }
+            &:hover {
+                filter: brightness(1.1);
+                transform: translateY(-2px);
+                box-shadow: $sombra-nivel-2;
+            }
+
+            // Eliminación del foco por defecto para limpieza visual
+            &:focus {
+                outline: none;
+                box-shadow: none;
+            }
+        }
     }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: $radio-curvatura;
-      font-family: $fuente-enfasis;
-      font-weight: 700;
-      color: $color-neutro-max;
-      cursor: pointer;
-      transition: all 0.3s ease-in-out;
-
-      &.exito {
-        background: $color-marca-principal;
-      }
-
-      &.error {
-        background: $color-secundario-calido-1;
-      }
-
-      &.info {
-        background: $color-secundario-frio-1;
-      }
-
-      &:hover {
-        filter: brightness(1.1);
-        transform: translateY(-2px);
-        box-shadow: $sombra-nivel-2;
-      }
-    }
-  }
 }

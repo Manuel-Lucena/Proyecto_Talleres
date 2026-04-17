@@ -1,7 +1,13 @@
+/* ==========================================================================
+   SISTEMA DE MODALES: GESTIÓN DE SESIONES Y HORARIOS
+   Diseño compacto para entrada de datos rápidos (Fecha/Hora).
+   ========================================================================== */
+
 @use '../../../../styles/variables' as v;
 @use '../../../../styles/mixins' as m;
 @use '../../../../styles/formularios' as f;
 
+// 1. ESTRUCTURA Y OVERLAY
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -15,6 +21,7 @@
     @include m.animacion-entrada;
 }
 
+// 2. CUERPO DEL MODAL (VERSIÓN COMPACTA)
 .modal-body {
     background: v.$color-neutro-max;
     width: 100%;
@@ -23,7 +30,7 @@
     box-shadow: v.$sombra-nivel-3;
     padding: 3.5rem 3rem;
     position: relative;
-    
+
     .btn-close {
         position: absolute;
         top: 1.5rem;
@@ -32,6 +39,7 @@
     }
 }
 
+// 3. CABECERA CENTRADA
 .modal-header-simple {
     margin-bottom: 2.5rem;
     text-align: center;
@@ -50,6 +58,7 @@
     }
 }
 
+// 4. FORMULARIO Y REJILLA (FECHA / HORA)
 .form-sesion {
     display: flex;
     flex-direction: column;
@@ -58,11 +67,11 @@
 
 .fila-formulario {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr; 
     gap: 1.5rem;
 
     @media (max-width: 480px) {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr; 
         gap: 0.5rem;
     }
 }
@@ -92,10 +101,11 @@
     }
 }
 
+// Contenedor de errores con altura mínima para evitar saltos
 .error-container {
     min-height: 20px;
     margin-top: 4px;
-    
+
     .error-message {
         color: v.$color-secundario-calido-1;
         font-size: 0.72rem;
@@ -103,15 +113,16 @@
     }
 }
 
+// 5. ACCIONES (BOTONERA ASIMÉTRICA)
 .acciones-form {
     margin-top: 2.5rem;
     display: grid;
-    grid-template-columns: 1fr 1.5fr; // El de confirmar es ligeramente más ancho
+    grid-template-columns: 1fr 1.5fr; 
     gap: 1rem;
     width: 100%;
 
     @media (max-width: 480px) {
-        grid-template-columns: 1fr; // Uno sobre otro en móvil
+        grid-template-columns: 1fr;
     }
 
     button {
@@ -139,12 +150,14 @@
     }
 
     .btn-guardar {
-        @include m.boton-primario; // Tu mixin naranja/marca
+        @include m.boton-primario; 
         border: none;
-        margin: 0; // Reset de márgenes del mixin
+        margin: 0; 
         gap: 8px;
-        
-        i { font-size: 1.1rem; }
+
+        i {
+            font-size: 1.1rem;
+        }
 
         &:disabled {
             background-color: #e0e0e0;

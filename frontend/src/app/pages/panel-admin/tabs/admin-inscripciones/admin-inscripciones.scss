@@ -1,6 +1,12 @@
+/* ==========================================================================
+   VISTA: GESTIÓN DE INSCRIPCIONES / VENTAS (ADMIN)
+   Layout con funciones de exportación (PDF), carga masiva y control de estados.
+   ========================================================================== */
+
 @use '../../../../../styles/variables' as v;
 @use '../../../../../styles/mixins' as m;
 
+// 1. ESTRUCTURA BASE (CONSISTENCIA CON DASHBOARD)
 .admin-wrapper {
   padding: 2.5rem;
   background-color: v.$color-fondo-pagina;
@@ -19,7 +25,7 @@
   }
 }
 
-// --- HEADER ---
+// 2. HEADER CON NAVEGACIÓN Y ACCIONES ESPECIALES
 .admin-header {
   flex-shrink: 0;
   display: flex;
@@ -34,6 +40,7 @@
     gap: 1.5rem;
   }
 
+  // Lado izquierdo: Botón volver + Títulos
   .header-left {
     display: flex;
     align-items: flex-start;
@@ -56,7 +63,7 @@
       &:hover {
         border-color: v.$color-marca-principal;
         color: v.$color-marca-principal;
-        transform: translateX(-3px);
+        transform: translateX(-3px); 
       }
     }
   }
@@ -78,6 +85,7 @@
     }
   }
 
+  // Lado derecho: Botonera de herramientas (PDF, Excel, Carga)
   .header-actions {
     display: flex;
     gap: 0.75rem;
@@ -89,9 +97,9 @@
       gap: 0.8rem;
     }
 
-    // Estilos base para botones de acción del header
-    .btn-primario-aula, 
-    .btn-header-pdf, 
+    // Estilos comunes para botones de acción del header
+    .btn-primario-aula,
+    .btn-header-pdf,
     .btn-header-masivo {
       height: 48px;
       border-radius: v.$radio-curvatura;
@@ -124,6 +132,7 @@
       border: none;
     }
 
+    // Botón específico para Generar PDF 
     .btn-header-pdf {
       background: white;
       border: 1px solid #e2e8f0;
@@ -143,9 +152,9 @@
       }
     }
 
-    // --- ESTILO BOTÓN CARGA MASIVA ---
+    // Botón específico para Carga Masiva 
     .btn-header-masivo {
-      background: #15803d; // Verde Excel / Carga
+      background: #15803d;
       color: white;
       border: none;
       padding: 0 1.5rem;
@@ -165,7 +174,7 @@
   }
 }
 
-// --- TOOLBAR ---
+// 3. TOOLBAR (ÁREA DE FILTRADO)
 .admin-toolbar {
   flex-shrink: 0;
   padding: 1rem 1.5rem;
@@ -176,10 +185,6 @@
   border-radius: v.$radio-curvatura;
   box-shadow: v.$sombra-nivel-1;
   align-items: center;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
 
   .search-group {
     display: flex;
@@ -213,7 +218,11 @@
 
       @media (max-width: 600px) {
         width: 50px;
-        span { display: none; }
+
+        span {
+          display: none;
+        }
+
       }
     }
 
@@ -236,13 +245,12 @@
         height: 45px;
         background: transparent;
         outline: none;
-        font-size: 0.95rem;
       }
     }
   }
 }
 
-// --- TABLA Y TARJETA ---
+// 4. TABLA DE DATOS
 .admin-card {
   background: white;
   border-radius: v.$radio-curvatura;
@@ -263,6 +271,7 @@
       width: 6px;
       height: 6px;
     }
+
     &::-webkit-scrollbar-thumb {
       background: #e0e0e0;
       border-radius: 10px;
@@ -290,7 +299,10 @@
       font-size: 0.75rem;
       font-weight: 800;
       text-transform: uppercase;
-      &:last-child { text-align: right; }
+
+      &:last-child {
+        text-align: right;
+      }
     }
   }
 
@@ -299,7 +311,10 @@
     border-bottom: 1px solid #f5f5f5;
     vertical-align: middle;
     color: v.$color-secundario-frio-2;
-    &:last-child { text-align: right; }
+
+    &:last-child {
+      text-align: right;
+    }
   }
 
   .item-info .main-text {
@@ -319,7 +334,7 @@
   }
 }
 
-// --- BADGES Y ACCIONES ---
+// 5. SISTEMA DE BADGES (ESTADOS DE PAGO/INSCRIPCIÓN)
 .badge-aula {
   padding: 6px 14px;
   border-radius: 20px;
@@ -332,16 +347,19 @@
     background: rgba(v.$color-marca-principal, 0.1);
     color: v.$color-marca-principal;
   }
+
   &.info {
     background: rgba(v.$color-secundario-frio-1, 0.1);
     color: v.$color-secundario-frio-1;
   }
+
   &.warning {
     background: rgba(v.$color-secundario-calido-1, 0.1);
     color: v.$color-secundario-calido-1;
   }
 }
 
+// 6. ACCIONES Y ANIMACIONES
 .actions-group {
   display: flex;
   gap: 8px;
@@ -378,13 +396,18 @@
   }
 }
 
-// --- ANIMACIONES ---
+// Utilidad para indicadores de carga (Spinners)
 .spin {
   animation: rotation 1s infinite linear;
   display: inline-block;
 }
 
 @keyframes rotation {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(359deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(359deg);
+  }
 }

@@ -1,177 +1,189 @@
+/* ==========================================================================
+   LAYOUT: PANEL DE ADMINISTRACIÓN
+   Sistema de navegación lateral colapsable con estados activo/móvil.
+   ========================================================================== */
+
 @use '../../../styles/variables' as v;
 
+// 1. CONTENEDOR RAÍZ 
 .contenedor-admin {
-    display: flex;
-    height: calc(100vh - 80px);
-    background-color: #f0f2f5;
-    position: relative;
-    overflow: hidden;
+  display: flex;
+  height: calc(100vh - 80px); 
+  background-color: #f0f2f5;
+  position: relative;
+  overflow: hidden;
 
-    &.colapsado {
-        .barra-lateral-admin {
-            width: 80px;
-            min-width: 80px;
-
-            .etiqueta-seccion,
-            span {
-                display: none;
-            }
-
-            // Centramos el icono del menú cuando está colapsado
-            .sidebar-header {
-                justify-content: center;
-                padding: 25px 0;
-            }
-
-            .enlace-pestana {
-                justify-content: center;
-                padding: 20px 0;
-                gap: 0;
-            }
-        }
-    }
-}
-
-.barra-lateral-admin {
-    width: 280px;
-    min-width: 280px;
-    background-color: v.$color-secundario-frio-2;
-    display: flex;
-    flex-direction: column;
-    z-index: 100;
-    transition: width 0.3s ease;
-
-    position: sticky;
-    top: 0;
-    height: 100%;
-    overflow-y: auto;
-
-    .sidebar-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        // MÁS AIRE: Aumentamos el padding superior e inferior
-        padding: 40px 25px 30px;
-
-        .etiqueta-seccion {
-            font-family: v.$fuente-enfasis;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.4);
-            font-weight: 800;
-            letter-spacing: 1.5px; // Un poco de espacio entre letras queda más "pro"
-        }
-
-        .btn-colapsar-pc {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            opacity: 0.6;
-
-            &:hover {
-                opacity: 1;
-            }
-
-            @media (max-width: 992px) {
-                display: none;
-            }
-        }
-    }
-}
-
-.menu-pestanas {
-    display: flex;
-    flex-direction: column;
-    gap: 5px; // Separación entre botones del menú
-
-    .enlace-pestana {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        padding: 16px 30px;
-        text-decoration: none;
-        color: rgba(255, 255, 255, 0.7);
-        font-family: v.$fuente-lectura;
-        transition: 0.3s ease;
-        border-left: 4px solid transparent;
-
-        i {
-            font-size: 1.2rem;
-        }
-
-        &:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            padding-left: 35px; // Efecto de empuje suave
-        }
-
-        &.activo {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-            border-left-color: v.$color-marca-principal;
-            font-weight: 600;
-
-            i {
-                color: v.$color-marca-principal;
-            }
-        }
-    }
-}
-
-.contenido-principal-admin {
-    flex: 1;
-    padding: 40px; // Más espacio para que el contenido respire
-    overflow-y: auto;
-    height: 100%;
-    background-color: #f8f9fa; // Gris más limpio de la guía
-}
-
-// RESPONSIVE MÓVIL
-@media (max-width: 992px) {
+  // ESTADO COLAPSADO (PC)
+  &.colapsado {
     .barra-lateral-admin {
-        position: fixed;
-        left: -280px;
-        top: 80px;
-        height: calc(100vh - 80px);
-        padding-top: 30px; // Espacio para que el título no choque en móvil
+      width: 80px;
+      min-width: 80px;
 
-        &.movil-show {
-            left: 0;
-        }
-    }
-
-    .sidebar-overlay {
+      .etiqueta-seccion,
+      span {
         display: none;
-        position: fixed;
-        inset: 80px 0 0 0;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(2px); // Un toque de desenfoque moderno
-        z-index: 90;
+      }
 
-        &.show {
-            display: block;
-        }
+      .sidebar-header {
+        justify-content: center;
+        padding: 25px 0;
+      }
+
+      .enlace-pestana {
+        justify-content: center;
+        padding: 20px 0;
+        gap: 0;
+      }
     }
+  }
 }
 
-.btn-movil-toggle {
+// 2. BARRA LATERAL (SIDEBAR)
+.barra-lateral-admin {
+  width: 280px;
+  min-width: 280px;
+  background-color: v.$color-secundario-frio-2;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  transition: width 0.3s ease; 
+  position: sticky;
+  top: 0;
+  height: 100%;
+  overflow-y: auto; 
+
+  .sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px 25px 30px; 
+
+    .etiqueta-seccion {
+      font-family: v.$fuente-enfasis;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.4);
+      font-weight: 800;
+      letter-spacing: 1.5px; 
+    }
+
+    .btn-colapsar-pc {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      opacity: 0.6;
+
+      &:hover {
+        opacity: 1;
+      }
+
+      @media (max-width: 992px) {
+        display: none;
+      }
+
+    }
+  }
+}
+
+// 3. MENÚ DE NAVEGACIÓN
+.menu-pestanas {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  .enlace-pestana {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 16px 30px;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: v.$fuente-lectura;
+    transition: 0.3s ease;
+    border-left: 4px solid transparent; 
+
+    i {
+      font-size: 1.2rem;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+      padding-left: 35px;
+    }
+
+    // ESTADO ACTIVO: Resalte visual de la sección actual
+    &.activo {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-left-color: v.$color-marca-principal;
+      font-weight: 600;
+
+      i {
+        color: v.$color-marca-principal;
+      }
+    }
+  }
+}
+
+// 4. ÁREA DE TRABAJO (CONTENIDO DINÁMICO)
+.contenido-principal-admin {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+  height: 100%;
+  background-color: #f8f9fa;
+}
+
+// 5. RESPONSIVE MÓVIL 
+@media (max-width: 992px) {
+  .barra-lateral-admin {
+    position: fixed;
+    left: -280px; 
+    top: 80px;
+    height: calc(100vh - 80px);
+    padding-top: 30px;
+
+    // Se activa cuando el usuario pulsa el toggle
+    &.movil-show {
+      left: 0;
+    }
+  }
+
+  // Capa de fondo oscura al abrir menú en móvil
+  .sidebar-overlay {
     display: none;
     position: fixed;
-    bottom: 25px;
-    right: 25px;
-    width: 55px;
-    height: 55px;
-    border-radius: 12px;
-    background: v.$color-marca-principal;
-    color: white;
-    border: none;
-    z-index: 200;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    inset: 80px 0 0 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 90;
 
-    @media (max-width: 992px) {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    &.show {
+      display: block;
     }
+  }
+}
+
+// Botón flotante para abrir el menú en móviles
+.btn-movil-toggle {
+  display: none;
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 55px;
+  height: 55px;
+  border-radius: 12px;
+  background: v.$color-marca-principal;
+  color: white;
+  border: none;
+  z-index: 200;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+
+  @media (max-width: 992px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }

@@ -1,10 +1,15 @@
+/* ==========================================================================
+   PÁGINA: MIS TALLERES (DASHBOARD ALUMNO)
+   Listado de inscripciones con acciones de gestión rápida.
+   ========================================================================== */
+
 @use '../../../styles/variables' as v;
 @use '../../../styles/mixins' as m;
 
 .contenedor-mis-talleres {
     padding: 3rem 10%;
     min-height: 85vh;
-    background-color: v.$color-fondo-pagina; 
+    background-color: v.$color-fondo-pagina;
     font-family: v.$fuente-lectura;
 
     @media (max-width: 768px) {
@@ -27,23 +32,25 @@
     }
 }
 
+// 1. GRID DINÁMICO
 .grid-mis-talleres {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     gap: 2rem;
 }
 
+// 2. TARJETA DE INSCRIPCIÓN (COMPUESTA)
 .card-inscripcion {
     background: v.$color-neutro-max;
     border-radius: v.$radio-curvatura;
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    overflow: hidden; 
+    overflow: hidden;
     border: 1px solid #eee;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     transition: border-color 0.3s ease;
-    height: 100%; // Asegura que todas las cards cierren igual
+    height: 100%; 
 
     &:hover {
         border-color: v.$color-marca-principal;
@@ -65,12 +72,12 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        flex-grow: 1; // <--- ESTO EMPUJA LA BARRA HACIA ABAJO
+        flex-grow: 1;
         gap: 15px;
 
         .texto {
             flex: 1;
-            min-width: 0;
+            min-width: 0; 
 
             h3 {
                 font-family: v.$fuente-enfasis;
@@ -100,12 +107,13 @@
         }
     }
 
+    // 3. BARRA DE ACCIONES (FOOTER DE CARD)
     .acciones-rapidas {
         display: flex;
         border-top: 1px solid #f0f0f0;
         padding: 15px 0;
         background-color: #fafafa;
-        margin-top: auto; // <--- PEGA LA BARRA AL FONDO
+        margin-top: auto; 
         width: 100%;
 
         .accion-item {
@@ -146,6 +154,7 @@
     }
 }
 
+// 4. ESTADO VACÍO (EMPTY STATE)
 .sin-talleres {
     @include m.card-elevada;
     text-align: center;
@@ -157,6 +166,7 @@
 
     .icon-container {
         margin-bottom: 1.5rem;
+
         i {
             font-size: 3.5rem;
             color: #eee;

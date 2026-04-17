@@ -1,3 +1,8 @@
+/* ==========================================================================
+   PÁGINA: LANDING / INICIO
+   Sección Hero y feed de noticias con gestión.
+   ========================================================================== */
+
 @import '../../../styles/variables';
 @import '../../../styles/mixins';
 
@@ -5,7 +10,7 @@
     background-color: $color-neutro-max;
     min-height: 100vh;
 
-    // --- HERO ---
+    // --- 1. HERO SECTION (ZONA SLIM) ---
     .hero-zone-slim {
         position: relative;
         padding: clamp(60px, 10vh, 100px) 0;
@@ -19,10 +24,11 @@
             position: absolute;
             inset: 0;
             background: url('/images/banner.jpg') center 20% / cover;
-            opacity: 0.5; // Suavizado para legibilidad
+            opacity: 0.5;
             z-index: 1;
         }
 
+      
         &::after {
             content: '';
             position: absolute;
@@ -31,15 +37,22 @@
             z-index: 2;
         }
 
-        .container { position: relative; z-index: 3; }
+        .container {
+            position: relative;
+            z-index: 3;
+        }
 
         .hero-text {
             .h1-title {
                 @include titulo-seccion($color-neutro-max);
-                font-size: clamp(2rem, 8vw, 3.5rem); // Responsive fluido
+                font-size: clamp(2rem, 8vw, 3.5rem);
                 margin-bottom: 0.5rem;
 
-                span { color: $color-marca-principal; }
+                span {
+                    color: $color-marca-principal;
+                }
+
+                // Resalte en verde marca
             }
 
             .hero-subtitle {
@@ -51,10 +64,11 @@
         }
     }
 
-    // --- CONTENT ---
+    // --- 2. ZONA DE CONTENIDO (NOTICIAS / ACTUALIDAD) ---
     .content-zone {
         padding: clamp(40px, 8vh, 80px) 0;
 
+        // Cabecera de sección con acciones dinámicas
         .header-seccion-noticias {
             display: flex;
             justify-content: space-between;
@@ -82,8 +96,14 @@
             height: 30px;
             background-color: #dfe6e9;
             margin: 0 15px;
+
+            @media (max-width: 576px) {
+                display: none;
+            }
+
         }
 
+        // Botón de administración rápida
         .btn-add-news-mini {
             background: rgba($color-marca-principal, 0.1);
             border: 1px solid rgba($color-marca-principal, 0.2);
@@ -108,15 +128,19 @@
             text-decoration: none;
             font-weight: 700;
             font-size: 0.9rem;
-            &:hover { color: $color-marca-principal; }
+
+            &:hover {
+                color: $color-marca-principal;
+            }
         }
 
-        // --- CARDS (Usando tus mixins) ---
+        // --- 3. CARDS DE NOTICIAS ---
         .news-card {
-            @include card-elevada; // Usa sombra nivel 1 y sube a nivel 2 en hover
+            @include card-elevada;
             display: flex;
             flex-direction: column;
             width: 100%;
+            height: 100%;
 
             .card-img-wrapper {
                 position: relative;
@@ -144,6 +168,11 @@
                 }
             }
 
+            // Efecto de zoom en la imagen al pasar por la card
+            &:hover .news-img {
+                transform: scale(1.05);
+            }
+
             .card-body-v {
                 padding: 1.8rem;
                 display: flex;
@@ -164,7 +193,7 @@
                     font-weight: 800;
                     color: $color-secundario-frio-2;
                     margin-bottom: 1rem;
-                    @include limitar-lineas(2);
+                    @include limitar-lineas(2); 
                 }
 
                 p {
@@ -175,6 +204,7 @@
                     @include limitar-lineas(3);
                 }
 
+                // Acciones de la card
                 .card-footer-actions {
                     margin-top: auto;
                     display: flex;
@@ -190,7 +220,11 @@
                         text-transform: uppercase;
                         padding: 0;
                         font-size: 0.85rem;
-                        &:hover { text-decoration: underline; }
+                        cursor: pointer;
+
+                        &:hover {
+                            text-decoration: underline;
+                        }
                     }
 
                     .btn-edit-icon {
@@ -204,6 +238,8 @@
                         align-items: center;
                         justify-content: center;
                         transition: all 0.2s;
+                        cursor: pointer;
+
                         &:hover {
                             background: $color-secundario-frio-2;
                             color: white;

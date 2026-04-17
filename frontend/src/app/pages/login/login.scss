@@ -1,28 +1,38 @@
+/* ==========================================================================
+   PÁGINA: LOGIN (ACCESO DE USUARIOS)
+   Diseño de tarjeta dividida con validaciones y efectos visuales.
+   ========================================================================== */
+
 @use '../../../styles/variables' as v;
 @use '../../../styles/mixins' as m;
 
+// 1. CONTENEDOR PRINCIPAL (FONDO CON GRADIENTE Y PARALLAX SUTIL)
 .contenedor-login {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: linear-gradient(135deg, rgba(v.$color-marca-principal, 0.2), rgba(v.$color-secundario-frio-2, 0.8)),
-    url('/images/fondo.jpg');
+  background: linear-gradient(135deg,
+      rgba(v.$color-marca-principal, 0.2),
+      rgba(v.$color-secundario-frio-2, 0.8)), url('/images/fondo.jpg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   font-family: v.$fuente-lectura;
 }
 
+// 2. LA TARJETA 
 .tarjeta-login {
   max-width: 900px;
   width: 100%;
   border-radius: v.$radio-curvatura;
   background-color: v.$color-neutro-max;
-  box-shadow: v.$sombra-nivel-3; // Nivel 3 para modales/login
+  box-shadow: v.$sombra-nivel-3;
+  overflow: hidden; 
 }
 
+// 3. SECCIÓN VISUAL (DERECHA)
 .seccion-derecha-imagen {
   background-image: url('/images/card.jpg');
   background-size: cover;
@@ -53,6 +63,7 @@
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
 }
 
+// 4. ELEMENTOS DEL FORMULARIO (IZQUIERDA)
 h1 {
   font-family: v.$fuente-enfasis;
   color: v.$color-secundario-frio-2;
@@ -63,8 +74,9 @@ h1 {
   color: v.$color-marca-principal;
 }
 
+// Estructura de los inputs con el mixin oficial
 .custom-focus {
-  @include m.input-group-personalizado; // Mixin oficial
+  @include m.input-group-personalizado;
 
   .input-group-text,
   .form-control {
@@ -72,7 +84,7 @@ h1 {
     background: transparent;
     padding: 0.8rem;
     color: v.$color-superficie-oscura;
-    box-shadow: none; 
+    box-shadow: none;
   }
 }
 
@@ -81,6 +93,7 @@ h1 {
   width: 100%;
 }
 
+// Botón para mostrar/ocultar contraseña
 .btn-ojito {
   border: none;
   background: transparent;
@@ -94,6 +107,7 @@ h1 {
   }
 }
 
+// 5. ENLACES Y VALIDACIONES
 .enlace-olvido {
   color: v.$color-secundario-frio-2;
   font-weight: 500;
@@ -105,7 +119,11 @@ h1 {
   }
 }
 
+// Estado de error en inputs
 .is-invalid {
   border-color: v.$danger;
-  .bi { color: v.$danger; }
+
+  .bi {
+    color: v.$danger;
+  }
 }

@@ -1,169 +1,172 @@
+/* ==========================================================================
+   VISTA: GESTIÓN DE HORARIOS / CALENDARIO (ADMIN)
+   Sistema de rejilla de 7 días con tarjetas de sesión dinámicas.
+   ========================================================================== */
+
 @import '../../../../../styles/variables';
 @import '../../../../../styles/mixins';
 
-// 1. Estructura General (Misma que tus otros tabs)
+// 1. ESTRUCTURA GENERAL
 .admin-wrapper {
-    padding: 2.5rem;
-    background-color: $color-fondo-pagina;
-    min-height: 100vh;
-    font-family: $fuente-lectura;
-    @include animacion-entrada; // Para que el horario aparezca suavemente
+  padding: 2.5rem;
+  background-color: $color-fondo-pagina;
+  min-height: 100vh;
+  font-family: $fuente-lectura;
+  @include animacion-entrada; 
 
-    @media (max-width: 768px) {
-        padding: 1.5rem;
-    }
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
 }
 
-// 2. Encabezado con botón de volver
+// 2. ENCABEZADO CON NAVEGACIÓN
 .admin-header {
-    display: flex;
-    justify-content: flex-start; // Alineamos a la izquierda para el botón volver
-    align-items: center;
-    margin-bottom: 2rem;
-    gap: 1.5rem;
+  display: flex;
+  justify-content: flex-start; 
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1.5rem;
 
-    .btn-back {
-        width: 45px;
-        height: 45px;
-        border-radius: $radio-curvatura;
-        border: 1px solid #eee;
-        background: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: 0.3s;
-        color: $color-secundario-frio-2;
-
-        &:hover {
-            border-color: $color-marca-principal;
-            color: $color-marca-principal;
-            transform: translateX(-3px);
-            box-shadow: $sombra-nivel-1;
-        }
-    }
-
-    .title-group {
-        .txt-h1 {
-            font-family: $fuente-enfasis;
-            font-weight: 700;
-            font-size: $tamaño-titular-lg;
-            color: $color-secundario-frio-2;
-            margin: 0;
-        }
-
-        .txt-bajada {
-            color: $color-superficie-suave;
-            font-size: 1rem;
-            margin: 0;
-        }
-    }
-}
-
-// 3. Rejilla de Horarios (Sustituye a la tabla)
-.schedule-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr); // 7 días
-    gap: 1rem;
-    align-items: start;
-
-    @media (max-width: 1200px) {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    }
-}
-
-// 4. Columna de Día
-.day-column {
+  .btn-back {
+    width: 45px;
+    height: 45px;
+    border-radius: $radio-curvatura;
+    border: 1px solid #eee;
     background: white;
-    border-radius: $radio-curvatura;
-    box-shadow: $sombra-nivel-1;
-    overflow: hidden;
-    min-height: 450px;
-    display: flex;
-    flex-direction: column;
-
-    .day-header {
-        padding: 1rem;
-        background: #fafafa;
-        border-bottom: 1px solid #eee;
-        text-align: center;
-
-        span {
-            font-family: $fuente-enfasis;
-            font-weight: 700;
-            font-size: 0.8rem;
-            color: $color-secundario-frio-2;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-    }
-
-    .day-content {
-        padding: 0.8rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.8rem;
-    }
-}
-
-// 5. Tarjetas de Sesión (Usando Mixin Card Elevada)
-.session-card {
-    @include card-elevada;
-    padding: 1rem;
-    border-left: 4px solid $color-marca-principal;
-    position: relative;
-
-    // Sobrescribimos el hover del mixin para que sea más sutil en el grid
-    &:hover {
-        transform: translateY(-2px);
-    }
-
-    .session-time {
-        font-family: $fuente-enfasis;
-        font-weight: 700;
-        font-size: 0.9rem;
-        color: $color-secundario-frio-2;
-        display: block;
-    }
-
-
-
-    .btn-delete-session {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        background: transparent;
-        border: none;
-        color: #ddd;
-        cursor: pointer;
-        transition: 0.2s;
-
-        &:hover {
-            color: $color-secundario-calido-1; // Naranja de acción
-        }
-    }
-}
-
-// 6. Botón de añadir (Estilo dashed coherente con la marca)
-.btn-add-slot {
-    border: 2px dashed #eee;
-    background: transparent;
-    padding: 0.8rem;
-    border-radius: $radio-curvatura;
-    color: $color-superficie-suave;
-    font-family: $fuente-enfasis;
-    font-weight: 600;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    color: $color-secundario-frio-2;
 
     &:hover {
-        border-color: $color-marca-principal;
-        color: $color-marca-principal;
-        background: rgba($color-marca-principal, 0.02);
+      border-color: $color-marca-principal;
+      color: $color-marca-principal;
+      transform: translateX(-3px);
+      box-shadow: $sombra-nivel-1;
     }
+  }
+
+  .title-group {
+    .txt-h1 {
+      font-family: $fuente-enfasis;
+      font-weight: 700;
+      font-size: $tamaño-titular-lg;
+      color: $color-secundario-frio-2;
+      margin: 0;
+    }
+
+    .txt-bajada {
+      color: $color-superficie-suave;
+      font-size: 1rem;
+      margin: 0;
+    }
+  }
+}
+
+// 3. REJILLA DE HORARIOS (EL MOTOR VISUAL)
+.schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1rem;
+  align-items: start;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
+// 4. COLUMNA DE DÍA (CONTENEDOR)
+.day-column {
+  background: white;
+  border-radius: $radio-curvatura;
+  box-shadow: $sombra-nivel-1;
+  overflow: hidden;
+  min-height: 450px;
+  display: flex;
+  flex-direction: column;
+
+  .day-header {
+    padding: 1rem;
+    background: #fafafa;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+
+    span {
+      font-family: $fuente-enfasis;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: $color-secundario-frio-2;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+  }
+
+  .day-content {
+    padding: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+}
+
+// 5. TARJETAS DE SESIÓN
+.session-card {
+  @include card-elevada;
+  padding: 1rem;
+  border-left: 4px solid $color-marca-principal; 
+  position: relative;
+
+  &:hover {
+    transform: translateY(-2px); 
+  }
+
+  .session-time {
+    font-family: $fuente-enfasis;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: $color-secundario-frio-2;
+    display: block;
+  }
+
+  // Botón de eliminar
+  .btn-delete-session {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: #ddd;
+    cursor: pointer;
+    transition: 0.2s;
+
+    &:hover {
+      color: $color-secundario-calido-1; 
+    }
+  }
+}
+
+// 6. BOTÓN DE AÑADIR (PLACEHOLDER)
+.btn-add-slot {
+  border: 2px dashed #eee; 
+  background: transparent;
+  padding: 0.8rem;
+  border-radius: $radio-curvatura;
+  color: $color-superficie-suave;
+  font-family: $fuente-enfasis;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:hover {
+    border-color: $color-marca-principal;
+    color: $color-marca-principal;
+    background: rgba($color-marca-principal, 0.02);
+  }
 }

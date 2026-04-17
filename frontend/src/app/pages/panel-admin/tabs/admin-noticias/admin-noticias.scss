@@ -1,6 +1,12 @@
+/* ==========================================================================
+   VISTA: GESTIÓN DE NOTICIAS / NOVEDADES (ADMIN)
+   Layout optimizado para contenido editorial con previsualización de imágenes.
+   ========================================================================== */
+
 @import '../../../../../styles/variables';
 @import '../../../../../styles/mixins';
 
+// 1. ESTRUCTURA DE SOPORTE (Idéntica al resto del panel para consistencia)
 .admin-wrapper {
     padding: 2.5rem;
     background-color: $color-fondo-pagina;
@@ -9,13 +15,14 @@
     flex-direction: column;
     box-sizing: border-box;
     font-family: $fuente-lectura;
-    overflow: hidden;
+    overflow: hidden; 
 
     @media (max-width: 768px) {
         padding: 1.5rem;
     }
 }
 
+// 2. CABECERA DE LA SECCIÓN
 .admin-header {
     flex-shrink: 0;
     display: flex;
@@ -50,6 +57,7 @@
     }
 }
 
+// 3. BARRA DE HERRAMIENTAS (TOOLBAR)
 .admin-toolbar {
     flex-shrink: 0;
     padding: 0.8rem 1.5rem;
@@ -81,14 +89,16 @@
     }
 }
 
+// 4. CONTENEDOR DE LA TABLA (CARD)
 .admin-card {
     background: white;
     border-radius: $radio-curvatura;
     box-shadow: $sombra-nivel-1;
-    flex: 1; 
-    overflow-y: auto; 
+    flex: 1;
+    overflow-y: auto;
     min-height: 0;
 
+    // Personalización estética del scroll
     &::-webkit-scrollbar {
         width: 6px;
     }
@@ -97,8 +107,14 @@
         background: #e0e0e0;
         border-radius: 10px;
     }
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto; 
+    }
 }
 
+// 5. ESTILOS DE LA TABLA EDITORIAL
 .admin-table {
     width: 100%;
     border-collapse: collapse;
@@ -128,15 +144,15 @@
         color: $color-secundario-frio-2;
     }
 
-    // --- MINIATURA SIN BORDE ---
+    // --- MINIATURA DE LA NOTICIA ---
     .img-preview-table {
-        width: 70px;
+        width: 70px; 
         height: 45px;
-        border-radius: 8px; // Curvatura más suave
+        border-radius: 8px;
         overflow: hidden;
         flex-shrink: 0;
-        // Border removido para mayor limpieza
 
+       
         img {
             width: 100%;
             height: 100%;
@@ -145,6 +161,7 @@
         }
     }
 
+    // --- INFORMACIÓN DE LA NOTICIA (META) ---
     .news-meta {
         display: flex;
         flex-direction: column;
@@ -163,19 +180,23 @@
             font-size: 0.75rem;
             color: $color-superficie-suave;
 
-            i { color: $color-marca-principal; }
+            i {
+                color: $color-marca-principal;
+            }
         }
     }
 
+    // --- RESUMEN DE TEXTO ---
     .txt-resumen {
         font-size: 0.85rem;
         color: $color-superficie-suave;
-        @include limitar-lineas(2);
+        @include limitar-lineas(2); 
         max-width: 350px;
         margin: 0;
     }
 }
 
+// 6. BOTONERA DE ACCIONES
 .actions-group {
     display: flex;
     gap: 8px;

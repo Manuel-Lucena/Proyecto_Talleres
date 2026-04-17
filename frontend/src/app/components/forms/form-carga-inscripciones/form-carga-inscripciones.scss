@@ -1,35 +1,38 @@
+/* ==========================================================================
+   SISTEMA DE MODALES: GESTIÓN DE INSCRIPCIONES (ADMIN)
+   Panel de control para listado de alumnos, estados de pago y asistencia.
+   ========================================================================== */
+
 @use '../../../../styles/variables' as v;
 @use '../../../../styles/mixins' as m;
 @use '../../../../styles/formularios' as f;
 
-// Contenedor principal que bloquea el fondo
+// 1. CAPA DE FONDO (OVERLAY)
 .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(v.$color-secundario-frio-2, 0.75); // Fondo oscuro semi-transparente
-    backdrop-filter: blur(6px); // Efecto desenfoque pro
-    z-index: 99999; // Por encima de todo
+    inset: 0;
+    background: rgba(v.$color-secundario-frio-2, 0.75);
+    backdrop-filter: blur(6px);
+    z-index: 99999;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 2rem;
+
     @include m.animacion-entrada;
 }
 
-// La "caja" del gestor
+// 2. CUERPO DEL MODAL (FORMATO LISTADO)
 .modal-body {
     background: v.$color-neutro-max;
     width: 100%;
-    max-width: 950px; // Ancho para que la tabla respire
-    max-height: 90vh; // Para que no se salga de la pantalla
+    max-width: 950px; // Espacio amplio para la tabla de alumnos
+    max-height: 90vh;
     border-radius: v.$radio-curvatura * 2;
     box-shadow: v.$sombra-nivel-3;
     padding: 3rem;
     position: relative;
-    overflow-y: auto; // Scroll interno si hay muchos datos
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
 
@@ -43,9 +46,10 @@
     }
 }
 
+// 3. CABECERA DE GESTIÓN
 .modal-header-simple {
     margin-bottom: 2rem;
-    text-align: left; // Alineado a la izquierda para look de herramienta
+    text-align: left;
 
     .titulo-formulario {
         font-family: v.$fuente-enfasis;
@@ -58,10 +62,15 @@
         font-size: 0.9rem;
         color: v.$color-superficie-suave;
         font-weight: 500;
+
+        strong {
+            color: v.$color-marca-principal;
+            font-weight: 700;
+        }
     }
 }
 
-// BARRA DE CARGA (INPUT + BOTÓN ANALIZAR)
+// 4. BARRA DE HERRAMIENTAS (BÚSQUEDA Y FILTROS)
 .barra-carga {
     display: flex;
     gap: 1rem;
@@ -77,48 +86,47 @@
         position: relative;
         height: 48px;
         background: white;
-        border: 2px dashed #ccd1d6;
+        border: 1px solid #ccd1d6;
         border-radius: 8px;
         display: flex;
         align-items: center;
         padding: 0 1rem;
-        transition: all 0.3s ease;
-
-        &:hover {
-            border-color: v.$color-marca-principal;
-        }
 
         i {
-            color: v.$color-marca-principal;
-            font-size: 1.2rem;
+            color: v.$color-superficie-suave;
+            font-size: 1.1rem;
             margin-right: 12px;
         }
 
         input {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .file-custom {
+            width: 100%;
+            border: none;
             font-size: 0.9rem;
+            font-weight: 600;
             color: v.$color-secundario-frio-2;
-            font-weight: 700;
+            outline: none;
+
+            &::placeholder {
+                color: #a0a0a0;
+            }
         }
     }
 
     .btn-procesar {
-        @include m.boton-primario; // Tu estilo naranja
+        @include m.boton-primario; // Botón para añadir inscripción manual
         height: 48px;
-        padding: 0 2rem;
+        padding: 0 1.5rem;
         margin: 0;
-        font-size: 0.9rem;
-        white-space: nowrap;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 }
 
-// CONTENEDOR DE LA TABLA EDITABLE
+// --------------------------------------------------------------------------
+// 5. LISTADO DE INSCRITOS (TABLA)
+// --------------------------------------------------------------------------
 .contenedor-editor {
     border: 1px solid #eef0f2;
     border-radius: v.$radio-curvatura;
@@ -127,7 +135,7 @@
     flex-grow: 1;
 
     .scroll-tabla {
-        max-height: 400px;
+        max-height: 450px;
         overflow-y: auto;
 
         &::-webkit-scrollbar {
@@ -148,7 +156,7 @@
             position: sticky;
             top: 0;
             background: #f8fafc;
-            padding: 1rem;
+            padding: 1.2rem 1rem;
             text-align: left;
             font-size: 0.7rem;
             font-weight: 800;
@@ -160,68 +168,69 @@
         }
 
         td {
-            padding: 0.5rem 1rem;
+            padding: 1rem;
             border-bottom: 1px solid #f1f4f8;
+            font-size: 0.85rem;
+            color: v.$color-secundario-frio-2;
+            vertical-align: middle;
 
-            input,
-            select {
-                width: 100%;
-                border: 1px solid transparent;
-                padding: 8px;
-                border-radius: 4px;
-                font-size: 0.85rem;
-                color: v.$color-secundario-frio-2;
-                background: transparent;
+            .nombre-alumno {
+                font-weight: 700;
+                display: block;
+            }
 
-                &:focus,
-                &:hover {
-                    background: white;
-                    border-color: rgba(v.$color-marca-principal, 0.3);
-                    outline: none;
+            .email-alumno {
+                font-size: 0.75rem;
+                color: v.$color-superficie-suave;
+            }
+
+            // Tags de estado de pago
+            .status-tag {
+                padding: 4px 10px;
+                border-radius: 20px;
+                font-size: 0.7rem;
+                font-weight: 800;
+                text-transform: uppercase;
+
+                &.pagado {
+                    background: rgba(v.$color-secundario-calido-2, 0.1);
+                    color: v.$color-secundario-calido-2;
                 }
 
-                &.input-error {
+                &.pendiente {
+                    background: rgba(v.$color-secundario-calido-1, 0.1);
                     color: v.$color-secundario-calido-1;
-                    border-color: v.$color-secundario-calido-1;
-                    background: rgba(v.$color-secundario-calido-1, 0.02);
                 }
             }
 
-            &.col-check {
-                width: 50px;
-                text-align: center;
-            }
+            // Acciones de fila (Borrar/Editar)
+            .btn-accion-tabla {
+                background: none;
+                border: none;
+                padding: 5px;
+                cursor: pointer;
+                color: v.$color-superficie-suave;
+                transition: color 0.2s;
 
-            .error-tag {
-                color: v.$color-secundario-calido-1;
-                font-size: 0.75rem;
-                font-weight: 700;
-                display: flex;
-                align-items: center;
-                gap: 5px;
-            }
+                &:hover {
+                    &.del {
+                        color: v.$color-secundario-calido-1;
+                    }
 
-            .ok-tag {
-                color: v.$color-secundario-calido-2;
-                font-size: 0.75rem;
-                font-weight: 700;
-                display: flex;
-                align-items: center;
-                gap: 5px;
+                    &.edit {
+                        color: v.$color-marca-principal;
+                    }
+                }
             }
         }
 
         tr:hover td {
             background-color: #f9fbff;
         }
-
-        .row-invalid td {
-            background-color: rgba(v.$color-secundario-calido-1, 0.01);
-        }
     }
 }
 
-// ACCIONES (GRID 1fr 1.5fr)
+// 6. ACCIONES GLOBALES
 .acciones-form {
     display: grid;
     grid-template-columns: 1fr 1.5fr;
@@ -237,13 +246,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        border: none;
         transition: 0.3s;
     }
 
     .btn-cancelar {
         background: v.$color-fondo-pagina;
         color: v.$color-superficie-suave;
+        border: none;
         cursor: pointer;
 
         &:hover {
@@ -255,13 +264,6 @@
     .btn-guardar {
         @include m.boton-primario;
         margin: 0;
-
-        &:disabled {
-            background: #e0e0e0 !important;
-            color: #999 !important;
-            cursor: not-allowed;
-            box-shadow: none !important;
-            transform: none !important;
-        }
+        border: none;
     }
 }

@@ -1,12 +1,18 @@
+/* ==========================================================================
+   SISTEMA DE MODALES: PROCESO DE PAGO / CHECKOUT (ESTÁNDAR)
+   Diseño de alta conversión con resumen visual y sección de pago segura.
+   ========================================================================== */
+
 @use '../../../../styles/variables' as v;
 @use '../../../../styles/mixins' as m;
 @use '../../../../styles/formularios' as f;
 
+// 1. ESTRUCTURA GLOBAL
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(v.$color-secundario-frio-2, 0.7); // Unificado
-    backdrop-filter: blur(4px); // Unificado
+    background: rgba(v.$color-secundario-frio-2, 0.7);
+    backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,7 +24,7 @@
     background: v.$color-neutro-max;
     max-width: 900px;
     width: 95%;
-    padding: 0; 
+    padding: 0;
     overflow: hidden;
     border-radius: v.$radio-curvatura * 2;
     box-shadow: v.$sombra-nivel-3;
@@ -29,10 +35,11 @@
         top: 1.2rem;
         right: 1.2rem;
         z-index: 100;
-        @include m.boton-cerrar-circular; // Aplicamos el nombre correcto
+        @include m.boton-cerrar-circular; 
     }
 }
 
+// 2. LAYOUT DE DOBLE COLUMNA (Resumen | Pago)
 .checkout-layout {
     display: grid;
     grid-template-columns: 1fr 1.2fr;
@@ -43,9 +50,11 @@
     }
 }
 
-// Columna Izquierda: Resumen de Compra
+// --------------------------------------------------------------------------
+// 3. COLUMNA IZQUIERDA: RESUMEN DE COMPRA
+// --------------------------------------------------------------------------
 .resumen-checkout-taller {
-    background: v.$color-fondo-pagina; 
+    background: v.$color-fondo-pagina;
     border-right: 1px solid rgba(v.$color-secundario-frio-2, 0.05);
     padding: 3rem 2.5rem;
 
@@ -85,6 +94,7 @@
     }
 }
 
+// Separador decorativo estilo ticket
 .separador-puntos {
     border-top: 2px dashed rgba(v.$color-secundario-frio-2, 0.1);
     margin: 2.5rem 0;
@@ -111,7 +121,9 @@
     }
 }
 
-// Columna Derecha: Proceso de Pago
+// --------------------------------------------------------------------------
+// 4. COLUMNA DERECHA: PROCESO DE PAGO
+// --------------------------------------------------------------------------
 .seccion-formulario-pago {
     padding: 3.5rem 3rem;
     display: flex;
@@ -124,6 +136,7 @@
         margin-bottom: 1.5rem;
     }
 
+    // Bloque de confianza (Trust Signals)
     .alerta-seguridad {
         display: flex;
         gap: 15px;
@@ -155,6 +168,7 @@
     }
 }
 
+// Visualizador de precio final antes de confirmar
 .input-checkout-grande {
     background: v.$color-fondo-pagina;
     border: 2px solid v.$color-marca-principal;
@@ -181,8 +195,9 @@
     }
 }
 
+// 5. ACCIÓN FINAL
 .btn-pagar-checkout {
-    @include m.boton-inscripcion-aula; // Mantengo tu mixin específico
+    @include m.boton-inscripcion-aula; 
     width: 100%;
     padding: 1.2rem;
     font-size: 1.1rem;

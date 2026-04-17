@@ -1,17 +1,22 @@
+/* ==========================================================================
+   PÁGINA: PERFIL DE USUARIO (CUENTA Y PREFERENCIAS)
+   Layout dividido con panel de información estática y edición dinámica.
+   ========================================================================== */
+
 @use '../../../styles/variables' as v;
 @use '../../../styles/mixins' as m;
-@use '../../../styles/formularios' as f; // Importamos la estructura de formularios
+@use '../../../styles/formularios' as f;
 
 .perfil-full-container {
     min-height: calc(100vh - 140px);
     display: flex;
-    @include m.animacion-entrada; // Usamos el mixin que creamos
+    @include m.animacion-entrada;
 
     .split-layout {
         display: flex;
         width: 100%;
 
-        // PANEL IZQUIERDO (ASIDE)
+        // 1. PANEL IZQUIERDO (ASIDE INFORMATIVO)
         .aside-info {
             flex: 0 0 28%;
             background: v.$color-secundario-frio-2;
@@ -24,13 +29,14 @@
 
             .sticky-content {
                 position: sticky;
-                top: 2rem;
+                top: 2rem; 
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 width: 100%;
             }
 
+            // Avatar con botón de cambio de foto
             .profile-avatar {
                 position: relative;
                 margin-bottom: 2rem;
@@ -74,7 +80,7 @@
                 .user-role {
                     background: rgba(v.$color-marca-principal, 0.15);
                     padding: 4px 14px;
-                    border-radius: v.$radio-curvatura; // Ajustado a 8px
+                    border-radius: v.$radio-curvatura;
                     font-size: 0.7rem;
                     color: v.$color-marca-principal;
                     text-transform: uppercase;
@@ -91,6 +97,7 @@
                 }
             }
 
+            // Lista de datos  
             .data-list {
                 width: 100%;
                 max-width: fit-content;
@@ -117,7 +124,6 @@
                             color: rgba(white, 0.4);
                             text-transform: uppercase;
                         }
-
                         p {
                             margin: 0;
                             font-size: 0.9rem;
@@ -132,7 +138,7 @@
                 width: 100%;
                 max-width: 220px;
                 @include m.boton-primario;
-                background: rgba(v.$danger, 0.1); // Usando variable de peligro
+                background: rgba(v.$danger, 0.1);
                 border: 1px solid rgba(v.$danger, 0.3);
                 color: v.$danger;
 
@@ -143,7 +149,7 @@
             }
         }
 
-        // CUERPO DEL FORMULARIO
+        // 2. CUERPO DEL FORMULARIO (MAIN CONTENT)
         .main-form {
             flex: 1;
             padding: 4rem;
@@ -158,21 +164,12 @@
 
                 .section-title {
                     margin-bottom: 3rem;
-
-                    h2 {
-                        @include m.titulo-seccion(v.$color-secundario-frio-2);
-                    }
-
-                    p {
-                        color: #64748b;
-                        font-family: v.$fuente-lectura;
-                    }
+                    h2 { @include m.titulo-seccion(v.$color-secundario-frio-2); }
+                    p { color: #64748b; font-family: v.$fuente-lectura; }
                 }
 
                 .av-form {
-                    .row-inputs {
-                        @extend .fila-formulario;
-                    }
+                    .row-inputs { @extend .fila-formulario; }
 
                     .av-input-group {
                         @extend .campo-formulario;
@@ -180,7 +177,6 @@
 
                         input {
                             @include m.estilo-input-base;
-
                             &.is-invalid {
                                 border-color: v.$danger;
                                 background-color: #fffafb;
@@ -189,7 +185,6 @@
 
                         &.readonly {
                             opacity: 0.7;
-
                             input {
                                 cursor: not-allowed;
                                 background: #f1f5f9;
@@ -198,7 +193,7 @@
                     }
 
                     .save-btn {
-                        @include m.boton-inscripcion-aula; // Naranja de acción para guardar cambios
+                        @include m.boton-inscripcion-aula;
                         width: 100%;
                         padding: 16px;
                     }
@@ -208,6 +203,7 @@
     }
 }
 
+// 3. RESPONSIVE: De Split a Stack
 @media (max-width: 1024px) {
     .perfil-full-container .split-layout {
         flex-direction: column;
@@ -216,6 +212,9 @@
             flex: 0 0 auto;
             border-right: none;
             border-bottom: 1px solid rgba(white, 0.1);
+            padding: 2rem;
+            
+            .sticky-content { position: static; }
         }
 
         .main-form {

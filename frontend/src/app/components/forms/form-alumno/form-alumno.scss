@@ -1,45 +1,57 @@
+/* ==========================================================================
+   SISTEMA DE MODALES: FORMULARIO DE REGISTRO/EDICIÓN DE ALUMNOS
+   Este componente integra el sistema de formularios con la lógica de modales.
+   ========================================================================== */
+
 @use '../../../../styles/variables' as v;
 @use '../../../../styles/mixins' as m;
 @use '../../../../styles/formularios' as f;
 
+// 1. CAPA DE FONDO (OVERLAY)
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(v.$color-secundario-frio-2, 0.7);
+    background: rgba(v.$color-secundario-frio-2, 0.7); // Azul oscuro institucional con transparencia
     backdrop-filter: blur(4px);
     z-index: 10000;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
+    
+    // Animación de entrada de la biblioteca de mixins
     @include m.animacion-entrada;
 }
 
+// 2. CUERPO DEL MODAL (HERENCIA DE FORMULARIOS)
 .modal-body {
-    @include f.estilo-contenedor-formulario;
+    @include f.estilo-contenedor-formulario; // Reutiliza el diseño base de formularios
     width: 100%;
     max-width: 900px;
     max-height: 95vh;
-    overflow-y: auto;
+    overflow-y: auto; // Scroll interno para formularios largos
     box-shadow: v.$sombra-nivel-3;
     border: none;
 }
 
-.input-personalizado,
-.input-custom {
+// 3. ELEMENTOS DE ENTRADA Y VALIDACIÓN
+.input-personalizado, .input-custom {
     @include m.estilo-input-base;
 
+    // Estado de error (Validación)
     &.is-invalid {
         border-color: v.$color-secundario-calido-1;
         background-color: rgba(v.$color-secundario-calido-1, 0.02);
     }
 }
 
+// 4. CONTENEDORES ESPECIALES (PASSWORD/ICONOS)
 .posicion-relativa {
     position: relative;
     display: flex;
     align-items: center;
 
+    // Botón para mostrar/ocultar contraseña
     .btn-ver-pass {
         position: absolute;
         right: 1rem;
@@ -56,6 +68,7 @@
     }
 }
 
+// 5. ZONA DE SUBIDA ESPECÍFICA PARA EL PERFIL
 .zona-subida-alumno {
     @include m.input-group-personalizado;
     background: v.$color-fondo-pagina;
@@ -84,6 +97,7 @@
     }
 }
 
+// 6. BLOQUE DE ACCIONES (FOOTER DEL FORMULARIO)
 .acciones-formulario {
     display: flex;
     justify-content: center;
@@ -113,6 +127,7 @@
         @include m.boton-primario;
         padding: 0.8rem 3rem;
 
+        // Gestión de estado deshabilitado (Botón gris y sin eventos)
         &:disabled {
             filter: grayscale(1);
             opacity: 0.5;
@@ -122,12 +137,13 @@
     }
 }
 
+// 7. MENSAJES DE ERROR FEEDBACK
 .error-container {
     min-height: 20px;
     margin-top: 4px;
 
     .error-message {
-        color: v.$color-secundario-calido-1;
+        color: v.$color-secundario-calido-1; 
         font-size: 0.75rem;
         font-weight: 700;
     }

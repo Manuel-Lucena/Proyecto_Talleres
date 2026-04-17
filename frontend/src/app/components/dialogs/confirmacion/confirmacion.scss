@@ -1,50 +1,92 @@
+/* ==========================================================================
+   SISTEMA DE MODALES: COMPONENTE DE CONFIRMACIÓN
+   Diseñado para alertas, avisos rápidos y acciones binarias (Sí/No).
+   ========================================================================== */
+
 @import '../../../../styles/variables';
 
+// 1. CAPA DE FONDO (OVERLAY)
 .modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba($color-neutro-min, 0.5); // Un poco más oscuro para foco
-  backdrop-filter: blur(4px); // Aumentado ligeramente según tendencia
-  display: flex; align-items: center; justify-content: center;
-  z-index: 99999; padding: 1rem;
+    position: fixed;
+    inset: 0;
+    background: rgba($color-neutro-min, 0.5); 
+    backdrop-filter: blur(4px); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    padding: 1rem;
 }
 
+// 2. TARJETA DEL MODAL
 .modal-card {
-  background: $color-neutro-max;
-  width: 100%; max-width: 360px;
-  padding: 2.5rem;
-  border-radius: $radio-curvatura; // 0.5rem consistente
-  box-shadow: $sombra-nivel-3; 
-  animation: modalIn 0.3s ease-out;
+    background: $color-neutro-max;
+    width: 100%;
+    max-width: 360px;
+    padding: 2.5rem;
+    border-radius: $radio-curvatura; 
+    box-shadow: $sombra-nivel-3;
+    animation: modalIn 0.3s ease-out;
 
-  .text-content {
-    text-align: center; margin-bottom: 2rem;
-    h3 {
-      font-family: $fuente-enfasis; color: $color-secundario-frio-2;
-      font-size: $tamaño-titular-md; font-weight: 800; margin-bottom: 0.8rem;
+    // BLOQUE DE TEXTO E INFORMACIÓN
+    .text-content {
+        text-align: center;
+        margin-bottom: 2rem;
+
+        h3 {
+            font-family: $fuente-enfasis;
+            color: $color-secundario-frio-2;
+            font-size: $tamaño-titular-md;
+            font-weight: 800;
+            margin-bottom: 0.8rem;
+        }
+
+        p {
+            font-family: $fuente-lectura;
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 0;
+        }
     }
-    p {
-      font-family: $fuente-lectura; color: #666;
-      font-size: 0.95rem; line-height: 1.5; margin: 0;
-    }
-  }
 }
 
+// 3. ACCIONES Y BOTONERA
 .modal-actions {
-  display: flex; gap: 12px;
-  button {
-    flex: 1; padding: 12px; border: none;
-    border-radius: $radio-curvatura;
-    font-family: $fuente-enfasis; font-weight: 700;
-    font-size: 0.9rem; cursor: pointer;
-    transition: all 0.3s ease-in-out;
-  }
-  .btn-alt {
-    background: $color-fondo-pagina; color: $color-superficie-oscura;
-    border: 1px solid $color-superficie-suave;
-    &:hover { background: darken($color-fondo-pagina, 5%); }
-  }
-  .btn-main {
-    background: $color-secundario-frio-2; color: $color-neutro-max;
-    &:hover { background: lighten($color-secundario-frio-2, 5%); box-shadow: $sombra-nivel-2; }
-  }
+    display: flex;
+    gap: 12px;
+
+    button {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: $radio-curvatura;
+        font-family: $fuente-enfasis;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+    }
+
+    // Botón Secundario (Cancelar/Cerrar)
+    .btn-alt {
+        background: $color-fondo-pagina;
+        color: $color-superficie-oscura;
+        border: 1px solid $color-superficie-suave;
+        
+        &:hover {
+            background: darken($color-fondo-pagina, 5%);
+        }
+    }
+
+    // Botón Principal (Aceptar/Confirmar)
+    .btn-main {
+        background: $color-secundario-frio-2;
+        color: $color-neutro-max;
+
+        &:hover {
+            background: lighten($color-secundario-frio-2, 5%);
+            box-shadow: $sombra-nivel-2;
+        }
+    }
 }

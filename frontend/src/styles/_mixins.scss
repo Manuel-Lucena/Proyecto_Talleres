@@ -1,7 +1,7 @@
 /* ==========================================================================
    BIBLIOTECA DE MIXINS - AULA VIVA
-   Contiene bloques de código reutilizables para botones, inputs, tipografía
-   y comportamientos visuales comunes.
+   Contiene bloques de código reutilizables para botones, inputs, 
+   tipografía y comportamientos visuales comunes.
    ========================================================================== */
 
 @import 'variables';
@@ -15,24 +15,24 @@
  * Incluye estados de hover con elevación sutil.
  */
 @mixin boton-primario {
-    background-color: $color-marca-principal;
-    border: none;
-    color: $color-neutro-min;
-    border-radius: $radio-curvatura;
-    font-family: $fuente-enfasis;
-    font-weight: 700;
-    transition: all 0.3s ease-in-out;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.8rem 1.5rem;
-    cursor: pointer;
+  background-color: $color-marca-principal;
+  border: none;
+  color: $color-neutro-min;
+  border-radius: $radio-curvatura;
+  font-family: $fuente-enfasis;
+  font-weight: 700;
+  transition: all 0.3s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
 
-    &:hover {
-        background-color: $color-marca-oscuro;
-        transform: translateY(-1px);
-        box-shadow: $sombra-nivel-2;
-    }
+  &:hover {
+    background-color: $color-marca-oscuro;
+    transform: translateY(-1px);
+    box-shadow: $sombra-nivel-2;
+  }
 }
 
 /**
@@ -40,25 +40,25 @@
  * Utiliza el color de acento cálido y gestiona estados deshabilitados.
  */
 @mixin boton-inscripcion-aula {
-    background-color: $color-secundario-calido-1;
-    border: none;
-    color: white;
-    border-radius: $radio-curvatura;
-    font-family: $fuente-enfasis;
-    font-weight: 700;
-    transition: all 0.3s ease-in-out;
-    padding: 10px 24px;
-    cursor: pointer;
+  background-color: $color-secundario-calido-1;
+  border: none;
+  color: white;
+  border-radius: $radio-curvatura;
+  font-family: $fuente-enfasis;
+  font-weight: 700;
+  transition: all 0.3s ease-in-out;
+  padding: 10px 24px;
+  cursor: pointer;
 
-    &:hover:not(:disabled) {
-        background-color: darken($color-secundario-calido-1, 10%);
-        box-shadow: $sombra-nivel-2;
-    }
+  &:hover:not(:disabled) {
+    background-color: darken($color-secundario-calido-1, 10%);
+    box-shadow: $sombra-nivel-2;
+  }
 
-    &:disabled {
-        background-color: #ccc;
-        cursor: not-allowed;
-    }
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
 }
 
 /**
@@ -66,32 +66,32 @@
  * Posicionamiento absoluto y efecto de escala al pasar el ratón.
  */
 @mixin boton-cerrar-circular {
-    position: absolute;
-    top: 1.2rem;
-    right: 1.5rem;
-    background: none;
-    border: none;
+  position: absolute;
+  top: 1.2rem;
+  right: 1.5rem;
+  background: none;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  color: $color-superficie-suave;
+  font-size: 2.2rem;
+  font-weight: 600;
+  line-height: 0.7;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  z-index: 110;
+  padding: 5px;
+
+  &:focus,
+  &:active {
     outline: none;
     box-shadow: none;
-    color: $color-superficie-suave;
-    font-size: 2.2rem;
-    font-weight: 600;
-    line-height: 0.7;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    z-index: 110;
-    padding: 5px;
+  }
 
-    &:focus,
-    &:active {
-        outline: none;
-        box-shadow: none;
-    }
-
-    &:hover {
-        color: $color-secundario-calido-1;
-        transform: scale(1.1);
-    }
+  &:hover {
+    color: $color-secundario-calido-1;
+    transform: scale(1.1);
+  }
 }
 
 // --------------------------------------------------------------------------
@@ -103,35 +103,35 @@
  * Incluye un estado de focus con un "glow" de marca.
  */
 @mixin estilo-input-base {
-    width: 100%;
-    padding: 14px;
-    border: 2px solid #f0f0f0;
-    background: #fbfbfb;
-    border-radius: $radio-curvatura;
-    transition: all 0.3s ease-in-out;
+  width: 100%;
+  padding: 14px;
+  border: 2px solid #f0f0f0;
+  background: #fbfbfb;
+  border-radius: $radio-curvatura;
+  transition: all 0.3s ease-in-out;
 
-    &:focus {
-        border-color: $color-marca-principal;
-        outline: none;
-        background: white;
-        box-shadow: 0 0 0 4px rgba($color-marca-principal, 0.1);
-    }
+  &:focus {
+    border-color: $color-marca-principal;
+    outline: none;
+    background: white;
+    box-shadow: 0 0 0 4px rgba($color-marca-principal, 0.1);
+  }
 }
 
 /**
  * Estructura para grupos de inputs que contienen iconos o botones adjuntos.
  */
 @mixin input-group-personalizado {
-    border: 1px solid $color-superficie-suave;
-    border-radius: $radio-curvatura;
-    transition: all 0.3s ease-in-out;
-    overflow: hidden;
-    display: flex;
+  border: 1px solid $color-superficie-suave;
+  border-radius: $radio-curvatura;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+  display: flex;
 
-    &:focus-within {
-        border-color: $color-marca-principal;
-        box-shadow: 0 0 0 0.25rem rgba($color-marca-principal, 0.1);
-    }
+  &:focus-within {
+    border-color: $color-marca-principal;
+    box-shadow: 0 0 0 0.25rem rgba($color-marca-principal, 0.1);
+  }
 }
 
 // --------------------------------------------------------------------------
@@ -143,23 +143,23 @@
  * @param {Color} $color-texto - Color del título (por defecto el frío oscuro).
  */
 @mixin titulo-seccion($color-texto: $color-secundario-frio-2) {
-    font-family: $fuente-enfasis;
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: $color-texto;
-    margin-bottom: 1.5rem;
-    line-height: 1.2;
+  font-family: $fuente-enfasis;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: $color-texto;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
 }
 
 /**
  * Truncado de texto multilínea.
- * @param {Number} $lineas - Cantidad de líneas visibles antes de los puntos suspensivos.
+ * @param {Number} $lineas - Cantidad de líneas visibles.
  */
 @mixin limitar-lineas($lineas: 3) {
-    display: -webkit-box;
-    -webkit-line-clamp: $lineas;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: $lineas;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 // --------------------------------------------------------------------------
@@ -170,121 +170,121 @@
  * Contenedor con elevación y desplazamiento vertical en hover.
  */
 @mixin card-elevada {
-    background: white;
-    border-radius: $radio-curvatura;
-    border: 1px solid #f0f0f0;
-    overflow: hidden;
-    box-shadow: $sombra-nivel-1;
-    transition: all 0.3s ease-in-out;
+  background: white;
+  border-radius: $radio-curvatura;
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+  box-shadow: $sombra-nivel-1;
+  transition: all 0.3s ease-in-out;
 
-    &:hover {
-        transform: translateY(-4px);
-        box-shadow: $sombra-nivel-2;
-    }
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $sombra-nivel-2;
+  }
 }
 
 /**
  * Animación suave de entrada para modales o elementos nuevos en el DOM.
  */
 @mixin animacion-entrada {
-    animation: fadeInModal 0.3s ease-out forwards;
+  animation: fadeInModal 0.3s ease-out forwards;
 
-    @keyframes fadeInModal {
-        from {
-            opacity: 0;
-            transform: scale(0.98);
-        }
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
+  @keyframes fadeInModal {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
     }
+
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 }
 
 /**
  * Estilo para zonas de arrastre de archivos (Drag & Drop) estándar.
  */
 @mixin zona-subida-estandar {
-    border: 2px dashed $color-superficie-suave;
-    background: $color-fondo-pagina;
-    border-radius: $radio-curvatura;
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    margin-top: 0.5rem;
+  border: 2px dashed $color-superficie-suave;
+  background: $color-fondo-pagina;
+  border-radius: $radio-curvatura;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  margin-top: 0.5rem;
 
-    i {
-        color: $color-marca-principal;
-        font-size: 1.4rem;
-    }
+  i {
+    color: $color-marca-principal;
+    font-size: 1.4rem;
+  }
 
-    span {
-        font-family: $fuente-lectura;
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: $color-secundario-frio-2;
-    }
+  span {
+    font-family: $fuente-lectura;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $color-secundario-frio-2;
+  }
 
-    &:hover {
-        border-color: $color-marca-principal;
-        background: white;
-        transform: translateY(-2px);
-        box-shadow: $sombra-nivel-1;
-    }
+  &:hover {
+    border-color: $color-marca-principal;
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: $sombra-nivel-1;
+  }
 
-    &.archivo-listo {
-        border-style: solid;
-        border-color: $color-marca-principal;
-        background: rgba($color-marca-principal, 0.05);
-    }
+  &.archivo-listo {
+    border-style: solid;
+    border-color: $color-marca-principal;
+    background: rgba($color-marca-principal, 0.05);
+  }
 }
 
 /**
  * Estructura de fila para elementos de lista de Aula Viva.
- * Incluye un indicador lateral dinámico en hover.
+ * Incluye un indicador lateral dinámico en hover (Injected Border).
  */
 @mixin card-aula-viva {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    padding: 1.6rem 2.5rem;
-    background: white;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    cursor: pointer;
-    transition: all 0.3s ease;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  padding: 1.6rem 2.5rem;
+  background: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.3s ease;
 
-    &:hover {
-        background-color: #fcfcfc;
-        box-shadow: inset 6px 0 0 $color-marca-principal;
+  &:hover {
+    background-color: #fcfcfc;
+    box-shadow: inset 6px 0 0 $color-marca-principal;
 
-        .titulo {
-            color: $color-marca-principal;
-        }
-
-        .action-icon,
-        .flecha-link {
-            transform: translateX(5px);
-            color: $color-marca-principal;
-        }
+    .titulo {
+      color: $color-marca-principal;
     }
+
+    .action-icon,
+    .flecha-link {
+      transform: translateX(5px);
+      color: $color-marca-principal;
+    }
+  }
 }
 
 /**
  * Efecto de escala interactiva para iconos y botones pequeños.
  */
 @mixin hover-escala {
-    transition: transform 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out;
 
-    &:hover {
-        transform: scale(1.1);
-    }
+  &:hover {
+    transform: scale(1.1);
+  }
 
-    &:active {
-        transform: scale(0.95);
-    }
+  &:active {
+    transform: scale(0.95);
+  }
 }
-

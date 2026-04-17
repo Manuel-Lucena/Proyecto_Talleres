@@ -1,8 +1,13 @@
+/* ==========================================================================
+   SISTEMA DE MODALES: PANEL DE ENTREGA DE TAREAS (ALUMNO)
+   Gestión de carga de archivos, comentarios y estados de entrega.
+   ========================================================================== */
+
 @use '../../../../styles/variables' as v;
 @use '../../../../styles/mixins' as m;
 @use '../../../../styles/formularios' as f;
 
-// --- CONTENEDOR PRINCIPAL ---
+// 1. CAPA DE FONDO (OVERLAY)
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -16,31 +21,31 @@
     @include m.animacion-entrada;
 }
 
+// 2. CUERPO DEL MODAL (ANCHO MEDIO)
 .modal-body {
     background: v.$color-neutro-max;
     width: 100%;
     max-width: 600px;
     border-radius: v.$radio-curvatura * 2;
-    box-shadow: v.$sombra-nivel-3; 
-    padding: 3.5rem; 
+    box-shadow: v.$sombra-nivel-3;
+    padding: 3.5rem;
     position: relative;
-    
+
     .btn-close {
         @include m.boton-cerrar-circular;
-        // Forzamos posición para asegurar que respete el diseño
         position: absolute;
         top: 1.2rem;
         right: 1.5rem;
     }
 }
 
-// --- HEADER ---
+// 3. CABECERA CON CONTEXTO DE TAREA
 .modal-header {
     margin-bottom: 2.5rem;
-    
+
     .badge-tarea {
         display: inline-block;
-        background: rgba(v.$color-secundario-calido-2, 0.1);
+        background: rgba(v.$color-secundario-calido-2, 0.1); 
         color: v.$color-secundario-calido-2;
         padding: 4px 14px;
         border-radius: 50px;
@@ -68,12 +73,14 @@
         color: v.$color-superficie-suave;
         font-size: 0.9rem;
         font-weight: 600;
-        
-        i { color: v.$color-secundario-calido-1; }
+
+        i {
+            color: v.$color-secundario-calido-1; 
+        }
     }
 }
 
-// --- CUERPO DEL FORMULARIO ---
+// 4. CAMPO DE COMENTARIOS
 .modal-content-body {
     display: flex;
     flex-direction: column;
@@ -98,15 +105,16 @@
     font-family: v.$fuente-lectura;
 }
 
-// --- ZONA DE SUBIDA (DROPZONE) ---
+// 5. ZONA DE SUBIDA (DROPZONE)
 .dropzone-entrega {
-    @include m.zona-subida-estandar; // Tu mixin corregido
+    @include m.zona-subida-estandar;
     position: relative;
     min-height: 140px;
     flex-direction: column;
     padding: 2rem;
     border-width: 2px;
 
+    // Input invisible para capturar el click en toda la zona
     .input-hidden {
         position: absolute;
         inset: 0;
@@ -122,7 +130,7 @@
         i {
             display: block;
             font-size: 2.5rem;
-            color: v.$color-secundario-calido-2;
+            color: v.$color-secundario-calido-2; 
             margin-bottom: 10px;
         }
 
@@ -140,7 +148,7 @@
     }
 }
 
-// --- LISTADO DE ARCHIVOS ---
+// 6. LISTADO DINÁMICO DE ARCHIVOS
 .grid-archivos-entregados {
     display: flex;
     flex-direction: column;
@@ -155,9 +163,17 @@
         border: 1px solid #eee;
         border-radius: v.$radio-curvatura;
         animation: slideIn 0.3s ease-out;
+        i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+        }
 
-        i { margin-right: 12px; font-size: 1.2rem; }
-        .name { flex: 1; font-weight: 600; color: v.$color-secundario-frio-2; font-size: 0.85rem; }
+        .name {
+            flex: 1;
+            font-weight: 600;
+            color: v.$color-secundario-frio-2;
+            font-size: 0.85rem;
+        }
 
         .btn-del {
             background: none;
@@ -167,15 +183,27 @@
             padding: 5px;
             display: flex;
             transition: color 0.2s;
-            &:hover { color: v.$color-secundario-calido-1; }
+
+            &:hover {
+                color: v.$color-secundario-calido-1;
+            }
         }
 
-        &.existente { border-left: 4px solid v.$color-secundario-calido-2; }
-        &.nuevo { border-left: 4px solid v.$color-marca-principal; }
+        // Diferenciación de estado del archivo
+        &.existente {
+            border-left: 4px solid v.$color-secundario-calido-2;
+        }
+
+        // Verde
+        &.nuevo {
+            border-left: 4px solid v.$color-marca-principal;
+        }
+
+        // Naranja
     }
 }
 
-// --- FOOTER (BOTONERA CENTRADA) ---
+// 7. FOOTER UNIFICADO (BOTONERA)
 .modal-footer {
     margin-top: 2.5rem;
     display: flex;
@@ -186,7 +214,7 @@
     display: flex;
     gap: 1rem;
     width: 100%;
-    max-width: 450px; // Limita el ancho para que no se estiren demasiado
+    max-width: 450px;
 
     @media (max-width: 480px) {
         flex-direction: column-reverse;
@@ -206,7 +234,7 @@
     }
 
     .btn-cancelar {
-        background: #f1f3f5; // Gris suave con cuerpo
+        background: #f1f3f5;
         border: 1px solid #e2e4e7;
         color: v.$color-superficie-suave;
         cursor: pointer;
@@ -222,7 +250,7 @@
         @include m.boton-primario;
         margin: 0;
         border: none;
-        
+
         &:disabled {
             background-color: #e0e0e0;
             color: #a0a0a0;
@@ -233,7 +261,15 @@
     }
 }
 
+// Animación local para la aparición de archivos
 @keyframes slideIn {
-    from { opacity: 0; transform: translateX(-10px); }
-    to { opacity: 1; transform: translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }

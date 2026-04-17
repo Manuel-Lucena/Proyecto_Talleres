@@ -1,12 +1,18 @@
+/* ==========================================================================
+   SISTEMA DE MODALES: INSCRIPCIÓN / GESTIÓN ADMINISTRATIVA
+   Enfocado en transacciones, edición de precios y estados de orden.
+   ========================================================================== */
+
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 @import '../../../../styles/formularios';
 
+// 1. OVERLAY CON DESENFOQUE PROFUNDO
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba($color-secundario-frio-2, 0.75); 
-    backdrop-filter: blur(8px);
+    background: rgba($color-secundario-frio-2, 0.75);
+    backdrop-filter: blur(8px); 
     display: flex;
     justify-content: center;
     align-items: center;
@@ -14,14 +20,14 @@
     padding: 1.5rem;
 }
 
+// 2. CUERPO DEL MODAL (COMPACTO)
 .modal-body-admin {
-    @include estilo-contenedor-formulario; 
+    @include estilo-contenedor-formulario;
     @include animacion-entrada;
-    width: 100%;
     max-width: 600px;
-    box-shadow: $sombra-nivel-3; 
-    position: relative; // Necesario para posicionar la X
-    border: none; 
+    box-shadow: $sombra-nivel-3;
+    position: relative;
+    border: none;
     padding: 3.5rem;
 
     .btn-close-modal {
@@ -31,13 +37,13 @@
         justify-content: center;
         
         i {
-            font-size: 1.6rem; // Tamaño ajustado para el icono X
+            font-size: 1.6rem; 
             line-height: 1;
         }
     }
 }
 
-// Bloque de información contextual
+// 3. BLOQUE DE CONTEXTO (INFO DEL ALUMNO/TALLER)
 .context-badge {
     background: rgba($color-marca-principal, 0.08);
     border-radius: $radio-curvatura;
@@ -48,39 +54,42 @@
     gap: 1rem;
     border: 1px solid rgba($color-marca-principal, 0.2);
 
-    i { color: $color-marca-principal; font-size: 1.5rem; }
-    
+    i {
+        color: $color-marca-principal;
+        font-size: 1.5rem;
+    }
+
     .text-content {
-        span { 
-            display: block; 
-            font-size: 0.7rem; 
-            text-transform: uppercase; 
-            font-weight: 700; 
+        span {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
             color: $color-secundario-frio-2;
             letter-spacing: 0.5px;
         }
-        strong { 
+        strong {
             font-family: $fuente-enfasis;
-            color: $color-marca-oscuro; 
+            color: $color-marca-oscuro;
             font-size: 1rem;
         }
     }
 }
 
-// Estilo moneda
+// 4. INPUT ESPECIAL: MONEDA / PRECIO
 .input-currency-wrapper {
     position: relative;
     display: flex;
     align-items: center;
-    
+
     input {
         @include estilo-input-base;
-        padding-right: 3rem;
+        padding-right: 3rem; 
         font-weight: 800;
         color: $color-secundario-frio-2;
         font-size: 1.1rem;
     }
-    
+
     .currency-tag {
         position: absolute;
         right: 1.2rem;
@@ -89,7 +98,7 @@
     }
 }
 
-// Order ID
+// 5. GESTIÓN DE ID DE ORDEN (LECTURA Y COPIA)
 .order-id-box {
     @include estilo-input-base;
     background: #fdfdfd;
@@ -98,10 +107,10 @@
     align-items: center;
     border-style: dashed; 
 
-    code { 
-        font-family: monospace; 
-        font-weight: 700; 
-        color: $color-secundario-frio-1; 
+    code {
+        font-family: monospace;
+        font-weight: 700;
+        color: $color-secundario-frio-1;
         font-size: 1rem;
     }
 
@@ -112,20 +121,24 @@
         cursor: pointer;
         padding: 4px;
         transition: transform 0.3s ease;
-        &:hover { transform: rotate(180deg); }
+
+        &:hover {
+            transform: rotate(180deg);
+        }
     }
 }
 
-// BOTONERA CORREGIDA Y CENTRADA
+// 6. BOTONERA FINAL CENTRADA Y ADAPTATIVA
 .footer-actions {
     margin-top: 3rem;
     display: flex;
     justify-content: center;
     gap: 1.2rem;
     width: 100%;
-    max-width: 480px; 
+    max-width: 480px;
     margin-inline: auto;
 
+    // Colapso a vertical en móviles
     @media (max-width: 480px) {
         flex-direction: column-reverse;
         max-width: 100%;
@@ -145,8 +158,8 @@
 
     .btn-cancelar {
         flex: 1;
-        background: #f1f3f5;       // Gris sólido
-        border: 1px solid #e2e4e7; // Borde para dar cuerpo
+        background: #f1f3f5;
+        border: 1px solid #e2e4e7;
         color: $color-superficie-suave;
         cursor: pointer;
 
@@ -158,11 +171,11 @@
     }
 
     .btn-guardar {
-        flex: 1.8; // Más ancho el de confirmar
-        @include boton-inscripcion-aula; 
+        flex: 1.8;
+        @include boton-inscripcion-aula;
         margin-bottom: 0;
         border: none;
-        
+
         &:disabled {
             background-color: #e0e0e0;
             color: #a0a0a0;

@@ -38,6 +38,6 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state) =
   }
 
   console.error(`Acceso denegado: El rol [${rolUsuario}] no tiene permiso para ${state.url}`);
-  router.navigate(['/landing']); // O a una página de 403
+  router.navigate(['/no-autorizado']); // O a una página de 403
   return false;
 };

@@ -13,6 +13,10 @@ export class App {
   showAccessMenu = false;
   contrastValue = 100;
 
+  get modalActive(): boolean {
+    return !!document.querySelector('.modal-overlay');
+  }
+
   toggleAccessMenu() {
     this.showAccessMenu = !this.showAccessMenu;
   }
@@ -25,9 +29,7 @@ export class App {
   setDaltonism(event: any) {
     const type = event.target.value;
     document.body.classList.remove('protanopia', 'deuteranopia', 'tritanopia');
-    if (type !== 'none') {
-      document.body.classList.add(type);
-    }
+    if (type !== 'none') document.body.classList.add(type);
   }
 
   changeFontSize(size: 'small' | 'medium' | 'large') {

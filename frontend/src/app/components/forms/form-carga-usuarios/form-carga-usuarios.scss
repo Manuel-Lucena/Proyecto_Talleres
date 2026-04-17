@@ -1,17 +1,22 @@
+/* ==========================================================================
+   SISTEMA DE MODALES: GESTOR DE IMPORTACIÓN MASIVA
+   Interfaz de análisis, validación y edición de tablas de datos (Excel/CSV).
+   ========================================================================== */
+
 @use '../../../../styles/variables' as v;
 @use '../../../../styles/mixins' as m;
 @use '../../../../styles/formularios' as f;
 
-// Contenedor principal que bloquea el fondo
+// 1. OVERLAY 
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(v.$color-secundario-frio-2, 0.75); // Fondo oscuro semi-transparente
-    backdrop-filter: blur(6px); // Efecto desenfoque pro
-    z-index: 99999; // Por encima de todo
+    background: rgba(v.$color-secundario-frio-2, 0.75);
+    backdrop-filter: blur(6px);
+    z-index: 99999;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -19,17 +24,17 @@
     @include m.animacion-entrada;
 }
 
-// La "caja" del gestor
+// 2. CUERPO DEL GESTOR 
 .modal-body {
     background: v.$color-neutro-max;
     width: 100%;
-    max-width: 950px; // Ancho para que la tabla respire
-    max-height: 90vh; // Para que no se salga de la pantalla
+    max-width: 950px; 
+    max-height: 90vh;
     border-radius: v.$radio-curvatura * 2;
     box-shadow: v.$sombra-nivel-3;
     padding: 3rem;
     position: relative;
-    overflow-y: auto; // Scroll interno si hay muchos datos
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
 
@@ -43,9 +48,10 @@
     }
 }
 
+// 3. CABECERA TÉCNICA
 .modal-header-simple {
     margin-bottom: 2rem;
-    text-align: left; // Alineado a la izquierda para look de herramienta
+    text-align: left;
 
     .titulo-formulario {
         font-family: v.$fuente-enfasis;
@@ -61,7 +67,7 @@
     }
 }
 
-// BARRA DE CARGA (INPUT + BOTÓN ANALIZAR)
+// 4. BARRA DE CARGA E INGESTA DE ARCHIVOS
 .barra-carga {
     display: flex;
     gap: 1rem;
@@ -109,7 +115,7 @@
     }
 
     .btn-procesar {
-        @include m.boton-primario; // Tu estilo naranja
+        @include m.boton-primario; 
         height: 48px;
         padding: 0 2rem;
         margin: 0;
@@ -118,7 +124,9 @@
     }
 }
 
-// CONTENEDOR DE LA TABLA EDITABLE
+// --------------------------------------------------------------------------
+// 5. EDITOR DE DATOS (TABLA DINÁMICA)
+// --------------------------------------------------------------------------
 .contenedor-editor {
     border: 1px solid #eef0f2;
     border-radius: v.$radio-curvatura;
@@ -130,6 +138,7 @@
         max-height: 400px;
         overflow-y: auto;
 
+   
         &::-webkit-scrollbar {
             width: 6px;
         }
@@ -144,6 +153,7 @@
         width: 100%;
         border-collapse: collapse;
 
+   
         th {
             position: sticky;
             top: 0;
@@ -180,6 +190,7 @@
                     outline: none;
                 }
 
+                // Error específico en celda
                 &.input-error {
                     color: v.$color-secundario-calido-1;
                     border-color: v.$color-secundario-calido-1;
@@ -192,6 +203,7 @@
                 text-align: center;
             }
 
+            // Indicadores de estado de fila
             .error-tag {
                 color: v.$color-secundario-calido-1;
                 font-size: 0.75rem;
@@ -215,13 +227,14 @@
             background-color: #f9fbff;
         }
 
+    
         .row-invalid td {
             background-color: rgba(v.$color-secundario-calido-1, 0.01);
         }
     }
 }
 
-// ACCIONES (GRID 1fr 1.5fr)
+// 6. ACCIONES FINALES 
 .acciones-form {
     display: grid;
     grid-template-columns: 1fr 1.5fr;
@@ -257,11 +270,11 @@
         margin: 0;
 
         &:disabled {
-            background: #e0e0e0 !important;
-            color: #999 !important;
+            background: #e0e0e0;
+            color: #999;
             cursor: not-allowed;
-            box-shadow: none !important;
-            transform: none !important;
+            box-shadow: none;
+            transform: none;
         }
     }
 }

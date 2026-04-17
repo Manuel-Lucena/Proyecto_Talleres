@@ -1,13 +1,19 @@
+/* ==========================================================================
+   SISTEMA DE MODALES: CREACIÓN DE NOTICIAS Y TALLERES (WITH PREVIEW)
+   Layout dividido: Formulario de edición + Vista previa de tarjeta en tiempo real.
+   ========================================================================== */
+
 @use '../../../../styles/variables' as v;
 @use '../../../../styles/mixins' as m;
 @use '../../../../styles/formularios' as f;
 
+// 1. ESTRUCTURA Y FONDO
 .modal-overlay {
     position: fixed;
     inset: 0;
     background: rgba(v.$color-secundario-frio-2, 0.7);
     backdrop-filter: blur(4px);
-    display: flex;
+    display: center;
     justify-content: center;
     align-items: center;
     z-index: 9999;
@@ -16,6 +22,7 @@
 }
 
 .modal-body {
+    @include m.animacion-entrada;
     background: v.$color-neutro-max;
     width: 100%;
     max-width: 950px;
@@ -25,6 +32,7 @@
     position: relative;
     overflow: hidden;
 
+    // Cabecera estilizada con borde de marca
     .cabecera-modal {
         padding: 1.5rem 2.5rem;
         border-bottom: 1px solid v.$color-fondo-pagina;
@@ -37,16 +45,17 @@
             font-family: v.$fuente-enfasis;
             font-size: v.$tamaño-titular-md;
             color: v.$color-secundario-frio-2;
-            border-left: 4px solid v.$color-marca-principal;
+            border-left: 4px solid v.$color-marca-principal; 
             padding-left: 15px;
         }
 
         .btn-close {
-            @include m.boton-cerrar-circular;
+            @include m.boton-cerrar-circular; 
         }
     }
 }
 
+// 2. GRID PRINCIPAL (FORM VS PREVIEW)
 .noticia-grid-container {
     display: grid;
     grid-template-columns: 1fr 340px;
@@ -60,6 +69,9 @@
     }
 }
 
+// --------------------------------------------------------------------------
+// 3. COLUMNA DE EDICIÓN (Izquierda)
+// --------------------------------------------------------------------------
 .noticia-form-col {
     padding: 2rem 2.5rem;
     overflow-y: auto;
@@ -91,6 +103,7 @@
         }
     }
 
+    // Feedback de errores
     .error-container {
         min-height: 18px;
         margin-top: 2px;
@@ -99,7 +112,6 @@
             color: v.$color-secundario-calido-1;
             font-size: 0.7rem;
             font-weight: 700;
-            font-family: v.$fuente-lectura;
         }
     }
 
@@ -111,8 +123,6 @@
 
         .error-message {
             color: v.$color-secundario-calido-1;
-            font-size: 0.75rem;
-            font-weight: 700;
         }
     }
 
@@ -127,6 +137,9 @@
     @include m.zona-subida-estandar;
 }
 
+// --------------------------------------------------------------------------
+// 4. COLUMNA DE VISTA PREVIA (Derecha)
+// --------------------------------------------------------------------------
 .noticia-preview-col {
     background: v.$color-fondo-pagina;
     padding: 2rem;
@@ -142,10 +155,10 @@
         color: v.$color-superficie-suave;
         text-transform: uppercase;
         letter-spacing: 1px;
-        margin-bottom: 0.5rem;
     }
 }
 
+// Réplica de la tarjeta final del feed
 .vista-previa-tarjeta {
     @include m.card-elevada;
     background: white;
@@ -223,6 +236,7 @@
     }
 }
 
+// 5. ACCIONES FINALES (FOOTER)
 .acciones-finales {
     margin-top: auto;
 
@@ -239,6 +253,7 @@
     }
 }
 
+// 6. ESTILOS PARA NG-SELECT (Personalización de librería externa)
 .custom-ng-select {
     ::ng-deep .ng-select-container {
         @include m.estilo-input-base;

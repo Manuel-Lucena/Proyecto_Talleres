@@ -1,4 +1,4 @@
-<div class="app-content-wrapper">
+<div class="app-content-wrapper" [class.modal-open]="modalActive">
   <router-outlet></router-outlet>
 </div>
 
@@ -11,12 +11,12 @@
     <div class="panel-header">
       <p class="panel-title">Accesibilidad</p>
     </div>
-    
+
     <div class="panel-body">
       <div class="option-item mb-3">
         <label class="d-block mb-1">Contraste ({{contrastValue}}%)</label>
-        <input type="range" class="form-range" min="50" max="150" step="10" 
-               (input)="updateContrast($event)" [value]="contrastValue">
+        <input type="range" class="form-range" min="50" max="150" step="10" (input)="updateContrast($event)"
+          [value]="contrastValue">
       </div>
 
       <div class="option-item mb-3">

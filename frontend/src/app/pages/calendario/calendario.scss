@@ -1,6 +1,11 @@
+/* ==========================================================================
+   PÁGINA: CALENDARIO DE HORARIOS (CÓDIGO ORIGINAL)
+   ========================================================================== */
+
 @use '../../../styles/variables' as v;
 
 // 1. SECCIÓN PRINCIPAL Y CONTENEDOR
+// Controla el espaciado exterior y el lienzo blanco del calendario
 .calendario-seccion {
     background-color: v.$color-fondo-pagina;
     padding: 40px 4%;
@@ -18,6 +23,7 @@
 }
 
 // 2. HEADER / TOOLBAR (Contiene Título, Botón PDF y Filtro)
+// Organiza los controles superiores de forma flexible
 .calendario-toolbar {
     padding: 30px 40px;
     display: flex;
@@ -42,7 +48,7 @@
         }
     }
 
-    // Contenedor de las acciones (Botón + Select)
+    // Contenedor de las acciones
     .toolbar-actions {
         display: flex;
         align-items: center;
@@ -54,7 +60,7 @@
             align-items: center;
             gap: 8px;
             background-color: white;
-            color: #e74c3c; // Rojo corporativo PDF
+            color: #e74c3c;
             border: 1px solid #e74c3c;
             padding: 0 20px;
             height: 48px;
@@ -80,7 +86,7 @@
             }
         }
 
-        // SELECT DE FILTRO
+        // SELECT DE FILTRO 
         .filter-wrapper {
             position: relative;
             display: flex;
@@ -128,6 +134,7 @@
 }
 
 // 3. GRID DEL CALENDARIO
+// Crea las 6 columnas para los días de la semana
 .calendario-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -179,6 +186,7 @@
         border-color: rgba(v.$color-marca-principal, 0.2);
     }
 
+    // Línea de acento lateral en verde
     .card-line {
         width: 5px;
         background: v.$color-marca-principal;
@@ -219,6 +227,7 @@
 }
 
 // 6. RESPONSIVE
+// Adaptación para tablets y móviles
 @media (max-width: 1100px) {
     .calendario-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -242,9 +251,10 @@
 
         .toolbar-actions {
             width: 100%;
-            flex-direction: column-reverse; // El botón PDF abajo para que sea más fácil pulsar
+            flex-direction: column-reverse;
 
-            .filter-wrapper, .btn-pdf {
+            .filter-wrapper,
+            .btn-pdf {
                 width: 100%;
                 min-width: 100%;
                 justify-content: center;

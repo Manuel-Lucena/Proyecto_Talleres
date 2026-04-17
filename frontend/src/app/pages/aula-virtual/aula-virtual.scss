@@ -1,3 +1,8 @@
+/* ==========================================================================
+   VISTA: CONTENEDOR PRINCIPAL AULA VIRTUAL
+   Estructura de navegación por pestañas y Layout base del área de estudio.
+   ========================================================================== */
+
 @use '../../../styles/variables' as v;
 @use '../../../styles/mixins' as m;
 
@@ -7,14 +12,13 @@
   font-family: v.$fuente-lectura;
 }
 
-// === BANDA DE PESTAÑAS ===
+// 1. BANDA DE PESTAÑAS (NAVBAR SUPERIOR DEL AULA)
 .aula-tabs-band {
-  background-color: v.$color-secundario-frio-2;
+  background-color: v.$color-secundario-frio-2; 
   padding: 0 4%;
   position: sticky;
-  top: 0;
   z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
   .tabs-wrapper {
     max-width: 1400px;
@@ -26,14 +30,14 @@
   }
 }
 
-// --- Escritorio (Pestañas horizontales) ---
+// --- Escritorio ---
 .nav-desktop {
   display: flex;
   height: 100%;
-  
+
   .tab-btn {
     padding: 0 1.5rem;
-    height: 70px; 
+    height: 70px;
     color: rgba(white, 0.65);
     font-family: v.$fuente-enfasis;
     font-weight: 700;
@@ -44,28 +48,29 @@
     align-items: center;
     gap: 10px;
     transition: all 0.3s ease;
-    border-bottom: 4px solid transparent;
+    border-bottom: 4px solid transparent; 
 
-    &:hover { 
-      color: white; 
-      background: rgba(255,255,255,0.08); 
+    &:hover {
+      color: white;
+      background: rgba(255, 255, 255, 0.08);
     }
-    
+
     &.active {
       color: white;
-      border-bottom-color: v.$color-marca-principal;
+      border-bottom-color: v.$color-marca-principal; 
       background-color: rgba(v.$color-marca-principal, 0.15);
     }
   }
 }
 
-// --- Móvil (Dropdown Secciones) ---
+// --- Móvil (Conversión a Dropdown para ahorrar espacio) ---
 .nav-mobile {
   display: none;
+
   .btn-sections {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     color: white;
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     padding: 0.6rem 1.2rem;
     border-radius: 8px;
     font-family: v.$fuente-enfasis;
@@ -75,18 +80,20 @@
     gap: 8px;
     transition: background 0.2s;
 
-    &:active { background: rgba(255,255,255,0.2); }
+    &:active {
+      background: rgba(255, 255, 255, 0.2);
+    }
   }
 }
 
-// --- Botón Crear ---
+// --- Acciones de Administrador dentro del Aula ---
 .admin-menu-wrapper {
   .btn-crear {
     background-color: v.$color-marca-principal;
     color: white;
     border: none;
     padding: 0.7rem 1.4rem;
-    border-radius: 50px;
+    border-radius: 50px; 
     font-family: v.$fuente-enfasis;
     font-weight: 800;
     font-size: 0.85rem;
@@ -105,7 +112,7 @@
   }
 }
 
-// === BREADCRUMB CON HOVER ===
+// 2. BREADCRUMB 
 .breadcrumb-minimal {
   display: flex;
   align-items: center;
@@ -115,60 +122,90 @@
   text-transform: uppercase;
   font-family: v.$fuente-enfasis;
   letter-spacing: 0.5px;
-  
-  a { 
-    color: v.$color-superficie-suave; 
-    text-decoration: none; 
+
+  a {
+    color: v.$color-superficie-suave;
+    text-decoration: none;
     font-weight: 700;
     transition: all 0.2s ease;
     position: relative;
 
-    &:hover { 
-      color: v.$color-marca-principal; 
+    &:hover {
+      color: v.$color-marca-principal;
       transform: translateX(2px);
     }
   }
 
-  i { 
-    font-size: 0.7rem; 
-    color: #cbd5e0; 
+  i {
+    font-size: 0.7rem;
+    color: #cbd5e0;
   }
 
-  .current { 
-    color: v.$color-secundario-frio-2; 
-    font-weight: 800; 
+  .current {
+    color: v.$color-secundario-frio-2;
+    font-weight: 800;
   }
 }
 
-// === RESPONSIVE ===
+// 3. RESPONSIVE DESIGN
 @media (max-width: 992px) {
-  .nav-desktop { display: none; }
-  .nav-mobile { display: block; }
-  
+  .nav-desktop {
+    display: none;
+  }
+
+  .nav-mobile {
+    display: block;
+  }
+
   .admin-menu-wrapper {
     .btn-crear {
       padding: 0.7rem 1rem;
-      .btn-text { display: none; }
-      i { font-size: 1.3rem; margin: 0; }
+
+      .btn-text {
+        display: none;
+      }
+
+      i {
+        font-size: 1.3rem;
+        margin: 0;
+      }
     }
   }
 }
 
 @media (max-width: 576px) {
-  .aula-tabs-band { padding: 0 15px; }
-  .aula-content { padding: 1.5rem 15px; }
-  .breadcrumb-minimal { margin-bottom: 1.5rem; }
+  .aula-tabs-band {
+    padding: 0 15px;
+  }
+
+  .aula-content {
+    padding: 1.5rem 15px;
+  }
+
+  .breadcrumb-minimal {
+    margin-bottom: 1.5rem;
+  }
 }
 
-// === CONTENIDO Y ANIMACIÓN ===
+// 4. ÁREA DE CONTENIDO Y ANIMACIONES
 .aula-content {
   max-width: 1400px;
   margin: 0 auto;
   padding: 2.5rem 4%;
 }
 
-.fade-in { animation: fadeIn 0.4s ease-out; }
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

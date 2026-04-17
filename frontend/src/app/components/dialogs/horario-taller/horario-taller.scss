@@ -1,24 +1,28 @@
+/* ==========================================================================
+   SISTEMA DE MODALES: CONSULTA DE HORARIOS (CON MIXINS)
+   ========================================================================== */
+
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba($color-neutro-min, 0.7); // Usando tu variable de negro
+    background: rgba($color-neutro-min, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    // Si quisieras la animación que tienes en mixins la pondrías aquí, 
-    // pero como no quieres animaciones, lo dejamos seco.
+    // Aplicamos la animación de entrada suave al overlay o al container
 }
 
 .modal-container {
+    @include animacion-entrada;
     background: $color-neutro-max;
     width: 90%;
     max-width: 380px;
-    border-radius: $radio-curvatura; // Tus 0.5rem (8px)
-    box-shadow: $sombra-nivel-3; // Máxima profundidad para el modal
+    border-radius: $radio-curvatura;
+    box-shadow: $sombra-nivel-3;
     border-top: 5px solid $color-marca-principal;
     overflow: hidden;
 }
@@ -35,21 +39,22 @@
         font-family: $fuente-enfasis;
         font-size: $tamaño-titular-md;
         font-weight: 700;
-        color: $color-secundario-frio-2; // Tu color de títulos
+        color: $color-secundario-frio-2;
         text-transform: uppercase;
         letter-spacing: -0.5px;
     }
 
     .btn-close {
+        @include hover-escala;
         background: transparent;
         border: none;
         font-size: 1.2rem;
         color: $color-superficie-suave;
         cursor: pointer;
-        transition: color 0.3s;
 
         &:hover {
-            color: $color-secundario-calido-1; // Tu naranja de acción/danger
+            outline: none;
+            color: $color-secundario-calido-1;
         }
     }
 }
@@ -78,10 +83,10 @@
         }
 
         .time-label {
-            font-family: 'Inter', monospace; // Usando tu variable Inter si existe
+            font-family: 'Inter', monospace;
             font-size: 1rem;
             color: $color-neutro-min;
-            background: rgba($color-marca-principal, 0.05); // Fondo muy suave de tu verde
+            background: rgba($color-marca-principal, 0.05);
             padding: 4px 10px;
             border-radius: 4px;
             font-weight: 500;
@@ -96,7 +101,7 @@
 
     i {
         font-size: 2rem;
-        color: $color-secundario-frio-1; // Tu cyan de info
+        color: $color-secundario-frio-1;
         display: block;
         margin-bottom: 10px;
     }

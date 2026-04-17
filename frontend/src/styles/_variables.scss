@@ -11,7 +11,6 @@
 $color-marca-principal: #0ed145; // Verde corporativo
 $color-marca-claro:     #11e147; // Variante para estados success o hover
 $color-marca-oscuro:    #0ce146; // Variante para contraste o bordes
-
 $color-neutro-max:      #ffffff; // Blanco puro
 $color-neutro-min:      #000000; // Negro puro
 
@@ -19,9 +18,9 @@ $color-neutro-min:      #000000; // Negro puro
 // 2. COLORES SECUNDARIOS (Temperatura y Función)
 // Utilizados para categorizar acciones y estados visuales.
 // --------------------------------------------------------------------------
-$color-secundario-frio-1:   #00bcd4; // Cian: Generalmente para información (Info)
+$color-secundario-frio-1:   #00bcd4; // Cian: Información (Info)
 $color-secundario-frio-2:   #2d4059; // Azul oscuro: Contraste y encabezados
-$color-secundario-calido-1: #f2994a; // Naranja: Acciones de peligro o alerta (Danger)
+$color-secundario-calido-1: #f2994a; // Naranja: Peligro o alerta (Danger)
 $color-secundario-calido-2: #f2c94c; // Amarillo: Advertencias (Warning)
 
 // --------------------------------------------------------------------------
@@ -34,7 +33,7 @@ $color-fondo-pagina:        #f8f9fa; // Gris muy claro (Layout de fondo)
 
 // --------------------------------------------------------------------------
 // 4. MAPEO FUNCIONAL (Bootstrap & Frameworks)
-// Vincula nuestros tokens de diseño con las variables estándar del framework.
+// Vincula nuestros tokens de diseño con las variables estándar.
 // --------------------------------------------------------------------------
 $primary:   $color-marca-principal;
 $secondary: $color-secundario-frio-2;
@@ -63,7 +62,7 @@ $tamaño-titular-md: calc(22rem / 16); // ~22px
 // --------------------------------------------------------------------------
 // 6. ESTRUCTURA Y GEOMETRÍA
 // --------------------------------------------------------------------------
-$radio-curvatura: 0.5rem; // Equivalente a 8px según guía de estilo
+$radio-curvatura: 0.5rem; // Equivalente a 8px
 
 // --------------------------------------------------------------------------
 // 7. PROFUNDIDAD (Elevation / Sombras)

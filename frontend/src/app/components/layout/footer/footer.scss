@@ -1,12 +1,18 @@
+/* ==========================================================================
+   SISTEMA DE CIERRE: FOOTER PRINCIPAL (AULA VIVA)
+   Diseño de alta densidad informativa con estética Dark Mode.
+   ========================================================================== */
+
 @use '../../../../styles/variables' as v;
 
 .main-footer {
     background-color: v.$color-superficie-oscura;
     color: rgba(v.$color-neutro-max, 0.7);
     padding: 70px 0 30px;
-    border-top: 4px solid v.$color-marca-principal; // El toque verde arriba oficial
+    border-top: 4px solid v.$color-marca-principal;
     font-family: v.$fuente-lectura;
 
+    // 1. BLOQUE DE IDENTIDAD
     .footer-logo {
         display: flex;
         align-items: center;
@@ -15,6 +21,7 @@
 
         .logo-img {
             width: 45px;
+            filter: brightness(0) invert(1); 
         }
 
         span {
@@ -25,6 +32,7 @@
         }
     }
 
+    // 2. TÍTULOS DE SECCIÓN CON SUBRAYADO DECORATIVO
     .footer-title {
         color: v.$color-neutro-max;
         font-family: v.$fuente-enfasis;
@@ -44,13 +52,15 @@
         }
     }
 
-    .footer-links,
-    .footer-contact {
+    // 3. LISTAS DE ENLACES Y CONTACTO
+    .footer-links, .footer-contact {
         list-style: none;
         padding: 0;
 
         li {
             margin-bottom: 12px;
+            display: flex;
+            align-items: center;
 
             a {
                 color: inherit;
@@ -59,17 +69,20 @@
 
                 &:hover {
                     color: v.$color-marca-principal;
-                    padding-left: 5px;
+                    padding-left: 5px; 
                 }
             }
 
             i {
                 color: v.$color-marca-claro;
                 margin-right: 10px;
+                width: 20px;
+                text-align: center;
             }
         }
     }
 
+    // 4. REDES SOCIALES (ICONOS CIRCULARES)
     .social-icons {
         display: flex;
         gap: 15px;
@@ -98,6 +111,7 @@
         }
     }
 
+    // 5. DIVISOR Y SECCIÓN LEGAL
     .footer-divider {
         margin: 40px 0 25px;
         border-top: 1px solid rgba(v.$color-neutro-max, 0.1);
@@ -111,14 +125,16 @@
         flex-wrap: wrap;
         gap: 10px;
 
-        .footer-legal a {
-            color: rgba(v.$color-neutro-max, 0.4);
-            text-decoration: none;
-            margin-left: 20px;
-            transition: color 0.3s ease-in-out;
+        .footer-legal {
+            a {
+                color: rgba(v.$color-neutro-max, 0.4);
+                text-decoration: none;
+                margin-left: 20px;
+                transition: color 0.3s ease-in-out;
 
-            &:hover {
-                color: v.$color-neutro-max;
+                &:hover {
+                    color: v.$color-neutro-max;
+                }
             }
         }
     }
