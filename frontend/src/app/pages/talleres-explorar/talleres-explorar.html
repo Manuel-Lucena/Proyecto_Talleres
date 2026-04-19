@@ -74,7 +74,8 @@
         <div class="contenido-curso">
           <div class="cuerpo-superior">
             <div class="periodo-curso">
-              <i class="bi bi-calendar-range"></i> {{ taller.fechaInicio | date:'dd MMM' }} - {{ taller.fechaFin | date:'dd MMM, yyyy' }}
+              <i class="bi bi-calendar-range"></i> {{ taller.fechaInicio | date:'dd MMM' }} - {{ taller.fechaFin |
+              date:'dd MMM, yyyy' }}
             </div>
             <h3 class="titulo-curso">{{ taller.nombre }}</h3>
             <p class="descripcion-curso">{{ taller.descripcion }}</p>
@@ -88,18 +89,17 @@
             </div>
             <div class="precio-inscripcion">
               <span class="moneda">{{ taller.precio }}€</span>
-              
-              <button class="btn-inscripcion" 
-                      [disabled]="taller.plazasDisponibles === 0 || estaInscrito(taller.idTaller)" 
-                      [class.ya-inscrito]="estaInscrito(taller.idTaller)"
-                      (click)="abrirInscripcion(taller)">
-                
-                <ng-container *ngIf="estaInscrito(taller.idTaller)">
-                   <i class="bi bi-check-circle-fill"></i> Ya inscrito
+
+              <button class="btn-inscripcion" [disabled]="taller.plazasDisponibles === 0 || estaInscrito(taller.nombre)"
+                [class.ya-inscrito]="estaInscrito(taller.nombre)"
+                (click)="!estaInscrito(taller.nombre) ? abrirInscripcion(taller) : null">
+
+                <ng-container *ngIf="estaInscrito(taller.nombre)">
+                  <i class="bi bi-check-circle-fill"></i> Ya inscrito
                 </ng-container>
 
-                <ng-container *ngIf="!estaInscrito(taller.idTaller)">
-                   {{ taller.plazasDisponibles > 0 ? 'Inscribirme' : 'Agotado' }}
+                <ng-container *ngIf="!estaInscrito(taller.nombre)">
+                  {{ taller.plazasDisponibles > 0 ? 'Inscribirme' : 'Agotado' }}
                 </ng-container>
               </button>
             </div>
@@ -110,8 +110,10 @@
   </div>
 </div>
 
-<app-form-taller *ngIf="mostrarModalForm" [tallerParaEditar]="tallerSeleccionado" (cerrar)="mostrarModalForm = false" (guardado)="guardarCambios($event)"></app-form-taller>
-<app-form-inscripcion *ngIf="mostrarModalInscripcion" [tallerParaInscribir]="tallerSeleccionado" (cerrar)="mostrarModalInscripcion = false" (guardado)="finalizarInscripcion($event)"></app-form-inscripcion>
+<app-form-taller *ngIf="mostrarModalForm" [tallerParaEditar]="tallerSeleccionado" (cerrar)="mostrarModalForm = false"
+  (guardado)="guardarCambios($event)"></app-form-taller>
+<app-form-inscripcion *ngIf="mostrarModalInscripcion" [tallerParaInscribir]="tallerSeleccionado"
+  (cerrar)="mostrarModalInscripcion = false" (guardado)="finalizarInscripcion($event)"></app-form-inscripcion>
 <app-confirmacion></app-confirmacion>
 <app-modal-notificacion></app-modal-notificacion>
 <app-footer></app-footer>

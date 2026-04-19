@@ -549,17 +549,17 @@ export class AulaDetalle implements OnInit {
    * @param id ID del recurso guardado.
    * @private
    */
-  private finalizarGuardado(id: number): void {
-    this.editando = false;
-    this.nuevosArchivos = [];
-    this.archivosParaEliminar = [];
-    if (this.esNuevo) {
-      this.router.navigate(['/aula-virtual', this.idTaller, this.tipo === 'tarea' ? 'tareas' : 'recursos', id], { replaceUrl: true })
-        .then(() => this.cargarDatos(id));
-    } else {
-      this.cargarDatos(id);
-    }
+private finalizarGuardado(id: number): void {
+  this.editando = false;
+  this.nuevosArchivos = [];
+  this.archivosParaEliminar = [];
+
+  if (this.esNuevo) {
+    this.router.navigate(['/aula-virtual', this.idTaller, 'muro'], { replaceUrl: true });
+  } else {
+    this.cargarDatos(id);
   }
+}
 
   /**
    * Revierte los cambios no guardados o vuelve atrás si es una creación.

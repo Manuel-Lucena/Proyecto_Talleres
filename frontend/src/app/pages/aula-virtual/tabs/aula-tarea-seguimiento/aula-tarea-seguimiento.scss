@@ -1,6 +1,12 @@
+/* ==========================================================================
+   VISTA: SEGUIMIENTO DE ENTREGAS / CALIFICACIONES (ADMIN/TUTOR)
+   Layout de tabla avanzada para gestión de alumnos y notas.
+   ========================================================================== */
+
 @use '../../../../../styles/variables' as v;
 @use '../../../../../styles/mixins' as m;
 
+// 1. CONTENEDOR PRINCIPAL
 .seguimiento-wrapper {
     padding: 2rem 2.5rem;
     max-width: 1200px;
@@ -8,6 +14,7 @@
     animation: fadeInSeguimiento 0.5s ease-in-out;
 }
 
+// 2. HEADER CON DASHBOARD DE ESTADÍSTICAS RÁPIDAS
 .seguimiento-header {
     display: flex;
     justify-content: space-between;
@@ -19,6 +26,7 @@
         gap: 1.5rem;
         align-items: center;
 
+        // Botón volver con hover direccional
         .btn-circular {
             width: 42px;
             height: 42px;
@@ -58,6 +66,7 @@
         }
     }
 
+    // Estadísticas numéricas (Entregados, Media, etc.)
     .header-stats {
         display: flex;
         gap: 3rem;
@@ -94,6 +103,7 @@
     }
 }
 
+// 3. TABLA DE GESTIÓN
 .card-tabla {
     background: white;
     border-radius: 16px;
@@ -127,6 +137,7 @@
         color: v.$color-superficie-oscura;
     }
 
+    // Celda de Usuario (Avatar + Nombre + Email)
     .user-cell {
         display: flex;
         align-items: center;
@@ -136,9 +147,8 @@
             width: 40px;
             height: 40px;
             flex-shrink: 0;
-            border-radius: 50%; // Imagen circular
+            border-radius: 50%;
             overflow: hidden;
-            background: transparent; // Eliminado fondo gris
 
             img {
                 width: 100%;
@@ -165,16 +175,7 @@
         }
     }
 
-    .fecha-cell {
-        font-size: 0.85rem;
-        color: #777;
-
-        i {
-            margin-right: 6px;
-            color: #ccc;
-        }
-    }
-
+    // Visualización de Nota (Valor / Máximo)
     .nota-container {
         display: flex;
         align-items: baseline;
@@ -197,6 +198,7 @@
         }
     }
 
+    // Fila en estado "No entregado"
     tr.fila-pendiente {
         background-color: #fcfcfc;
 
@@ -206,6 +208,7 @@
     }
 }
 
+// 4. SISTEMA DE BADGES SEMÁNTICOS
 .badge-status {
     padding: 4px 10px;
     border-radius: 6px;
@@ -236,6 +239,7 @@
     }
 }
 
+// 5. ACCIONES Y ESTADOS VACÍOS
 .btn-accion-revisar {
     @include m.boton-primario;
     padding: 6px 16px;
@@ -243,13 +247,6 @@
     border-radius: 8px;
     border: none;
     cursor: pointer;
-}
-
-.esperando-txt {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #ccc;
-    font-style: italic;
 }
 
 .loading-state,
@@ -270,6 +267,7 @@
     }
 }
 
+// 6. ANIMACIONES
 @keyframes fadeInSeguimiento {
     from {
         opacity: 0;

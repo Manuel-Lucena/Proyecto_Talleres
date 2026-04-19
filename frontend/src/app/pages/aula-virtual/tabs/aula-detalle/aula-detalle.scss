@@ -1,18 +1,36 @@
+/* ==========================================================================
+   VISTA: DETALLE INTEGRAL DE TAREA / RECURSO
+   Este archivo gestiona la visualización del contenido, el estado de entrega 
+   del alumno y la interfaz de edición del profesor.
+   ========================================================================== */
+
 @use '../../../../../styles/variables' as v;
 @use '../../../../../styles/mixins' as m;
 
+// 1. ESTRUCTURA BASE Y LAYOUT
 .pagina-detalle-wrapper {
   background-color: #f0f2f5;
-  min-height: 100vh;
-  padding: 2rem;
+  // ELIMINA: min-height: 100vh;
+  
+  // CAMBIA POR:
+  display: block;
+  width: 100%;
+  padding: 2rem 2rem 0 2rem; // 0 abajo para que no sume espacio extra al final
+  box-sizing: border-box;
+  
+  // Si quieres que al menos ocupe la pantalla cuando no hay nada:
+  min-height: auto; 
 }
 
 .contenedor-ancho {
   width: 100%;
   margin: 0 auto;
   max-width: 1200px;
+  display: block; // Cambiamos a block para que el flujo sea natural
+  overflow: hidden; // Evita que los márgenes de los hijos "salgan" y sumen espacio
 }
 
+// 2. NAVEGACIÓN SUPERIOR Y BOTONES DE ACCIÓN
 .nav-superior {
   display: flex;
   justify-content: space-between;
@@ -36,12 +54,11 @@
   }
 }
 
-// Estilos específicos para botones de acción en Desktop
-// 1. Unificamos los botones del nav superior
+// 3. ACCIONES PARA ESCRITORIO (Desktop)
 .acciones-desktop-wrapper {
   display: flex;
   align-items: center;
-  gap: 1.5rem; // Un poco más de espacio entre ellos
+  gap: 1.5rem;
 
   .btn-link-volver {
     background: none;
@@ -61,46 +78,23 @@
     }
 
     &:hover {
-      background-color: #f2f3f5; // Fondo gris muy suave al pasar el ratón
+      background-color: #f2f3f5;
       color: v.$color-marca-principal;
     }
   }
 
-  // El de eliminar lo mantenemos con su toque rojo sutil
+  // Botón de eliminar con feedback visual de peligro
   .btn-eliminar-recurso {
     &:hover {
-      color: #dc3545 !important;
-      background-color: rgba(220, 53, 69, 0.08) !important;
+      color: #dc3545;
+      background-color: rgba(220, 53, 69, 0.08);
     }
   }
 }
 
-// 2. Efecto Hover para los archivos
-.lista-archivos {
-  .item-archivo {
-    transition: all 0.2s ease-in-out;
-    cursor: pointer;
-
-    &:hover {
-      transform: translateY(-3px); // Pequeño salto hacia arriba
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      border-color: v.$color-marca-principal;
-      background: white; // Cambia un poco el fondo para resaltar
-    }
-
-    i {
-      transition: transform 0.2s;
-    }
-
-    &:hover i {
-      transform: scale(1.1); // El icono crece un poquito
-    }
-  }
-}
-
-// Estilos para el botón de menú móvil
+// 4. ACCIONES PARA MÓVIL (Dropdown)
 .acciones-mobile-wrapper {
-  display: none; // Oculto por defecto
+  display: none; // Oculto en pantallas grandes
 
   .btn-dropdown-trigger {
     background: #e4e6eb;
@@ -137,7 +131,12 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   padding: 3rem;
   @include m.animacion-entrada;
+  
+  // Este margen determinará la separación con el footer
+  margin-bottom: 2rem; 
 
+
+  // Encabezado con Título y Badges
   .encabezado-tarea {
     display: flex;
     justify-content: space-between;
@@ -180,6 +179,7 @@
         }
       }
 
+      // Input de edición de título
       .form-control-titulo-edit {
         font-size: 2rem;
         font-weight: 700;
@@ -190,6 +190,7 @@
       }
     }
 
+    // Bloque de fechas de entrega
     .bloque-fechas-horizontal {
       display: flex;
       gap: 3rem;
@@ -215,6 +216,7 @@
     }
   }
 
+  // Cuerpo del texto (instrucciones/contenido)
   .contenido-texto {
     font-size: 1.15rem;
     line-height: 1.8;
@@ -223,6 +225,7 @@
     margin-bottom: 2rem;
   }
 
+  // 6. LISTADO DE ARCHIVOS ADJUNTOS
   .lista-archivos {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -237,21 +240,35 @@
       background: #f8f9fa;
       border: 1px solid #e4e6eb;
       border-radius: 10px;
+      transition: all 0.2s ease-in-out;
+      cursor: pointer;
 
       i {
         font-size: 1.8rem;
         color: v.$color-marca-principal;
         cursor: pointer;
+        transition: transform 0.2s;
       }
 
       .file-meta {
         display: flex;
         flex-direction: column;
-        cursor: pointer;
 
         .file-name {
           font-weight: 600;
           font-size: 0.9rem;
+        }
+      }
+
+      // Estados del archivo
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border-color: v.$color-marca-principal;
+        background: white;
+
+        i {
+          transform: scale(1.1);
         }
       }
 
@@ -260,6 +277,7 @@
         background: #f4fff6;
       }
 
+      // Botón flotante para eliminar archivo cargado
       .btn-borrar-file {
         position: absolute;
         top: -8px;
@@ -269,40 +287,14 @@
         background: white;
         border-radius: 50%;
         cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
     }
   }
 
+  // 7. TABLA DE GESTIÓN DE ENTREGAS (ESTILO MOODLE)
   .seccion-tabla-moodle {
     margin-top: 4rem;
-
-    // ... dentro de .seccion-tabla-moodle .wrapper-tabla .tabla-custom
-
-    .archivo-entregado-link {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      border-radius: 6px;
-      color: v.$color-marca-principal; // O el color que prefieras para links
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      width: fit-content; // Para que el hover no ocupe todo el ancho de la celda
-
-      i {
-        font-size: 1.2rem;
-        transition: transform 0.2s ease;
-      }
-
-      &:hover {
-        background-color: rgba(v.$color-marca-principal, 0.08); // Fondo sutil
-        color: darken(v.$color-marca-principal, 10%); // Oscurece un poco el texto
-
-  
-      }
-    }
 
     .titulo-tabla {
       font-size: 1.4rem;
@@ -350,6 +342,31 @@
             font-size: 0.95rem;
           }
         }
+
+        // Link para ver el archivo que el alumno entregó
+        .archivo-entregado-link {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px 12px;
+          border-radius: 6px;
+          color: v.$color-marca-principal;
+          font-weight: 600;
+          font-size: 0.9rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          width: fit-content;
+
+          i {
+            font-size: 1.2rem;
+            transition: transform 0.2s ease;
+          }
+
+          &:hover {
+            background-color: rgba(v.$color-marca-principal, 0.08);
+            color: darken(v.$color-marca-principal, 10%);
+          }
+        }
       }
     }
 
@@ -372,7 +389,7 @@
   }
 }
 
-// Formularios y Dropdowns Custom
+// 8. FORMULARIOS Y COMPONENTES DE EDICIÓN CUSTOM
 .form-control-custom {
   width: 100%;
   border: 1px solid #ddd;
@@ -387,6 +404,7 @@
   }
 }
 
+// Área de Drag & Drop
 .zona-upload {
   border: 2px dashed #cbd5e0;
   border-radius: 12px;
@@ -412,6 +430,7 @@
   }
 }
 
+// Botones de guardado/cancelación
 .footer-save-central {
   display: flex;
   justify-content: center;
@@ -435,6 +454,7 @@
   cursor: pointer;
 }
 
+// Toggle de visibilidad (Ojo)
 .btn-ojo-minimal {
   background: none;
   border: none;
@@ -458,6 +478,7 @@
   }
 }
 
+// 9. DROPDOWN DE EXTENSIONES PERSONALIZADO
 .dropdown-extensiones-custom {
   position: relative;
   width: 100%;
@@ -506,6 +527,7 @@
   }
 }
 
+// 10. ESTADOS AUXILIARES Y LOADER
 .label-form {
   display: block;
   font-weight: 700;
@@ -529,7 +551,7 @@
   color: v.$color-marca-principal;
 }
 
-// --- MEDIA QUERIES (Aquí ocurre la magia) ---
+// 11. MEDIA QUERIES (RESPONSIVE ADAPTATION)
 @media (max-width: 992px) {
   .pagina-detalle-wrapper {
     padding: 1rem;
@@ -539,12 +561,9 @@
     display: none;
   }
 
-  // Ocultamos botones largos
   .acciones-mobile-wrapper {
     display: block;
   }
-
-  // Mostramos el dropdown
 
   .card-tarea-principal {
     padding: 1.5rem;

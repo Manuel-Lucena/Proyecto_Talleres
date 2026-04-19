@@ -8,13 +8,13 @@
 
 .aula-virtual-container {
   background-color: v.$color-fondo-pagina;
-  min-height: 100vh;
+  min-height: auto;
   font-family: v.$fuente-lectura;
 }
 
 // 1. BANDA DE PESTAÑAS (NAVBAR SUPERIOR DEL AULA)
 .aula-tabs-band {
-  background-color: v.$color-secundario-frio-2; 
+  background-color: v.$color-secundario-frio-2;
   padding: 0 4%;
   position: sticky;
   z-index: 1000;
@@ -48,7 +48,7 @@
     align-items: center;
     gap: 10px;
     transition: all 0.3s ease;
-    border-bottom: 4px solid transparent; 
+    border-bottom: 4px solid transparent;
 
     &:hover {
       color: white;
@@ -57,7 +57,7 @@
 
     &.active {
       color: white;
-      border-bottom-color: v.$color-marca-principal; 
+      border-bottom-color: v.$color-marca-principal;
       background-color: rgba(v.$color-marca-principal, 0.15);
     }
   }
@@ -93,7 +93,7 @@
     color: white;
     border: none;
     padding: 0.7rem 1.4rem;
-    border-radius: 50px; 
+    border-radius: 50px;
     font-family: v.$fuente-enfasis;
     font-weight: 800;
     font-size: 0.85rem;

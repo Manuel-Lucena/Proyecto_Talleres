@@ -32,26 +32,41 @@ export const routes: Routes = [
     { path: 'perfil', component: Perfil, canActivate: [authGuard] },
     { path: 'talleres-explorar', component: TalleresExplorar, canActivate: [authGuard] },
     { path: 'mis-talleres', component: MisTalleres, canActivate: [authGuard] },
-    { path: 'calendario', component: Calendario, canActivate: [authGuard] },
+    {
+        path: 'calendario',
+        component: Calendario,
+        canActivate: [authGuard],
+        children: [
+            { path: '', redirectTo: 'talleres', pathMatch: 'full' },
+            {
+                path: 'talleres',
+                loadComponent: () => import('./pages/calendario/tabs/calendario-talleres/calendario-talleres').then(m => m.CalendarioTalleres)
+            },
+            {
+                path: 'tareas',
+                loadComponent: () => import('./pages/calendario/tabs/calendario-tareas/calendario-tareas').then(m => m.CalendarioTareas)
+            }
+        ]
+    },
 
     // --- RUTA PANEL ADMIN (Solo ADMIN) ---
     {
         path: 'panel-admin',
         component: PanelAdmin,
         canActivate: [authGuard],
-        data: { roles: ['ADMIN'] }, 
+        data: { roles: ['ADMIN'] },
         children: [
-            { path: '', redirectTo: 'talleres', pathMatch: 'full' }, 
+            { path: '', redirectTo: 'talleres', pathMatch: 'full' },
             {
                 path: 'talleres',
                 loadComponent: () => import('./pages/panel-admin/tabs/admin-talleres/admin-talleres').then(m => m.AdminTalleres)
             },
             {
-                path: 'talleres/:idTaller/inscripciones', 
+                path: 'talleres/:idTaller/inscripciones',
                 loadComponent: () => import('./pages/panel-admin/tabs/admin-inscripciones/admin-inscripciones').then(m => m.AdminInscripciones)
             },
             {
-                path: 'usuarios/:idUsuario/inscripciones', 
+                path: 'usuarios/:idUsuario/inscripciones',
                 loadComponent: () => import('./pages/panel-admin/tabs/admin-inscripciones/admin-inscripciones').then(m => m.AdminInscripciones)
             },
             {
@@ -81,7 +96,7 @@ export const routes: Routes = [
             { path: 'tareas', component: AulaTareas, data: { breadcrumb: 'Tareas' } },
             { path: 'recursos', component: AulaMateriales, data: { breadcrumb: 'Materiales' } },
             { path: 'participantes', component: AulaParticipantes, data: { breadcrumb: 'Participantes' } },
-            
+
             // Solo Profesores y Admins pueden ver seguimiento y crear contenido nuevo
             {
                 path: 'tareas/:idRecurso/seguimiento',

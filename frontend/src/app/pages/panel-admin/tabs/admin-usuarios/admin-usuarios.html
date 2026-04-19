@@ -4,13 +4,11 @@
       <h1 class="txt-h1">Gestión de Usuarios</h1>
       <p class="txt-bajada">Directorio oficial de la comunidad Aula Viva</p>
     </div>
-
     <div class="d-flex gap-2">
       <button class="btn-secundario-aula" (click)="mostrarModalCarga = true" title="Importar desde CSV">
         <i class="bi bi-file-earmark-arrow-up-fill"></i>
         <span class="btn-text">Carga Masiva</span>
       </button>
-
       <button class="btn-primario-aula" (click)="abrirCrear()">
         <i class="bi bi-person-plus-fill"></i>
         <span class="btn-text">Nuevo Miembro</span>
@@ -33,7 +31,6 @@
         <input type="text" [placeholder]="getPlaceholder()" [(ngModel)]="busqueda" class="input-aula">
       </div>
     </div>
-
     <div class="filter-box">
       <i class="bi bi-filter"></i>
       <select [(ngModel)]="filtroRol" class="select-aula">
@@ -46,68 +43,70 @@
   </section>
 
   <div class="admin-card shadow-1">
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Perfil</th>
-          <th>DNI</th>
-          <th>Contacto</th>
-          <th>Rol</th>
-          <th class="text-right">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (u of usuariosFiltrados; track u.idUsuario) {
-        <tr>
-          <td class="col-user">
-            <div class="user-item">
-              <div class="avatar-frame">
-                <img [src]="u.fotoPerfilRuta ? '/usuarios/' + u.fotoPerfilRuta : '/usuarios/Predeterminada.png'"
-                  alt="User" (error)="u.fotoPerfilRuta = ''">
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Perfil</th>
+            <th>DNI</th>
+            <th>Contacto</th>
+            <th>Rol</th>
+            <th class="text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of usuariosFiltrados; track u.idUsuario) {
+          <tr>
+            <td class="col-user">
+              <div class="user-item">
+                <div class="avatar-frame">
+                  <img [src]="u.fotoPerfilRuta ? '/usuarios/' + u.fotoPerfilRuta : '/usuarios/Predeterminada.png'"
+                    alt="User" (error)="u.fotoPerfilRuta = ''">
+                </div>
+                <div class="user-meta">
+                  <span class="u-name">{{ u.nombre }} {{ u.apellidos }}</span>
+                  <span class="u-email">{{ u.email }}</span>
+                </div>
               </div>
-              <div class="user-meta">
-                <span class="u-name">{{ u.nombre }} {{ u.apellidos }}</span>
-                <span class="u-email">{{ u.email }}</span>
+            </td>
+            <td><span class="u-dni">{{ u.dni }}</span></td>
+            <td>
+              <div class="contact-vertical">
+                <div class="contact-row">
+                  <i class="bi bi-telephone"></i>
+                  <span>{{ u.telefono || '---' }}</span>
+                </div>
+                <div class="contact-row mt-1">
+                  <i class="bi bi-geo-alt"></i>
+                  <span class="u-dir">{{ u.direccion || '---' }}</span>
+                </div>
               </div>
-            </div>
-          </td>
-          <td><span class="u-dni">{{ u.dni }}</span></td>
-          <td>
-            <div class="contact-vertical">
-              <div class="contact-row">
-                <i class="bi bi-telephone"></i>
-                <span>{{ u.telefono || '---' }}</span>
+            </td>
+            <td>
+              <span class="badge-rol" [ngClass]="u.nombreRol.toLowerCase()">{{ u.nombreRol }}</span>
+            </td>
+            <td class="text-right">
+              <div class="actions-group">
+                <button class="btn-tool info" (click)="verInscripciones(u.idUsuario)" title="Ver Talleres Inscritos">
+                  <i class="bi bi-journal-check"></i>
+                </button>
+                <button class="btn-tool status" (click)="toggleEstado(u)" [class.active]="u.activo"
+                  title="Cambiar estado">
+                  <i class="bi" [class]="u.activo ? 'bi-shield-check' : 'bi-shield-slash'"></i>
+                </button>
+                <button class="btn-tool edit" (click)="abrirEditar(u)" title="Editar">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+                <button class="btn-tool delete" (click)="eliminarUsuario(u.idUsuario)" title="Eliminar">
+                  <i class="bi bi-trash3"></i>
+                </button>
               </div>
-              <div class="contact-row mt-1">
-                <i class="bi bi-geo-alt"></i>
-                <span class="u-dir">{{ u.direccion || '---' }}</span>
-              </div>
-            </div>
-          </td>
-          <td>
-            <span class="badge-rol" [ngClass]="u.nombreRol.toLowerCase()">{{ u.nombreRol }}</span>
-          </td>
-          <td class="text-right">
-            <div class="actions-group">
-              <button class="btn-tool info" (click)="verInscripciones(u.idUsuario)" title="Ver Talleres Inscritos">
-                <i class="bi bi-journal-check"></i>
-              </button>
-              <button class="btn-tool status" (click)="toggleEstado(u)" [class.active]="u.activo"
-                title="Cambiar estado">
-                <i class="bi" [class]="u.activo ? 'bi-shield-check' : 'bi-shield-slash'"></i>
-              </button>
-              <button class="btn-tool edit" (click)="abrirEditar(u)" title="Editar">
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button class="btn-tool delete" (click)="eliminarUsuario(u.idUsuario)" title="Eliminar">
-                <i class="bi bi-trash3"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -116,11 +115,9 @@
   (usuarioGuardado)="ejecutarGuardado($event)">
 </app-form-alumno>
 }
-
 @if (mostrarModalCarga) {
 <app-form-carga-usuarios (cerrar)="mostrarModalCarga = false" (guardado)="cargarUsuarios()">
 </app-form-carga-usuarios>
 }
-
 <app-confirmacion></app-confirmacion>
 <app-modal-notificacion></app-modal-notificacion>

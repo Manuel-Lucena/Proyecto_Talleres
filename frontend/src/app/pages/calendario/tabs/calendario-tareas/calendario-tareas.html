@@ -1,0 +1,38 @@
+<div class="calendario-container">
+    <div class="calendario-toolbar">
+        <div class="toolbar-info">
+            <h2 class="titulo-horario">Agenda de <span>Entregas</span></h2>
+        </div>
+
+        <div class="calendar-nav">
+            <button (click)="cambiarMes(-1)" class="btn-nav"><i class="bi bi-chevron-left"></i></button>
+            <span class="mes-actual">{{ fechaVisual | date:'MMMM yyyy' | titlecase }}</span>
+            <button (click)="cambiarMes(1)" class="btn-nav"><i class="bi bi-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <div class="calendar-body">
+        <div class="weekdays-grid">
+            @for (dia of nombresDias; track dia) {
+            <div class="weekday">{{ dia }}</div>
+            }
+        </div>
+
+        <div class="days-grid">
+            @for (item of diasCalendario; track $index) {
+            <div class="day-cell" [class.empty]="!item.dia" [class.today]="item.hoy">
+                @if (item.dia) {
+                <span class="day-number">{{ item.dia }}</span>
+                <div class="day-events">
+                    @for (tarea of item.tareas; track tarea.idTarea) {
+                    <div class="mini-event" [title]="tarea.titulo" (click)="irATarea(tarea)"> <span class="dot"></span>
+                        <span class="event-text">{{ tarea.titulo }}</span>
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+            }
+        </div>
+    </div>
+</div>

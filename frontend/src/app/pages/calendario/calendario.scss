@@ -1,270 +1,89 @@
 /* ==========================================================================
-   PÁGINA: CALENDARIO DE HORARIOS (CÓDIGO ORIGINAL)
+   VISTA: CALENDARIO PADRE (DISEÑO EXPANDIDO Y FUSIONADO)
    ========================================================================== */
-
 @use '../../../styles/variables' as v;
 
-// 1. SECCIÓN PRINCIPAL Y CONTENEDOR
-// Controla el espaciado exterior y el lienzo blanco del calendario
 .calendario-seccion {
-    background-color: v.$color-fondo-pagina;
-    padding: 40px 4%;
-    min-height: 90vh;
+  background-color: v.$color-fondo-pagina;
+  padding: 30px 2%; // Reducido para que el contenido respire más a los lados
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.calendario-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    background: white;
-    border-radius: v.$radio-curvatura;
-    box-shadow: v.$sombra-nivel-1;
-    overflow: hidden;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-}
+.tabs-container {
+  max-width: 1600px; // Aumentado para ocupar más parte de la pantalla
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 
-// 2. HEADER / TOOLBAR (Contiene Título, Botón PDF y Filtro)
-// Organiza los controles superiores de forma flexible
-.calendario-toolbar {
-    padding: 30px 40px;
+  // 1. HEADER DE NAVEGACIÓN
+  .tabs-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 20px;
-    background: white;
-    border-bottom: 2px solid v.$color-fondo-pagina;
+    gap: 4px;
+    margin-bottom: -1px; // Pisa el borde del contenedor hijo
+    padding-left: 10px;
+    position: relative;
+    z-index: 10; // Por encima para tapar la línea superior del hijo
 
-    .toolbar-info {
-        .titulo-horario {
-            font-family: v.$fuente-enfasis;
-            font-weight: 800;
-            color: v.$color-secundario-frio-2;
-            margin: 0;
-            font-size: 1.8rem;
+    .tab-btn {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 35px;
+      background: #e2e8f0; 
+      color: #64748b;
+      border: 1px solid #cbd5e1;
+      border-bottom: none;
+      border-radius: 12px 12px 0 0;
+      font-family: v.$fuente-enfasis;
+      font-weight: 700;
+      transition: all 0.2s ease;
 
-            span {
-                color: v.$color-marca-principal;
-            }
-        }
+      i { font-size: 1.2rem; }
+
+      &:hover:not(.active) {
+        background: #cbd5e1;
+        transform: translateY(-2px);
+      }
+
+      &.active {
+        background: white;
+        color: v.$color-marca-principal;
+        border: 1px solid #cbd5e1;
+        border-bottom: 3px solid white ; 
+        border-top: 5px solid v.$color-marca-principal;
+        pointer-events: none;
+      }
     }
+  }
 
-    // Contenedor de las acciones
-    .toolbar-actions {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-
-        // BOTÓN EXPORTAR PDF
-        .btn-pdf {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background-color: white;
-            color: #e74c3c;
-            border: 1px solid #e74c3c;
-            padding: 0 20px;
-            height: 48px;
-            border-radius: 10px;
-            font-family: v.$fuente-enfasis;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-
-            i {
-                font-size: 1.2rem;
-            }
-
-            &:hover {
-                background-color: #e74c3c;
-                color: white;
-                box-shadow: v.$sombra-nivel-1;
-                transform: translateY(-2px);
-            }
-
-            &:active {
-                transform: translateY(0);
-            }
-        }
-
-        // SELECT DE FILTRO 
-        .filter-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: white;
-            padding: 0 18px;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s ease;
-            min-width: 280px;
-            height: 48px;
-
-            &:hover,
-            &:focus-within {
-                border-color: v.$color-marca-principal;
-                box-shadow: v.$sombra-nivel-1;
-            }
-
-            i:first-child {
-                color: v.$color-marca-principal;
-                font-size: 1.1rem;
-            }
-        }
-
-        .maquina-select {
-            appearance: none;
-            -webkit-appearance: none;
-            border: none;
-            background: transparent;
-            font-family: v.$fuente-lectura;
-            color: v.$color-secundario-frio-2;
-            width: 100%;
-            outline: none;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.95rem;
-
-            option {
-                background: white;
-                color: v.$color-secundario-frio-2;
-            }
-        }
-    }
+  .tabs-content {
+    position: relative;
+    z-index: 5;
+  }
 }
 
-// 3. GRID DEL CALENDARIO
-// Crea las 6 columnas para los días de la semana
-.calendario-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    background-color: #f1f1f1;
-    gap: 1px;
-}
-
-.dia-columna {
-    background: white;
-    min-height: 600px;
-    display: flex;
+// Responsive
+@media (max-width: 768px) {
+  .tabs-header {
     flex-direction: column;
-
-    .dia-header {
-        padding: 22px;
-        text-align: center;
-        font-family: v.$fuente-enfasis;
-        font-weight: 800;
-        font-size: 0.95rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: v.$color-secundario-frio-2;
-        background: #fdfdfd;
-        border-bottom: 1px solid #f0f0f0;
+    padding-left: 0;
+    .tab-btn {
+      border-radius: 8px;
+      &.active { border-left: 6px solid v.$color-marca-principal; border-bottom: 1px solid #cbd5e1; }
     }
+  }
 }
 
-.eventos-container {
-    padding: 18px;
-    background-color: #fafafa;
-    flex-grow: 1;
+router-outlet + * {
+  display: block;
+  animation: fadeInTab 0.3s ease-out;
 }
 
-// 4. TARJETAS DE EVENTO (Talleres individuales)
-.evento-card {
-    display: flex;
-    background: white;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    box-shadow: v.$sombra-nivel-1;
-    overflow: hidden;
-    border: 1px solid rgba(0, 0, 0, 0.03);
-    transition: all 0.3s ease-in-out;
-    cursor: pointer;
-
-    &:hover {
-        transform: translateY(-3px);
-        box-shadow: v.$sombra-nivel-2;
-        border-color: rgba(v.$color-marca-principal, 0.2);
-    }
-
-    // Línea de acento lateral en verde
-    .card-line {
-        width: 5px;
-        background: v.$color-marca-principal;
-    }
-
-    .card-content {
-        padding: 14px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-
-        .hora {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-weight: 700;
-            color: v.$color-marca-principal;
-            font-size: 0.75rem;
-        }
-
-        .nombre {
-            font-family: v.$fuente-enfasis;
-            color: v.$color-secundario-frio-2;
-            font-size: 1rem;
-            line-height: 1.3;
-            font-weight: 700;
-        }
-    }
-}
-
-// 5. PLACEHOLDER CUANDO NO HAY TALLERES
-.vacio-placeholder {
-    padding: 50px 10px;
-    text-align: center;
-    color: #bbb;
-    font-size: 0.8rem;
-    font-style: italic;
-}
-
-// 6. RESPONSIVE
-// Adaptación para tablets y móviles
-@media (max-width: 1100px) {
-    .calendario-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        background-color: v.$color-fondo-pagina;
-        padding: 10px;
-    }
-
-    .dia-columna {
-        border-radius: 10px;
-        border: 1px solid #eee;
-        min-height: auto;
-    }
-}
-
-@media (max-width: 850px) {
-    .calendario-toolbar {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 20px;
-
-        .toolbar-actions {
-            width: 100%;
-            flex-direction: column-reverse;
-
-            .filter-wrapper,
-            .btn-pdf {
-                width: 100%;
-                min-width: 100%;
-                justify-content: center;
-            }
-        }
-    }
-}
-
-@media (max-width: 600px) {
-    .calendario-grid {
-        grid-template-columns: 1fr;
-    }
+@keyframes fadeInTab {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }

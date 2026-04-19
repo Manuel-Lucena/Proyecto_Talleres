@@ -1,3 +1,8 @@
+/* ==========================================================================
+   VISTA: MURO DE ACTIVIDAD RECIENTE (AULA VIRTUAL)
+   Muestra un feed unificado de tareas y materiales publicados.
+   ========================================================================== */
+
 @use '../../../../../styles/variables' as v;
 @use '../../../../../styles/mixins' as m;
 
@@ -5,6 +10,7 @@
     width: 100%;
 }
 
+// 1. ESTADO DE CARGA (Skeleton / Spinner)
 .loading-wrapper {
     display: flex;
     flex-direction: column;
@@ -23,11 +29,12 @@
     flex-direction: column;
 }
 
+// 2. TARJETA DE ACTIVIDAD (FEED ITEM)
 .actividad-card {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto; // Contenido a la izquierda, Meta a la derecha
     align-items: center;
-    padding: 1.6rem 2.5rem; // Padding unificado con los otros
+    padding: 1.6rem 2.5rem; // Consistencia con Detalle y Recursos
     background: white;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     cursor: pointer;
@@ -35,6 +42,7 @@
 
     &:hover {
         background-color: #fcfcfc;
+        // El "inset" crea la línea lateral de marca sin desplazar el contenido
         box-shadow: inset 6px 0 0 v.$color-marca-principal;
 
         .main-info .titulo {
@@ -47,13 +55,14 @@
         }
     }
 
+    // --- BLOQUE IZQUIERDO: ICONO Y TÍTULOS ---
     .card-content {
         display: flex;
         align-items: center;
         gap: 1.8rem;
         min-width: 0;
 
-        // LA CAJA DEL ICONO: Ahora es cuadrada-redondeada como los otros
+        // Contenedor del icono (Estandarizado a 54px/14px)
         .icon-container {
             width: 54px;
             height: 54px;
@@ -67,6 +76,7 @@
                 font-size: 1.7rem;
             }
 
+            // Variaciones de color según el tipo de actividad
             &.bg-verde {
                 background: rgba(v.$color-marca-principal, 0.1);
 
@@ -94,6 +104,7 @@
             gap: 12px;
             margin-bottom: 4px;
 
+            // Etiquetas de categoría (Mismo estilo que badges del detalle)
             .tipo-tag {
                 font-family: v.$fuente-enfasis;
                 font-size: 0.65rem;
@@ -120,6 +131,7 @@
                 font-size: 1.15rem;
                 color: v.$color-secundario-frio-2;
                 transition: color 0.3s;
+                @include m.limitar-lineas(1);
             }
         }
 
@@ -134,6 +146,7 @@
         }
     }
 
+    // --- BLOQUE DERECHO: FECHA Y ACCIÓN ---
     .card-meta {
         display: flex;
         align-items: center;
@@ -157,7 +170,7 @@
     }
 }
 
-// === RESPONSIVE UNIFICADO ===
+// 3. RESPONSIVE UNIFICADO
 @media (max-width: 768px) {
     .actividad-card {
         grid-template-columns: 1fr;
@@ -180,11 +193,60 @@
 
         .card-meta {
             justify-content: space-between;
-            padding-left: 60px;
+            padding-left: 60px; // Alineado con el inicio del texto (54px + gap)
 
             .flecha-link {
                 display: none;
             }
         }
+    }
+}
+
+// 4. ESTADO VACÍO (UNIFICADO CON EL RESTO DE LA APP)
+/* ==========================================================================
+   ESTADO VACÍO UNIFICADO (EMPTY STATES)
+   Ajuste para que el Muro coincida con el diseño de Materiales/Biblioteca
+   ========================================================================== */
+
+// Cambiamos .sin-actividad por .sin-datos para que coincida con tu HTML actual
+.sin-datos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;   
+    justify-content: center; 
+    padding: 8rem 2rem;     
+    text-align: center;
+    color: v.$color-superficie-suave;
+    @include m.animacion-entrada;
+
+
+    .empty-icon {
+        margin-bottom: 1.5rem;
+        
+        i {
+            font-size: 4.5rem;
+            color: v.$color-secundario-frio-2;
+            opacity: 0.12;   
+            display: block;
+        }
+    }
+
+    // El título "Aún no hay actividad"
+    h3 {
+        font-family: v.$fuente-enfasis;
+        font-weight: 800;    
+        font-size: 1.8rem;     
+        color: v.$color-secundario-frio-2;
+        margin: 0 0 0.5rem 0; 
+    }
+
+    // El texto de bajada
+    p {
+        font-family: v.$fuente-lectura;
+        font-size: 1.05rem;
+        color: v.$color-superficie-suave;
+        opacity: 0.7;
+        margin: 0;
+        max-width: 400px;      
     }
 }

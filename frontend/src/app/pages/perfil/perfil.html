@@ -113,8 +113,8 @@
           </div>
 
           <div class="form-footer">
-            <button type="submit" class="save-btn" [disabled]="perfilForm.invalid">
-              Guardar todos los cambios
+            <button type="submit" class="save-btn" [disabled]="perfilForm.invalid || perfilForm.pristine"> Guardar todos
+              los cambios
             </button>
           </div>
         </form>

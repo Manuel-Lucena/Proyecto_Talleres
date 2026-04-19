@@ -1,34 +1,34 @@
 /* ==========================================================================
    VISTA: GESTIÓN DE USUARIOS (SISTEMA DE TABLA MAESTRA)
-   Layout de alta densidad de datos con scroll interno y UI de administración.
+   Layout de alta densidad con scroll interno y cabecera pegajosa (sticky).
    ========================================================================== */
 
 @use '../../../../../styles/variables' as v;
 @use '../../../../../styles/mixins' as m;
 
-// 1. WRAPPER PRINCIPAL (CONTENEDOR DE PANTALLA COMPLETA)
+// 1. CONTENEDOR PRINCIPAL
 .admin-wrapper {
     padding: 2.5rem;
     background-color: v.$color-fondo-pagina;
-    height: 100vh; // Fija la altura al visor para permitir scroll interno
+    height: 100vh; // Altura fija para forzar el scroll interno en la tabla
     display: flex;
-    flex-direction: column; // Distribución vertical: Header -> Toolbar -> Card
+    flex-direction: column;
     box-sizing: border-box;
-    overflow: hidden; // Evita que la página entera haga scroll
-    @include m.animacion-entrada; // Mixin de opacidad/desplazamiento al cargar
+    overflow: hidden; // Evita el scroll de la página completa
+    max-width: 100vw;
+    @include m.animacion-entrada;
 
-    // Ajustes para tablets y móviles
     @media (max-width: 992px) {
         padding: 1rem;
-        height: auto; // En móvil preferimos el scroll natural de la página
+        height: auto; // En móvil soltamos la altura para scroll natural
         min-height: 100vh;
         overflow-y: auto;
     }
 }
 
-// 2. HEADER DE LA SECCIÓN (Título y Botonera)
+// 2. CABECERA DE ACCIONES (Título + Botones)
 .admin-header {
-    flex-shrink: 0; // Evita que el título se aplaste
+    flex-shrink: 0; 
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
@@ -38,7 +38,6 @@
     @media (max-width: 992px) {
         flex-direction: column;
         align-items: flex-start;
-        gap: 1.5rem;
     }
 
     .title-group {
@@ -58,17 +57,10 @@
         }
     }
 
-    // Grupo de botones (Exportar, Nuevo Usuario, etc.)
+    // Estilos de botones de acción superior
     .d-flex.gap-2 {
         display: flex;
         gap: 0.75rem;
-        align-items: center;
-
-        @media (max-width: 992px) {
-            width: 100%;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
 
         .btn-primario-aula,
         .btn-secundario-aula {
@@ -83,16 +75,10 @@
             cursor: pointer;
             transition: all 0.3s ease;
             white-space: nowrap;
-            font-size: 0.95rem;
-
-            @media (max-width: 992px) {
-                width: 100%;
-                flex: none;
-            }
         }
 
         .btn-primario-aula {
-            @include m.boton-primario; // Estilo azul sólido
+            @include m.boton-primario;
             padding: 0 1.8rem;
             border: none;
         }
@@ -110,15 +96,14 @@
             }
 
             &:hover {
-                background: #f8fafc;
                 border-color: v.$color-marca-principal;
-                transform: translateY(-2px); 
+                transform: translateY(-2px);
             }
         }
     }
 }
 
-// 3. TOOLBAR (Buscador avanzado y Filtros)
+// 3. BARRA DE HERRAMIENTAS (Buscador y Filtros)
 .admin-toolbar {
     flex-shrink: 0;
     padding: 1rem 1.5rem;
@@ -132,11 +117,9 @@
 
     @media (max-width: 768px) {
         flex-direction: column;
-        padding: 1rem;
-        gap: 1rem;
     }
 
-    // Buscador compuesto (Criterio + Input)
+    // Buscador de doble zona (Criterio + Input)
     .search-group {
         display: flex;
         flex: 2;
@@ -148,9 +131,7 @@
 
         &:focus-within {
             border-color: v.$color-marca-principal;
-            box-shadow: 0 0 0 3px rgba(v.$color-marca-principal, 0.1);
         }
-
 
         .criteria-box {
             width: 140px;
@@ -164,12 +145,6 @@
                 padding: 0 15px;
                 font-size: 0.85rem;
                 font-weight: 600;
-                color: v.$color-secundario-frio-2;
-                outline: none;
-            }
-
-            @media (max-width: 600px) {
-                width: 90px;
             }
         }
 
@@ -191,12 +166,10 @@
                 width: 100%;
                 height: 45px;
                 background: transparent;
-                outline: none;
             }
         }
     }
 
-    // Selector de filtro simple (ej. por Rol)
     .filter-box {
         flex: 1;
         position: relative;
@@ -220,24 +193,25 @@
     }
 }
 
-// 4. CONTENEDOR DE LA TABLA (CARD)
+// 4. CONTENEDOR DE TABLA (CARD)
 .admin-card {
     background: white;
     border-radius: v.$radio-curvatura;
     box-shadow: v.$sombra-nivel-1;
-    flex: 1;
+    flex: 1; 
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    min-height: 0;
+    min-height: 0; 
 
+    // Wrapper con scrollbars personalizados
     .table-responsive {
         width: 100%;
-        overflow-x: auto; 
+        overflow-x: auto;
         overflow-y: auto; 
         flex: 1;
+        display: block;
 
-        // Customización de la barra de scroll 
         &::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -250,14 +224,15 @@
     }
 }
 
-// 5. DISEÑO DE LA TABLA
+// 5. ESTILOS DE LA TABLA
 .admin-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 950px; 
+    min-width: 1000px;
+    flex-shrink: 0; 
 
     thead {
-        position: sticky; 
+        position: sticky;
         top: 0;
         z-index: 10;
         background: #fafafa;
@@ -271,10 +246,6 @@
             font-size: 0.75rem;
             font-weight: 800;
             text-transform: uppercase;
-
-            &:last-child {
-                text-align: right;
-            }
         }
     }
 
@@ -283,15 +254,10 @@
         border-bottom: 1px solid #f5f5f5;
         vertical-align: middle;
         color: v.$color-secundario-frio-2;
-
-        &:last-child {
-            text-align: right;
-        }
     }
 }
 
-// 6. CELDAS ESPECIALIZADAS 
-// Bloque de Usuario 
+// 6. CELDAS ESPECIALES
 .user-item {
     display: flex;
     align-items: center;
@@ -327,7 +293,6 @@
     }
 }
 
-// Bloque de Contacto (Teléfono y Localización)
 .contact-vertical {
     display: flex;
     flex-direction: column;
@@ -342,12 +307,11 @@
 
         i {
             color: v.$color-marca-principal;
-            font-size: 0.9rem;
         }
     }
 }
 
-// Etiquetas de Roles (Colores semánticos)
+// Estados de insignias por rol
 .badge-rol {
     padding: 6px 14px;
     border-radius: 20px;
@@ -372,7 +336,7 @@
     }
 }
 
-// Botones de acción (Editar / Eliminar)
+// Botones de acción en fila
 .actions-group {
     display: flex;
     gap: 8px;
@@ -391,9 +355,9 @@
         transition: 0.2s;
 
         &:hover {
-            transform: translateY(-2px);
             border-color: v.$color-marca-principal;
             color: v.$color-marca-principal;
+            transform: translateY(-2px);
         }
 
         &.delete:hover {

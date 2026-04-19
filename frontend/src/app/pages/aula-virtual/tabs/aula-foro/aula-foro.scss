@@ -1,12 +1,18 @@
+/* ==========================================================================
+   COMPONENTE: MURO / FORO DE CONSULTAS (AULA VIRTUAL)
+   Diseño de feed de mensajes con editor de publicaciones y sistema de hilos.
+   ========================================================================== */
+
 @use '../../../../../styles/variables' as v;
 @use '../../../../../styles/mixins' as m;
 
 .foro-container {
-    max-width: 900px;
+    max-width: 900px; 
     margin: 0 auto;
     padding: 1.5rem 2.5rem;
 }
 
+// 1. ENCABEZADO DEL FORO
 .foro-header {
     margin-bottom: 2.5rem;
 
@@ -23,6 +29,7 @@
     }
 }
 
+// 2. SECCIÓN DE PUBLICACIÓN (TEXTAREA EDITOR)
 .publicar-seccion {
     background: white;
     padding: 1.8rem;
@@ -38,7 +45,7 @@
         min-height: 100px;
         margin-bottom: 1.2rem;
         font-family: v.$fuente-lectura;
-        resize: none;
+        resize: none; 
         padding: 1rem;
 
         &:focus {
@@ -69,6 +76,7 @@
     }
 }
 
+// 3. TARJETA DE MENSAJE (FEED)
 .mensaje-card {
     background: white;
     padding: 1.8rem;
@@ -76,6 +84,7 @@
     border: 1px solid rgba(0, 0, 0, 0.05);
     margin-bottom: 1.5rem;
 
+    // --- Header del Mensaje (Autor e Info) ---
     .card-header {
         display: flex;
         align-items: center;
@@ -83,7 +92,7 @@
         margin-bottom: 1.2rem;
 
         .avatar-wrapper {
-            width: 54px;
+            width: 54px; 
             height: 54px;
             flex-shrink: 0;
             border-radius: 14px;
@@ -119,21 +128,19 @@
         }
     }
 
+    // --- Cuerpo del Mensaje ---
     .contenido {
         font-family: v.$fuente-lectura;
-        line-height: 1.7;
+        line-height: 1.7; 
         color: v.$color-superficie-oscura;
-        // Padding inferior para que no quede pegado al borde de la card
         padding-bottom: 0.5rem;
 
-        p {
-            margin: 0;
-        }
+        p { margin: 0; }
     }
 }
 
-.loading-state,
-.empty-foro {
+// 4. ESTADOS DE CARGA Y VACÍO
+.loading-state, .empty-foro {
     text-align: center;
     padding: 5rem 2rem;
     color: v.$color-superficie-suave;
@@ -155,15 +162,11 @@
     }
 }
 
+// 5. RESPONSIVE
 @media (max-width: 768px) {
-    .foro-container {
-        padding: 1rem;
-    }
-
-    .mensaje-card {
-        padding: 1.2rem;
-    }
-
+    .foro-container { padding: 1rem; }
+    .mensaje-card { padding: 1.2rem; }
+    
     .mensaje-card .card-header .avatar-wrapper {
         width: 48px;
         height: 48px;

@@ -1,0 +1,52 @@
+
+
+<div class="calendario-seccion">
+  <div class="calendario-container">
+
+    <div class="calendario-toolbar">
+      <div class="toolbar-info">
+        <h2 class="titulo-horario">Horarios de <span>Talleres</span></h2>
+      </div>
+      
+      <div class="toolbar-actions">
+        <button class="btn-pdf" (click)="descargarAgenda()" title="Descargar Agenda en PDF">
+          <i class="bi bi-file-earmark-pdf"></i>
+          <span>Exportar PDF</span>
+        </button>
+
+        <div class="filter-wrapper">
+          <i class="bi bi-funnel"></i>
+          <select class="maquina-select" (change)="onFiltroChange($event)">
+            <option value="">Todos los talleres</option>
+            <option *ngFor="let t of talleresDisponibles" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="calendario-grid">
+      <div class="dia-columna" *ngFor="let dia of diasSemana">
+        <div class="dia-header">
+          <span class="nombre-dia">{{ dia }}</span>
+        </div>
+
+        <div class="eventos-container">
+          <div class="evento-card" *ngFor="let h of filtrarPorDia(dia)">
+            <div class="card-line"></div>
+            <div class="card-content">
+              <span class="hora">
+                {{ h.horaInicio.substring(0,5) }} - {{ h.horaFin.substring(0,5) }}
+              </span>
+              <span class="nombre">{{ h.nombreTaller }}</span>
+            </div>
+          </div>
+
+          <div class="vacio-placeholder" *ngIf="filtrarPorDia(dia).length === 0">
+            <span>Sin talleres</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

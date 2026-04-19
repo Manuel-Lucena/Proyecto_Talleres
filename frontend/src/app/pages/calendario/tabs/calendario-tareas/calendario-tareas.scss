@@ -1,0 +1,149 @@
+@use '../../../../../styles/variables' as v;
+
+.calendario-container {
+    width: 100%;
+    background: white;
+    border-radius: 0 15px 15px 15px;
+    border: 1px solid #cbd5e1;
+    box-shadow: v.$sombra-nivel-1;
+    overflow: hidden;
+    margin-top: 0;
+}
+
+.calendario-toolbar {
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+
+    .calendar-nav {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        background: #f1f5f9;
+        padding: 8px 15px;
+        border-radius: 12px;
+
+        .mes-actual {
+            font-family: v.$fuente-enfasis;
+            font-weight: 700;
+            color: v.$color-secundario-frio-2;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        .btn-nav {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+
+            &:hover {
+                background: v.$color-marca-principal;
+                color: white;
+                border-color: v.$color-marca-principal;
+            }
+        }
+    }
+}
+
+.calendar-body {
+    padding: 0;
+}
+
+.weekdays-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+
+    .weekday {
+        padding: 12px;
+        text-align: center;
+        font-weight: 800;
+        font-size: 0.75rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+    }
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #cbd5e1; // Color de las líneas divisorias
+    gap: 1px;
+
+    .day-cell {
+        background: white;
+        min-height: 120px;
+        padding: 10px;
+        transition: background 0.2s;
+
+        &.empty {
+            background: #f8fafc;
+        }
+
+        &.today {
+            background: #f0f9ff;
+
+            .day-number {
+                background: v.$color-marca-principal;
+                color: white;
+                border-radius: 50%;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        .day-number {
+            font-family: v.$fuente-enfasis;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+    }
+}
+
+.day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .mini-event {
+        background: rgba(v.$color-marca-principal, 0.08);
+        border-left: 3px solid v.$color-marca-principal;
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: transform 0.1s;
+
+        &:hover {
+            transform: scale(1.02);
+            background: rgba(v.$color-marca-principal, 0.15);
+        }
+
+        .event-text {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: v.$color-marca-principal;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+}

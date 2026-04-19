@@ -23,7 +23,7 @@ import { InscripcionResponse } from "../../interfaces/Inscripcion.Interface";
   selector: 'app-talleres-explorar',
   standalone: true,
   imports: [
-    CommonModule, RouterModule, ReactiveFormsModule, Navbar, Footer, 
+    CommonModule, RouterModule, ReactiveFormsModule, Navbar, Footer,
     FormTaller, FormInscripcion, Confirmacion, Notificacion
   ],
   templateUrl: './talleres-explorar.html',
@@ -33,8 +33,8 @@ export class TalleresExplorar implements OnInit {
 
   // --- Propiedades de Datos ---
   talleres: TallerResponse[] = [];            // Listado maestro obtenido del servidor
-  talleresFiltrados: TallerResponse[] = [];    // Listado procesado para mostrar en la vista
-  misInscripcionesIds: number[] = [];         // Almacena IDs de talleres para control de botones
+  talleresFiltrados: TallerResponse[] = [];   // Listado procesado para mostrar en la vista
+  misTalleresInscritosNombres: string[] = []; // Almacena nombre de talleres para control de botones
 
   // --- Propiedades de Estado y UI ---
   filtroForm: FormGroup;                      // Control reactivo de los filtros
@@ -68,12 +68,12 @@ export class TalleresExplorar implements OnInit {
   ngOnInit(): void {
     this.comprobarPermisos();
     this.cargarTalleres();
-    
+
     // Si hay sesión activa, recuperamos inscripciones para deshabilitar botones
     if (this.tokenService.isLogged()) {
       this.cargarMisInscripciones();
     }
-    
+
     // Suscripción reactiva a los cambios del formulario de filtros
     this.filtroForm.valueChanges.subscribe(() => {
       this.aplicarFiltros();
@@ -88,21 +88,17 @@ export class TalleresExplorar implements OnInit {
    * Recupera las inscripciones del usuario logueado para marcar los talleres ya adquiridos.
    */
   cargarMisInscripciones(): void {
-    const idUsuario = this.tokenService.getId(); 
+    const idUsuario = this.tokenService.getId();
     if (!idUsuario) return;
 
     this.inscripcionService.listarPorUsuario(idUsuario).subscribe({
       next: (res) => {
-        const datos = res.data || res;
+        const datos = res.data || [];
+
         if (Array.isArray(datos)) {
-          this.misInscripcionesIds = datos.map((ins: any) => {
-            // Mapeo flexible de ID según respuesta del servidor (CamelCase o SnakeCase)
-            const id = ins.idTaller || ins.id_taller || ins.tallerId;
-            return Number(id);
-          });
-          
-          // Limpieza de datos corruptos y actualización de vista
-          this.misInscripcionesIds = this.misInscripcionesIds.filter(id => !isNaN(id));
+          this.misTalleresInscritosNombres = datos
+            .map((ins: any) => ins.nombreTaller)
+            .filter(nombre => !!nombre);
           this.cdr.detectChanges();
         }
       }
@@ -113,8 +109,9 @@ export class TalleresExplorar implements OnInit {
    * Comprueba si un taller específico ya está en la lista de inscritos del usuario.
    * @param idTaller ID del taller a verificar.
    */
-  estaInscrito(idTaller: number): boolean {
-    return this.misInscripcionesIds.includes(Number(idTaller));
+  estaInscrito(nombreTaller: string): boolean {
+    if (!nombreTaller) return false;
+    return this.misTalleresInscritosNombres.includes(nombreTaller);
   }
 
   // ===========================================================================
@@ -155,8 +152,8 @@ export class TalleresExplorar implements OnInit {
     const buscar = texto.toLowerCase();
 
     this.talleresFiltrados = this.talleres.filter(t => {
-      const coincideTexto = t.nombre.toLowerCase().includes(buscar) || 
-                            t.descripcion.toLowerCase().includes(buscar);
+      const coincideTexto = t.nombre.toLowerCase().includes(buscar) ||
+        t.descripcion.toLowerCase().includes(buscar);
       const coincidePrecio = t.precio <= precioMax;
       const coincidePlazas = soloDisponibles ? t.plazasDisponibles > 0 : true;
 
@@ -243,9 +240,9 @@ export class TalleresExplorar implements OnInit {
    * @param taller Taller a eliminar.
    */
   async eliminarTaller(taller: TallerResponse): Promise<void> {
-    const confirmar = await this.notify.confirmar({ 
-      titulo: 'Eliminar', 
-      mensaje: `¿Borrar "${taller.nombre}"?` 
+    const confirmar = await this.notify.confirmar({
+      titulo: 'Eliminar',
+      mensaje: `¿Borrar "${taller.nombre}"?`
     });
 
     if (confirmar) {
