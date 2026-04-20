@@ -48,7 +48,7 @@ export class AulaMuro implements OnInit {
 
   /**
    * Ciclo de vida: Inicializa permisos de rol y captura el identificador del taller 
-   * a través del parent snapshot para disparar la hidratación del muro.
+   * a través del parent snapshot para refrescar del muro.
    */
   ngOnInit(): void {
     const rol = this.tokenService.getRol();

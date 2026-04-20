@@ -27,7 +27,7 @@ export class AulaTareaSeguimiento implements OnInit {
   idTaller: number = 0;                       // Contexto del taller actual
   idTarea: number = 0;                        // ID de la actividad a supervisar
   tarea: any = null;                          // Datos descriptivos de la tarea
-  filas: any[] = [];                          // Matriz unificada: Alumno + Entrega + Estado
+  filas: any[] = [];                          // LISTADO unificada: Alumno + Entrega + Estado
 
   // --- Propiedades de Estado y UI ---
   cargando: boolean = true;                   // Orquestador de visualización de carga
@@ -66,7 +66,7 @@ export class AulaTareaSeguimiento implements OnInit {
   // ===========================================================================
 
   /**
-   * Ejecuta peticiones paralelas para construir la matriz de seguimiento.
+   * Ejecuta peticiones paralelas para construir la LISTADO de seguimiento.
    * * TÉCNICA: Se utiliza forkJoin para garantizar la atomicidad de los datos:
    * No se renderiza la tabla hasta que todas las fuentes han respondido.
    */
@@ -84,7 +84,7 @@ export class AulaTareaSeguimiento implements OnInit {
         const listaUsuarios = res.usuarios?.data || [];
         const listaEntregas = res.entregas?.data || [];
 
-        // MAPEO DE MATRIZ: Vinculamos cada alumno con su entrega (si existe)
+        // MAPEO DE LISTADO: Vinculamos cada alumno con su entrega (si existe)
         this.filas = listaUsuarios
           .filter((u: any) => u.nombreRol?.toUpperCase() === 'ALUMNO')
           .map((alumno: any) => {

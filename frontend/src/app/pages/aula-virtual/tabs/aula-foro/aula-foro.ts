@@ -28,7 +28,7 @@ export class AulaForo implements OnInit {
   nuevoMensaje: string = '';                  // Buffer vinculado al Two-Way Binding del input
 
   // --- Propiedades de Estado y UI ---
-  cargando: boolean = false;                  // Flag para el control de la hidratación inicial
+  cargando: boolean = false;                  // Flag para el control de la carga inicial
 
   /**
    * @param route Captura de parámetros desde el contexto superior de la ruta.

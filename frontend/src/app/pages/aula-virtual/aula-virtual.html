@@ -3,7 +3,7 @@
 <div class="aula-virtual-container">
   <nav class="aula-tabs-band">
     <div class="tabs-wrapper">
-      
+
       <div class="nav-desktop">
         <a routerLink="muro" routerLinkActive="active" class="tab-btn">
           <i class="bi bi-megaphone"></i> Muro
@@ -17,6 +17,9 @@
         <a routerLink="recursos" routerLinkActive="active" class="tab-btn">
           <i class="bi bi-folder2-open"></i> Materiales
         </a>
+        <a routerLink="calificaciones" routerLinkActive="active" class="tab-btn">
+          <i class="bi bi-star"></i> Calificaciones
+        </a>
         <a routerLink="participantes" routerLinkActive="active" class="tab-btn">
           <i class="bi bi-people"></i> Participantes
         </a>
@@ -28,18 +31,26 @@
             <i class="bi bi-list"></i> Secciones
           </button>
           <ul class="dropdown-menu shadow">
-            <li><a class="dropdown-item" routerLink="muro" routerLinkActive="active"><i class="bi bi-megaphone me-2"></i> Muro</a></li>
-            <li><a class="dropdown-item" routerLink="foro" routerLinkActive="active"><i class="bi bi-chat-left-dots me-2"></i> Foro</a></li>
-            <li><a class="dropdown-item" routerLink="tareas" routerLinkActive="active"><i class="bi bi-journal-check me-2"></i> Tareas</a></li>
-            <li><a class="dropdown-item" routerLink="recursos" routerLinkActive="active"><i class="bi bi-folder2-open me-2"></i> Materiales</a></li>
-            <li><a class="dropdown-item" routerLink="participantes" routerLinkActive="active"><i class="bi bi-people me-2"></i> Participantes</a></li>
+            <li><a class="dropdown-item" routerLink="muro" routerLinkActive="active"><i
+                  class="bi bi-megaphone me-2"></i> Muro</a></li>
+            <li><a class="dropdown-item" routerLink="foro" routerLinkActive="active"><i
+                  class="bi bi-chat-left-dots me-2"></i> Foro</a></li>
+            <li><a class="dropdown-item" routerLink="tareas" routerLinkActive="active"><i
+                  class="bi bi-journal-check me-2"></i> Tareas</a></li>
+            <li><a class="dropdown-item" routerLink="recursos" routerLinkActive="active"><i
+                  class="bi bi-folder2-open me-2"></i> Materiales</a></li>
+            <li><a class="dropdown-item" routerLink="calificaciones" routerLinkActive="active"><i
+                  class="bi bi-star me-2"></i> Calificaciones</a></li>
+            <li><a class="dropdown-item" routerLink="participantes" routerLinkActive="active"><i
+                  class="bi bi-people me-2"></i> Participantes</a></li>
           </ul>
         </div>
       </div>
 
       <div class="admin-menu-wrapper">
         <div class="dropdown">
-          <button class="btn-crear" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+          <button class="btn-crear" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown"
+            aria-expanded="false">
             <i class="bi bi-plus-circle-fill"></i>
             <span class="btn-text">Crear</span>
           </button>
@@ -66,9 +77,18 @@
       <a routerLink="/mis-talleres">Mis Talleres</a>
       <i class="bi bi-chevron-right"></i>
       <a [routerLink]="['/aula-virtual', idTaller, 'muro']">{{ nombreTaller }}</a>
+
       <ng-container *ngIf="seccionActual">
         <i class="bi bi-chevron-right"></i>
-        <span class="current">{{ seccionActual }}</span>
+        <a *ngIf="recursoNombre" [routerLink]="['/aula-virtual', idTaller, seccionEnlace]">
+          {{ seccionActual }}
+        </a>
+        <span *ngIf="!recursoNombre" class="current">{{ seccionActual }}</span>
+      </ng-container>
+
+      <ng-container *ngIf="recursoNombre">
+        <i class="bi bi-chevron-right"></i>
+        <span class="current">{{ recursoNombre }}</span>
       </ng-container>
     </nav>
 

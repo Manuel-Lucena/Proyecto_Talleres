@@ -110,12 +110,16 @@ export const routes: Routes = [
                 data: { roles: ['ADMIN', 'PROFESOR'], breadcrumb: 'Nuevo' },
                 loadComponent: () => import('./pages/aula-virtual/tabs/aula-detalle/aula-detalle').then(m => m.AulaDetalle)
             },
-            // Ver el detalle de algo existente lo permitimos a todos (el Back filtrará el contenido)
             {
                 path: 'detalle/:tipo/:idRecurso',
                 canActivate: [authGuard],
-                data: { breadcrumb: 'Detalle' },
+                data: { breadcrumb: 'Cargando...' },
                 loadComponent: () => import('./pages/aula-virtual/tabs/aula-detalle/aula-detalle').then(m => m.AulaDetalle)
+            },
+            {
+                path: 'calificaciones',
+                loadComponent: () => import('./pages/aula-virtual/tabs/aula-calificaciones/aula-calificaciones').then(m => m.AulaCalificaciones),
+                data: { breadcrumb: 'Calificaciones' }
             }
         ]
     },

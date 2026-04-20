@@ -11,7 +11,7 @@ VALUES (2, 'Alumno', 'Prueba', '87654321B', 'alumno@talleres.com', '$2a$12$WwG.L
 
 -- 3. TALLERES (id_profesor es FK a usuario 1)
 INSERT INTO taller (id_taller, nombre, descripcion, plazas_maximas, precio, activo, fecha_inicio, id_profesor) 
-VALUES (1, 'Cerámica', 'Taller de barro', 20, 50.0, true, '2026-04-01', 1);
+VALUES (1, 'Ceramica', 'Taller de barro', 20, 50.0, true, '2026-04-01', 1);
 
 -- 4. HORARIOS (Relacionado con taller 1)
 INSERT INTO horario (id_horario, id_taller, dia_semana, hora_inicio, hora_fin) 

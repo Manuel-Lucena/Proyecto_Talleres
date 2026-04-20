@@ -120,7 +120,7 @@
 
                     <div class="row" *ngIf="tipo === 'tarea' && esProfesor()">
                         <div class="col-12 mb-4">
-                            <label class="label-form">Asignar a alumnos específicos (Opcional)</label>
+                            <label class="label-form">Asignar a alumnos específicos</label>
                             <div class="dropdown-extensiones-custom">
                                 <div class="dropdown-trigger-custom"
                                     (click)="toggleDropdownAlumnos(); $event.stopPropagation()">
@@ -130,13 +130,24 @@
                                     </span>
                                     <i class="bi bi-people-fill"></i>
                                 </div>
+
                                 <div class="dropdown-menu-custom" [class.show]="mostrarDropdownAlumnos"
                                     (click)="$event.stopPropagation()">
+
+                                    <div class="dropdown-header-acciones">
+                                        <span class="header-label">Asignación</span>
+                                        <button type="button" class="btn-accion-masiva" (click)="toggleTodosAlumnos()">
+                                            {{ alumnosSeleccionadosIds.length === alumnosTaller.length ? 'Desmarcar
+                                            todos' : 'Seleccionar todos' }}
+                                        </button>
+                                    </div>
+
                                     <div class="p-2 border-bottom">
                                         <input type="text" class="form-control-custom" placeholder="Buscar alumno..."
                                             [(ngModel)]="filtroAlumno" [ngModelOptions]="{standalone: true}">
                                     </div>
-                                    <div>
+
+                                    <div class="lista-alumnos-scroll">
                                         <label *ngFor="let alu of alumnosFiltrados" class="dropdown-item-check">
                                             <input type="checkbox"
                                                 [checked]="alumnosSeleccionadosIds.includes(alu.idUsuario)"
@@ -146,8 +157,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <small class="text-muted">Si no seleccionas a nadie, la tarea será visible para todo el
-                                taller.</small>
                         </div>
                     </div>
                 </div>
@@ -204,6 +213,12 @@
                             <tr>
                                 <td class="col-gris">Estado de la calificación</td>
                                 <td class="col-blanca">{{ recurso.calificacion || 'Sin calificar' }}</td>
+                            </tr>
+                            <tr *ngIf="recurso.entregado && entregaRealizada?.comentarioProfesor">
+                                <td class="col-gris">Comentario del profesor</td>
+                                <td class="col-blanca contenido-texto-entrega">
+                                    {{ entregaRealizada.comentarioProfesor }}
+                                </td>
                             </tr>
                             <tr>
                                 <td class="col-gris">Tiempo restante</td>

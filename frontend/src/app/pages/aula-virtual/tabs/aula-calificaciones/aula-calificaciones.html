@@ -1,0 +1,47 @@
+<div class="calificaciones-container fade-in">
+  
+  <div *ngIf="cargando" class="loading-wrapper">
+    <div class="spinner-border" role="status"></div>
+    <span>Actualizando expediente...</span>
+  </div>
+
+  <div *ngIf="!cargando && filas.length > 0">
+    
+    <div class="resumen-mini">
+      <div class="resumen-content">
+        <span class="label">CALIFICACIÓN TOTAL DEL TALLER:</span>
+        <span class="valor">{{ mediaTaller }} / 10</span>
+      </div>
+    </div>
+
+    <div class="lista-calificaciones">
+      <div class="fila-nota" *ngFor="let f of filas" (click)="verDetalle(f.idTarea)">
+        
+        <div class="col-principal">
+          <h3 class="titulo">{{ f.titulo }}</h3>
+          <span class="badge-estado" [class.is-entregado]="f.entregado">
+            {{ f.entregado ? 'ENTREGADO' : 'PENDIENTE' }}
+          </span>
+        </div>
+
+        <div class="col-comentario">
+          <p class="comentario-texto" *ngIf="f.comentario">
+            <i class="bi bi-chat-left-dots"></i> {{ f.comentario }}
+          </p>
+        </div>
+
+        <div class="col-puntos">
+          <span class="nota-numero" [class.tiene-nota]="f.nota !== null">
+            {{ f.nota !== null ? f.nota : '-' }}
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="sin-datos" *ngIf="!cargando && filas.length === 0">
+    <p>No se han encontrado actividades calificables.</p>
+  </div>
+</div>

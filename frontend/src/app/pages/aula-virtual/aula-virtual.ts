@@ -23,7 +23,7 @@ import { BreadcrumbService } from '../../services/Breadcrumb.Service';
 export class AulaVirtual implements OnInit {
 
   // --- Identidad del Taller ---
-  idTaller!: number; 
+  idTaller!: number;
   nombreTaller: string = 'Cargando taller...';
 
   // --- Estado de Navegación (Breadcrumbs) ---
@@ -44,7 +44,7 @@ export class AulaVirtual implements OnInit {
     private tallerService: TallerService,
     private breadcrumbService: BreadcrumbService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   /**
    * Configura las suscripciones reactivas para mantener la UI sincronizada con la URL.
@@ -64,17 +64,17 @@ export class AulaVirtual implements OnInit {
       this.actualizarBreadcrumbDesdeRuta();
     });
 
-   
+
     this.breadcrumbService.recursoNombre$.subscribe(nombre => {
       this.recursoNombre = nombre;
-      
+
       if (nombre && !this.seccionActual) {
         this.actualizarBreadcrumbDesdeRuta();
       }
       this.cdr.detectChanges();
     });
 
-  
+
     this.actualizarBreadcrumbDesdeRuta();
   }
 
@@ -96,34 +96,31 @@ export class AulaVirtual implements OnInit {
    */
   actualizarBreadcrumbDesdeRuta() {
     let currentRoute: ActivatedRoute | null = this.route;
-
     while (currentRoute?.firstChild) {
       currentRoute = currentRoute.firstChild;
     }
 
-    const breadcrumb = currentRoute?.snapshot.data['breadcrumb'];
-    
-    if (breadcrumb !== undefined) {
-      this.seccionActual = breadcrumb;
+    const breadcrumbData = currentRoute?.snapshot.data['breadcrumb'];
 
-      // --- Mapeo de Enlaces de Retorno ---
-      // Si estamos en un detalle, configuramos el enlace de vuelta a la lista correspondiente
-      if (this.router.url.includes('/detalle/material')) {
-        this.seccionActual = 'Materiales';
-        this.seccionEnlace = 'recursos';
-      } else if (this.router.url.includes('/detalle/tarea')) {
-        this.seccionActual = 'Tareas';
-        this.seccionEnlace = 'tareas';
-      } else {
-        this.seccionEnlace = this.router.url.split('/').pop() || '';
-      }
-
-      // Limpieza preventiva: Si volvemos a la raíz del aula, borramos nombres de recursos específicos
-      if (!this.router.url.includes('/detalle/') && !this.router.url.includes('/seguimiento')) {
-        this.recursoNombre = '';
-        this.breadcrumbService.setRecursoNombre('');
-      }
+    // 1. Identificar la Sección Base
+    if (this.router.url.includes('/detalle/material') || this.router.url.includes('/recursos')) {
+      this.seccionActual = 'Materiales';
+      this.seccionEnlace = 'recursos';
+    } else if (this.router.url.includes('/detalle/tarea') || this.router.url.includes('/tareas')) {
+      this.seccionActual = 'Tareas';
+      this.seccionEnlace = 'tareas';
+    } else {
+      // Si es Muro, Foro, etc.
+      this.seccionActual = breadcrumbData || '';
+      this.seccionEnlace = this.router.url.split('/').pop() || '';
     }
+
+    // 2. Limpieza: Si NO estamos en un detalle, el nombre del recurso debe morir
+    if (!this.router.url.includes('/detalle/') && !this.router.url.includes('/seguimiento')) {
+      this.recursoNombre = '';
+      // No llames a setRecursoNombre('') aquí porque crearás un bucle infinito de eventos
+    }
+
     this.cdr.detectChanges();
   }
 

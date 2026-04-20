@@ -32,10 +32,18 @@
     position: relative;
 
     .btn-close {
-        @include m.boton-cerrar-circular;
         position: absolute;
-        top: 1.2rem;
+        top: 1.5rem;
         right: 1.5rem;
+        @include m.boton-cerrar-circular;
+
+       
+
+        i {
+            font-size: 1.2rem;
+            line-height: 1;
+            display: block;
+        }
     }
 }
 
@@ -45,7 +53,7 @@
 
     .badge-tarea {
         display: inline-block;
-        background: rgba(v.$color-secundario-calido-2, 0.1); 
+        background: rgba(v.$color-secundario-calido-2, 0.1);
         color: v.$color-secundario-calido-2;
         padding: 4px 14px;
         border-radius: 50px;
@@ -75,7 +83,7 @@
         font-weight: 600;
 
         i {
-            color: v.$color-secundario-calido-1; 
+            color: v.$color-secundario-calido-1;
         }
     }
 }
@@ -130,7 +138,7 @@
         i {
             display: block;
             font-size: 2.5rem;
-            color: v.$color-secundario-calido-2; 
+            color: v.$color-secundario-calido-2;
             margin-bottom: 10px;
         }
 
@@ -163,6 +171,7 @@
         border: 1px solid #eee;
         border-radius: v.$radio-curvatura;
         animation: slideIn 0.3s ease-out;
+
         i {
             margin-right: 12px;
             font-size: 1.2rem;

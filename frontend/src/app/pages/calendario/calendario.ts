@@ -7,7 +7,7 @@ import { Footer } from "../../components/layout/footer/footer";
 @Component({
   selector: 'app-calendario',
   standalone: true,
-  imports: [CommonModule, RouterModule, Navbar, Footer], // Añadimos RouterModule
+  imports: [CommonModule, RouterModule, Navbar, Footer],
   templateUrl: './calendario.html',
   styleUrl: './calendario.scss',
 })

@@ -157,20 +157,17 @@ public class SecurityConfiguration {
                         // =========================================================
                         // 10. ENTIDAD: ENTREGAS (Calificaciones y Trabajos)
                         // =========================================================
-
-                        // Acción de entregar: Alumno autenticado
+                        // Acción de entregar y CONSULTAR (ahora incluimos GET para alumnos)
                         .requestMatchers(HttpMethod.POST, "/api/entregas").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/entregas/tarea/**").authenticated() 
+                                                                                                 
 
-                        // Calificar y Feedback: Solo Admin y Profesor
+                        // Calificar y Feedback: Sigue siendo SOLO para Profe/Admin
                         .requestMatchers(HttpMethod.PUT, "/api/entregas/*/calificar").hasAnyRole("ADMIN", "PROFESOR")
 
-                        // Listados grupales y gestión: Solo Admin y Profesor
-                        .requestMatchers(HttpMethod.GET, "/api/entregas", "/api/entregas/tarea/**")
-                        .hasAnyRole("ADMIN", "PROFESOR")
+                        // Listados globales (sin filtros) y gestión: Sigue siendo SOLO para Profe/Admin
+                        .requestMatchers(HttpMethod.GET, "/api/entregas").hasAnyRole("ADMIN", "PROFESOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/entregas/**").hasAnyRole("ADMIN", "PROFESOR")
-
-                        // Consulta de entrega individual y actualización: Alumno (dueño) o Profesor
-                        .requestMatchers("/api/entregas/**").authenticated()
 
                         // =========================================================
                         // 11. ENTIDAD: ARCHIVOS DE TAREA (Adjuntos/Enunciados)

@@ -148,7 +148,7 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
-   * Inicialización: Resuelve contexto, roles y dispara la hidratación de datos.
+   * Inicialización: Resuelve contexto, roles y recarga de datos.
    */
   ngOnInit(): void {
     this.idTaller = Number(this.route.parent?.snapshot.paramMap.get('id'));
@@ -170,7 +170,7 @@ export class AulaDetalle implements OnInit {
   }
 
   // ===========================================================================
-  // --- GESTIÓN DE LA HIDRATACIÓN DE DATOS ---
+  // --- GESTIÓN DE LA CARGA DE DATOS ---
   // ===========================================================================
 
   /**
@@ -181,10 +181,14 @@ export class AulaDetalle implements OnInit {
     this.usuarioService.listarPorTaller(this.idTaller).subscribe({
       next: (resp) => {
         this.alumnosTaller = resp.data.filter(u => u.nombreRol === 'ALUMNO');
+
+        // Si estamos creando una tarea, la marcamos para todos los alumnos actuales por defecto
+        if (this.esNuevo && this.tipo === 'tarea') {
+          this.alumnosSeleccionadosIds = this.alumnosTaller.map(a => a.idUsuario);
+        }
       }
     });
   }
-
   /**
    * Método orquestador para cargar toda la información del recurso actual.
    * @param id Identificador único del recurso (Tarea o Material).
@@ -289,6 +293,18 @@ export class AulaDetalle implements OnInit {
   }
 
   /**
+ * Gestiona la selección masiva de alumnos.
+ * Si están todos marcados, limpia la lista. Si no, los marca a todos.
+ */
+  toggleTodosAlumnos(): void {
+    if (this.alumnosSeleccionadosIds.length === this.alumnosTaller.length) {
+      this.alumnosSeleccionadosIds = [];
+    } else {
+      this.alumnosSeleccionadosIds = this.alumnosTaller.map(a => a.idUsuario);
+    }
+  }
+
+  /**
    * Añade o quita un alumno del buffer de asignación.
    * @param idAlumno ID del alumno a conmutar.
    */
@@ -308,7 +324,7 @@ export class AulaDetalle implements OnInit {
   get alumnosFiltrados(): UsuarioResponse[] {
     if (!this.filtroAlumno) return this.alumnosTaller;
     const busqueda = this.filtroAlumno.toLowerCase();
-    return this.alumnosTaller.filter(a => 
+    return this.alumnosTaller.filter(a =>
       (a.nombre + ' ' + a.apellidos).toLowerCase().includes(busqueda)
     );
   }
@@ -330,8 +346,8 @@ export class AulaDetalle implements OnInit {
    */
   onExtensionChange(event: any): void {
     const value = event.target.value;
-    let seleccionadas = this.form.get('extensionesPermitidas')?.value 
-      ? this.form.get('extensionesPermitidas')?.value.split(',').map((s: string) => s.trim()).filter((s: string) => s !== "") 
+    let seleccionadas = this.form.get('extensionesPermitidas')?.value
+      ? this.form.get('extensionesPermitidas')?.value.split(',').map((s: string) => s.trim()).filter((s: string) => s !== "")
       : [];
 
     if (event.target.checked) {
@@ -411,10 +427,10 @@ export class AulaDetalle implements OnInit {
     this.cargando = true;
 
     const v = this.form.value;
-    const payload: any = { 
-      titulo: v.titulo, 
-      idTaller: this.idTaller, 
-      visible: this.recurso.visible ?? true 
+    const payload: any = {
+      titulo: v.titulo,
+      idTaller: this.idTaller,
+      visible: this.recurso.visible ?? true
     };
 
     if (this.tipo === 'material') {
@@ -549,17 +565,17 @@ export class AulaDetalle implements OnInit {
    * @param id ID del recurso guardado.
    * @private
    */
-private finalizarGuardado(id: number): void {
-  this.editando = false;
-  this.nuevosArchivos = [];
-  this.archivosParaEliminar = [];
+  private finalizarGuardado(id: number): void {
+    this.editando = false;
+    this.nuevosArchivos = [];
+    this.archivosParaEliminar = [];
 
-  if (this.esNuevo) {
-    this.router.navigate(['/aula-virtual', this.idTaller, 'muro'], { replaceUrl: true });
-  } else {
-    this.cargarDatos(id);
+    if (this.esNuevo) {
+      this.router.navigate(['/aula-virtual', this.idTaller, 'muro'], { replaceUrl: true });
+    } else {
+      this.cargarDatos(id);
+    }
   }
-}
 
   /**
    * Revierte los cambios no guardados o vuelve atrás si es una creación.

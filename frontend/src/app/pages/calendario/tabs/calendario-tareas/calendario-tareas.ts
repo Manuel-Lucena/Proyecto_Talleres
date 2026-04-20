@@ -8,34 +8,63 @@ import { TokenService } from '../../../../services/Token.Service';
 import { TareaResponse } from '../../../../interfaces/Tarea.Interface';
 import { Router } from '@angular/router';
 
+/**
+ * Componente de Calendario de Tareas.
+ * Centraliza las fechas de entrega de todos los talleres en los que el alumno
+ * está inscrito, proporcionando una interfaz de cuadrícula mensual.
+ */
 @Component({
   selector: 'app-calendario-tareas',
   standalone: true,
-  imports: [CommonModule ],
+  imports: [CommonModule],
   templateUrl: './calendario-tareas.html',
   styleUrl: './calendario-tareas.scss'
 })
 export class CalendarioTareas implements OnInit {
-  tareasGlobales: TareaResponse[] = [];
-  cargando = true;
-  
-  // Lógica de Calendario
-  fechaVisual: Date = new Date();
-  diasCalendario: any[] = [];
+
+  // --- Estado de Datos ---
+  tareasGlobales: TareaResponse[] = []; // Colección total de tareas de todos los talleres
+
+  // --- Lógica de Calendario ---
+  fechaVisual: Date = new Date();       // Fecha de referencia para el renderizado del mes
+  diasCalendario: any[] = [];           // Listado de celdas (días) a dibujar en el grid
   nombresDias = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
+  // --- Estado de UI ---
+  cargando = true;
+
+  /**
+   * @param tallerService Obtención de talleres del usuario.
+   * @param tareaService Recuperación de tareas por taller.
+   * @param tokenService Metadatos del usuario actual.
+   * @param router Redirección al detalle de la tarea.
+   * @param cdr Control de detección de cambios manual.
+   */
   constructor(
     private tallerService: TallerService,
     private tareaService: TareaService,
     private tokenService: TokenService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
+  /**
+   * Ciclo de vida: Inicia la secuencia de carga de tareas multi-taller.
+   */
   ngOnInit(): void {
     this.cargarTareas();
   }
 
+  // ===========================================================================
+  // --- NÚCLEO DE DATOS (RXJS) ---
+  // ===========================================================================
+
+  /**
+   * Orquestación asíncrona:
+   * 1. Obtiene los talleres del alumno.
+   * 2. Por cada taller, dispara una petición de tareas visibles.
+   * 3. Aplana los resultados en una única colección global.
+   */
   cargarTareas() {
     const idUser = this.tokenService.getId();
     if (!idUser) return;
@@ -44,10 +73,11 @@ export class CalendarioTareas implements OnInit {
       switchMap(resp => {
         const talleres = resp?.data || [];
         if (talleres.length === 0) return of([]);
+
         const peticiones = talleres.map(taller => {
           const idTaller = (taller as any).idTaller || (taller as any).id;
           return this.tareaService.listarVisibles(idTaller, idUser).pipe(
-            map(res => (res.data || []).map(t => ({...t, nombreTaller: taller.nombre}))),
+            map(res => (res.data || []).map(t => ({ ...t, nombreTaller: taller.nombre }))),
             catchError(() => of([]))
           );
         });
@@ -63,30 +93,37 @@ export class CalendarioTareas implements OnInit {
     });
   }
 
+  // ===========================================================================
+  // --- LÓGICA DEL CALENDARIO ---
+  // ===========================================================================
+
+  /**
+   * Genera la estructura de celdas para el mes actual.
+   * Calcula el offset inicial (días vacíos) y cruza cada día con las tareas globales.
+   */
   renderizarCalendario() {
     const año = this.fechaVisual.getFullYear();
     const mes = this.fechaVisual.getMonth();
-    
-    // Primer día del mes
+
     const primerDiaMes = new Date(año, mes, 1);
-    // Ajuste para que Lunes sea 0
+    // Ajuste: getDay() devuelve 0 para Domingo, convertimos a 0 para Lunes
     let diaInicio = primerDiaMes.getDay() - 1;
     if (diaInicio === -1) diaInicio = 6;
 
     const ultimoDiaMes = new Date(año, mes + 1, 0).getDate();
     this.diasCalendario = [];
 
-    // Rellenar días vacíos al inicio
     for (let i = 0; i < diaInicio; i++) {
       this.diasCalendario.push({ dia: null, tareas: [] });
     }
 
-    // Rellenar días con tareas
     for (let i = 1; i <= ultimoDiaMes; i++) {
       const fechaDia = new Date(año, mes, i);
       const tareasDia = this.tareasGlobales.filter(t => {
         const fEntrega = new Date(t.fechaEntrega);
-        return fEntrega.getDate() === i && fEntrega.getMonth() === mes && fEntrega.getFullYear() === año;
+        return fEntrega.getDate() === i &&
+          fEntrega.getMonth() === mes &&
+          fEntrega.getFullYear() === año;
       });
 
       this.diasCalendario.push({
@@ -99,17 +136,31 @@ export class CalendarioTareas implements OnInit {
     this.cdr.detectChanges();
   }
 
+  /**
+   * Navegación temporal del calendario.
+   * @param delta Cantidad de meses a sumar o restar.
+   */
   cambiarMes(delta: number) {
     this.fechaVisual = new Date(this.fechaVisual.setMonth(this.fechaVisual.getMonth() + delta));
     this.renderizarCalendario();
   }
 
+  /**
+   * Compara una fecha con el día actual del sistema.
+   */
   esHoy(fecha: Date): boolean {
     const hoy = new Date();
     return fecha.toDateString() === hoy.toDateString();
   }
 
+  // ===========================================================================
+  // --- NAVEGACIÓN ---
+  // ===========================================================================
+
+  /**
+   * Redirige al alumno a la vista de detalle de la tarea seleccionada.
+   */
   irATarea(tarea: TareaResponse) {
-  this.router.navigate([`/aula-virtual/${tarea.idTaller}/detalle/tarea/${tarea.idTarea}`]);
-}
+    this.router.navigate([`/aula-virtual/${tarea.idTaller}/detalle/tarea/${tarea.idTarea}`]);
+  }
 }

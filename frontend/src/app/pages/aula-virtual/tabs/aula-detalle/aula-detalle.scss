@@ -10,24 +10,20 @@
 // 1. ESTRUCTURA BASE Y LAYOUT
 .pagina-detalle-wrapper {
   background-color: #f0f2f5;
-  // ELIMINA: min-height: 100vh;
-  
-  // CAMBIA POR:
   display: block;
   width: 100%;
-  padding: 2rem 2rem 0 2rem; // 0 abajo para que no sume espacio extra al final
+  padding: 2rem 2rem 0 2rem;
   box-sizing: border-box;
-  
-  // Si quieres que al menos ocupe la pantalla cuando no hay nada:
-  min-height: auto; 
+
+  min-height: auto;
 }
 
 .contenedor-ancho {
   width: 100%;
   margin: 0 auto;
   max-width: 1200px;
-  display: block; // Cambiamos a block para que el flujo sea natural
-  overflow: hidden; // Evita que los márgenes de los hijos "salgan" y sumen espacio
+  display: block;
+  overflow: hidden;
 }
 
 // 2. NAVEGACIÓN SUPERIOR Y BOTONES DE ACCIÓN
@@ -131,9 +127,9 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   padding: 3rem;
   @include m.animacion-entrada;
-  
+
   // Este margen determinará la separación con el footer
-  margin-bottom: 2rem; 
+  margin-bottom: 2rem;
 
 
   // Encabezado con Título y Badges
@@ -479,6 +475,7 @@
 }
 
 // 9. DROPDOWN DE EXTENSIONES PERSONALIZADO
+/* Busca tu .dropdown-extensiones-custom y reemplázalo por este */
 .dropdown-extensiones-custom {
   position: relative;
   width: 100%;
@@ -505,12 +502,59 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     display: none;
-    padding: 10px;
-    max-height: 250px;
-    overflow-y: auto;
+    padding: 0; // Cambiado a 0 para que la cabecera gris llegue a los bordes
+    overflow: hidden; // Para que las esquinas de la cabecera no se salgan del radio
 
     &.show {
       display: block;
+    }
+
+    // --- NUEVO: ESTILO PARA LA CABECERA DEL BOTÓN SELECCIONAR ---
+    .dropdown-header-acciones {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 0.8rem;
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #e4e6eb;
+
+      .header-label {
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: #65676b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .btn-accion-masiva {
+        background: none;
+        border: none;
+        color: v.$color-marca-principal;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        padding: 0;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    // --- NUEVO: CONTENEDOR CON SCROLL PARA LOS ALUMNOS ---
+    .lista-alumnos-scroll {
+      max-height: 220px;
+      overflow-y: auto;
+      padding: 5px 0;
+
+      &::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #ddd;
+        border-radius: 10px;
+      }
     }
 
     .dropdown-item-check {

@@ -50,12 +50,35 @@ export class MisTalleres implements OnInit {
    */
   ngOnInit(): void {
     const idUsuario = this.tokenService.getId();
-    if (idUsuario) {
+    const rol = this.tokenService.getRol();
+
+    if (rol === 'ADMIN') {
+      this.cargarTodosLosTalleres();
+    } else if (idUsuario) {
       this.cargarMisTalleres(Number(idUsuario));
     } else {
       this.cargando = false;
       this.cdr.detectChanges();
     }
+  }
+
+  /**
+ * Nueva función para que el Admin vea todo el catálogo activo
+ */
+  cargarTodosLosTalleres(): void {
+    this.cargando = true;
+    this.tallerService.listarTodos().subscribe({
+      next: (resp) => {
+        this.talleres = resp.data;
+        this.cargando = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error("Error cargando todos los talleres", err);
+        this.cargando = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   /**

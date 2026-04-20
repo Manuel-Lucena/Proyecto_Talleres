@@ -26,7 +26,7 @@ export class AulaParticipantes implements OnInit {
   alumnos: UsuarioResponse[] = [];            // Colección filtrada de usuarios discentes
 
   // --- Propiedades de Estado y UI ---
-  cargando: boolean = true;                   // Flag de control para el estado de hidratación de la vista
+  cargando: boolean = true;                   // Flag de control para refrescar la vista
 
   /**
    * @param route Inyección de la ruta activa para la captura de parámetros de la URL.
