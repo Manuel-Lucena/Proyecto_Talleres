@@ -47,7 +47,7 @@ public class TallerService {
         if (dto.getIdProfesor() != null) {
             taller.setProfesor(obtenerProfesor(dto.getIdProfesor()));
         } else {
-            taller.setProfesor(null); 
+            taller.setProfesor(null);
         }
 
         taller = tallerRepository.save(taller);
@@ -93,6 +93,19 @@ public class TallerService {
     @Transactional(readOnly = true)
     public List<TallerResponseDTO> listarTalleresPorUsuarioId(Long idUsuario) {
         return tallerRepository.findTalleresByUsuarioId(idUsuario).stream()
+                .map(tallerMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Lista los talleres que un profesor tiene asignados como titular.
+     * * @param idProfesor ID del profesor a consultar.
+     * 
+     * @return Lista de talleres que imparte el usuario.
+     */
+    @Transactional(readOnly = true)
+    public List<TallerResponseDTO> listarTalleresPorProfesorId(Long idProfesor) {
+        return tallerRepository.findByProfesorId(idProfesor).stream()
                 .map(tallerMapper::toResponse)
                 .collect(Collectors.toList());
     }

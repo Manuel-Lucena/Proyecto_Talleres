@@ -23,6 +23,7 @@ export const routes: Routes = [
     // --- RUTAS PÚBLICAS ---
     { path: '', redirectTo: '/landing', pathMatch: 'full' },
     { path: 'landing', component: Landing },
+    { path: 'talleres-explorar', component: TalleresExplorar },
     { path: 'login', component: Login },
     { path: 'no-autorizado', component: AccesoDenegado },
     { path: 'solicitar-recuperacion', component: SolicitarRecuperacion },
@@ -30,7 +31,6 @@ export const routes: Routes = [
 
     // --- RUTAS PROTEGIDAS (Cualquier usuario logueado) ---
     { path: 'perfil', component: Perfil, canActivate: [authGuard] },
-    { path: 'talleres-explorar', component: TalleresExplorar, canActivate: [authGuard] },
     { path: 'mis-talleres', component: MisTalleres, canActivate: [authGuard] },
     {
         path: 'calendario',

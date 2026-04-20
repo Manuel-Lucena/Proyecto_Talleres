@@ -6,6 +6,7 @@ import { Navbar } from '../../components/layout/navbar/navbar';
 import { Footer } from '../../components/layout/footer/footer';
 import { TallerService } from '../../services/Taller.Service';
 import { BreadcrumbService } from '../../services/Breadcrumb.Service';
+import { TokenService } from '../../services/Token.Service';
 
 /**
  * Shell Component (Contenedor) del Aula Virtual.
@@ -36,6 +37,7 @@ export class AulaVirtual implements OnInit {
    * @param router Escucha eventos globales de navegación.
    * @param tallerService Obtiene metadatos para el encabezado.
    * @param breadcrumbService Puente para que los componentes hijos envíen el nombre del recurso actual.
+   * @param tokenService Gestiona la identidad y roles del usuario actual.
    * @param cdr Sincroniza la UI tras cambios en el flujo de navegación o avisos del service.
    */
   constructor(
@@ -43,8 +45,19 @@ export class AulaVirtual implements OnInit {
     private router: Router,
     private tallerService: TallerService,
     private breadcrumbService: BreadcrumbService,
+    public tokenService: TokenService, 
     private cdr: ChangeDetectorRef
   ) { }
+
+  /**
+   * Determina si el usuario tiene privilegios de edición o gestión.
+   * Utilizado en el HTML para mostrar/ocultar el menú "Crear".
+   * @returns true si el rol es PROFESOR o ADMIN.
+   */
+  get esProfesor(): boolean {
+    const rol = this.tokenService.getRol();
+    return rol === 'PROFESOR' || rol === 'ADMIN';
+  }
 
   /**
    * Configura las suscripciones reactivas para mantener la UI sincronizada con la URL.

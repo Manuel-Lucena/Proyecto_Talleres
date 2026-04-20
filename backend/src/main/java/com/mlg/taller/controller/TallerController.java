@@ -14,7 +14,8 @@ import java.util.List;
 
 /**
  * Controlador REST para la gestión de talleres educativos.
- * Gestiona el catálogo de actividades, inscripciones disponibles y la asignación de profesores.
+ * Gestiona el catálogo de actividades, inscripciones disponibles y la
+ * asignación de profesores.
  */
 @RestController
 @RequestMapping("/api/talleres")
@@ -26,11 +27,13 @@ public class TallerController {
     // --- MÉTODOS POST ---
 
     /**
-     * Registra un nuevo taller en el sistema, permitiendo adjuntar una imagen promocional.
+     * Registra un nuevo taller en el sistema, permitiendo adjuntar una imagen
+     * promocional.
      * El cuerpo de la petición debe ser multipart/form-data.
+     * 
      * @param request Datos del taller en formato JSON (parte 'taller').
      * @param archivo Imagen representativa del taller (parte 'archivo', opcional).
-     * @return        ApiResponse con el taller creado y su ruta de imagen generada.
+     * @return ApiResponse con el taller creado y su ruta de imagen generada.
      */
     @PostMapping(consumes = { "multipart/form-data" })
     @ResponseStatus(HttpStatus.CREATED)
@@ -44,6 +47,7 @@ public class TallerController {
 
     /**
      * Recupera el catálogo completo de talleres activos en el sistema.
+     * 
      * @return ApiResponse con una lista de TallerResponseDTO con plazas y profesor.
      */
     @GetMapping
@@ -54,8 +58,9 @@ public class TallerController {
 
     /**
      * Obtiene la información detallada de un taller específico por su ID.
+     * 
      * @param id Identificador único del taller.
-     * @return   ApiResponse con los datos detallados del taller solicitado.
+     * @return ApiResponse con los datos detallados del taller solicitado.
      */
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -65,13 +70,28 @@ public class TallerController {
 
     /**
      * Obtiene los talleres en los que un usuario específico está inscrito.
+     * 
      * @param idUsuario ID del alumno.
-     * @return          Lista de talleres para la vista "Mis Talleres".
+     * @return Lista de talleres para la vista "Mis Talleres".
      */
     @GetMapping("/usuario/{idUsuario}")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<List<TallerResponseDTO>> listarPorUsuario(@PathVariable Long idUsuario) {
-        return ApiResponse.success(tallerService.listarTalleresPorUsuarioId(idUsuario), "Mis talleres obtenidos correctamente");
+        return ApiResponse.success(tallerService.listarTalleresPorUsuarioId(idUsuario),
+                "Mis talleres obtenidos correctamente");
+    }
+
+    /**
+     * Obtiene los talleres impartidos por un profesor específico.
+     * 
+     * @param idProfesor ID del usuario con rol profesor.
+     * @return ApiResponse con la lista de talleres bajo la tutela del profesor.
+     */
+    @GetMapping("/profesor/{idProfesor}")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<List<TallerResponseDTO>> listarPorProfesor(@PathVariable Long idProfesor) {
+        return ApiResponse.success(tallerService.listarTalleresPorProfesorId(idProfesor),
+                "Talleres impartidos obtenidos correctamente");
     }
 
     // --- MÉTODOS PUT ---
@@ -79,10 +99,11 @@ public class TallerController {
     /**
      * Actualiza la información y/o la imagen de un taller existente.
      * Si no se proporciona un nuevo archivo, se preserva la imagen anterior.
+     * 
      * @param id      Identificador del taller a modificar.
      * @param request Nuevos datos para el taller (parte 'taller').
      * @param archivo Nueva imagen para el taller (parte 'archivo', opcional).
-     * @return        ApiResponse con el taller actualizado.
+     * @return ApiResponse con el taller actualizado.
      */
     @PutMapping(value = "/{id}", consumes = { "multipart/form-data" })
     @ResponseStatus(HttpStatus.OK)
@@ -96,9 +117,10 @@ public class TallerController {
     // --- MÉTODOS DELETE ---
 
     /**
-     * Realiza la eliminación de un taller del sistema. 
+     * Realiza la eliminación de un taller del sistema.
+     * 
      * @param id Identificador del taller a eliminar.
-     * @return   ApiResponse confirmando la eliminación.
+     * @return ApiResponse confirmando la eliminación.
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)

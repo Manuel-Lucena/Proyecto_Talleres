@@ -5,11 +5,13 @@ import org.hibernate.annotations.SQLRestriction;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Entidad principal que representa un taller formativo.
  * Gestiona la capacidad, el profesor asignado y los periodos de impartición.
- * Implementa 'Soft Delete' para preservar la integridad de inscripciones históricas.
+ * Implementa 'Soft Delete' para preservar la integridad de inscripciones
+ * históricas.
  */
 @Entity
 @Table(name = "TALLER")
@@ -34,7 +36,8 @@ public class Taller {
     @Column(columnDefinition = "TEXT")
     private String descripcion;
 
-    /** * Usuario con rol de profesor encargado del taller.
+    /**
+     * * Usuario con rol de profesor encargado del taller.
      * La carga es diferida (LAZY) para optimizar consultas de listado.
      */
     @ManyToOne(fetch = FetchType.LAZY)
@@ -64,4 +67,7 @@ public class Taller {
     /** Estado de visibilidad del taller (Gestionado por el borrado lógico). */
     @Builder.Default
     private boolean activo = true;
+
+    @OneToMany(mappedBy = "taller")
+    private List<Inscripcion> inscripciones;
 }

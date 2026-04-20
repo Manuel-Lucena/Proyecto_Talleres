@@ -1,9 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { InscripcionService } from '../../../../services/Inscripcion.Service';
 import { NotificacionService } from '../../../../services/Notificacion.Service';
+import { TallerService } from '../../../../services/Taller.Service';
 import { InscripcionResponse } from '../../../../interfaces/Inscripcion.Interface';
 import { Confirmacion } from "../../../../components/dialogs/confirmacion/confirmacion";
 import { Notificacion } from "../../../../components/dialogs/mensaje/notificacion";
@@ -12,54 +13,69 @@ import { FormCargaInscripciones } from '../../../../components/forms/form-carga-
 
 /**
  * Componente administrativo polivalente para la gestión de inscripciones.
- * Funciona en dos modos:
+ * Funciona en tres modos:
  * 1. Vista de Taller: Muestra todos los alumnos inscritos en un taller específico.
- * 2. Vista de Usuario: Muestra todos los talleres en los que participa un alumno.
+ * 2. Vista de Usuario (Alumno): Muestra todos los talleres en los que participa.
+ * 3. Vista de Usuario (Profesor): Muestra los talleres que el usuario imparte.
  */
 @Component({
   selector: 'app-admin-inscripciones',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, Confirmacion, Notificacion, 
-    FormInscripcionAdmin, FormCargaInscripciones
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    Confirmacion,
+    Notificacion,
+    FormInscripcionAdmin,
+    FormCargaInscripciones
   ],
   templateUrl: './admin-inscripciones.html',
   styleUrl: './admin-inscripciones.scss',
 })
 export class AdminInscripciones implements OnInit {
-
   // --- Propiedades de Datos y Colecciones ---
-  inscripciones: InscripcionResponse[] = []; // Listado de registros según contexto
-  tallerContexto: any = null;                // Datos del taller (si estamos en vista taller)
-  usuarioContexto: any = null;               // Datos del usuario (si estamos en vista usuario)
-  
+  inscripciones: InscripcionResponse[] = []; // Listado de registros (Inscripciones o Talleres impartidos)
+  tallerContexto: any = null;                // Datos del taller (vista taller)
+  usuarioContexto: any = null;               // Datos del usuario (vista usuario)
+
   // --- Estado de la Ruta y Parámetros ---
   idTaller?: number;
   idUsuario?: number;
-  esVistaTaller = false; // Flag para conmutar la lógica de la UI y peticiones
+  esVistaTaller = false;
+  esVistaProfesor = false;                   // Flag para identificar si listamos autoría en lugar de matrícula
 
   // --- UI, Mensajes y Modales ---
   cargando = true;
-  mostrarModal = false;           // Modal para inscripción individual
-  mostrarModalMasivo = false;     // Modal para carga mediante CSV/Excel
-  busqueda: string = '';          // Filtro de texto para la tabla
-  titulo = '';                    // Título dinámico de la página
-  subtitulo = '';                 // Subtítulo dinámico de la página
+  mostrarModal = false;
+  mostrarModalMasivo = false;
+  busqueda: string = '';
+  titulo = '';
+  subtitulo = '';
 
   // --- Flags de Procesos de Descarga ---
-  descargandoLista = false;               // Estado para el PDF de lista de alumnos
-  descargandoFacturaId: number | null = null; // ID específico para el spinner de factura
+  descargandoLista = false;
+  descargandoFacturaId: number | null = null;
 
+  /**
+   * @param route Captura parámetros de la URL padre (idTaller o idUsuario).
+   * @param location Permite la navegación hacia atrás en el historial.
+   * @param inscripcionService Servicio para gestionar las matrículas de alumnos.
+   * @param tallerService Servicio para gestionar los talleres y sus profesores.
+   * @param notificacionService Puente para diálogos de confirmación y alertas.
+   * @param cdr Forzado de detección de cambios para actualizaciones asíncronas.
+   */
   constructor(
     private route: ActivatedRoute,
     private location: Location,
     private inscripcionService: InscripcionService,
+    private tallerService: TallerService,
     private notificacionService: NotificacionService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   /**
-   * Ciclo de vida: Analiza los parámetros de la URL para determinar el modo de funcionamiento.
+   * Inicialización: Determina el contexto de trabajo analizando la URL activa.
    */
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -82,50 +98,118 @@ export class AdminInscripciones implements OnInit {
    */
   cargarDatos(tipo: 'taller' | 'usuario', id: number) {
     this.cargando = true;
-    const peticion = tipo === 'taller' 
-      ? this.inscripcionService.listarPorTaller(id) 
-      : this.inscripcionService.listarPorUsuario(id);
+    this.esVistaProfesor = false;
 
-    peticion.subscribe({
+    if (tipo === 'taller') {
+      this.cargarInscripcionesPorTaller(id);
+    } else {
+      this.cargarActividadUsuario(id);
+    }
+  }
+
+  /**
+   * Carga los alumnos inscritos en un taller específico.
+   */
+  private cargarInscripcionesPorTaller(id: number) {
+    this.inscripcionService.listarPorTaller(id).subscribe({
       next: (res) => {
         this.inscripciones = res.data || [];
-        
-        // Sincronización de contextos para mostrar info en las cabeceras
-        if (tipo === 'taller') {
-          this.usuarioContexto = null;
-          this.tallerContexto = {
-            idTaller: id,
-            nombre: this.inscripciones.length > 0 ? this.inscripciones[0].nombreTaller : 'Taller',
-            precio: this.inscripciones.length > 0 ? this.inscripciones[0].montoPagado : 0
-          };
-        } else {
-          this.tallerContexto = null;
-          this.usuarioContexto = {
-            idUsuario: id,
-            email: this.inscripciones.length > 0 ? this.inscripciones[0].emailUsuario : 'Usuario'
-          };
-        }
-        
-        this.configurarTextos();
-        this.cargando = false;
-        this.cdr.detectChanges();
+        this.usuarioContexto = null;
+        this.tallerContexto = {
+          idTaller: id,
+          nombre: this.inscripciones.length > 0 ? this.inscripciones[0].nombreTaller : 'Taller',
+          precio: this.inscripciones.length > 0 ? this.inscripciones[0].montoPagado : 0
+        };
+        this.finalizarProcesoCarga();
       },
       error: () => this.cargando = false
     });
   }
 
   /**
-   * Getter que filtra la tabla dinámicamente según el contexto (por email o por nombre de taller).
+   * Lógica híbrida para usuarios: Primero busca si es Alumno, si no, busca si es Profesor.
+   * @param idUsuario ID del usuario a consultar.
+   */
+  private cargarActividadUsuario(idUsuario: number) {
+    // 1. Intentamos cargar como Alumno (inscripciones)
+    this.inscripcionService.listarPorUsuario(idUsuario).subscribe({
+      next: (res) => {
+        const data = res.data || [];
+        if (data.length > 0) {
+          this.inscripciones = data;
+          this.completarContextoUsuario(idUsuario);
+        } else {
+          // 2. Si no tiene inscripciones, buscamos como Profesor
+          this.cargarTalleresImpartidos(idUsuario);
+        }
+      },
+      error: () => this.cargarTalleresImpartidos(idUsuario)
+    });
+  }
+
+  /**
+   * Consulta los talleres a cargo de un profesor usando el nuevo método del TallerService.
+   * Mapea los resultados para que la tabla sea compatible.
+   */
+  private cargarTalleresImpartidos(idUsuario: number) {
+    this.tallerService.listarPorProfesor(idUsuario).subscribe({
+      next: (res) => {
+        const talleres = res.data || [];
+        if (talleres.length > 0) {
+          this.esVistaProfesor = true;
+          // Adaptamos TallerResponse a InscripcionResponse para no romper la UI
+          this.inscripciones = talleres.map(t => ({
+            idInscripcion: 0, // Flag para deshabilitar facturas y eliminar
+            idTaller: t.idTaller,
+            nombreTaller: t.nombre,
+            emailUsuario: t.nombreCompletoProfesor || 'Docente',
+            fechaInscripcion: t.fechaInicio,
+            montoPagado: t.precio,
+            estadoPago: 'DOCENCIA', // Texto distintivo para la tabla
+            activa: true
+          })) as any;
+        } else {
+          this.inscripciones = [];
+        }
+        this.completarContextoUsuario(idUsuario);
+      },
+      error: () => {
+        this.inscripciones = [];
+        this.completarContextoUsuario(idUsuario);
+        this.cargando = false;
+      }
+    });
+  }
+
+  /**
+   * Finaliza la configuración del contexto de usuario para la cabecera.
+   */
+  private completarContextoUsuario(id: number) {
+    this.tallerContexto = null;
+    this.usuarioContexto = {
+      idUsuario: id,
+      email: this.inscripciones.length > 0 ? (this.esVistaProfesor ? 'Perfil Profesor' : this.inscripciones[0].emailUsuario) : 'Usuario'
+    };
+    this.finalizarProcesoCarga();
+  }
+
+  /**
+   * Cierra el estado de carga y refresca la UI.
+   */
+  private finalizarProcesoCarga() {
+    this.configurarTextos();
+    this.cargando = false;
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Getter que filtra la tabla dinámicamente según el contexto.
    */
   get inscripcionesFiltradas() {
     const term = this.busqueda?.toLowerCase().trim();
     if (!term) return this.inscripciones;
-
     return this.inscripciones.filter(ins => {
-      // En vista taller buscamos por el email del alumno, en vista usuario por el nombre del taller
-      return this.esVistaTaller 
-        ? ins.emailUsuario?.toLowerCase().includes(term)
-        : ins.nombreTaller?.toLowerCase().includes(term);
+      return this.esVistaTaller ? ins.emailUsuario?.toLowerCase().includes(term) : ins.nombreTaller?.toLowerCase().includes(term);
     });
   }
 
@@ -135,27 +219,24 @@ export class AdminInscripciones implements OnInit {
   configurarTextos() {
     if (this.esVistaTaller) {
       this.titulo = "Gestión de Alumnos";
-      this.subtitulo = this.inscripciones.length > 0 
-        ? `Inscritos en ${this.inscripciones[0].nombreTaller}` 
-        : "Lista de alumnos";
+      this.subtitulo = this.inscripciones.length > 0 ? `Inscritos en ${this.inscripciones[0].nombreTaller}` : "Lista de alumnos";
     } else {
-      this.titulo = "Talleres del Usuario";
-      this.subtitulo = this.inscripciones.length > 0 
-        ? `Cursos de ${this.inscripciones[0].emailUsuario}` 
-        : "Inscripciones del usuario";
+      this.titulo = this.esVistaProfesor ? "Talleres Impartidos" : "Talleres del Usuario";
+      this.subtitulo = this.inscripciones.length > 0 ? (this.esVistaProfesor ? `Cursos asignados al docente` : `Cursos de ${this.inscripciones[0].emailUsuario}`) : "Sin actividad registrada";
     }
   }
 
   // ===========================================================================
   // --- GESTIÓN DE INSCRIPCIONES (MODALES) ---
   // ===========================================================================
+  abrirInscripcion() {
+    this.mostrarModal = true;
+  }
 
-  abrirInscripcion() { this.mostrarModal = true; }
-  cerrarModal() { this.mostrarModal = false; }
+  cerrarModal() {
+    this.mostrarModal = false;
+  }
 
-  /**
-   * Persiste una inscripción manual realizada por el administrador.
-   */
   guardarInscripcion(datos: any) {
     this.inscripcionService.inscribir(datos).subscribe({
       next: () => {
@@ -169,17 +250,17 @@ export class AdminInscripciones implements OnInit {
     });
   }
 
-  /**
-   * Abre el flujo de carga masiva de inscripciones (solo disponible en vista de taller).
-   */
   abrirInscripcionMasiva() {
-    if (this.esVistaTaller && this.idTaller) {
-      this.mostrarModalMasivo = true;
-    }
+    if (this.esVistaTaller && this.idTaller) this.mostrarModalMasivo = true;
   }
 
-  cerrarModalMasivo() { this.mostrarModalMasivo = false; }
-  onMasivoGuardado() { this.refrescarDatos(); }
+  cerrarModalMasivo() {
+    this.mostrarModalMasivo = false;
+  }
+
+  onMasivoGuardado() {
+    this.refrescarDatos();
+  }
 
   private refrescarDatos() {
     if (this.idTaller) this.cargarDatos('taller', this.idTaller);
@@ -189,12 +270,8 @@ export class AdminInscripciones implements OnInit {
   // ===========================================================================
   // --- DESCARGAS Y EXPORTACIÓN ---
   // ===========================================================================
-
-  /**
-   * Gestiona la descarga del PDF de factura de una inscripción concreta.
-   * Utiliza window.URL.createObjectURL para procesar el Blob devuelto por el servidor.
-   */
   descargarFactura(idInscripcion: number) {
+    if (idInscripcion === 0) return; // No hay factura para autoría de profesor
     this.descargandoFacturaId = idInscripcion;
     this.inscripcionService.descargarFactura(idInscripcion).subscribe({
       next: (blob) => {
@@ -204,7 +281,7 @@ export class AdminInscripciones implements OnInit {
         a.download = `Factura_${idInscripcion}.pdf`;
         document.body.appendChild(a);
         a.click();
-        window.URL.revokeObjectURL(url); // Liberación de memoria
+        window.URL.revokeObjectURL(url);
         a.remove();
         this.descargandoFacturaId = null;
         this.cdr.detectChanges();
@@ -217,13 +294,9 @@ export class AdminInscripciones implements OnInit {
     });
   }
 
-  /**
-   * Exporta la lista completa de alumnos de un taller en formato PDF.
-   */
   descargarLista() {
     if (!this.idTaller) return;
     this.descargandoLista = true;
-    
     this.inscripcionService.descargarListaPdf(this.idTaller).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
@@ -240,7 +313,7 @@ export class AdminInscripciones implements OnInit {
       },
       error: () => {
         this.descargandoLista = false;
-        this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'No se pudo generar la lista de alumnos.', tipo: 'error' });
+        this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'No se pudo generar la lista.', tipo: 'error' });
         this.cdr.detectChanges();
       }
     });
@@ -249,11 +322,8 @@ export class AdminInscripciones implements OnInit {
   // ===========================================================================
   // --- ACCIONES DE TABLA ---
   // ===========================================================================
-
-  /**
-   * Cambia el estado (activa/inactiva) de una inscripción sin necesidad de recargar toda la lista.
-   */
   alternarEstado(id: number) {
+    if (id === 0) return;
     this.inscripcionService.cambiarEstado(id).subscribe({
       next: (res) => {
         const index = this.inscripciones.findIndex(i => i.idInscripcion === id);
@@ -265,34 +335,27 @@ export class AdminInscripciones implements OnInit {
     });
   }
 
-  /**
-   * Elimina un registro de inscripción de forma definitiva.
-   */
   eliminar(id: number) {
-    this.notificacionService.confirmar({
-      titulo: '¿Eliminar inscripción?',
-      mensaje: 'Esta acción borrará el registro de forma permanente.',
-      textoConfirmar: 'Eliminar',
-      textoCancelar: 'Cancelar'
-    }).then(confirmado => {
+    if (id === 0) {
+      this.notificacionService.mostrar({ titulo: 'Aviso', mensaje: 'No se puede eliminar la autoría desde aquí. Ve a Gestión de Talleres.', tipo: 'info' });
+      return;
+    }
+    this.notificacionService.confirmar({ titulo: '¿Eliminar inscripción?', mensaje: 'Esta acción borrará el registro de forma permanente.', textoConfirmar: 'Eliminar', textoCancelar: 'Cancelar' }).then(confirmado => {
       if (confirmado) {
         this.inscripcionService.eliminar(id).subscribe({
           next: () => {
             this.inscripciones = this.inscripciones.filter(i => i.idInscripcion !== id);
-            this.notificacionService.mostrar({ titulo: 'Inscripción eliminada', mensaje: 'El registro ha sido borrado correctamente.', tipo: 'exito' });
+            this.notificacionService.mostrar({ titulo: 'Éxito', mensaje: 'Inscripción eliminada', tipo: 'exito' });
             this.cdr.detectChanges();
           },
           error: (err) => {
-            this.notificacionService.mostrar({ titulo: 'Error', mensaje: err.error?.message || 'No se pudo eliminar la inscripción', tipo: 'error' });
+            this.notificacionService.mostrar({ titulo: 'Error', mensaje: err.error?.message || 'Error al eliminar', tipo: 'error' });
           }
         });
       }
     });
   }
 
-  /**
-   * Navega a la pantalla anterior utilizando el servicio de Location.
-   */
   volver() {
     this.location.back();
   }

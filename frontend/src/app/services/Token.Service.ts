@@ -69,6 +69,15 @@ export class TokenService {
   }
 
   /**
+   * Centraliza la validación de privilegios de personal docente/admin.
+   * @returns true si el usuario actual tiene permisos de gestión.
+   */
+  get esPersonalGestion(): boolean {
+    const rol = this.getRol();
+    return rol === 'PROFESOR' || rol === 'ADMIN';
+  }
+
+  /**
    * Verifica si el usuario está autenticado y si su sesión sigue siendo válida.
    * Compara la fecha de expiración del token (exp) con la hora actual del sistema.
    * @returns true si el token existe y no ha expirado, false en caso contrario.

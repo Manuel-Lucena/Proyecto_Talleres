@@ -51,6 +51,15 @@ export class TallerService {
   }
 
   /**
+   * Obtiene la lista de talleres que un profesor imparte como titular.
+   * @param idProfesor Identificador único del profesor.
+   * @returns Observable con la lista de talleres asignados al docente.
+   */
+  listarPorProfesor(idProfesor: number): Observable<ApiResponse<TallerResponse[]>> {
+    return this.http.get<ApiResponse<TallerResponse[]>>(`${this.apiUrl}/profesor/${idProfesor}`);
+  }
+
+  /**
    * Actualiza la información de un taller existente.
    * Permite modificar tanto datos textuales como la imagen de portada.
    * @param id Identificador del taller a actualizar.

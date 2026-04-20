@@ -12,21 +12,23 @@
 
     <div class="header-actions d-flex gap-2">
       @if (esVistaTaller && idTaller) {
-      <button class="btn-header-pdf" (click)="descargarLista()" title="Descargar lista de asistencia" [disabled]="descargandoLista">
+      <button class="btn-header-pdf" (click)="descargarLista()" title="Descargar lista de asistencia"
+        [disabled]="descargandoLista">
         <i [class]="descargandoLista ? 'bi bi-arrow-repeat spin' : 'bi bi-file-earmark-pdf'"></i>
         <span class="btn-text">{{ descargandoLista ? 'Generando...' : 'Descargar Lista' }}</span>
       </button>
-
       <button class="btn-header-masivo" (click)="abrirInscripcionMasiva()" title="Carga masiva desde CSV">
         <i class="bi bi-file-earmark-spreadsheet"></i>
         <span class="btn-text">Carga Masiva</span>
       </button>
       }
 
+      @if (!esVistaProfesor) {
       <button class="btn-primario-aula" (click)="abrirInscripcion()">
         <i class="bi bi-plus-lg"></i>
         <span class="btn-text">Nueva Inscripción</span>
       </button>
+      }
     </div>
   </header>
 
@@ -40,7 +42,9 @@
       </div>
       <div class="search-box">
         <i class="bi bi-search"></i>
-        <input type="text" [placeholder]="esVistaTaller ? 'Buscar por email de alumno...' : 'Buscar por nombre de taller...'" [(ngModel)]="busqueda" class="input-aula">
+        <input type="text"
+          [placeholder]="esVistaTaller ? 'Buscar por email de alumno...' : 'Buscar por nombre de taller...'"
+          [(ngModel)]="busqueda" class="input-aula">
       </div>
     </div>
   </section>
@@ -57,11 +61,16 @@
         <thead>
           <tr>
             <th>{{ esVistaTaller ? 'Alumno' : 'Taller' }}</th>
-            <th>Fecha Registro</th>
+            <th>Fecha Inicio/Registro</th>
+            @if (!esVistaProfesor) {
             <th>Monto</th>
             <th>Pago</th>
             <th>Estado Alta</th>
-            <th>Acciones</th>
+            <th class="text-center">Acciones</th>
+            } @else {
+            <th>Estado</th>
+            <th class="text-center">Info</th>
+            }
           </tr>
         </thead>
         <tbody>
@@ -77,9 +86,12 @@
                 <span class="d-main">{{ ins.fechaInscripcion | date:'dd/MM/yyyy' }}</span>
               </div>
             </td>
+
+            @if (!esVistaProfesor) {
             <td><span class="price-tag">{{ ins.montoPagado }}€</span></td>
             <td>
-              <span class="badge-aula" [class.success]="ins.estadoPago === 'COMPLETADO'" [class.info]="ins.estadoPago !== 'COMPLETADO'">
+              <span class="badge-aula" [class.success]="ins.estadoPago === 'COMPLETADO'"
+                [class.info]="ins.estadoPago !== 'COMPLETADO'">
                 {{ ins.estadoPago }}
               </span>
             </td>
@@ -90,10 +102,13 @@
             </td>
             <td>
               <div class="actions-group">
-                <button class="btn-tool" (click)="descargarFactura(ins.idInscripcion)" title="Descargar Factura" [disabled]="descargandoFacturaId === ins.idInscripcion">
-                  <i [class]="descargandoFacturaId === ins.idInscripcion ? 'bi bi-arrow-repeat spin' : 'bi bi-receipt text-primary'"></i>
+                <button class="btn-tool" (click)="descargarFactura(ins.idInscripcion)" title="Descargar Factura"
+                  [disabled]="descargandoFacturaId === ins.idInscripcion">
+                  <i
+                    [class]="descargandoFacturaId === ins.idInscripcion ? 'bi bi-arrow-repeat spin' : 'bi bi-receipt text-primary'"></i>
                 </button>
-                <button class="btn-tool" [title]="ins.activa ? 'Dar de baja' : 'Activar'" (click)="alternarEstado(ins.idInscripcion)">
+                <button class="btn-tool" [title]="ins.activa ? 'Dar de baja' : 'Activar'"
+                  (click)="alternarEstado(ins.idInscripcion)">
                   <i class="bi" [ngClass]="ins.activa ? 'bi-toggle-on text-success' : 'bi-toggle-off'"></i>
                 </button>
                 <button class="btn-tool delete" (click)="eliminar(ins.idInscripcion)" title="Eliminar permanentemente">
@@ -101,12 +116,20 @@
                 </button>
               </div>
             </td>
+            } @else {
+            <td>
+              <span class="badge-aula success">DOCENTE</span>
+            </td>
+            <td class="text-center">
+              <span class="text-muted small">Gestionar en Talleres</span>
+            </td>
+            }
           </tr>
           } @empty {
           <tr>
-            <td colspan="6" class="text-center py-5">
+            <td [attr.colspan]="esVistaProfesor ? 4 : 6" class="text-center py-5">
               <i class="bi bi-info-circle text-muted fs-3"></i>
-              <p class="mt-2 text-muted">No se encontraron inscripciones.</p>
+              <p class="mt-2 text-muted">No se encontraron registros.</p>
             </td>
           </tr>
           }
@@ -118,20 +141,14 @@
 </div>
 
 @if (mostrarModal) {
-<app-form-inscripcion-admin 
-  [tallerParaInscribir]="tallerContexto" 
-  [usuarioParaInscribir]="usuarioContexto" 
-  (cerrar)="cerrarModal()" 
-  (guardado)="guardarInscripcion($event)">
+<app-form-inscripcion-admin [tallerParaInscribir]="tallerContexto" [usuarioParaInscribir]="usuarioContexto"
+  (cerrar)="cerrarModal()" (guardado)="guardarInscripcion($event)">
 </app-form-inscripcion-admin>
 }
 
 @if (mostrarModalMasivo) {
-<app-form-carga-inscripciones 
-  [idTaller]="idTaller!" 
-  [nombreTaller]="tallerContexto?.nombre"
-  (cerrar)="cerrarModalMasivo()" 
-  (guardado)="onMasivoGuardado()">
+<app-form-carga-inscripciones [idTaller]="idTaller!" [nombreTaller]="tallerContexto?.nombre"
+  (cerrar)="cerrarModalMasivo()" (guardado)="onMasivoGuardado()">
 </app-form-carga-inscripciones>
 }
 
