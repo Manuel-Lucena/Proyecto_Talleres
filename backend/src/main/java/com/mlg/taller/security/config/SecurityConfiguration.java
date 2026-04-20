@@ -55,7 +55,7 @@ public class SecurityConfiguration {
                         // =========================================================
 
                         // Lectura: Cualquier usuario logueado puede ver el catálogo y sus talleres
-                        .requestMatchers(HttpMethod.GET, "/api/talleres/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/talleres/**").permitAll()
 
                         // Escritura: Solo el ADMIN puede crear, modificar o eliminar talleres
                         .requestMatchers(HttpMethod.POST, "/api/talleres/**").hasRole("ADMIN")
