@@ -12,7 +12,6 @@ import com.mlg.taller.repositories.InscripcionRepository;
 import com.mlg.taller.repositories.MensajeRepository;
 import com.mlg.taller.repositories.TallerRepository;
 import com.mlg.taller.util.SecurityUtils;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +22,8 @@ import java.util.stream.Collectors;
 
 /**
  * Servicio para la gestión de mensajes en los foros de los talleres.
+ * Implementa reglas de seguridad para asegurar que la comunicación se mantenga
+ * dentro de los límites de cada taller y sus participantes.
  */
 @Service
 @RequiredArgsConstructor
@@ -37,11 +38,12 @@ public class MensajeService {
 
     /**
      * Registra y envía un nuevo mensaje dentro de un taller.
-     * * @param dto Datos del mensaje a enviar.
-     * 
-     * @return Mensaje enviado y persistido.
+     * Valida que el emisor sea el profesor del taller, un alumno inscrito o administrador.
+     *
+     * @param dto Datos del mensaje a enviar.
+     * @return MensajeResponseDTO persistido.
      * @throws ResourceNotFoundException Si el taller no existe.
-     * @throws BadRequestException       Si el usuario no está inscrito o activo.
+     * @throws BadRequestException Si el usuario no tiene relación activa con el taller.
      */
     @Transactional
     public MensajeResponseDTO enviar(MensajeRequestDTO dto) {
@@ -49,14 +51,12 @@ public class MensajeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Taller no encontrado"));
 
         Usuario usuario = SecurityUtils.getUsuarioAutenticado();
-
         boolean esAdmin = usuario.getRol().getNombre().equalsIgnoreCase("ADMIN");
         boolean esProfeDelTaller = taller.getProfesor() != null && taller.getProfesor().getId().equals(usuario.getId());
-        boolean estaInscrito = inscripcionRepository.existsByUsuarioIdAndTallerIdAndActivaTrue(usuario.getId(),
-                dto.getIdTaller());
+        boolean estaInscrito = inscripcionRepository.existsByUsuarioIdAndTallerIdAndActivaTrue(usuario.getId(), dto.getIdTaller());
 
         if (!esAdmin && !esProfeDelTaller && !estaInscrito) {
-            throw new BadRequestException("Acceso denegado: No tienes permisos en este taller.");
+            throw new BadRequestException("Acceso denegado: No puedes enviar mensajes a un taller donde no participas.");
         }
 
         Mensaje mensaje = mensajeMapper.toEntity(dto);
@@ -69,22 +69,30 @@ public class MensajeService {
     // --- MÉTODOS GET ---
 
     /**
-     * Obtiene el listado completo de todos los mensajes del sistema.
-     * 
+     * Obtiene el listado global de todos los mensajes registrados.
+     * Uso exclusivo para el perfil ADMINISTRADOR.
+     *
      * @return Lista de mensajes globales.
+     * @throws BadRequestException Si el solicitante no es administrador.
      */
     @Transactional(readOnly = true)
     public List<MensajeResponseDTO> listarTodos() {
+        if (!SecurityUtils.getUsuarioAutenticado().getRol().getNombre().equalsIgnoreCase("ADMIN")) {
+            throw new BadRequestException("No tienes permiso para ver el historial global de mensajería.");
+        }
         return mensajeRepository.findAll().stream()
                 .map(mensajeMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Lista cronológicamente los mensajes pertenecientes a un taller específico.
-     * * @param idTaller ID del taller a consultar.
-     * 
-     * @return Lista de mensajes del taller ordenados por fecha.
+     * Lista cronológicamente los mensajes de un taller.
+     * Verifica que el usuario tenga acceso legítimo al taller.
+     *
+     * @param idTaller ID del taller a consultar.
+     * @return Lista de mensajes ordenados por fecha.
+     * @throws ResourceNotFoundException Si el taller no existe.
+     * @throws BadRequestException Si el usuario no participa en el taller.
      */
     @Transactional(readOnly = true)
     public List<MensajeResponseDTO> listarPorTaller(Long idTaller) {
@@ -92,11 +100,9 @@ public class MensajeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Taller no encontrado"));
 
         Usuario usuario = SecurityUtils.getUsuarioAutenticado();
-
         boolean esAdmin = usuario.getRol().getNombre().equalsIgnoreCase("ADMIN");
         boolean esProfeDelTaller = taller.getProfesor() != null && taller.getProfesor().getId().equals(usuario.getId());
-        boolean estaInscrito = inscripcionRepository.existsByUsuarioIdAndTallerIdAndActivaTrue(usuario.getId(),
-                idTaller);
+        boolean estaInscrito = inscripcionRepository.existsByUsuarioIdAndTallerIdAndActivaTrue(usuario.getId(), idTaller);
 
         if (!esAdmin && !esProfeDelTaller && !estaInscrito) {
             throw new BadRequestException("No tienes permiso para ver el historial de este taller.");
@@ -110,16 +116,28 @@ public class MensajeService {
     // --- MÉTODOS DELETE ---
 
     /**
-     * Elimina un mensaje del sistema por su identificador.
-     * 
+     * Elimina un mensaje del sistema.
+     * Un mensaje solo puede ser eliminado por su autor, el profesor del taller o el administrador.
+     *
      * @param id ID del mensaje a borrar.
      * @throws ResourceNotFoundException Si el mensaje no existe.
+     * @throws BadRequestException Si el usuario no tiene permisos para eliminar este mensaje específico.
      */
     @Transactional
     public void eliminar(Long id) {
-        if (!mensajeRepository.existsById(id)) {
-            throw new ResourceNotFoundException("No se puede eliminar: El mensaje no existe con ID: " + id);
+        Mensaje mensaje = mensajeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Mensaje no encontrado con ID: " + id));
+
+        Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
+        boolean esAdmin = solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN");
+        boolean esAutor = mensaje.getAutor().getId().equals(solicitante.getId());
+        boolean esProfeDelTaller = mensaje.getTaller().getProfesor() != null && 
+                                   mensaje.getTaller().getProfesor().getId().equals(solicitante.getId());
+
+        if (!esAdmin && !esAutor && !esProfeDelTaller) {
+            throw new BadRequestException("No tienes permiso para eliminar este mensaje.");
         }
-        mensajeRepository.deleteById(id);
+
+        mensajeRepository.delete(mensaje);
     }
 }

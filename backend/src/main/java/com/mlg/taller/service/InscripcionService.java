@@ -1,5 +1,6 @@
 package com.mlg.taller.service;
 
+import com.mlg.taller.exception.BadRequestException;
 import com.mlg.taller.exception.ResourceNotFoundException;
 import com.mlg.taller.model.dtos.InscripcionRequestDTO;
 import com.mlg.taller.model.dtos.InscripcionResponseDTO;
@@ -10,6 +11,8 @@ import com.mlg.taller.model.mappers.InscripcionMapper;
 import com.mlg.taller.repositories.InscripcionRepository;
 import com.mlg.taller.repositories.TallerRepository;
 import com.mlg.taller.repositories.UsuarioRepository;
+import com.mlg.taller.util.SecurityUtils;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,10 +44,18 @@ public class InscripcionService {
          * 
          * @return DTO con la información de la inscripción realizada.
          * @throws ResourceNotFoundException Si el usuario o el taller no existen.
+         * @throws BadRequestException       Si un alumno intenta inscribir a otro
+         *                                   usuario distinto a él mismo.
          */
         @Transactional
         public InscripcionResponseDTO inscribir(InscripcionRequestDTO dto) {
-                // 1. Validaciones de existencia
+                Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
+                boolean esAdmin = solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN");
+
+                if (!esAdmin && !solicitante.getId().equals(dto.getIdUsuario())) {
+                        throw new BadRequestException("No puedes realizar inscripciones para otros usuarios.");
+                }
+
                 Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "Usuario no encontrado con ID: " + dto.getIdUsuario()));
@@ -53,18 +64,14 @@ public class InscripcionService {
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "Taller no encontrado con ID: " + dto.getIdTaller()));
 
-                // 2. Mapeo y persistencia
                 Inscripcion inscripcion = inscripcionMapper.toEntity(dto, usuario, taller);
                 Inscripcion guardada = inscripcionRepository.save(inscripcion);
                 InscripcionResponseDTO response = inscripcionMapper.toResponse(guardada);
 
-                // 3. Generación de la Factura en PDF (en memoria)
-                // Usamos el método que devuelve byte[] para no guardarlo en disco
                 byte[] pdfFactura = pdfService.generarBytesPdf("factura-inscripcion", Map.of(
                                 "inscripcion", response,
                                 "usuario", usuario));
 
-                // 4. Envío de Email con la Factura adjunta
                 emailService.enviarCorreoConAdjunto(
                                 usuario.getEmail(),
                                 "¡Inscripción Confirmada! - Recibo de " + taller.getNombre(),
@@ -127,10 +134,26 @@ public class InscripcionService {
          * cualquier actividad.
          * * @param idTaller Identificador único del taller a consultar.
          * * @return Lista de DTOs con la información de los alumnos y sus estados de
-         * inscripción.
+         * 
+         * @throws BadRequestException Si un profesor intenta ver los alumnos de un
+         *                             taller que no le pertenece.
+         *                             inscripción.
          */
         @Transactional(readOnly = true)
         public List<InscripcionResponseDTO> listarPorTaller(Long idTaller) {
+                Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
+                boolean esAdmin = solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN");
+
+                Taller taller = tallerRepository.findById(idTaller)
+                                .orElseThrow(() -> new ResourceNotFoundException("Taller no encontrado"));
+
+                if (!esAdmin && solicitante.getRol().getNombre().equalsIgnoreCase("PROFESOR")) {
+                        if (taller.getProfesor() == null || !taller.getProfesor().getId().equals(solicitante.getId())) {
+                                throw new BadRequestException(
+                                                "No puedes ver los alumnos de un taller que no impartes.");
+                        }
+                }
+
                 return inscripcionRepository.findByTallerId(idTaller).stream()
                                 .map(inscripcionMapper::toResponse)
                                 .collect(Collectors.toList());
@@ -142,13 +165,27 @@ public class InscripcionService {
          * 
          * @return Inscripción encontrada.
          * @throws ResourceNotFoundException Si la inscripción no existe.
+         * @throws BadRequestException       Si el usuario no tiene permisos (no es
+         *                                   admin, ni el dueño de la inscripción, ni el
+         *                                   profesor del taller).
          */
         @Transactional(readOnly = true)
         public InscripcionResponseDTO buscarPorId(Long id) {
-                return inscripcionRepository.findById(id)
-                                .map(inscripcionMapper::toResponse)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Inscripción no encontrada con ID: " + id));
+                Inscripcion inscripcion = inscripcionRepository.findById(id)
+                                .orElseThrow(() -> new ResourceNotFoundException("Inscripción no encontrada"));
+
+                Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
+                boolean esAdmin = solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN");
+                boolean esSuInscripcion = inscripcion.getUsuario().getId().equals(solicitante.getId());
+
+                boolean esSuProfesor = inscripcion.getTaller().getProfesor() != null &&
+                                inscripcion.getTaller().getProfesor().getId().equals(solicitante.getId());
+
+                if (!esAdmin && !esSuInscripcion && !esSuProfesor) {
+                        throw new BadRequestException("No tienes permiso para ver esta inscripción.");
+                }
+
+                return inscripcionMapper.toResponse(inscripcion);
         }
 
         /**
@@ -156,9 +193,18 @@ public class InscripcionService {
          * * @param idUsuario ID del usuario.
          * 
          * @return Lista de sus inscripciones.
+         * @throws BadRequestException Si un usuario intenta consultar las
+         *                             inscripciones de otra persona.
          */
         @Transactional(readOnly = true)
         public List<InscripcionResponseDTO> listarPorUsuario(Long idUsuario) {
+                Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
+                boolean esAdmin = solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN");
+
+                if (!esAdmin && !solicitante.getId().equals(idUsuario)) {
+                        throw new BadRequestException("No puedes consultar las inscripciones de otro usuario.");
+                }
+
                 return inscripcionRepository.findByUsuarioId(idUsuario).stream()
                                 .map(inscripcionMapper::toResponse)
                                 .collect(Collectors.toList());
@@ -166,13 +212,22 @@ public class InscripcionService {
 
         /**
          * Genera el PDF de una factura para una inscripción ya existente.
-         * ESTE ES EL MÉTODO QUE LLAMARÁS DESDE EL CONTROLLER PARA LA DESCARGA MANUAL.
+         * 
+         * @throws BadRequestException Si el usuario intenta descargar una factura que
+         *                             no le pertenece y no es administrador.
          */
         @Transactional(readOnly = true)
         public byte[] obtenerFacturaPdf(Long idInscripcion) {
                 Inscripcion inscripcion = inscripcionRepository.findByIdIncludingInactive(idInscripcion)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Inscripción no encontrada con ID: " + idInscripcion));
+                                .orElseThrow(() -> new ResourceNotFoundException("Inscripción no encontrada"));
+
+                Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
+                boolean esAdmin = solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN");
+                boolean esSuInscripcion = inscripcion.getUsuario().getId().equals(solicitante.getId());
+
+                if (!esAdmin && !esSuInscripcion) {
+                        throw new BadRequestException("No tienes permiso para descargar esta factura.");
+                }
 
                 return pdfService.generarBytesPdf("factura-inscripcion", Map.of(
                                 "inscripcion", inscripcionMapper.toResponse(inscripcion),
@@ -199,7 +254,6 @@ public class InscripcionService {
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "No existe la inscripción para actualizar con ID: " + id));
 
-             
                 if (!existente.getUsuario().getId().equals(dto.getIdUsuario())) {
                         Usuario nuevoUsuario = usuarioRepository.findById(dto.getIdUsuario())
                                         .orElseThrow(() -> new ResourceNotFoundException(
@@ -215,8 +269,6 @@ public class InscripcionService {
                                                                         + dto.getIdTaller()));
                         existente.setTaller(nuevoTaller);
                 }
-
-                
 
                 existente.setMontoPagado(dto.getMontoPagado());
                 existente.setOrderId(dto.getOrderId());
@@ -242,20 +294,18 @@ public class InscripcionService {
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "Inscripcion no encontrada con ID: " + id));
 
-                // Cambiamos el estado (Toggle)
                 inscripcion.setActiva(!inscripcion.isActiva());
                 Inscripcion guardada = inscripcionRepository.save(inscripcion);
 
-                // DETERMINAR ASUNTO Y PLANTILLA
                 String asunto;
                 String plantilla;
 
                 if (guardada.isActiva()) {
                         asunto = "¡Tu inscripción ha sido reactivada!";
-                        plantilla = "mail/confirmacion-inscripcion"; // O una específica de reactivación
+                        plantilla = "mail/confirmacion-inscripcion";
                 } else {
                         asunto = "Notificación: Tu inscripción ha sido suspendida";
-                        plantilla = "mail/baja-taller"; // Reutilizamos la de baja o usa una de 'suspension'
+                        plantilla = "mail/baja-taller";
                 }
 
                 emailService.enviarCorreo(

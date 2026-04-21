@@ -34,10 +34,11 @@
         <li class="nav-item">
           <a class="nav-link" routerLink="/mis-talleres" routerLinkActive="active-link">Mis Talleres</a>
         </li>
-        }
+       
         <li class="nav-item">
           <a class="nav-link" routerLink="/calendario" routerLinkActive="active-link">Calendario</a>
         </li>
+         }
         @if (tokenService.getRol()?.toLowerCase() === 'admin') {
         <li class="nav-item">
           <a class="nav-link" routerLink="/panel-admin" routerLinkActive="active-link">Panel Admin</a>

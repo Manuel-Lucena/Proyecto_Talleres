@@ -11,6 +11,8 @@ import com.mlg.taller.repositories.RolRepository;
 import com.mlg.taller.repositories.UsuarioRepository;
 import com.mlg.taller.security.jwt.JwtService;
 import com.mlg.taller.util.FileUtil;
+import com.mlg.taller.util.SecurityUtils;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -89,6 +91,8 @@ public class UsuarioService {
      * * @param dtos Lista de datos de usuarios a registrar.
      * 
      * @return Lista de usuarios creados mapeados a ResponseDTO.
+     * @throws DuplicateResourceException Si algún email o DNI de la lista ya existe
+     *                                    en el sistema.
      */
     @Transactional
     public List<UsuarioResponseDTO> registrarMasivo(List<UsuarioRequestDTO> dtos) {
@@ -180,29 +184,46 @@ public class UsuarioService {
     // --- MÉTODOS PUT ---
 
     /**
-     * Actualiza el perfil de un usuario, validando cambios en datos únicos y
-     * regenerando el token.
+     * Actualiza el perfil de un usuario.
+     * Mantenemos la firma original para no romper el resto del código,
+     * pero añadimos el blindaje de seguridad interna.
+     * * @param id ID del usuario a modificar.
      * 
-     * @param id      ID del usuario a modificar.
      * @param dto     Nuevos datos.
      * @param archivo Nueva imagen opcional.
      * @return Usuario actualizado con nuevo token JWT.
-     * @throws ResourceNotFoundException Si el usuario no existe.
+     * @throws BadRequestException        Si un usuario que no es ADMIN intenta
+     *                                    modificar a otro, o si un no-ADMIN intenta
+     *                                    cambiar su propio rol.
+     * @throws DuplicateResourceException Si el nuevo email o DNI ya están en uso
+     *                                    por otro usuario.
      */
     @Transactional
     public UsuarioResponseDTO actualizar(Long id, UsuarioRequestDTO dto, MultipartFile archivo) {
+        Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
+        boolean esAdmin = solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN");
+
+        if (!esAdmin && !solicitante.getId().equals(id)) {
+            throw new BadRequestException("No tienes permisos para modificar el perfil de otros usuarios.");
+        }
+
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
 
         validarCambioDatosUnicos(dto, usuario);
+
         usuarioMapper.updateEntityFromDto(dto, usuario);
+
+        if (dto.getIdRol() != null) {
+            if (esAdmin) {
+                usuario.setRol(obtenerRol(dto.getIdRol()));
+            } else if (!usuario.getRol().getId().equals(dto.getIdRol())) {
+                throw new BadRequestException("No tienes permiso para cambiar tu nivel de privilegios.");
+            }
+        }
 
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
             usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
-        }
-
-        if (dto.getIdRol() != null) {
-            usuario.setRol(obtenerRol(dto.getIdRol()));
         }
 
         gestionarImagenPerfil(usuario, archivo);
@@ -292,10 +313,8 @@ public class UsuarioService {
 
         tokenRepository.deleteByUsuario(usuario);
 
-      
         String token = java.util.UUID.randomUUID().toString();
 
-     
         PasswordResetToken tokenEntity = PasswordResetToken.builder()
                 .token(token)
                 .usuario(usuario)
@@ -306,7 +325,6 @@ public class UsuarioService {
 
         String urlFront = "http://localhost:4200/reset-password?token=" + token;
 
- 
         emailService.enviarCorreo(usuario.getEmail(), "Restablecer contraseña - MLG Taller", "recuperar-password",
                 java.util.Map.of("usuario", usuario, "url", urlFront));
     }
@@ -315,7 +333,8 @@ public class UsuarioService {
      * Valida el token y actualiza la contraseña del usuario en el sistema.
      * * @param dto Contiene el token de validación y la nueva password.
      * 
-     * @throws BadRequestException Si el token es inválido o ha expirado.
+     * @throws BadRequestException Si el token proporcionado no existe, es inválido
+     *                             o ya ha superado el tiempo límite de 15 minutos.
      */
     @Transactional
     public void cambiarPassword(PasswordChangeRequestDTO dto) {

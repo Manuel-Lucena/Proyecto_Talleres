@@ -39,16 +39,21 @@ public class SecurityConfiguration {
                         // 1. ENTIDAD: USUARIOS & AUTH
                         // =========================================================
 
-                        // 1. PRIMERO LAS EXCEPCIONES PÚBLICAS (Orden importa)
+                        // 1. Excepciones públicas (Auth)
                         .requestMatchers(HttpMethod.POST, "/api/usuarios/register", "/api/usuarios/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/usuarios/password-reset-request").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/usuarios/password-reset-confirm").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/usuarios/password-reset-request",
+                                "/api/usuarios/password-reset-confirm")
+                        .permitAll()
 
-                        // 2. LUEGO LAS REGLAS DE ADMIN
+                        // 2. Acciones exclusivas de ADMIN
+                        .requestMatchers(HttpMethod.GET, "/api/usuarios").hasRole("ADMIN") // Solo admin ve a todos
                         .requestMatchers(HttpMethod.POST, "/api/usuarios/batch").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/usuarios/**").hasRole("ADMIN")
 
-                        // 3. POR ÚLTIMO, TODO LO DEMÁS DE USUARIOS REQUIERE AUTH
+                        // 3. Acciones de Usuario (Perfil propio)
+                        .requestMatchers(HttpMethod.PUT, "/api/usuarios/perfil").authenticated()
+
+                        // 4. Todo lo demás (buscar por ID, etc.)
                         .requestMatchers("/api/usuarios/**").authenticated()
                         // =========================================================
                         // 2. ENTIDAD: TALLERES
@@ -78,19 +83,21 @@ public class SecurityConfiguration {
                         // 4. ENTIDAD: MENSAJES
                         // =========================================================
 
-                        // Moderación y Auditoría: Solo ADMIN ve todo el historial global o elimina
-                        .requestMatchers(HttpMethod.GET, "/api/mensajes").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/mensajes/**").hasRole("ADMIN")
+                        // Solo Admin y Profesores pueden borrar
+                        .requestMatchers(HttpMethod.DELETE, "/api/mensajes/**").hasAnyRole("ADMIN", "PROFESOR")
 
-                        // Comunicación: Alumnos/Profesores pueden enviar y ver chats de sus talleres
+                        // El listado global (GET /api/mensajes) solo para Admin
+                        .requestMatchers(HttpMethod.GET, "/api/mensajes").hasRole("ADMIN")
+
+                        // El resto (enviar y ver chat del taller) para todos los que pasen el filtro
+                        // del Service
                         .requestMatchers("/api/mensajes/**").authenticated()
 
                         // =========================================================
                         // 5. ENTIDAD: TAREAS (Gestión de Actividades)
                         // =========================================================
 
-                        // Lectura: Cualquier usuario logueado puede ver tareas (sujeto a la lógica de
-                        // visibilidad del Service)
+                        .requestMatchers(HttpMethod.GET, "/api/tareas").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/tareas/**").authenticated()
 
                         // Gestión: El Profesor y el Admin pueden Crear, Editar (incluida visibilidad) y
@@ -113,8 +120,8 @@ public class SecurityConfiguration {
                         // 7. ENTIDAD: MATERIALES
                         // =========================================================
 
-                        // Lectura: Alumnos y Profesores pueden ver materiales (el Service filtra la
-                        // visibilidad)
+                        .requestMatchers(HttpMethod.GET, "/api/materiales").hasRole("ADMIN")
+                        // Alumnos y Profesores pueden ver materiales específicos o por taller
                         .requestMatchers(HttpMethod.GET, "/api/materiales/**").authenticated()
 
                         // Gestión: El Profesor y el Admin pueden Crear, Editar y Eliminar materiales

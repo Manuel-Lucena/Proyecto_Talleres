@@ -33,7 +33,8 @@ public class NoticiaService {
 
     /**
      * Crea una nueva noticia y procesa su imagen asociada si existe.
-     * @param dto Datos de la noticia a crear.
+     * 
+     * @param dto     Datos de la noticia a crear.
      * @param archivo Archivo de imagen opcional.
      * @return Noticia creada con su imagen asignada.
      */
@@ -55,6 +56,7 @@ public class NoticiaService {
 
     /**
      * Recupera todas las noticias ordenadas por fecha de publicación descendente.
+     * 
      * @return Lista de todas las noticias registradas.
      */
     @Transactional(readOnly = true)
@@ -66,6 +68,7 @@ public class NoticiaService {
 
     /**
      * Busca una noticia específica por su identificador único.
+     * 
      * @param id Identificador de la noticia.
      * @return Noticia encontrada.
      * @throws ResourceNotFoundException Si la noticia no existe.
@@ -81,8 +84,9 @@ public class NoticiaService {
 
     /**
      * Actualiza el contenido y/o la imagen de una noticia existente.
-     * @param id ID de la noticia a modificar.
-     * @param dto Nuevos datos de la noticia.
+     * 
+     * @param id      ID de la noticia a modificar.
+     * @param dto     Nuevos datos de la noticia.
      * @param archivo Nuevo archivo de imagen opcional.
      * @return Noticia actualizada.
      * @throws ResourceNotFoundException Si la noticia no existe.
@@ -90,11 +94,15 @@ public class NoticiaService {
     @Transactional
     public NoticiaResponseDTO actualizar(Long id, NoticiaRequestDTO dto, MultipartFile archivo) {
         Noticia noticia = noticiaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Noticia no encontrada con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Noticia no encontrada"));
+
+        LocalDate fechaOriginal = noticia.getFechaPublicacion();
 
         noticiaMapper.updateEntityFromDto(dto, noticia);
-        gestionarImagenNoticia(noticia, archivo);
 
+        noticia.setFechaPublicacion(fechaOriginal);
+
+        gestionarImagenNoticia(noticia, archivo);
         return noticiaMapper.toResponse(noticiaRepository.save(noticia));
     }
 
@@ -102,13 +110,15 @@ public class NoticiaService {
 
     /**
      * Elimina una noticia y su archivo de imagen físico del servidor.
+     * 
      * @param id ID de la noticia a eliminar.
      * @throws ResourceNotFoundException Si la noticia no existe.
      */
     @Transactional
     public void eliminar(Long id) {
         Noticia noticia = noticiaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede eliminar: Noticia no encontrada con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se puede eliminar: Noticia no encontrada con ID: " + id));
 
         if (noticia.getImagenUrl() != null) {
             fileUtil.eliminar(FOLDER, noticia.getImagenUrl(), true);
@@ -121,6 +131,7 @@ public class NoticiaService {
 
     /**
      * Procesa, guarda y vincula la imagen física con la entidad noticia.
+     * 
      * @param noticia Entidad a la que se asignará la imagen.
      * @param archivo Archivo recibido desde el controlador.
      */

@@ -8,6 +8,7 @@ import com.mlg.taller.model.dtos.UsuarioRequestDTO;
 import com.mlg.taller.model.dtos.UsuarioResponseDTO;
 import com.mlg.taller.service.UsuarioService;
 import com.mlg.taller.util.ApiResponse;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -130,21 +131,27 @@ public class UsuarioController {
 
     // --- MÉTODOS PUT ---
 
+
     /**
      * Actualiza la información de un usuario existente.
-     * Permite la actualización parcial de datos y el cambio de imagen de perfil.
+     * Este método es polivalente:
+     * - El ADMIN lo usa para editar a cualquier usuario por su ID.
+     * - El Usuario/Profesor lo usa para editar su propio perfil pasando su ID.
+     * * @param id ID del usuario a modificar (Validado internamente en el Service).
      * 
-     * @param id      ID del usuario a modificar.
      * @param dto     Datos actualizados del usuario.
      * @param archivo Nueva imagen de perfil (opcional).
-     * @return ApiResponse con los datos del usuario tras la actualización.
+     * @return ApiResponse con los datos del usuario y el token actualizado.
      */
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<UsuarioResponseDTO> actualizar(
             @PathVariable Long id,
             @RequestPart("usuario") @Valid UsuarioRequestDTO dto,
             @RequestPart(value = "archivo", required = false) MultipartFile archivo) {
-        return ApiResponse.success(usuarioService.actualizar(id, dto, archivo), "Usuario actualizado");
+
+        UsuarioResponseDTO actualizado = usuarioService.actualizar(id, dto, archivo);
+
+        return ApiResponse.success(actualizado, "Usuario actualizado correctamente");
     }
 
     // --- MÉTODOS DELETE ---
