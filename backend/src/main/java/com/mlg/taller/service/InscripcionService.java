@@ -189,13 +189,34 @@ public class InscripcionService {
          * @return Inscripción actualizada.
          * @throws ResourceNotFoundException Si la inscripción no existe.
          */
+        /**
+         * Actualiza los datos de una inscripción existente, validando la integridad
+         * de los nuevos IDs de usuario y taller si se proporcionan.
+         */
         @Transactional
         public InscripcionResponseDTO actualizar(Long id, InscripcionRequestDTO dto) {
-                Inscripcion existente = inscripcionRepository.findById(id)
-                                .orElseThrow(
-                                                () -> new ResourceNotFoundException(
-                                                                "No existe la inscripción para actualizar con ID: "
-                                                                                + id));
+                Inscripcion existente = inscripcionRepository.findByIdIncludingInactive(id)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "No existe la inscripción para actualizar con ID: " + id));
+
+             
+                if (!existente.getUsuario().getId().equals(dto.getIdUsuario())) {
+                        Usuario nuevoUsuario = usuarioRepository.findById(dto.getIdUsuario())
+                                        .orElseThrow(() -> new ResourceNotFoundException(
+                                                        "No se puede actualizar: Nuevo Usuario no encontrado con ID: "
+                                                                        + dto.getIdUsuario()));
+                        existente.setUsuario(nuevoUsuario);
+                }
+
+                if (!existente.getTaller().getId().equals(dto.getIdTaller())) {
+                        Taller nuevoTaller = tallerRepository.findById(dto.getIdTaller())
+                                        .orElseThrow(() -> new ResourceNotFoundException(
+                                                        "No se puede actualizar: Nuevo Taller no encontrado con ID: "
+                                                                        + dto.getIdTaller()));
+                        existente.setTaller(nuevoTaller);
+                }
+
+                
 
                 existente.setMontoPagado(dto.getMontoPagado());
                 existente.setOrderId(dto.getOrderId());

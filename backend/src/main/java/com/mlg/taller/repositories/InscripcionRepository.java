@@ -48,6 +48,11 @@ public interface InscripcionRepository extends JpaRepository<Inscripcion, Long> 
     long countByTallerIdAndActivaTrue(Long idTaller);
 
     /**
+     * Verifica si el alumno tiene una inscripción VIGENTE en el taller.
+     */
+    boolean existsByUsuarioIdAndTallerIdAndActivaTrue(Long idUsuario, Long idTaller);
+
+    /**
      * Busca una inscripción por ID incluyendo aquellas que están desactivadas
      * (activa = false).
      * Se usa Native Query para saltar el @SQLRestriction de Hibernate.

@@ -126,19 +126,25 @@ public class SecurityConfiguration {
                         // 8. ENTIDAD: INSCRIPCIONES
                         // =========================================================
 
-                        // 1. Rutas específicas de cambio de estado (MUY ESPECÍFICO)
+                        // 1. CARGA MASIVA: Siempre arriba del todo porque es la más restrictiva.
+                        .requestMatchers(HttpMethod.POST, "/api/inscripciones/masivo").hasRole("ADMIN")
+
+                        // 2. CAMBIO DE ESTADO: Específica para gestión de alumnos (Admin y Prof)
                         .requestMatchers(HttpMethod.PUT, "/api/inscripciones/*/estado").hasAnyRole("ADMIN", "PROFESOR")
 
-                        // 2. Rutas generales de gestión
+                        // 3. CONSULTAS DE GESTIÓN: Listar alumnos de un taller o todas la inscripciones
                         .requestMatchers(HttpMethod.GET, "/api/inscripciones/taller/**").hasAnyRole("ADMIN", "PROFESOR")
                         .requestMatchers(HttpMethod.GET, "/api/inscripciones").hasAnyRole("ADMIN", "PROFESOR")
 
-                        // 3. Rutas de usuario (ALUMNO)
+                        // 4. RUTAS DE ALUMNO: Acciones personales (Inscribirse o ver sus propios
+                        // talleres)
+
                         .requestMatchers(HttpMethod.POST, "/api/inscripciones").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/inscripciones/usuario/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/inscripciones/{id}").authenticated()
 
-                        // 4. Fallback para cualquier otro PUT/DELETE en inscripciones
+                        // 5. MANTENIMIENTO: Actualizar o borrar inscripciones
+
                         .requestMatchers(HttpMethod.PUT, "/api/inscripciones/**").hasAnyRole("ADMIN", "PROFESOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/inscripciones/**").hasAnyRole("ADMIN", "PROFESOR")
 
@@ -159,8 +165,7 @@ public class SecurityConfiguration {
                         // =========================================================
                         // Acción de entregar y CONSULTAR (ahora incluimos GET para alumnos)
                         .requestMatchers(HttpMethod.POST, "/api/entregas").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/entregas/tarea/**").authenticated() 
-                                                                                                 
+                        .requestMatchers(HttpMethod.GET, "/api/entregas/tarea/**").authenticated()
 
                         // Calificar y Feedback: Sigue siendo SOLO para Profe/Admin
                         .requestMatchers(HttpMethod.PUT, "/api/entregas/*/calificar").hasAnyRole("ADMIN", "PROFESOR")

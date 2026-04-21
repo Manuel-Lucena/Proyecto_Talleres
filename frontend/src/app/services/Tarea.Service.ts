@@ -25,19 +25,19 @@ export class TareaService {
   }
 
   /**
-     * Recupera las tareas asignadas individualmente según el nivel.
+     * [ALUMNO] Recupera las tareas visibles y asignadas según el nivel del alumno.
      * @param idTaller Identificador del taller.
-     * @param idAlumno ID del alumno para filtrar por asignación.
+     * @returns Observable con la lista de tareas permitidas.
      */
-  listarVisibles(idTaller: number, idAlumno: number): Observable<ApiResponse<TareaResponse[]>> {
-    return this.http.get<ApiResponse<TareaResponse[]>>(`${this.apiUrl}/taller/${idTaller}/visibles/${idAlumno}`);
+  listarVisibles(idTaller: number): Observable<ApiResponse<TareaResponse[]>> {
+    return this.http.get<ApiResponse<TareaResponse[]>>(`${this.apiUrl}/taller/${idTaller}/visibles`);
   }
-
+  
   /**
-   * Obtiene la información detallada de una tarea específica por su ID.
-   * @param id Identificador único de la tarea.
-   * @returns Observable con los datos de la tarea solicitada.
-   */
+     * Obtiene la información detallada de una tarea específica por su ID.
+     * @param id Identificador único de la tarea.
+     * @returns Observable con los datos de la tarea solicitada.
+     */
   obtenerPorId(id: number): Observable<ApiResponse<TareaResponse>> {
     return this.http.get<ApiResponse<TareaResponse>>(`${this.apiUrl}/${id}`);
   }

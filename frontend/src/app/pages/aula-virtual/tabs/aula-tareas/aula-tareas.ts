@@ -68,11 +68,10 @@ export class AulaTareas implements OnInit {
    */
   listarTareas(id: number): void {
     this.cargando = true;
-    const idAlumno = this.tokenService.getId();
 
     const obs = this.esProfesor 
       ? this.tareaService.listarPorTaller(id) 
-      : this.tareaService.listarVisibles(id, idAlumno!);
+      : this.tareaService.listarVisibles(id);
 
     obs.subscribe({
       next: (res) => {

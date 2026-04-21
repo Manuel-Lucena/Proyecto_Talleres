@@ -76,7 +76,7 @@ export class CalendarioTareas implements OnInit {
 
         const peticiones = talleres.map(taller => {
           const idTaller = (taller as any).idTaller || (taller as any).id;
-          return this.tareaService.listarVisibles(idTaller, idUser).pipe(
+          return this.tareaService.listarVisibles(idTaller).pipe(
             map(res => (res.data || []).map(t => ({ ...t, nombreTaller: taller.nombre }))),
             catchError(() => of([]))
           );

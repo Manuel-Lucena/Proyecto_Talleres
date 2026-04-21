@@ -79,7 +79,7 @@ export class AulaCalificaciones implements OnInit {
     this.cargando = true;
     const idUsuario = this.tokenService.getId();
 
-    this.tareaService.listarVisibles(this.idTaller, idUsuario!).subscribe({
+    this.tareaService.listarVisibles(this.idTaller).subscribe({
       next: (resTareas) => {
         const tareas = resTareas.data || [];
         this.filas = [];

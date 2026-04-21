@@ -75,7 +75,7 @@ export class AulaMuro implements OnInit {
 
     const tareasObs = this.esProfesor 
       ? this.tareaService.listarPorTaller(idTaller) 
-      : this.tareaService.listarVisibles(idTaller, idAlumno!);
+      : this.tareaService.listarVisibles(idTaller);
 
     const materialesObs = this.esProfesor 
       ? this.materialService.listarPorTaller(idTaller) 

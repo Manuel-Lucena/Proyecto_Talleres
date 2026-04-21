@@ -13,13 +13,13 @@ export class MensajeService {
   /** URL base para los endpoints de la API de mensajes */
   private apiUrl = 'http://localhost:8080/api/mensajes';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
-   * Obtiene el historial de mensajes publicados en el muro de un taller específico.
-   * @param idTaller Identificador del taller.
-   * @returns Observable con la lista de mensajes (MensajeResponse).
-   */
+     * Obtiene el historial de mensajes publicados en el muro de un taller específico.
+     * * @param idTaller Identificador del taller.
+     * @returns Observable con la lista de mensajes.
+     */
   listarPorTaller(idTaller: number): Observable<ApiResponse<MensajeResponse[]>> {
     return this.http.get<ApiResponse<MensajeResponse[]>>(`${this.apiUrl}/taller/${idTaller}`);
   }

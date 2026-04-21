@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Controlador para la gestión de la mensajería y comunicación dentro de los talleres.
- * Permite el envío de mensajes, la consulta de historiales por taller y la 
+ * Controlador para la gestión de la mensajería y comunicación dentro de los
+ * talleres.
+ * Permite el envío de mensajes, la consulta de historiales por taller y la
  * moderación (eliminación) de los mismos.
  */
 @RestController
@@ -25,8 +26,9 @@ public class MensajeController {
 
     /**
      * Registra y envía un nuevo mensaje en el sistema.
+     * 
      * @param dto Objeto con el contenido del mensaje, emisor y taller de destino.
-     * @return    ApiResponse con los datos del mensaje enviado.
+     * @return ApiResponse con los datos del mensaje enviado.
      */
     @PostMapping
     public ApiResponse<MensajeResponseDTO> enviar(@RequestBody MensajeRequestDTO dto) {
@@ -37,17 +39,18 @@ public class MensajeController {
 
     /**
      * Recupera el historial de mensajes asociados a un taller específico.
-     * @param idTaller Identificador único del taller.
-     * @return         ApiResponse con la lista de mensajes del taller solicitado.
+     * * @param idTaller Identificador único del taller.
+     * 
+     * @return ApiResponse con la lista de mensajes del taller solicitado.
      */
     @GetMapping("/taller/{idTaller}")
     public ApiResponse<List<MensajeResponseDTO>> listarPorTaller(@PathVariable Long idTaller) {
-        return ApiResponse.success(mensajeService.listarPorTaller(idTaller), "Historial del taller obtenido");
+        return ApiResponse.success(mensajeService.listarPorTaller(idTaller), "Historial obtenido");
     }
 
     /**
      * Obtiene el listado global de todos los mensajes registrados en la plataforma.
-     * @return ApiResponse con la lista completa de mensajes.
+     * * @return ApiResponse con la lista completa de mensajes.
      */
     @GetMapping
     public ApiResponse<List<MensajeResponseDTO>> listarTodos() {
@@ -58,8 +61,9 @@ public class MensajeController {
 
     /**
      * Elimina de forma definitiva un mensaje mediante su identificador.
+     * 
      * @param id Identificador único del mensaje a suprimir.
-     * @return   ApiResponse confirmando la eliminación del registro.
+     * @return ApiResponse confirmando la eliminación del registro.
      */
     @DeleteMapping("/{id}")
     public ApiResponse<Void> eliminar(@PathVariable Long id) {

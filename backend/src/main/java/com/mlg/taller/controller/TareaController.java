@@ -42,8 +42,7 @@ public class TareaController {
 
     /**
      * Recupera el listado global de todas las tareas registradas.
-     * 
-     * @return ApiResponse con la lista completa de tareas.
+     * * @return ApiResponse con la lista completa de tareas.
      */
     @GetMapping
     public ApiResponse<List<TareaResponseDTO>> listar() {
@@ -52,8 +51,8 @@ public class TareaController {
 
     /**
      * Obtiene todas las tareas pertenecientes a un taller concreto.
+     * * @param idTaller Identificador único del taller.
      * 
-     * @param idTaller Identificador único del taller.
      * @return ApiResponse con la lista de tareas de dicho taller.
      */
     @GetMapping("/taller/{idTaller}")
@@ -62,19 +61,21 @@ public class TareaController {
     }
 
     /**
-     * Lista tareas personalizadas.
-     * El profesor elige aquí qué alumnos ven la tarea según su nivel
+     * [ALUMNO] Obtiene el listado de tareas personalizadas según el nivel del
+     * alumno.
+     * * @param idTaller Identificador único del taller.
+     * 
+     * @return ApiResponse con la lista de tareas visibles y asignadas para su
+     *         nivel.
      */
-    @GetMapping("/taller/{idTaller}/visibles/{idAlumno}")
-    public ApiResponse<List<TareaResponseDTO>> listarVisibles(@PathVariable Long idTaller,
-            @PathVariable Long idAlumno) {
-        return ApiResponse.success(tareaService.listarVisibles(idTaller, idAlumno), "Tareas de tu nivel obtenidas");
+    @GetMapping("/taller/{idTaller}/visibles")
+    public ApiResponse<List<TareaResponseDTO>> listarVisibles(@PathVariable Long idTaller) {
+        return ApiResponse.success(tareaService.listarVisibles(idTaller), "Tareas obtenidas con éxito");
     }
 
     /**
      * Busca la información detallada de una tarea por su identificador.
-     * 
-     * @param id Identificador único de la tarea.
+     * * @param id Identificador único de la tarea.
      * @return ApiResponse con la tarea encontrada.
      */
     @GetMapping("/{id}")

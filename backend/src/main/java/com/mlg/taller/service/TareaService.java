@@ -1,5 +1,6 @@
 package com.mlg.taller.service;
 
+import com.mlg.taller.exception.BadRequestException;
 import com.mlg.taller.exception.ResourceNotFoundException;
 import com.mlg.taller.model.dtos.TareaRequestDTO;
 import com.mlg.taller.model.dtos.TareaResponseDTO;
@@ -8,6 +9,7 @@ import com.mlg.taller.model.enums.EstadoTarea;
 import com.mlg.taller.model.mappers.TareaMapper;
 import com.mlg.taller.repositories.*;
 import com.mlg.taller.util.FileUtil;
+import com.mlg.taller.util.SecurityUtils;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -64,7 +66,12 @@ public class TareaService {
                 asignarTareaAAlumno(tareaGuardada, alumnoId);
             }
         } else {
-            List<Inscripcion> inscripcionesActivas = inscripcionRepository.findByTallerId(taller.getId());
+            // Filtrar directamente por activa = true
+            List<Inscripcion> inscripcionesActivas = inscripcionRepository.findByTallerId(taller.getId())
+                    .stream()
+                    .filter(Inscripcion::isActiva)
+                    .toList();
+
             for (Inscripcion inscripcion : inscripcionesActivas) {
                 asignarTareaAAlumno(tareaGuardada, inscripcion.getUsuario().getId());
             }
@@ -89,31 +96,51 @@ public class TareaService {
 
     /**
      * Lista solo las tareas de un taller que tienen visible = true
-     * y estan asignadas al alumno.
-     * * @param idTaller ID del taller.
+     * * @param idTaller ID del taller a consultar.
      * 
-     * @return Lista de tareas visibles.
+     * @return Lista de tareas visibles y asignadas al alumno identificado por el
+     *         Token.
+     * @throws BadRequestException Si el alumno no posee una inscripción activa en
+     *                             el taller.
      */
     @Transactional(readOnly = true)
-    public List<TareaResponseDTO> listarVisibles(Long idTaller, Long idAlumno) {
+    public List<TareaResponseDTO> listarVisibles(Long idTaller) {
+    
+        Long idAlumno = SecurityUtils.getIdUsuarioAutenticado();
+
+        boolean estaInscrito = inscripcionRepository.existsByUsuarioIdAndTallerIdAndActivaTrue(idAlumno, idTaller);
+        if (!estaInscrito) {
+            throw new BadRequestException(
+                    "Acceso denegado: No puedes listar tareas de un taller en el que no estás inscrito.");
+        }
+
         return tareaRepository.findVisiblesParaAlumno(idTaller, idAlumno).stream()
                 .map(tareaMapper::toResponse)
                 .toList();
     }
 
-    /**
+   /**
      * Busca una tarea específica por su identificador único.
-     * 
-     * @param id ID de la tarea.
-     * @return Tarea encontrada.
+     * * @param id Identificador único de la tarea.
+     * @return TareaResponseDTO con la información detallada de la actividad.
      * @throws ResourceNotFoundException Si la tarea no existe.
+     * @throws BadRequestException        Si el alumno no está inscrito en el taller correspondiente.
      */
     @Transactional(readOnly = true)
-
     public TareaResponseDTO obtenerPorId(Long id) {
-        return tareaRepository.findById(id)
-                .map(tareaMapper::toResponse)
+        Tarea tarea = tareaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarea no encontrada con ID: " + id));
+
+        Long idAlumno = SecurityUtils.getIdUsuarioAutenticado();
+
+        boolean estaInscrito = inscripcionRepository.existsByUsuarioIdAndTallerIdAndActivaTrue(
+                idAlumno, tarea.getTaller().getId());
+
+        if (!estaInscrito) {
+            throw new BadRequestException("Acceso denegado: No figuras como alumno activo en el taller de esta tarea.");
+        }
+
+        return tareaMapper.toResponse(tarea);
     }
 
     /**

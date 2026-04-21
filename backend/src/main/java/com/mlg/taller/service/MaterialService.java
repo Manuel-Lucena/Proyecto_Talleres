@@ -1,5 +1,6 @@
 package com.mlg.taller.service;
 
+import com.mlg.taller.exception.BadRequestException;
 import com.mlg.taller.exception.ResourceNotFoundException;
 import com.mlg.taller.model.dtos.MaterialRequestDTO;
 import com.mlg.taller.model.dtos.MaterialResponseDTO;
@@ -7,9 +8,11 @@ import com.mlg.taller.model.entities.ArchivoMaterial;
 import com.mlg.taller.model.entities.Material;
 import com.mlg.taller.model.entities.Taller;
 import com.mlg.taller.model.mappers.MaterialMapper;
+import com.mlg.taller.repositories.InscripcionRepository;
 import com.mlg.taller.repositories.MaterialRepository;
 import com.mlg.taller.repositories.TallerRepository;
 import com.mlg.taller.util.FileUtil;
+import com.mlg.taller.util.SecurityUtils;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,7 @@ public class MaterialService {
     private final TallerRepository tallerRepository;
     private final MaterialMapper materialMapper;
     private final FileUtil fileUtil;
+    private final InscripcionRepository inscripcionRepository;
 
     // --- MÉTODOS POST ---
 
@@ -70,29 +74,50 @@ public class MaterialService {
 
     /**
      * Lista solo los materiales de un taller que tienen visible = true.
-     * * @param idTaller ID del taller.
+     * * @param idTaller Identificador del taller.
      * 
-     * @return Lista de materiales visibles.
+     * @return Lista de materiales visibles para los alumnos inscritos.
+     * @throws BadRequestException Si el usuario no tiene una matrícula vigente.
      */
     @Transactional(readOnly = true)
     public List<MaterialResponseDTO> listarVisibles(Long idTaller) {
+
+        Long idUsuario = SecurityUtils.getIdUsuarioAutenticado();
+
+        boolean estaInscrito = inscripcionRepository.existsByUsuarioIdAndTallerIdAndActivaTrue(idUsuario, idTaller);
+        if (!estaInscrito) {
+            throw new BadRequestException("Acceso denegado: No tienes una inscripción activa en este taller.");
+        }
+
         return materialRepository.findByTallerIdAndVisibleTrue(idTaller).stream()
                 .map(materialMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Recupera un material específico por su identificador.
+     * Recupera un material específico por su identificador único.
+     * * @param id Identificador del material a buscar.
      * 
-     * @param id ID del material a buscar.
-     * @return Material encontrado.
-     * @throws ResourceNotFoundException Si el material no existe.
+     * @return Material encontrado y mapeado a DTO.
+     * @throws ResourceNotFoundException Si el material no existe en el sistema.
+     * @throws BadRequestException       Si el usuario no tiene permiso de acceso
+     *                                   por falta de inscripción.
      */
     @Transactional(readOnly = true)
     public MaterialResponseDTO buscarPorId(Long id) {
-        return materialRepository.findById(id)
-                .map(materialMapper::toResponse)
+        Material material = materialRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Material no encontrado con ID: " + id));
+
+        Long idUsuario = SecurityUtils.getIdUsuarioAutenticado();
+
+        boolean estaInscrito = inscripcionRepository.existsByUsuarioIdAndTallerIdAndActivaTrue(
+                idUsuario, material.getTaller().getId());
+
+        if (!estaInscrito) {
+            throw new BadRequestException("No tienes permiso para ver este material.");
+        }
+
+        return materialMapper.toResponse(material);
     }
 
     /**
@@ -174,7 +199,6 @@ public class MaterialService {
                 .map(ArchivoMaterial::getNombre)
                 .toList();
 
-        
         materialRepository.delete(material);
 
         nombresArchivos.forEach(nombre -> fileUtil.eliminar("materiales", nombre, false));

@@ -42,8 +42,7 @@ public class MaterialController {
 
     /**
      * Recupera el listado completo de todos los materiales registrados.
-     * 
-     * @return ApiResponse con la lista global de materiales.
+     * * @return ApiResponse con la lista global de materiales.
      */
     @GetMapping
     public ApiResponse<List<MaterialResponseDTO>> listarTodos() {
@@ -52,8 +51,8 @@ public class MaterialController {
 
     /**
      * Busca un material específico mediante su identificador único.
+     * * @param id Identificador del material a buscar.
      * 
-     * @param id Identificador del material a buscar.
      * @return ApiResponse con el material encontrado.
      */
     @GetMapping("/{id}")
@@ -62,20 +61,20 @@ public class MaterialController {
     }
 
     /**
-     * [ALUMNO] Obtiene solo los materiales marcados como visibles.
+     * [ALUMNO] Obtiene solo los materiales marcados como visibles de un taller.
      * * @param idTaller Identificador del taller.
      * 
      * @return ApiResponse con la lista de materiales visibles.
      */
     @GetMapping("/taller/{idTaller}/visibles")
     public ApiResponse<List<MaterialResponseDTO>> listarVisiblesParaAlumno(@PathVariable Long idTaller) {
-        return ApiResponse.success(materialService.listarVisibles(idTaller), "Materiales visibles obtenidos con éxito");
+        return ApiResponse.success(materialService.listarVisibles(idTaller), "Materiales visibles obtenidos");
     }
 
     /**
      * Obtiene todos los materiales vinculados a un taller específico.
+     * * @param idTaller Identificador del taller.
      * 
-     * @param idTaller Identificador del taller.
      * @return ApiResponse con la lista de materiales del taller solicitado.
      */
     @GetMapping("/taller/{idTaller}")

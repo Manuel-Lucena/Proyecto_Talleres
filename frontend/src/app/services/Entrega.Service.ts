@@ -24,19 +24,19 @@ export class EntregaService {
     }
 
     /**
-     * Busca una entrega específica mediante su identificador único.
-     * @param id ID de la entrega.
-     * @returns Observable con la información detallada de la entrega.
-     */
+       * Busca una entrega específica mediante su identificador único.
+       * @param id ID de la entrega.
+       * @returns Observable con la información detallada de la entrega.
+       */
     buscarPorId(id: number): Observable<ApiResponse<EntregaResponse>> {
         return this.http.get<ApiResponse<EntregaResponse>>(`${this.apiUrl}/${id}`);
     }
 
     /**
-     * Obtiene todas las entregas realizadas para una tarea concreta.
-     * @param idTarea Identificador de la tarea.
-     * @returns Observable con el listado de entregas de los alumnos para esa tarea.
-     */
+       * Obtiene todas las entregas realizadas para una tarea concreta.
+       * @param idTarea Identificador de la tarea.
+       * @returns Observable con el listado de entregas de los alumnos para esa tarea.
+       */
     listarPorTarea(idTarea: number): Observable<ApiResponse<EntregaResponse[]>> {
         return this.http.get<ApiResponse<EntregaResponse[]>>(`${this.apiUrl}/tarea/${idTarea}`);
     }
