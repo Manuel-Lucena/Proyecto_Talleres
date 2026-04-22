@@ -111,9 +111,8 @@ public class SecurityConfiguration {
                         // =========================================================
 
                         // El Profe crea y elimina las asignaciones de sus tareas
-                        .requestMatchers(HttpMethod.GET, "/api/tareas-asignadas/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/tareas-asignadas/actualizar/**")
-                        .hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.GET, "/api/tareas-asignadas/**").hasAnyRole("ADMIN", "PROFESOR")
+                        .requestMatchers(HttpMethod.POST, "/api/tareas-asignadas/**").hasAnyRole("ADMIN", "PROFESOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/tareas-asignadas/**").hasAnyRole("ADMIN", "PROFESOR")
 
                         // =========================================================
@@ -159,13 +158,14 @@ public class SecurityConfiguration {
                         // 9. ENTIDAD: HORARIOS
                         // =========================================================
 
-                        // Lectura: Los alumnos ven su agenda y los horarios de los talleres
+                        // Lectura: Profesores y Alumnos pueden ver horarios y agendas (cada uno la
+                        // suya)
                         .requestMatchers(HttpMethod.GET, "/api/horarios/**").authenticated()
 
-                        // Gestión: Solo Admin y Profesor crean, editan o borran turnos
-                        .requestMatchers(HttpMethod.POST, "/api/horarios/**").hasAnyRole("ADMIN", "PROFESOR")
-                        .requestMatchers(HttpMethod.PUT, "/api/horarios/**").hasAnyRole("ADMIN", "PROFESOR")
-                        .requestMatchers(HttpMethod.DELETE, "/api/horarios/**").hasAnyRole("ADMIN", "PROFESOR")
+                        // Escritura: ÚNICAMENTE el ADMIN puede tocar los turnos
+                        .requestMatchers(HttpMethod.POST, "/api/horarios/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/horarios/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/horarios/**").hasRole("ADMIN")
 
                         // =========================================================
                         // 10. ENTIDAD: ENTREGAS (Calificaciones y Trabajos)

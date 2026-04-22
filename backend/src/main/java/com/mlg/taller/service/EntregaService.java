@@ -13,7 +13,6 @@ import com.mlg.taller.repositories.EntregaRepository;
 import com.mlg.taller.repositories.InscripcionRepository;
 import com.mlg.taller.repositories.TareaRepository;
 import com.mlg.taller.util.SecurityUtils;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +23,9 @@ import java.util.stream.Collectors;
 
 /**
  * Servicio para la gestión de entregas de tareas.
+ * Implementa un blindaje estricto para proteger la integridad de las
+ * calificaciones
+ * y la privacidad de los trabajos entre alumnos.
  */
 @Service
 @RequiredArgsConstructor
@@ -36,44 +38,51 @@ public class EntregaService {
 
     // --- MÉTODOS POST ---
 
-   /**
-     * Registra una nueva entrega de tarea. 
-     * El alumno se identifica automáticamente mediante su Token (JWT).
-     * * @param dto Datos del envío (idTarea, textoEntrega, etc).
-     * @return DTO de la entrega creada.
-     * @throws DuplicateResourceException Si el alumno ya entregó esta tarea previamente.
+    /**
+     * Registra una nueva entrega de tarea validando requisitos de acceso y
+     * visibilidad.
+     * * @param dto Datos del envío (idTarea, textoEntrega).
+     * 
+     * @return EntregaResponseDTO de la entrega creada.
      * @throws ResourceNotFoundException  Si la tarea no existe.
+     * @throws BadRequestException        Si la tarea está oculta o el alumno no
+     *                                    está inscrito.
+     * @throws DuplicateResourceException Si el alumno ya envió un trabajo para esta
+     *                                    tarea.
      */
     @Transactional
     public EntregaResponseDTO enviar(EntregaRequestDTO dto) {
-    
         Usuario alumno = SecurityUtils.getUsuarioAutenticado();
-        Long idAlumno = alumno.getId();
 
         Tarea tarea = tareaRepository.findById(dto.getIdTarea())
                 .orElseThrow(() -> new ResourceNotFoundException("Tarea no encontrada con ID: " + dto.getIdTarea()));
 
-
-        boolean puedeEntregar = inscripcionRepository.existsByUsuarioIdAndTallerIdAndActivaTrue(
-                idAlumno, 
-                tarea.getTaller().getId());
-
-        if (!puedeEntregar) {
-            throw new BadRequestException("No tienes una inscripción activa en este taller.");
+        // 1. Validar que la tarea esté publicada
+        if (!tarea.isVisible()) {
+            throw new BadRequestException("No puedes entregar trabajos para una tarea que aún no ha sido publicada.");
         }
 
-        // 4. Comprobar si ya existe una entrega (usando el ID del Token)
-        entregaRepository.findByTareaIdAndAlumnoId(dto.getIdTarea(), idAlumno)
+        // 2. Validar inscripción activa
+        boolean puedeEntregar = inscripcionRepository.existsByUsuarioIdAndTallerIdAndActivaTrue(
+                alumno.getId(), tarea.getTaller().getId());
+        if (!puedeEntregar) {
+            throw new BadRequestException("No tienes una inscripción activa en el taller correspondiente.");
+        }
+
+        // 3. Evitar duplicados
+        entregaRepository.findByTareaIdAndAlumnoId(dto.getIdTarea(), alumno.getId())
                 .ifPresent(e -> {
-                    throw new DuplicateResourceException(
-                            "Ya existe una entrega registrada para ti en esta tarea");
+                    throw new DuplicateResourceException("Ya existe una entrega registrada para ti en esta tarea.");
                 });
 
-        // 5. Mapear y persistir
         Entrega entrega = entregaMapper.toEntity(dto);
         entrega.setTarea(tarea);
-        entrega.setAlumno(alumno); 
+        entrega.setAlumno(alumno);
         entrega.setFechaEntrega(LocalDateTime.now());
+
+        // Blindaje: Forzamos que la entrega nazca sin nota ni feedback
+        entrega.setCalificacion(null);
+        entrega.setComentarioProfesor(null);
 
         return entregaMapper.toResponse(entregaRepository.save(entrega));
     }
@@ -81,61 +90,71 @@ public class EntregaService {
     // --- MÉTODOS GET ---
 
     /**
-     * Obtiene el listado completo de entregas del sistema.
+     * Obtiene el listado global de todas las entregas del sistema.
+     * * @return Lista de todas las entregas registradas.
      * 
-     * @return Lista de todas las entregas.
+     * @throws BadRequestException Si el usuario no es ADMINISTRADOR.
      */
     @Transactional(readOnly = true)
     public List<EntregaResponseDTO> listarTodas() {
+        if (!SecurityUtils.getUsuarioAutenticado().getRol().getNombre().equalsIgnoreCase("ADMIN")) {
+            throw new BadRequestException("Acceso denegado: Solo el administrador puede ver el listado global.");
+        }
         return entregaRepository.findAll().stream()
                 .map(entregaMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
-  /**
-     * Recupera una entrega validando permisos (Admin, Dueño o Profesor del taller).
+    /**
+     * Recupera una entrega validando permisos de privacidad (Dueño, Profesor o
+     * Admin).
      * * @param id Identificador de la entrega.
-     * @return DTO de la entrega encontrada.
+     * 
+     * @return EntregaResponseDTO encontrada.
+     * @throws ResourceNotFoundException Si la entrega no existe.
+     * @throws BadRequestException       Si el usuario intenta ver una entrega ajena
+     *                                   sin ser su profesor.
      */
     @Transactional(readOnly = true)
     public EntregaResponseDTO buscarPorId(Long id) {
         Entrega entrega = entregaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No se encontró la entrega con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Entrega no encontrada con ID: " + id));
 
-        // Obtenemos el ID del usuario directamente del Token (JWT)
-        Long idUsuario = SecurityUtils.getIdUsuarioAutenticado();
         Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
-
         boolean esAdmin = solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN");
-        boolean esElDueno = entrega.getAlumno().getId().equals(idUsuario);
-        boolean esSuProfesor = entrega.getTarea().getTaller().getProfesor().getId().equals(idUsuario);
+        boolean esElDueno = entrega.getAlumno().getId().equals(solicitante.getId());
+        boolean esSuProfesor = entrega.getTarea().getTaller().getProfesor() != null &&
+                entrega.getTarea().getTaller().getProfesor().getId().equals(solicitante.getId());
 
         if (!esAdmin && !esElDueno && !esSuProfesor) {
-            throw new BadRequestException("No tienes permisos para visualizar esta entrega.");
+            throw new BadRequestException("Acceso denegado: No tienes permiso para visualizar esta entrega.");
         }
 
         return entregaMapper.toResponse(entrega);
     }
 
- /**
-     * Lista las entregas asociadas a una tarea validando rol de Profesor o Admin.
+    /**
+     * Lista las entregas de una tarea validando que el solicitante sea el profesor
+     * titular.
      * * @param idTarea ID de la tarea a consultar.
-     * @return Lista de entregas para dicha tarea.
+     * 
+     * @return Lista de entregas de la tarea.
+     * @throws ResourceNotFoundException Si la tarea no existe.
+     * @throws BadRequestException       Si el usuario no es el profesor del taller
+     *                                   o administrador.
      */
     @Transactional(readOnly = true)
     public List<EntregaResponseDTO> listarPorTarea(Long idTarea) {
         Tarea tarea = tareaRepository.findById(idTarea)
-                .orElseThrow(() -> new ResourceNotFoundException("Tarea no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Tarea no encontrada con ID: " + idTarea));
 
         Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
-        Long idUsuario = solicitante.getId();
-
         boolean esAdmin = solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN");
-        boolean esSuProfesor = tarea.getTaller().getProfesor().getId().equals(idUsuario);
+        boolean esSuProfesor = tarea.getTaller().getProfesor() != null &&
+                tarea.getTaller().getProfesor().getId().equals(solicitante.getId());
 
         if (!esAdmin && !esSuProfesor) {
-            throw new BadRequestException(
-                    "Solo el profesor del taller o el administrador pueden ver el listado de entregas.");
+            throw new BadRequestException("Acceso denegado: Solo el profesor del taller puede listar estas entregas.");
         }
 
         return entregaRepository.findByTareaId(idTarea).stream()
@@ -146,29 +165,29 @@ public class EntregaService {
     // --- MÉTODOS PUT ---
 
     /**
-     * Actualiza el contenido textual de una entrega existente (edición del alumno).
+     * Actualiza el contenido de una entrega validando que no esté calificada.
+     * * @param id ID de la entrega a modificar.
      * 
-     * @param id  ID de la entrega.
      * @param dto Nuevos datos.
-     * @return DTO actualizado.
+     * @return EntregaResponseDTO actualizada.
      * @throws ResourceNotFoundException Si la entrega no existe.
+     * @throws BadRequestException       Si la entrega ya tiene nota o el usuario no
+     *                                   es el dueño.
      */
     @Transactional
     public EntregaResponseDTO actualizar(Long id, EntregaRequestDTO dto) {
         Entrega entrega = entregaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Entrega no encontrada para actualizar"));
+                .orElseThrow(() -> new ResourceNotFoundException("Entrega no encontrada con ID: " + id));
 
-        if (entrega.getCalificacion() != null) {
-            throw new BadRequestException("No puedes editar una entrega que ya ha sido calificada.");
+        Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
+
+        if (!entrega.getAlumno().getId().equals(solicitante.getId())) {
+            throw new BadRequestException("Acceso denegado: No puedes editar el trabajo de otro alumno.");
         }
 
-        boolean sigueActivo = inscripcionRepository.existsByUsuarioIdAndTallerIdAndActivaTrue(
-                entrega.getAlumno().getId(),
-                entrega.getTarea().getTaller().getId());
-
-        if (!sigueActivo) {
+        if (entrega.getCalificacion() != null) {
             throw new BadRequestException(
-                    "No puedes editar la entrega: Tu inscripción ya no está activa en este taller.");
+                    "Integridad protegida: No se puede editar una entrega que ya ha sido calificada.");
         }
 
         entrega.setTextoEntrega(dto.getTextoEntrega());
@@ -176,42 +195,59 @@ public class EntregaService {
     }
 
     /**
-     * Asigna una nota y comentarios a una entrega (acción del profesor).
+     * Asigna calificación y feedback a una entrega.
+     * * @param id ID de la entrega a calificar.
      * 
-     * @param id  ID de la entrega a calificar.
-     * @param dto Datos de la calificación.
+     * @param dto Datos con la nota y comentarios.
      * @return Entrega calificada.
      * @throws ResourceNotFoundException Si la entrega no existe.
-     * @throws BadRequestException       Si la calificación no es válida.
+     * @throws BadRequestException       Si la nota está fuera de rango o el usuario
+     *                                   no es el profesor titular.
      */
     @Transactional
     public EntregaResponseDTO calificar(Long id, EntregaRequestDTO dto) {
         Entrega entrega = entregaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede calificar una entrega inexistente"));
+                .orElseThrow(() -> new ResourceNotFoundException("Entrega no encontrada para calificar"));
 
-        if (dto.getCalificacion() < 0 || dto.getCalificacion() > 10) {
-            throw new BadRequestException("La calificación debe estar entre 0 y 10");
+        Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
+        boolean esAdmin = solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN");
+        boolean esSuProfesor = entrega.getTarea().getTaller().getProfesor() != null &&
+                entrega.getTarea().getTaller().getProfesor().getId().equals(solicitante.getId());
+
+        if (!esAdmin && !esSuProfesor) {
+            throw new BadRequestException("Acceso denegado: Solo el profesor titular puede calificar esta entrega.");
         }
 
         entrega.setCalificacion(dto.getCalificacion());
         entrega.setComentarioProfesor(dto.getComentarioProfesor());
-
         return entregaMapper.toResponse(entregaRepository.save(entrega));
     }
 
     // --- MÉTODOS DELETE ---
 
     /**
-     * Elimina permanentemente una entrega del sistema.
+     * Elimina una entrega del sistema.
+     * * @param id ID de la entrega a borrar.
      * 
-     * @param id ID de la entrega.
      * @throws ResourceNotFoundException Si la entrega no existe.
+     * @throws BadRequestException       Si el usuario no tiene permisos de gestión
+     *                                   (Admin/Profe).
      */
     @Transactional
     public void eliminar(Long id) {
-        if (!entregaRepository.existsById(id)) {
-            throw new ResourceNotFoundException("No se puede eliminar: la entrega no existe con ID: " + id);
+        Entrega entrega = entregaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Entrega no encontrada con ID: " + id));
+
+        Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
+        boolean esAdmin = solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN");
+        boolean esSuProfesor = entrega.getTarea().getTaller().getProfesor() != null &&
+                entrega.getTarea().getTaller().getProfesor().getId().equals(solicitante.getId());
+
+        if (!esAdmin && !esSuProfesor) {
+            throw new BadRequestException(
+                    "Acceso denegado: Solo el profesor o administrador pueden eliminar entregas.");
         }
-        entregaRepository.deleteById(id);
+
+        entregaRepository.delete(entrega);
     }
 }
