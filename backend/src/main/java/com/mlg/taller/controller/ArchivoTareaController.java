@@ -44,15 +44,6 @@ public class ArchivoTareaController {
     // --- MÉTODOS GET ---
 
     /**
-     * Recupera el catálogo completo de archivos de tareas registrados en el sistema.
-     * * @return ApiResponse con la lista de todos los archivos de tareas.
-     */
-    @GetMapping
-    public ApiResponse<List<ArchivoTareaResponseDTO>> listarTodos() {
-        return ApiResponse.success(archivoTareaService.listarTodos(), "Listado completo de archivos obtenido");
-    }
-
-    /**
      * Busca la información de un archivo específico mediante su identificador único.
      * * @param id Identificador único del registro del archivo en base de datos.
      * @return   ApiResponse con los metadatos del archivo encontrado.
@@ -73,19 +64,6 @@ public class ArchivoTareaController {
         return ApiResponse.success(archivoTareaService.listarPorTarea(idTarea), "Archivos de la tarea obtenidos");
     }
 
-    // --- MÉTODOS PUT ---
-
-    /**
-     * Actualiza los metadatos de un registro de archivo de tarea ya existente.
-     * * @param id  Identificador del archivo a modificar.
-     * @param dto Nuevos datos para el archivo (validado mediante @Valid).
-     * @return    ApiResponse con la información actualizada.
-     */
-    @PutMapping("/{id}")
-    public ApiResponse<ArchivoTareaResponseDTO> actualizar(@PathVariable Long id,
-            @Valid @RequestBody ArchivoTareaRequestDTO dto) {
-        return ApiResponse.success(archivoTareaService.actualizar(id, dto), "Archivo actualizado correctamente");
-    }
 
     // --- MÉTODOS DELETE ---
 

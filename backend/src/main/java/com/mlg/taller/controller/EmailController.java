@@ -2,6 +2,8 @@ package com.mlg.taller.controller;
 
 import com.mlg.taller.service.EmailService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,6 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/email")
 @RequiredArgsConstructor
+@Profile("dev")
 public class EmailController {
 
     private final EmailService emailService;

@@ -8,6 +8,7 @@ import com.mlg.taller.model.entities.Material;
 import com.mlg.taller.model.mappers.ArchivoMaterialMapper;
 import com.mlg.taller.repositories.ArchivoMaterialRepository;
 import com.mlg.taller.repositories.MaterialRepository;
+import com.mlg.taller.service.validators.ArchivoMaterialValidator;
 import com.mlg.taller.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,9 @@ import java.util.stream.Collectors;
 
 /**
  * Servicio para la gestión de archivos adjuntos a los materiales educativos.
+ *
+ * Gestiona el ciclo de vida de los recursos físicos delegando las validaciones 
+ * de seguridad en el validador y la persistencia en disco en FileUtil.
  */
 @Service
 @RequiredArgsConstructor
@@ -27,6 +31,7 @@ public class ArchivoMaterialService {
     private final ArchivoMaterialRepository archivoMaterialRepository;
     private final MaterialRepository materialRepository;
     private final ArchivoMaterialMapper archivoMaterialMapper;
+    private final ArchivoMaterialValidator archivoMaterialValidator;
     private final FileUtil fileUtil;
 
     private static final String FOLDER = "materiales";
@@ -34,24 +39,21 @@ public class ArchivoMaterialService {
     // --- MÉTODOS POST ---
 
     /**
-     * Guarda un archivo físico y registra su vinculación con un material educativo.
-     * @param dto Datos del registro del archivo.
-     * @param file Archivo físico recibido desde el cliente.
-     * @return Archivo registrado y persistido.
-     * @throws ResourceNotFoundException Si el material asociado no existe.
+     * Guarda un archivo físico y registra su vinculación con un material.
+     *
+     * @param dto Datos del registro.
+     * @param file Archivo binario recibido.
+     * @return DTO del archivo registrado.
      */
     @Transactional
     public ArchivoMaterialResponseDTO guardar(ArchivoMaterialRequestDTO dto, MultipartFile file) {
-        Material material = materialRepository.findById(dto.getIdMaterial())
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede guardar el archivo: Material no encontrado con ID: " + dto.getIdMaterial()));
+        Material material = buscarMaterialInterno(dto.getIdMaterial());
+        archivoMaterialValidator.validarPropiedadMaterial(material);
 
         String nombreOriginal = file.getOriginalFilename();
-        String extension = nombreOriginal != null && nombreOriginal.contains(".") 
-                ? nombreOriginal.substring(nombreOriginal.lastIndexOf(".") + 1).toLowerCase() 
-                : "";
+        String extension = obtenerExtension(nombreOriginal);
         String nombreFisico = System.currentTimeMillis() + "_" + nombreOriginal;
 
-        // Guardado físico protegido (false)
         fileUtil.guardar(file, FOLDER, nombreFisico, false);
 
         ArchivoMaterial archivo = archivoMaterialMapper.toEntity(dto);
@@ -66,72 +68,76 @@ public class ArchivoMaterialService {
     // --- MÉTODOS GET ---
 
     /**
-     * Recupera un archivo específico mediante su identificador.
-     * @param id ID del archivo a buscar.
-     * @return Archivo encontrado.
-     * @throws ResourceNotFoundException Si el archivo no existe.
+     * Recupera un archivo específico validando permisos de acceso.
+     *
+     * @param id Identificador único del archivo.
+     * @return DTO del archivo encontrado.
      */
     @Transactional(readOnly = true)
     public ArchivoMaterialResponseDTO buscarPorId(Long id) {
-        return archivoMaterialRepository.findById(id)
-                .map(archivoMaterialMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Archivo no encontrado con ID: " + id));
+        ArchivoMaterial archivo = buscarArchivoInterno(id);
+        archivoMaterialValidator.validarAccesoLectura(archivo.getMaterial());
+        return archivoMaterialMapper.toResponse(archivo);
     }
 
     /**
-     * Lista todos los archivos vinculados a un material concreto.
-     * @param idMaterial ID del material padre.
-     * @return Lista de archivos asociados al material.
+     * Lista todos los archivos de un material para usuarios autorizados.
+     *
+     * @param idMaterial Identificador del material.
+     * @return Lista de archivos adjuntos.
      */
     @Transactional(readOnly = true)
     public List<ArchivoMaterialResponseDTO> listarPorMaterial(Long idMaterial) {
+        Material material = buscarMaterialInterno(idMaterial);
+        archivoMaterialValidator.validarAccesoLectura(material);
+        
         return archivoMaterialRepository.findByMaterialId(idMaterial).stream()
                 .map(archivoMaterialMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
-    // --- MÉTODOS PUT ---
-
-    /**
-     * Actualiza la información descriptiva o la vinculación de un archivo.
-     * @param id ID del archivo a modificar.
-     * @param dto Nuevos datos (nombre visual o ID de material).
-     * @return Archivo actualizado.
-     * @throws ResourceNotFoundException Si el archivo o el nuevo material no existen.
-     */
-    @Transactional
-    public ArchivoMaterialResponseDTO actualizar(Long id, ArchivoMaterialRequestDTO dto) {
-        ArchivoMaterial archivo = archivoMaterialRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Archivo no encontrado con ID: " + id));
-        
-        archivo.setNombre(dto.getNombre());
-        
-        if (!archivo.getMaterial().getId().equals(dto.getIdMaterial())) {
-            Material nuevoMaterial = materialRepository.findById(dto.getIdMaterial())
-                    .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Material no encontrado con ID: " + dto.getIdMaterial()));
-            archivo.setMaterial(nuevoMaterial);
-        }
-
-        return archivoMaterialMapper.toResponse(archivoMaterialRepository.save(archivo));
-    }
-
     // --- MÉTODOS DELETE ---
 
     /**
-     * Elimina el registro del archivo y borra el contenido físico del servidor.
-     * @param id ID del archivo a eliminar.
-     * @throws ResourceNotFoundException Si el archivo no existe en la base de datos.
+     * Elimina el registro del archivo y su contenido físico del servidor.
+     *
+     * @param id Identificador del archivo a suprimir.
      */
     @Transactional
     public void eliminar(Long id) {
-        ArchivoMaterial archivo = archivoMaterialRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede eliminar: Archivo no encontrado con ID: " + id));
+        ArchivoMaterial archivo = buscarArchivoInterno(id);
+        archivoMaterialValidator.validarPropiedadMaterial(archivo.getMaterial());
 
-        String[] partes = archivo.getRutaArchivo().split("/");
-        if (partes.length == 2) {
-            fileUtil.eliminar(partes[0], partes[1], false);
-        }
-
+        String rutaCompleta = archivo.getRutaArchivo();
+        String nombreFisico = rutaCompleta.substring(rutaCompleta.lastIndexOf("/") + 1);
+        
+        fileUtil.eliminar(FOLDER, nombreFisico, false);
         archivoMaterialRepository.delete(archivo);
+    }
+
+    // --- MÉTODOS PRIVADOS ---
+
+    /**
+     * Búsqueda interna de materiales.
+     */
+    private Material buscarMaterialInterno(Long id) {
+        return materialRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Material no encontrado con ID: " + id));
+    }
+
+    /**
+     * Búsqueda interna de archivos.
+     */
+    private ArchivoMaterial buscarArchivoInterno(Long id) {
+        return archivoMaterialRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Archivo no encontrado con ID: " + id));
+    }
+
+    /**
+     * Extrae la extensión de un nombre de archivo.
+     */
+    private String obtenerExtension(String nombre) {
+        return (nombre != null && nombre.contains(".")) ? 
+                nombre.substring(nombre.lastIndexOf(".") + 1).toLowerCase() : "";
     }
 }

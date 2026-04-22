@@ -38,7 +38,7 @@ public class EmailSchedulerService {
             // Usamos la versión de una línea con Map.of que tanto nos gusta
             emailService.enviarCorreo(
                 inscripcion.getUsuario().getEmail(),
-                "⏰ ¡Falta una semana! Recordatorio de inicio: " + inscripcion.getTaller().getNombre(),
+                "¡Falta una semana! Recordatorio de inicio: " + inscripcion.getTaller().getNombre(),
                 "recordatorio-inicio",
                 Map.of(
                     "usuario", inscripcion.getUsuario(),

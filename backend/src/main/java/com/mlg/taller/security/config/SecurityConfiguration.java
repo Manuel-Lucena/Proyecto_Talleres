@@ -190,7 +190,6 @@ public class SecurityConfiguration {
 
                         // Gestión de recursos: Solo Admin y Profesor suben, editan o borran enunciados
                         .requestMatchers(HttpMethod.POST, "/api/archivos-tarea/**").hasAnyRole("ADMIN", "PROFESOR")
-                        .requestMatchers(HttpMethod.PUT, "/api/archivos-tarea/**").hasAnyRole("ADMIN", "PROFESOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/archivos-tarea/**").hasAnyRole("ADMIN", "PROFESOR")
 
                         // =========================================================
@@ -202,7 +201,6 @@ public class SecurityConfiguration {
 
                         // Gestión: Solo Admin y Profesor pueden subir, editar o borrar estos archivos
                         .requestMatchers(HttpMethod.POST, "/api/archivos-material/**").hasAnyRole("ADMIN", "PROFESOR")
-                        .requestMatchers(HttpMethod.PUT, "/api/archivos-material/**").hasAnyRole("ADMIN", "PROFESOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/archivos-material/**").hasAnyRole("ADMIN", "PROFESOR")
 
                         // =========================================================
