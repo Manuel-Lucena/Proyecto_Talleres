@@ -40,7 +40,8 @@ public class TallerService {
 
     /**
      * Crea un nuevo taller asociándolo a un profesor y procesando su imagen.
-     * * @param dto     Datos del taller a crear.
+     * * @param dto Datos del taller a crear.
+     * 
      * @param archivo Imagen opcional para el taller.
      * @return TallerResponseDTO persistido.
      * @throws ResourceNotFoundException Si el profesor indicado no existe.
@@ -58,7 +59,7 @@ public class TallerService {
 
         taller = tallerRepository.save(taller);
         gestionarImagenTallerInterno(taller, archivo);
-        
+
         return tallerMapper.toResponse(tallerRepository.save(taller));
     }
 
@@ -78,6 +79,7 @@ public class TallerService {
     /**
      * Busca un taller por su identificador único.
      * * @param id Identificador del taller.
+     * 
      * @return TallerResponseDTO encontrado.
      * @throws ResourceNotFoundException Si el taller no existe.
      */
@@ -87,16 +89,18 @@ public class TallerService {
     }
 
     /**
-     * Lista los talleres en los que participa un usuario específico (inscripciones).
+     * Lista los talleres en los que participa un usuario específico
+     * (inscripciones).
      * * @param idUsuario ID del usuario.
+     * 
      * @return Lista de talleres asociados.
-     * @throws BadRequestException Acceso denegado: Si un usuario que no es ADMIN 
-     * intenta consultar los talleres de otro usuario.
+     * @throws BadRequestException Acceso denegado: Si un usuario que no es ADMIN
+     *                             intenta consultar los talleres de otro usuario.
      */
     @Transactional(readOnly = true)
     public List<TallerResponseDTO> listarTalleresPorUsuarioId(Long idUsuario) {
         tallerValidator.validarAccesoPrivado(SecurityUtils.getUsuarioAutenticado(), idUsuario);
-        
+
         return tallerRepository.findTalleresByUsuarioId(idUsuario).stream()
                 .map(tallerMapper::toResponse)
                 .collect(Collectors.toList());
@@ -105,14 +109,15 @@ public class TallerService {
     /**
      * Lista los talleres que un profesor tiene asignados como titular.
      * * @param idProfesor ID del profesor a consultar.
+     * 
      * @return Lista de talleres que imparte el usuario.
-     * @throws BadRequestException Acceso denegado: Si un profesor intenta consultar 
-     * la carga docente de otro sin ser ADMIN.
+     * @throws BadRequestException Acceso denegado: Si un profesor intenta consultar
+     *                             la carga docente de otro sin ser ADMIN.
      */
     @Transactional(readOnly = true)
     public List<TallerResponseDTO> listarTalleresPorProfesorId(Long idProfesor) {
         tallerValidator.validarAccesoPrivado(SecurityUtils.getUsuarioAutenticado(), idProfesor);
-        
+
         return tallerRepository.findByProfesorId(idProfesor).stream()
                 .map(tallerMapper::toResponse)
                 .collect(Collectors.toList());
@@ -122,12 +127,15 @@ public class TallerService {
 
     /**
      * Actualiza la información de un taller existente.
-     * * @param id      ID del taller a modificar.
+     * * @param id ID del taller a modificar.
+     * 
      * @param dto     Nuevos datos del taller.
      * @param archivo Nueva imagen opcional.
      * @return TallerResponseDTO actualizado.
-     * @throws ResourceNotFoundException Si el taller o el nuevo profesor no existen.
-     * @throws BadRequestException Operación denegada: Si el usuario no es ADMINISTRADOR.
+     * @throws ResourceNotFoundException Si el taller o el nuevo profesor no
+     *                                   existen.
+     * @throws BadRequestException       Operación denegada: Si el usuario no es
+     *                                   ADMINISTRADOR.
      */
     @Transactional
     public TallerResponseDTO actualizar(Long id, TallerRequestDTO dto, MultipartFile archivo) {
@@ -152,13 +160,14 @@ public class TallerService {
     /**
      * Elimina un taller del sistema y su imagen asociada del almacenamiento.
      * * @param id ID del taller a borrar.
+     * 
      * @throws ResourceNotFoundException Si el taller no existe.
-     * @throws BadRequestException Si el usuario no es ADMINISTRADOR.
+     * @throws BadRequestException       Si el usuario no es ADMINISTRADOR.
      */
     @Transactional
     public void eliminar(Long id) {
         tallerValidator.validarEsAdmin(SecurityUtils.getUsuarioAutenticado());
-        
+
         Taller taller = buscarTallerInterno(id);
         if (taller.getFotoRuta() != null) {
             fileUtil.eliminar(FOLDER, taller.getFotoRuta(), true);
@@ -169,7 +178,15 @@ public class TallerService {
     // --- MÉTODOS PRIVADOS DE APOYO ---
 
     /**
-     * Busca el taller o lanza excepción si no se encuentra.
+     * Busca un taller en el repositorio a partir de su identificador único.
+     * * Centraliza la recuperación de entidades de taller para garantizar que
+     * cualquier
+     * operación sobre un recurso inexistente sea gestionada mediante una excepción
+     * de recurso no encontrado.
+     *
+     * @param id Identificador único del taller.
+     * @return Entidad Taller encontrada.
+     * @throws ResourceNotFoundException si el taller no existe en la base de datos.
      */
     private Taller buscarTallerInterno(Long id) {
         return tallerRepository.findById(id)
@@ -177,20 +194,23 @@ public class TallerService {
     }
 
     /**
-     * Busca un usuario con rol de profesor.
-     * * @param idProfesor ID del usuario profesor.
-     * @return Usuario encontrado.
-     * @throws ResourceNotFoundException Si el profesor no existe.
+     * Recupera un usuario con rol de profesor a partir de su identificador.
+     * 
+     * @param idProfesor Identificador del usuario profesor.
+     * @return Entidad Usuario correspondiente al profesor.
+     * @throws ResourceNotFoundException si el profesor no existe.
      */
     private Usuario buscarProfesorInterno(Long idProfesor) {
         return usuarioRepository.findById(idProfesor)
-                .orElseThrow(() -> new ResourceNotFoundException("El profesor asignado (ID: " + idProfesor + ") no existe"));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("El profesor asignado (ID: " + idProfesor + ") no existe"));
     }
 
     /**
-     * Procesa y guarda físicamente la imagen del taller en el sistema de archivos.
-     * * @param taller  Entidad taller que recibirá la ruta del archivo.
-     * @param archivo Archivo de imagen recibido por el controlador.
+     * Procesa y persiste físicamente la imagen representativa del taller.
+     * 
+     * @param taller  Entidad taller que recibirá la ruta del archivo.
+     * @param archivo Archivo de imagen (binario) recibido por el controlador.
      */
     private void gestionarImagenTallerInterno(Taller taller, MultipartFile archivo) {
         if (archivo != null && !archivo.isEmpty()) {

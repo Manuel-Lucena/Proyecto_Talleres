@@ -27,7 +27,7 @@ public class EmailSchedulerService {
     public void enviarRecordatoriosDeInicio() {
         LocalDate proximaSemana = LocalDate.now().plusDays(7);
         
-        // Ajustamos el nombre del método con el guion bajo como en el Repository
+     
         List<Inscripcion> recordatoriosPendientes = inscripcionRepository
                 .findAllByTaller_FechaInicioAndActivaTrue(proximaSemana);
 
@@ -35,7 +35,7 @@ public class EmailSchedulerService {
                  proximaSemana, recordatoriosPendientes.size());
 
         for (Inscripcion inscripcion : recordatoriosPendientes) {
-            // Usamos la versión de una línea con Map.of que tanto nos gusta
+        
             emailService.enviarCorreo(
                 inscripcion.getUsuario().getEmail(),
                 "¡Falta una semana! Recordatorio de inicio: " + inscripcion.getTaller().getNombre(),

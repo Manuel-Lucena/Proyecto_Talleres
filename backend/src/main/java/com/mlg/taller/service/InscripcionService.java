@@ -54,7 +54,7 @@ public class InscripcionService {
     public InscripcionResponseDTO inscribir(InscripcionRequestDTO dto) {
         Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
         inscripcionValidator.validarPropiedadOSolicitante(solicitante, dto.getIdUsuario());
-        
+
         Usuario usuario = buscarUsuarioInterno(dto.getIdUsuario());
         Taller taller = buscarTallerInterno(dto.getIdTaller());
         inscripcionValidator.verificarDuplicado(usuario.getId(), taller.getId());
@@ -80,7 +80,7 @@ public class InscripcionService {
     /**
      * Procesa múltiples inscripciones de forma masiva.
      * 
-     * Realiza validaciones de duplicados por cada registro y envía 
+     * Realiza validaciones de duplicados por cada registro y envía
      * notificaciones simples de confirmación.
      *
      * @param dtos Lista de peticiones de inscripción.
@@ -90,7 +90,8 @@ public class InscripcionService {
     public List<InscripcionResponseDTO> inscribirMasivo(List<InscripcionRequestDTO> dtos) {
         return dtos.stream().map(dto -> {
             Usuario usuario = usuarioRepository.findByEmail(dto.getEmailUsuario())
-                    .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + dto.getEmailUsuario()));
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException("Usuario no encontrado: " + dto.getEmailUsuario()));
             Taller taller = buscarTallerInterno(dto.getIdTaller());
 
             inscripcionValidator.verificarDuplicado(usuario.getId(), taller.getId());
@@ -98,9 +99,9 @@ public class InscripcionService {
             Inscripcion inscripcion = inscripcionMapper.toEntity(dto, usuario, taller);
             Inscripcion guardada = inscripcionRepository.save(inscripcion);
 
-            emailService.enviarCorreo(usuario.getEmail(), 
+            emailService.enviarCorreo(usuario.getEmail(),
                     "Confirmación de plaza: " + taller.getNombre(),
-                    "mail/confirmacion-inscripcion", 
+                    "mail/confirmacion-inscripcion",
                     Map.of("usuario", usuario, "taller", taller));
 
             return inscripcionMapper.toResponse(guardada);
@@ -136,7 +137,7 @@ public class InscripcionService {
     public List<InscripcionResponseDTO> listarPorTaller(Long idTaller) {
         Taller taller = buscarTallerInterno(idTaller);
         inscripcionValidator.validarAccesoListaTaller(SecurityUtils.getUsuarioAutenticado(), taller);
-        
+
         return inscripcionRepository.findByTallerId(idTaller).stream()
                 .map(inscripcionMapper::toResponse)
                 .collect(Collectors.toList());
@@ -145,6 +146,7 @@ public class InscripcionService {
     /**
      * Busca una inscripción específica validando permisos de acceso.
      * * @param id ID de la inscripción.
+     * 
      * @return Inscripción encontrada.
      */
     @Transactional(readOnly = true)
@@ -157,6 +159,7 @@ public class InscripcionService {
     /**
      * Lista las inscripciones de un usuario concreto.
      * * @param idUsuario ID del usuario.
+     * 
      * @return Lista de sus inscripciones.
      */
     @Transactional(readOnly = true)
@@ -168,8 +171,48 @@ public class InscripcionService {
     }
 
     /**
+     * Analiza la agenda del alumno revisando todos los horarios de sus talleres
+     * actuales para detectar posibles colisiones con el nuevo taller.
+     * * @param idUsuario Identificador único del alumno.
+     * 
+     * @param idTaller Identificador del taller al que desea apuntarse.
+     * @return Un mapa con el estado del conflicto y el nombre del taller
+     *         coincidente.
+     */
+    @Transactional(readOnly = true)
+    public Map<String, Object> validarSolapamientoHorarios(Long idUsuario, Long idTaller) {
+    
+        Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
+        inscripcionValidator.validarPropiedadOSolicitante(solicitante, idUsuario);
+ 
+        Taller tallerNuevo = buscarTallerInterno(idTaller);
+        List<Inscripcion> inscripcionesActivas = inscripcionRepository.findByUsuarioId(idUsuario)
+                .stream()
+                .filter(Inscripcion::isActiva)
+                .collect(Collectors.toList());
+
+        for (Inscripcion registro : inscripcionesActivas) {
+            Taller tallerInscrito = registro.getTaller();
+
+         
+            if (tallerInscrito.getId().equals(idTaller))
+                continue;
+
+           
+            if (inscripcionValidator.verificarSolapamiento(tallerNuevo, tallerInscrito)) {
+                return Map.of(
+                        "hayConflicto", true,
+                        "tallerConflicto", tallerInscrito.getNombre());
+            }
+        }
+
+        return Map.of("hayConflicto", false);
+    }
+
+    /**
      * Genera el PDF de la factura para una inscripción existente.
      * * @param idInscripcion ID de la inscripción.
+     * 
      * @return Array de bytes con el PDF.
      */
     @Transactional(readOnly = true)
@@ -187,13 +230,14 @@ public class InscripcionService {
     /**
      * Actualiza los datos de pago o vinculación de una inscripción.
      * * @param id ID de la inscripción.
+     * 
      * @param dto Datos actualizados.
      * @return Inscripción actualizada.
      */
     @Transactional
     public InscripcionResponseDTO actualizar(Long id, InscripcionRequestDTO dto) {
         Inscripcion existente = buscarInscripcionInterna(id);
-        
+
         if (!existente.getUsuario().getId().equals(dto.getIdUsuario())) {
             existente.setUsuario(buscarUsuarioInterno(dto.getIdUsuario()));
         }
@@ -203,26 +247,27 @@ public class InscripcionService {
 
         existente.setMontoPagado(dto.getMontoPagado());
         existente.setOrderId(dto.getOrderId());
-        
+
         return inscripcionMapper.toResponse(inscripcionRepository.save(existente));
     }
 
     /**
      * Alterna el estado de activación de una inscripción y notifica al usuario.
      * * @param id ID de la inscripción.
+     * 
      * @return Inscripción con el estado modificado.
      */
     @Transactional
     public InscripcionResponseDTO cambiarEstado(Long id) {
         Inscripcion inscripcion = buscarInscripcionInterna(id);
         inscripcion.setActiva(!inscripcion.isActiva());
-        
+
         Inscripcion guardada = inscripcionRepository.save(inscripcion);
-        
+
         String asunto = guardada.isActiva() ? "Inscripción Reactivada" : "Inscripción Suspendida";
         String plantilla = guardada.isActiva() ? "mail/confirmacion-inscripcion" : "mail/baja-taller";
 
-        emailService.enviarCorreo(guardada.getUsuario().getEmail(), asunto, plantilla, 
+        emailService.enviarCorreo(guardada.getUsuario().getEmail(), asunto, plantilla,
                 Map.of("usuario", guardada.getUsuario(), "taller", guardada.getTaller()));
 
         return inscripcionMapper.toResponse(guardada);
@@ -241,15 +286,21 @@ public class InscripcionService {
         Taller taller = inscripcion.getTaller();
 
         inscripcionRepository.delete(inscripcion);
-        
-        emailService.enviarCorreo(usuario.getEmail(), "Baja de taller", "mail/baja-taller", 
+
+        emailService.enviarCorreo(usuario.getEmail(), "Baja de taller", "mail/baja-taller",
                 Map.of("usuario", usuario, "taller", taller));
     }
 
     // --- MÉTODOS PRIVADOS ---
 
+    // --- MÉTODOS PRIVADOS DE APOYO ---
+
     /**
-     * Búsqueda interna de usuarios.
+     * Realiza una búsqueda interna de un usuario por su identificador único.
+     * 
+     * @param id Identificador del usuario.
+     * @return Entidad Usuario encontrada.
+     * @throws ResourceNotFoundException si el usuario no existe.
      */
     private Usuario buscarUsuarioInterno(Long id) {
         return usuarioRepository.findById(id)
@@ -257,7 +308,11 @@ public class InscripcionService {
     }
 
     /**
-     * Búsqueda interna de talleres.
+     * Realiza una búsqueda interna de un taller por su identificador único.
+     * 
+     * @param id Identificador del taller.
+     * @return Entidad Taller encontrada.
+     * @throws ResourceNotFoundException si el taller no existe.
      */
     private Taller buscarTallerInterno(Long id) {
         return tallerRepository.findById(id)
@@ -265,7 +320,13 @@ public class InscripcionService {
     }
 
     /**
-     * Búsqueda interna de inscripciones (incluyendo inactivas).
+     * Recupera una inscripción de la base de datos, incluyendo aquellas marcadas
+     * como inactivas.
+     * 
+     * @param id Identificador único de la inscripción.
+     * @return Entidad Inscripcion encontrada (activa o inactiva).
+     * @throws ResourceNotFoundException si no se encuentra el registro de
+     *                                   inscripción.
      */
     private Inscripcion buscarInscripcionInterna(Long id) {
         return inscripcionRepository.findByIdIncludingInactive(id)

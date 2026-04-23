@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../interfaces/ApiResponse.Interface';
 import { MaterialRequest, MaterialResponse } from '../interfaces/Material.Interface';
+import { environment } from '../../environments/environment';
 
 /**
  * Servicio para la gestión de materiales didácticos y recursos de apoyo.
@@ -11,7 +12,7 @@ import { MaterialRequest, MaterialResponse } from '../interfaces/Material.Interf
 @Injectable({ providedIn: 'root' })
 export class MaterialService {
   /** URL base para los endpoints de la API de materiales */
-  private apiUrl = 'http://localhost:8080/api/materiales';
+  private apiUrl = `${environment.apiUrl}/materiales`;
 
   constructor(private http: HttpClient) { }
 

@@ -68,6 +68,9 @@ public class Taller {
     @Builder.Default
     private boolean activo = true;
 
+    @OneToMany(mappedBy = "taller", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Horario> horarios;
+
     @OneToMany(mappedBy = "taller")
     private List<Inscripcion> inscripciones;
 }

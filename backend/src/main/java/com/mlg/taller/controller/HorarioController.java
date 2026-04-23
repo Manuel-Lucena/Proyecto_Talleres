@@ -89,20 +89,19 @@ public class HorarioController {
      *                 binario.
      */
     @GetMapping("/usuario/{idUsuario}/pdf")
-public void descargarAgendaPdf(@PathVariable Long idUsuario, HttpServletResponse response) {
-    var usuario = usuarioService.buscarPorId(idUsuario);
-    var horarios = horarioService.listarPorUsuario(idUsuario);
+    public void descargarAgendaPdf(@PathVariable Long idUsuario, HttpServletResponse response) {
+        var usuario = usuarioService.buscarPorId(idUsuario);
+        var horarios = horarioService.listarPorUsuario(idUsuario);
 
-    // COMENTA ESTA LÍNEA TEMPORALMENTE PARA TESTEAR
-    // response.setContentType("application/pdf"); 
-    
-    response.setHeader("Content-Disposition", "attachment; filename=test.pdf");
+        // COMENTA ESTA LÍNEA TEMPORALMENTE PARA TESTEAR
+        // response.setContentType("application/pdf");
 
-    pdfService.generarPdf("agenda-semanal", Map.of(
-        "usuario", usuario,
-        "horarios", horarios
-    ), response);
-}
+        response.setHeader("Content-Disposition", "attachment; filename=test.pdf");
+
+        pdfService.generarPdf("agenda-semanal", Map.of(
+                "usuario", usuario,
+                "horarios", horarios), response);
+    }
 
     // --- MÉTODOS PUT ---
 

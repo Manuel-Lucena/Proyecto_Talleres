@@ -113,8 +113,14 @@ public class MensajeService {
 
     // --- MÉTODOS PRIVADOS DE APOYO ---
 
+
     /**
-     * Busca el taller en base de datos o lanza excepción.
+     * Busca un taller en la base de datos a partir de su identificador único.
+     *
+     * @param idTaller Identificador único del taller a localizar.
+     * @return Entidad Taller recuperada del repositorio.
+     * @throws ResourceNotFoundException si no se encuentra ningún taller con el ID
+     *                                   proporcionado.
      */
     private Taller buscarTallerInterno(Long idTaller) {
         return tallerRepository.findById(idTaller)

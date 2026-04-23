@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiResponse } from '../interfaces/ApiResponse.Interface'; 
+import { ApiResponse } from '../interfaces/ApiResponse.Interface';
 import { ArchivoTareaResponse } from '../interfaces/Archivo.Interface';
+import { environment } from '../../environments/environment';
 
 /**
  * Servicio encargado de la gestión de archivos físicos asociados a las tareas (enunciados).
@@ -14,7 +15,7 @@ import { ArchivoTareaResponse } from '../interfaces/Archivo.Interface';
 export class ArchivoTareaService {
 
   /** URL base para los endpoints de la API de archivos de tarea */
-  private readonly URL = 'http://localhost:8080/api/archivos-tarea';
+  private URL = `${environment.apiUrl}/archivos-tarea`;
 
   constructor(private http: HttpClient) { }
 
@@ -54,7 +55,7 @@ export class ArchivoTareaService {
   guardar(idTarea: number, archivo: File): Observable<ApiResponse<ArchivoTareaResponse>> {
     const formData = new FormData();
     const dto = { idTarea: idTarea };
-    
+
     // Convertimos el DTO a un Blob JSON para que el Backend lo procese correctamente como @RequestPart
     formData.append('datos', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
     formData.append('archivo', archivo);

@@ -20,7 +20,8 @@ import java.util.stream.Collectors;
 
 /**
  * Servicio para la gestión de asignaciones individuales de alumnos a tareas.
- * Implementa un blindaje de seguridad para que solo el profesor titular del taller
+ * Implementa un blindaje de seguridad para que solo el profesor titular del
+ * taller
  * o el administrador puedan gestionar quién tiene acceso a cada actividad.
  */
 @Service
@@ -56,9 +57,10 @@ public class TareaAsignadaService {
 
     /**
      * Sincroniza la visibilidad selectiva de una tarea de forma atómica.
-     * Borra las asignaciones previas y crea las nuevas verificando la inscripción de los alumnos.
+     * Borra las asignaciones previas y crea las nuevas verificando la inscripción
+     * de los alumnos.
      *
-     * @param idTarea ID de la tarea a gestionar.
+     * @param idTarea   ID de la tarea a gestionar.
      * @param alumnoIds Lista de IDs de alumnos que recibirán acceso.
      */
     @Transactional
@@ -75,8 +77,7 @@ public class TareaAsignadaService {
         List<TareaAsignada> nuevasAsignaciones = alumnoIds.stream().map(alumnoId -> {
             Usuario alumno = usuarioRepository.findById(alumnoId)
                     .orElseThrow(() -> new ResourceNotFoundException("Alumno no encontrado con ID: " + alumnoId));
-            
-         
+
             tareaAsignadaValidator.validarAlumnoInscrito(alumnoId, tarea.getTaller().getId());
 
             return TareaAsignada.builder()
@@ -99,14 +100,19 @@ public class TareaAsignadaService {
     public void eliminarAsignacionesDeTarea(Long idTarea) {
         Tarea tarea = buscarTareaInterna(idTarea);
         tareaAsignadaValidator.validarAccesoProfesor(SecurityUtils.getUsuarioAutenticado(), tarea);
-        
+
         tareaAsignadaRepository.deleteByTareaId(idTarea);
     }
 
     // --- MÉTODOS PRIVADOS DE APOYO ---
 
     /**
-     * Busca la tarea en el repositorio o lanza excepción si no existe.
+     * Busca una tarea en el repositorio a partir de su identificador único.
+     * 
+     * @param idTarea Identificador único de la tarea a localizar.
+     * @return Entidad Tarea recuperada de la base de datos.
+     * @throws ResourceNotFoundException si no se encuentra ninguna tarea con el ID
+     *                                   proporcionado.
      */
     private Tarea buscarTareaInterna(Long idTarea) {
         return tareaRepository.findById(idTarea)

@@ -13,7 +13,8 @@ import { FormTaller } from "../../components/forms/form-taller/form-taller";
 import { FormInscripcion } from "../../components/forms/form-inscripcion/form-inscripcion";
 import { Confirmacion } from "../../components/dialogs/confirmacion/confirmacion";
 import { Notificacion } from "../../components/dialogs/mensaje/notificacion";
-import { InscripcionResponse } from "../../interfaces/Inscripcion.Interface";
+import { HorarioTaller } from "../../components/dialogs/horario-taller/horario-taller";
+
 
 /**
  * Componente principal para la exploración, filtrado y gestión de talleres.
@@ -24,7 +25,8 @@ import { InscripcionResponse } from "../../interfaces/Inscripcion.Interface";
   standalone: true,
   imports: [
     CommonModule, RouterModule, ReactiveFormsModule, Navbar, Footer,
-    FormTaller, FormInscripcion, Confirmacion, Notificacion
+    FormTaller, FormInscripcion, Confirmacion, Notificacion,
+    HorarioTaller
   ],
   templateUrl: './talleres-explorar.html',
   styleUrl: './talleres-explorar.scss',
@@ -44,6 +46,7 @@ export class TalleresExplorar implements OnInit {
   // --- Gestión de Modales ---
   mostrarModalForm: boolean = false;          // Visibilidad modal Alta/Edición
   mostrarModalInscripcion: boolean = false;   // Visibilidad modal de Pago/Registro
+  mostrarModalHorarios: boolean = false;      // Visibilidad modal de Horario
   tallerSeleccionado: TallerResponse | null = null; // Buffer para edición o inscripción
 
   constructor(
@@ -207,16 +210,51 @@ export class TalleresExplorar implements OnInit {
   }
 
   /**
-   * Prepara el proceso de inscripción. Valida que el usuario esté logueado.
+   * Prepara el proceso de inscripción. Valida logueo y solapamiento de horarios.
    * @param taller Taller al que se desea apuntar el usuario.
    */
-  abrirInscripcion(taller: TallerResponse): void {
+  async abrirInscripcion(taller: TallerResponse): Promise<void> {
+    // 1. Validar que esté logueado
     if (!this.tokenService.isLogged()) {
       this.notify.mostrar({ titulo: 'Atención', mensaje: 'Inicia sesión para inscribirte', tipo: 'error' });
       return;
     }
+
+    const idUsuario = this.tokenService.getId();
+    if (!idUsuario) return;
+
+    this.inscripcionService.validarSolapamiento(idUsuario, taller.idTaller).subscribe({
+      next: async (res) => {
+        if (res.data && res.data.hayConflicto) {
+          const continuar = await this.notify.confirmar({
+            titulo: '¡Conflicto de Horarios!',
+            mensaje: `Este taller coincide en el tiempo con "${res.data.tallerConflicto}". ¿Deseas inscribirte de todas formas?`,
+            textoConfirmar: 'Sí, continuar',
+            textoCancelar: 'No, revisar'
+          });
+
+          if (!continuar) return;
+        }
+
+      
+        this.tallerSeleccionado = { ...taller };
+        this.mostrarModalInscripcion = true;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.tallerSeleccionado = { ...taller };
+        this.mostrarModalInscripcion = true;
+      }
+    });
+  }
+
+  /**
+ * Abre el visualizador de horarios para un taller específico.
+ * @param taller 
+ */
+  verHorarios(taller: TallerResponse): void {
     this.tallerSeleccionado = { ...taller };
-    this.mostrarModalInscripcion = true;
+    this.mostrarModalHorarios = true;
   }
 
   /**
@@ -229,7 +267,7 @@ export class TalleresExplorar implements OnInit {
         this.notify.mostrar({ titulo: '¡Éxito!', mensaje: 'Inscripción realizada', tipo: 'exito' });
         this.mostrarModalInscripcion = false;
         this.cargarTalleres();
-        this.cargarMisInscripciones(); // Refresco de estado local
+        this.cargarMisInscripciones();
       },
       error: () => this.notify.mostrar({ titulo: 'Error', mensaje: 'No se pudo procesar', tipo: 'error' })
     });

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../interfaces/ApiResponse.Interface';
 import { TareaAsignadaResponse } from '../interfaces/TareaAsignada.Interface';
+import { environment } from '../../environments/environment';
 
 /**
  * Servicio para la gestión de visibilidad selectiva de tareas por alumno.
@@ -10,9 +11,9 @@ import { TareaAsignadaResponse } from '../interfaces/TareaAsignada.Interface';
  */
 @Injectable({ providedIn: 'root' })
 export class TareaAsignadaService {
-  private apiUrl = 'http://localhost:8080/api/tareas-asignadas';
+  private apiUrl = `${environment.apiUrl}/tareas-asignadas`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Recupera el listado de alumnos que tienen acceso a una tarea específica.

@@ -2,272 +2,343 @@
    PÁGINA: EXPLORAR TALLERES (CATÁLOGO DINÁMICO)
    Diseño en dos columnas con filtros laterales y tarjetas expandibles.
    ========================================================================== */
-
 @use '../../../styles/variables' as v;
 @use '../../../styles/mixins' as m;
 
 .pagina-explorar-full {
-    width: 100%;
-    padding: 50px 4%;
-    background-color: v.$color-fondo-pagina;
-    min-height: 100vh;
+  width: 100%;
+  padding: 50px 4%;
+  background-color: v.$color-fondo-pagina;
+  min-height: 100vh;
 }
 
 // 1. CABECERA PRINCIPAL (Título + Acciones Admin)
 .header-principal {
-    margin-bottom: 40px;
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+
+  h2 {
+    font-size: 2.8rem;
+    color: v.$color-secundario-frio-2;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  // Separador visual entre título y botón de creación
+  .linea-vertical {
+    width: 2px;
+    height: 35px;
+    background-color: #ddd;
+    margin: 0 10px;
+  }
+
+  .btn-azul-plus {
+    background-color: v.$color-secundario-frio-2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: v.$radio-curvatura;
+    font-weight: 600;
     display: flex;
     align-items: center;
+    gap: 8px;
+    transition: 0.3s;
 
-    h2 {
-        font-size: 2.8rem;
-        color: v.$color-secundario-frio-2;
-        font-weight: 800;
-        margin: 0;
+    &:hover {
+      background-color: v.$color-marca-principal;
+      transform: scale(1.02);
     }
-
-    // Separador visual entre título y botón de creación
-    .linea-vertical {
-        width: 2px;
-        height: 35px;
-        background-color: #ddd;
-        margin: 0 10px;
-    }
-
-    .btn-azul-plus {
-        background-color: v.$color-secundario-frio-2;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: v.$radio-curvatura;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: 0.3s;
-
-        &:hover {
-            background-color: v.$color-marca-principal;
-            transform: scale(1.02);
-        }
-    }
+  }
 }
 
-// 2. LAYOUT FLEXIBLE 
+// 2. LAYOUT FLEXIBLE
 .layout-flex {
-    display: flex;
-    gap: 40px;
-    align-items: flex-start;
-    width: 100%;
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  width: 100%;
 
-    // ÁREA DE CONTENIDO: 
-    .seccion-lista-cursos {
-        flex: 1;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-    }
+  // ÁREA DE CONTENIDO:
+  .seccion-lista-cursos {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 // 3. SIDEBAR DE FILTROS
 .sidebar-reserva {
-    width: 250px;
-    min-width: 250px;
-    background: white;
-    padding: 25px;
-    border-radius: v.$radio-curvatura;
-    border: 1px solid #f0f0f0;
-    box-shadow: v.$sombra-nivel-1;
+  width: 250px;
+  min-width: 250px;
+  background: white;
+  padding: 25px;
+  border-radius: v.$radio-curvatura;
+  border: 1px solid #f0f0f0;
+  box-shadow: v.$sombra-nivel-1;
 
-    .form-filtros {
-        margin-top: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
+  .form-filtros {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 
-        .grupo-filtro {
-            label {
-                display: block;
-                font-size: 0.85rem;
-                font-weight: 700;
-                margin-bottom: 8px;
+    .grupo-filtro {
+      label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 8px;
 
-                i {
-                    color: v.$color-marca-principal;
-                }
-            }
-
-            .form-control {
-                border-radius: 8px;
-                border: 1px solid #eee;
-            }
+        i {
+          color: v.$color-marca-principal;
         }
+      }
 
-        .btn-limpiar {
-            background: none;
-            border: 1px dashed #ccc;
-            color: #888;
-            padding: 8px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            cursor: pointer;
-        }
+      .form-control {
+        border-radius: 8px;
+        border: 1px solid #eee;
+      }
     }
+
+    .btn-limpiar {
+      background: none;
+      border: 1px dashed #ccc;
+      color: #888;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+  }
 }
 
 // 4. TARJETA DE CURSO (FORMATO HORIZONTAL)
 .card-curso-horizontal {
-    @include m.card-elevada;
-    display: flex;
+  @include m.card-elevada;
+  display: flex;
+  position: relative;
+  min-height: 270px;
+  width: 100%;
+  margin-bottom: 25px;
+  overflow: visible;
+
+  // Menú flotante de administración
+  .admin-dropdown {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 30;
+
+    .btn-kebab {
+      background: white;
+      border: none;
+      color: #333;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      transition: 0.2s;
+
+      &:hover,
+      &:focus {
+        background: v.$color-marca-principal;
+        color: white;
+      }
+    }
+  }
+
+  // Contenedor visual de la imagen
+  .imagen-container {
+    width: 340px;
+    min-width: 340px;
     position: relative;
-    min-height: 270px;
-    width: 100%;
-    margin-bottom: 25px;
-    overflow: visible;
 
-    // Menú flotante de administración
-    .admin-dropdown {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        z-index: 30;
-
-        .btn-kebab {
-            background: white;
-            border: none;
-            color: #333;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            transition: 0.2s;
-
-            &:hover,
-            &:focus {
-                background: v.$color-marca-principal;
-                color: white;
-            }
-        }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
-    // Contenedor visual de la imagen
-    .imagen-container {
-        width: 340px;
-        min-width: 340px;
-        position: relative;
-
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .badge-profesor {
-            position: absolute;
-            bottom: 15px;
-            left: 15px;
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            backdrop-filter: blur(4px);
-        }
+    .badge-profesor {
+      position: absolute;
+      bottom: 15px;
+      left: 15px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      backdrop-filter: blur(4px);
     }
+  }
 
-    // Cuerpo de información
-    .contenido-curso {
-        flex: 1;
-        padding: 30px;
+  // Cuerpo de información
+  .contenido-curso {
+    flex: 1;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .cuerpo-superior {
+      .periodo-curso {
         display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-
-        .titulo-curso {
-            font-size: 1.7rem;
-            color: v.$color-secundario-frio-2;
-            font-weight: 800;
-        }
-
-        .descripcion-curso {
-            color: #666;
-            @include m.limitar-lineas(2);
-        }
-    }
-
-    // Footer de la card con precio y estados
-    .footer-curso {
-        display: flex;
-        justify-content: space-between;
         align-items: center;
-        padding-top: 15px;
-        border-top: 1px solid #f9f9f9;
+        gap: 15px;
+        margin-bottom: 12px;
+        color: #666;
+        font-size: 0.9rem;
+        font-weight: 500;
 
-        .precio-inscripcion {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-
-            .moneda {
-                font-size: 2rem;
-                font-weight: 900;
-                color: v.$color-secundario-frio-2;
-            }
-
-            .btn-inscripcion {
-                @include m.boton-inscripcion-aula;
-
-
-                &.ya-inscrito {
-                    background-color: #27ae60;
-                    color: white;
-                    border: none;
-                    cursor: default;
-                    opacity: 0.9;
-
-                    &:hover {
-                        transform: none; 
-                        box-shadow: none;
-                    }
-                }
-
-                &:disabled {
-                    filter: grayscale(0.5);
-                }
-            }
+        i {
+          color: v.$color-marca-principal;
         }
+
+        // Estilo del botón "Ver Horarios"
+        .btn-ver-horario {
+          background: rgba(v.$color-marca-principal, 0.1);
+          color: v.$color-marca-principal;
+          border: none;
+          padding: 4px 12px;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+
+          &:hover {
+            background: v.$color-marca-principal;
+            color: white;
+          }
+
+          i {
+            color: inherit;
+            font-size: 0.85rem;
+          }
+        }
+      }
     }
+
+    .titulo-curso {
+      font-size: 1.7rem;
+      color: v.$color-secundario-frio-2;
+      font-weight: 800;
+      margin-top: 5px;
+    }
+
+    .descripcion-curso {
+      color: #666;
+      margin-top: 10px;
+      @include m.limitar-lineas(2);
+    }
+  }
+
+  // Footer de la card con precio y estados
+  .footer-curso {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid #f9f9f9;
+
+    .precio-inscripcion {
+      display: flex;
+      justify-content: space-between; 
+      align-items: center;
+      width: 100%; 
+      gap: 25px;
+
+      // Estilo para el bloque de plazas 
+      .detalles-tecnicos {
+        color: #777;
+        font-size: 0.9rem;
+        
+        i { color: v.$color-marca-principal; }
+
+        span.sin-plazas {
+          color: #e74c3c;
+          font-weight: 700;
+        }
+      }
+
+      // Contenedor de moneda y botón
+      .accion-compra {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+
+        .moneda {
+          font-size: 2rem;
+          font-weight: 900;
+          color: v.$color-secundario-frio-2;
+        }
+
+        .btn-inscripcion {
+          @include m.boton-inscripcion-aula;
+          &.ya-inscrito {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            cursor: default;
+            opacity: 0.9;
+            &:hover {
+              transform: none;
+              box-shadow: none;
+            }
+          }
+          &:disabled {
+            filter: grayscale(0.5);
+          }
+        }
+      }
+    }
+  }
 }
 
 // 5. RESPONSIVE
 @media (max-width: 1000px) {
-    .layout-flex {
-        flex-direction: column;
+  .layout-flex {
+    flex-direction: column;
+  }
+
+  .sidebar-reserva {
+    width: 100%;
+  }
+
+  .card-curso-horizontal {
+    flex-direction: column;
+
+    .imagen-container {
+      width: 100%;
+      height: 200px;
     }
 
-    .sidebar-reserva {
-        width: 100%;
-    }
+    .footer-curso {
+      padding-top: 20px;
 
-    .card-curso-horizontal {
-        flex-direction: column;
+      .precio-inscripcion {
+        flex-direction: column; 
+        align-items: flex-start; 
+        gap: 15px;
 
-        .imagen-container {
-            width: 100%;
-            height: 200px;
+        .accion-compra {
+          width: 100%; 
+          justify-content: space-between; 
+          align-items: center;
         }
 
-        .footer-curso {
-            flex-direction: column;
-            gap: 15px;
-
-            .precio-inscripcion {
-                width: 100%;
-                justify-content: space-between;
-            }
+        .btn-inscripcion {
+          flex: 1;
         }
+      }
     }
+  }
 }

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../interfaces/ApiResponse.Interface';
 import { InscripcionRequest, InscripcionResponse } from '../interfaces/Inscripcion.Interface';
+import { environment } from '../../environments/environment';
 
 /**
  * Servicio encargado de gestionar las matriculaciones de alumnos en los talleres.
@@ -11,7 +12,7 @@ import { InscripcionRequest, InscripcionResponse } from '../interfaces/Inscripci
 @Injectable({ providedIn: 'root' })
 export class InscripcionService {
   /** URL base para los endpoints de la API de inscripciones */
-  private apiUrl = 'http://localhost:8080/api/inscripciones';
+  private apiUrl = `${environment.apiUrl}/inscripciones`;
 
   constructor(private http: HttpClient) { }
 
@@ -42,12 +43,22 @@ export class InscripcionService {
   }
 
   /**
+    * Comprueba si el usuario tiene algun horario que se solape con el taller al que va a inscribirse.
+    * @param idUsuario Identificador del usuario.
+    * @param idUsuario Identificador del taller.
+    * @returns Observable con los talleres asociados a ese usuario.
+    */
+  validarSolapamiento(idUsuario: number, idTaller: number): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/validar-solapamiento/${idUsuario}/${idTaller}`);
+  }
+
+  /**
    * Descarga el PDF con la lista de alumnos de un taller.
    * @param idTaller ID del taller.
    */
   descargarListaPdf(idTaller: number): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/taller/${idTaller}/pdf`, {
-      responseType: 'blob' 
+      responseType: 'blob'
     });
   }
 
@@ -105,5 +116,5 @@ export class InscripcionService {
    */
   eliminar(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
-  } 
+  }
 }

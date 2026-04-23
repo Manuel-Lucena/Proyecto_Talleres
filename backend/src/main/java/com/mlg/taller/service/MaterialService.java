@@ -21,7 +21,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Servicio para la gestión de los materiales educativos asociados a los talleres.
+ * Servicio para la gestión de los materiales educativos asociados a los
+ * talleres.
  *
  * Centraliza la lógica de persistencia y delega las reglas de seguridad
  * en el componente de validación de materiales. Gestiona tanto la información
@@ -42,21 +43,23 @@ public class MaterialService {
     /**
      * Crea un nuevo material y lo asocia a un taller específico.
      *
-     * Se valida que el usuario autenticado tenga permisos de gestión (ADMIN o profesor titular).
+     * Se valida que el usuario autenticado tenga permisos de gestión (ADMIN o
+     * profesor titular).
      *
      * @param dto Objeto de transferencia con los datos del material a crear.
      * @return DTO con los datos del material persistido.
-     * @throws ResourceNotFoundException si el ID del taller proporcionado no existe.
+     * @throws ResourceNotFoundException si el ID del taller proporcionado no
+     *                                   existe.
      */
     @Transactional
     public MaterialResponseDTO crear(MaterialRequestDTO dto) {
         Taller taller = buscarTallerInterno(dto.getIdTaller());
         materialValidator.validarPermisosGestion(SecurityUtils.getUsuarioAutenticado(), taller);
-        
+
         Material material = materialMapper.toEntity(dto);
         material.setTaller(taller);
         material.setFechaSubida(LocalDateTime.now());
-        
+
         return materialMapper.toResponse(materialRepository.save(material));
     }
 
@@ -77,9 +80,11 @@ public class MaterialService {
     }
 
     /**
-     * Lista los materiales marcados como visibles para un alumno en un taller específico.
+     * Lista los materiales marcados como visibles para un alumno en un taller
+     * específico.
      *
-     * Verifica que el alumno tenga una inscripción activa antes de devolver el listado.
+     * Verifica que el alumno tenga una inscripción activa antes de devolver el
+     * listado.
      *
      * @param idTaller Identificador único del taller.
      * @return Lista de materiales que tienen el flag de visibilidad activo.
@@ -95,7 +100,8 @@ public class MaterialService {
     /**
      * Recupera un material específico mediante su identificador.
      *
-     * Valida los permisos de lectura según el rol (ADMIN, Profesor titular o Alumno inscrito).
+     * Valida los permisos de lectura según el rol (ADMIN, Profesor titular o Alumno
+     * inscrito).
      *
      * @param id Identificador único del material.
      * @return DTO con la información del recurso.
@@ -134,27 +140,28 @@ public class MaterialService {
      * Si el material se intenta mover de taller, se valida que el usuario
      * tenga permisos también en el taller de destino.
      *
-     * @param id Identificador del material a modificar.
+     * @param id  Identificador del material a modificar.
      * @param dto Datos actualizados.
      * @return DTO del material actualizado.
-     * @throws ResourceNotFoundException si el material o el nuevo taller no existen.
+     * @throws ResourceNotFoundException si el material o el nuevo taller no
+     *                                   existen.
      */
     @Transactional
     public MaterialResponseDTO actualizar(Long id, MaterialRequestDTO dto) {
         Material existente = buscarMaterialInterno(id);
         var solicitante = SecurityUtils.getUsuarioAutenticado();
-        
+
         materialValidator.validarPermisosGestion(solicitante, existente.getTaller());
-        
+
         existente.setTitulo(dto.getTitulo());
         existente.setContenido(dto.getContenido());
-        
+
         if (!existente.getTaller().getId().equals(dto.getIdTaller())) {
             Taller nuevoTaller = buscarTallerInterno(dto.getIdTaller());
             materialValidator.validarPermisosGestion(solicitante, nuevoTaller);
             existente.setTaller(nuevoTaller);
         }
-        
+
         return materialMapper.toResponse(materialRepository.save(existente));
     }
 
@@ -169,7 +176,7 @@ public class MaterialService {
     public MaterialResponseDTO cambiarVisibilidad(Long id) {
         Material material = buscarMaterialInterno(id);
         materialValidator.validarPermisosGestion(SecurityUtils.getUsuarioAutenticado(), material.getTaller());
-        
+
         material.setVisible(!material.isVisible());
         return materialMapper.toResponse(materialRepository.save(material));
     }
@@ -179,7 +186,8 @@ public class MaterialService {
     /**
      * Elimina un material del sistema y limpia sus archivos físicos asociados.
      *
-     * Se recuperan los nombres de los archivos vinculados antes de eliminar la entidad
+     * Se recuperan los nombres de los archivos vinculados antes de eliminar la
+     * entidad
      * para asegurar que el almacenamiento físico no quede huérfano.
      *
      * @param id Identificador único del material a eliminar.
@@ -189,19 +197,23 @@ public class MaterialService {
     public void eliminar(Long id) {
         Material material = buscarMaterialInterno(id);
         materialValidator.validarPermisosGestion(SecurityUtils.getUsuarioAutenticado(), material.getTaller());
-        
+
         List<String> nombresArchivos = material.getArchivos().stream()
                 .map(ArchivoMaterial::getNombre)
                 .toList();
-        
+
         materialRepository.delete(material);
         nombresArchivos.forEach(nombre -> fileUtil.eliminar("materiales", nombre, false));
     }
 
-    // --- MÉTODOS PRIVADOS ---
+    // --- MÉTODOS PRIVADOS DE APOYO ---
 
     /**
-     * Busca un taller en la base de datos.
+     * Busca un taller en la base de datos a partir de su identificador único.
+     *
+     * @param id Identificador único del taller.
+     * @return Entidad Taller recuperada.
+     * @throws ResourceNotFoundException si el taller no existe.
      */
     private Taller buscarTallerInterno(Long id) {
         return tallerRepository.findById(id)
@@ -209,7 +221,11 @@ public class MaterialService {
     }
 
     /**
-     * Busca un material en la base de datos.
+     * Busca un material en la base de datos a partir de su identificador único.
+     *
+     * @param id Identificador único del material.
+     * @return Entidad Material recuperada.
+     * @throws ResourceNotFoundException si el material no existe.
      */
     private Material buscarMaterialInterno(Long id) {
         return materialRepository.findById(id)

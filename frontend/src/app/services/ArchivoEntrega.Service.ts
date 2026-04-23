@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../interfaces/ApiResponse.Interface';
 import { ArchivoEntregaResponse } from '../interfaces/Archivo.Interface';
+import { environment } from '../../environments/environment';
 
 /**
  * Servicio encargado de gestionar los archivos que los alumnos adjuntan en sus entregas.
@@ -14,7 +15,7 @@ import { ArchivoEntregaResponse } from '../interfaces/Archivo.Interface';
 export class ArchivoEntregaService {
 
   /** URL base para los endpoints de la API de archivos de entrega */
-  private readonly URL = 'http://localhost:8080/api/archivos-entrega';
+  private URL = `${environment.apiUrl}/archivos-entrega`;
 
   constructor(private http: HttpClient) { }
 

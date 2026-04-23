@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * Servicio para la gestión de archivos adjuntos a las tareas.
  *
- * Gestiona el ciclo de vida de los archivos (enunciados y recursos) delegando 
+ * Gestiona el ciclo de vida de los archivos (enunciados y recursos) delegando
  * las reglas de acceso en el validador y la persistencia física en FileUtil.
  */
 @Service
@@ -33,7 +33,7 @@ public class ArchivoTareaService {
     private final ArchivoTareaMapper archivoTareaMapper;
     private final ArchivoTareaValidator archivoTareaValidator;
     private final FileUtil fileUtil;
-    
+
     private static final String FOLDER = "tareas";
 
     // --- MÉTODOS POST ---
@@ -41,7 +41,7 @@ public class ArchivoTareaService {
     /**
      * Guarda un archivo físico y registra su vinculación con una tarea.
      *
-     * @param dto Datos descriptivos del archivo.
+     * @param dto  Datos descriptivos del archivo.
      * @param file Archivo binario recibido.
      * @return DTO del archivo persistido.
      */
@@ -90,7 +90,7 @@ public class ArchivoTareaService {
     public List<ArchivoTareaResponseDTO> listarPorTarea(Long idTarea) {
         Tarea tarea = buscarTareaInterna(idTarea);
         archivoTareaValidator.validarAccesoLectura(tarea);
-        
+
         return archivoTareaRepository.findByTareaId(idTarea).stream()
                 .map(archivoTareaMapper::toResponse)
                 .collect(Collectors.toList());
@@ -110,7 +110,7 @@ public class ArchivoTareaService {
 
         String rutaCompleta = archivo.getRutaArchivo();
         String nombreFisico = rutaCompleta.substring(rutaCompleta.lastIndexOf("/") + 1);
-        
+
         fileUtil.eliminar(FOLDER, nombreFisico, false);
         archivoTareaRepository.delete(archivo);
     }
@@ -118,7 +118,11 @@ public class ArchivoTareaService {
     // --- MÉTODOS PRIVADOS ---
 
     /**
-     * Busca una tarea en la base de datos.
+     * Realiza una búsqueda interna de una tarea por su identificador único.
+     * 
+     * @param id Identificador único de la tarea.
+     * @return Entidad Tarea recuperada del repositorio.
+     * @throws ResourceNotFoundException si la tarea no existe en la base de datos.
      */
     private Tarea buscarTareaInterna(Long id) {
         return tareaRepository.findById(id)
@@ -126,7 +130,11 @@ public class ArchivoTareaService {
     }
 
     /**
-     * Busca un archivo en la base de datos.
+     * Realiza una búsqueda interna de un archivo de tarea por su identificador.
+     * 
+     * @param id Identificador único del archivo.
+     * @return Entidad ArchivoTarea encontrada.
+     * @throws ResourceNotFoundException si el archivo no existe.
      */
     private ArchivoTarea buscarArchivoInterno(Long id) {
         return archivoTareaRepository.findById(id)
@@ -134,10 +142,13 @@ public class ArchivoTareaService {
     }
 
     /**
-     * Extrae la extensión de un nombre de archivo.
+     * Extrae de forma segura la extensión de un nombre de archivo.
+     * 
+     * @param nombre Nombre original del archivo (ej. "documento.PDF").
+     * @return Extensión del archivo (ej. "pdf") o cadena vacía si no tiene.
      */
     private String obtenerExtension(String nombre) {
-        return (nombre != null && nombre.contains(".")) ? 
-                nombre.substring(nombre.lastIndexOf(".") + 1).toLowerCase() : "";
+        return (nombre != null && nombre.contains(".")) ? nombre.substring(nombre.lastIndexOf(".") + 1).toLowerCase()
+                : "";
     }
 }

@@ -48,7 +48,7 @@ public class HorarioService {
 
         Horario horario = horarioMapper.toEntity(dto);
         horario.setTaller(taller);
-        
+
         return horarioMapper.toResponse(horarioRepository.save(horario));
     }
 
@@ -98,7 +98,7 @@ public class HorarioService {
     /**
      * Actualiza un horario existente.
      *
-     * @param id Identificador del horario a modificar.
+     * @param id  Identificador del horario a modificar.
      * @param dto Nuevos datos.
      * @return DTO del horario actualizado.
      */
@@ -108,11 +108,11 @@ public class HorarioService {
         horarioValidator.validarConsistenciaHoraria(dto);
 
         Horario h = buscarHorarioInterno(id);
-        
+
         h.setDiaSemana(dto.getDiaSemana());
         h.setHoraInicio(dto.getHoraInicio());
         h.setHoraFin(dto.getHoraFin());
-        
+
         return horarioMapper.toResponse(horarioRepository.save(h));
     }
 
@@ -126,18 +126,22 @@ public class HorarioService {
     @Transactional
     public void eliminar(Long id) {
         horarioValidator.validarPermisosGestion();
-        
+
         if (!horarioRepository.existsById(id)) {
             throw new ResourceNotFoundException("No se puede eliminar: el horario no existe");
         }
-        
+
         horarioRepository.deleteById(id);
     }
 
     // --- MÉTODOS PRIVADOS ---
 
     /**
-     * Búsqueda interna de talleres con manejo de excepciones.
+     * Realiza una búsqueda interna de un taller por su identificador único.
+     * 
+     * @param id Identificador único del taller.
+     * @return Entidad Taller recuperada del repositorio.
+     * @throws ResourceNotFoundException si el taller no existe en la base de datos.
      */
     private Taller buscarTallerInterno(Long id) {
         return tallerRepository.findById(id)
@@ -145,7 +149,11 @@ public class HorarioService {
     }
 
     /**
-     * Búsqueda interna de horarios con manejo de excepciones.
+     * Realiza una búsqueda interna de un registro de horario por su identificador.
+     * 
+     * @param id Identificador único del horario.
+     * @return Entidad Horario encontrada.
+     * @throws ResourceNotFoundException si el horario no existe.
      */
     private Horario buscarHorarioInterno(Long id) {
         return horarioRepository.findById(id)

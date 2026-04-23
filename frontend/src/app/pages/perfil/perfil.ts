@@ -32,7 +32,7 @@ export class Perfil implements OnInit {
    * @param fb Constructor de formularios reactivos.
    * @param usuarioService Operaciones CRUD y de archivos para usuarios.
    * @param tokenService Gestión de JWT y datos de sesión local.
-   * @param notify Servicio centralizado para feedback visual (Snackbars/Modales).
+   * @param notify Servicio centralizado para feedback visual.
    * @param cdr Forzado de detección de cambios en respuestas asíncronas.
    */
   constructor(

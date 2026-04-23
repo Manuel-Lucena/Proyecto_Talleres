@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 /**
  * Servicio especializado en la descarga de archivos binarios desde el servidor.
@@ -9,7 +10,7 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class ArchivoService {
   /** URL base para el controlador de descargas y visualización de archivos */
-  private apiUrl = 'http://localhost:8080/api/descargas';
+  private apiUrl = `${environment.apiUrl}/descargas`;
 
   constructor(private http: HttpClient) { }
 

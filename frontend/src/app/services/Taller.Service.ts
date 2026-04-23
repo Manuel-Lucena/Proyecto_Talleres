@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../interfaces/ApiResponse.Interface';
 import { TallerResponse } from '../interfaces/Taller.Interface';
+import { environment } from '../../environments/environment';
 
 /**
  * Servicio encargado de la gestión de los talleres o cursos del sistema.
@@ -11,7 +12,7 @@ import { TallerResponse } from '../interfaces/Taller.Interface';
  */
 @Injectable({ providedIn: 'root' })
 export class TallerService {
-  private apiUrl = 'http://localhost:8080/api/talleres';
+  private apiUrl = `${environment.apiUrl}/talleres`;
 
   constructor(private http: HttpClient) { }
 

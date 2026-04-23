@@ -52,6 +52,10 @@
         color: $color-superficie-suave;
         cursor: pointer;
 
+        &:focus {
+            box-shadow: none;
+        }
+
         &:hover {
             outline: none;
             color: $color-secundario-calido-1;

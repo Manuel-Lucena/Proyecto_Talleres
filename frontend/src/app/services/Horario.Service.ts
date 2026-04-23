@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../interfaces/ApiResponse.Interface';
 import { HorarioRequest, HorarioResponse } from '../interfaces/Horario.Interface';
+import { environment } from '../../environments/environment';
 
 /**
  * Servicio para la gestión de la disponibilidad temporal de los talleres.
@@ -11,7 +12,7 @@ import { HorarioRequest, HorarioResponse } from '../interfaces/Horario.Interface
 @Injectable({ providedIn: 'root' })
 export class HorarioService {
 
-  private apiUrl = 'http://localhost:8080/api/horarios';
+  private apiUrl = `${environment.apiUrl}/horarios`;
 
   constructor(private http: HttpClient) { }
 

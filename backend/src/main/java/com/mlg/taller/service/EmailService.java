@@ -16,7 +16,7 @@ import java.util.Map;
 
 /**
  * Servicio encargado de la gestión y envío de correos electrónicos.
- * <p>
+ * 
  * Este servicio utiliza Thymeleaf para el renderizado de plantillas HTML y 
  * JavaMailSender para la transmisión. Está diseñado para ser no bloqueante 
  * mediante el uso de ejecución asíncrona.
@@ -31,7 +31,7 @@ public class EmailService {
 
     /**
      * Envía un correo electrónico con un archivo adjunto de forma asíncrona.
-     * <p>
+     * 
      * Se captura la excepción MessagingException internamente y se relanza como 
      * RuntimeException para evitar ensuciar la firma de los métodos en la capa de negocio.
      *

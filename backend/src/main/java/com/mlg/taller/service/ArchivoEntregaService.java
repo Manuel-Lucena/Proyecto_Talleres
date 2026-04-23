@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * Servicio para la gestión de archivos físicos entregados por los alumnos.
  *
- * Se encarga del ciclo de vida de los adjuntos de las entregas, delegando 
+ * Se encarga del ciclo de vida de los adjuntos de las entregas, delegando
  * las validaciones de identidad y formatos en el validador correspondiente.
  */
 @Service
@@ -41,7 +41,7 @@ public class ArchivoEntregaService {
     /**
      * Registra y guarda físicamente un archivo asociado a una entrega.
      *
-     * @param dto Datos del registro del archivo.
+     * @param dto  Datos del registro del archivo.
      * @param file Binario enviado (documento, imagen, etc.).
      * @return DTO con la información del archivo persistido.
      */
@@ -79,7 +79,7 @@ public class ArchivoEntregaService {
     public List<ArchivoEntregaResponseDTO> listarPorEntrega(Long idEntrega) {
         Entrega entrega = buscarEntregaInterna(idEntrega);
         archivoEntregaValidator.validarAccesoLectura(entrega);
-        
+
         return archivoEntregaRepository.findByEntregaId(idEntrega).stream()
                 .map(archivoEntregaMapper::toResponse)
                 .collect(Collectors.toList());
@@ -114,14 +114,19 @@ public class ArchivoEntregaService {
         if (partes.length == 2) {
             fileUtil.eliminar(partes[0], partes[1], false);
         }
-        
+
         archivoEntregaRepository.delete(archivo);
     }
 
     // --- MÉTODOS PRIVADOS ---
 
     /**
-     * Búsqueda interna de entregas.
+     * Realiza una búsqueda interna de una entrega por su identificador único.
+     * 
+     * @param id Identificador único de la entrega.
+     * @return Entidad Entrega recuperada del repositorio.
+     * @throws ResourceNotFoundException si la entrega no existe en la base de
+     *                                   datos.
      */
     private Entrega buscarEntregaInterna(Long id) {
         return entregaRepository.findById(id)
@@ -129,7 +134,11 @@ public class ArchivoEntregaService {
     }
 
     /**
-     * Búsqueda interna de archivos de entrega.
+     * Realiza una búsqueda interna de un archivo de entrega por su identificador.
+     * 
+     * @param id Identificador único del archivo de entrega.
+     * @return Entidad ArchivoEntrega encontrada.
+     * @throws ResourceNotFoundException si el archivo no existe.
      */
     private ArchivoEntrega buscarArchivoInterno(Long id) {
         return archivoEntregaRepository.findById(id)
@@ -137,10 +146,14 @@ public class ArchivoEntregaService {
     }
 
     /**
-     * Extrae la extensión de un nombre de archivo.
+     * Extrae de forma segura la extensión de un nombre de archivo.
+     * 
+     * @param nombre Nombre original del archivo (ej. "proyecto_final.DOCX").
+     * @return Extensión del archivo en minúsculas (ej. "docx") o cadena vacía si no
+     *         tiene.
      */
     private String obtenerExtension(String nombre) {
-        return (nombre != null && nombre.contains(".")) ? 
-                nombre.substring(nombre.lastIndexOf(".") + 1).toLowerCase() : "";
+        return (nombre != null && nombre.contains(".")) ? nombre.substring(nombre.lastIndexOf(".") + 1).toLowerCase()
+                : "";
     }
 }

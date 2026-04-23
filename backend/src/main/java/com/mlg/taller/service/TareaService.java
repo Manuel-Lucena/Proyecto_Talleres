@@ -188,18 +188,31 @@ public class TareaService {
 
         tareaRepository.delete(tarea);
 
-    
         paraBorrar.forEach(nom -> fileUtil.eliminar("tareas", nom, false));
         paraBorrar.forEach(nom -> fileUtil.eliminar("entregas", nom, false));
     }
 
     // --- MÉTODOS PRIVADOS DE APOYO ---
 
+    /**
+     * Realiza una búsqueda interna de una tarea por su identificador único.
+     *
+     * @param id Identificador de la tarea.
+     * @return Entidad Tarea encontrada.
+     * @throws ResourceNotFoundException si la tarea no existe en la base de datos.
+     */
     private Tarea buscarTareaInterna(Long id) {
         return tareaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarea no encontrada con ID: " + id));
     }
 
+    /**
+     * Realiza una búsqueda interna de un taller por su identificador único.
+     *
+     * @param id Identificador del taller.
+     * @return Entidad Taller encontrada.
+     * @throws ResourceNotFoundException si el taller no existe en la base de datos.
+     */
     private Taller buscarTallerInterno(Long id) {
         return tallerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Taller no encontrado con ID: " + id));
@@ -208,6 +221,10 @@ public class TareaService {
     /**
      * Gestiona la asignación masiva de tareas basándose en una lista de IDs
      * o en la inscripción actual del taller.
+     * 
+     * @param tarea      Tarea a asignar.
+     * @param alumnosIds Lista opcional de identificadores de alumnos.
+     * @param idTaller   Identificador del taller para asignación por defecto.
      */
     private void asignarTareaMasivaInterno(Tarea tarea, List<Long> alumnosIds, Long idTaller) {
         if (alumnosIds != null && !alumnosIds.isEmpty()) {
@@ -220,7 +237,11 @@ public class TareaService {
     }
 
     /**
-     * Registra la asignación individual de una tarea a un alumno.
+     * Registra la asignación individual de una tarea a un alumno específico.
+     * 
+     * @param tarea    Tarea que se asigna.
+     * @param alumnoId Identificador del alumno receptor.
+     * @throws ResourceNotFoundException si el alumno no existe.
      */
     private void asignarTareaAAlumno(Tarea tarea, Long alumnoId) {
         Usuario alumno = usuarioRepository.findById(alumnoId)
@@ -230,6 +251,7 @@ public class TareaService {
                 .tarea(tarea)
                 .alumno(alumno)
                 .build();
+
         tareaAsignadaRepository.save(asignacion);
     }
 }

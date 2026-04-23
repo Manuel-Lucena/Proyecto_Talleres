@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 /**
  * Servicio para la gestión de entregas de tareas.
  *
- * Implementa la lógica de envío, calificación y consulta de trabajos, 
+ * Implementa la lógica de envío, calificación y consulta de trabajos,
  * delegando la validación de reglas de acceso en el componente validator.
  */
 @Service
@@ -54,7 +54,7 @@ public class EntregaService {
         entrega.setTarea(tarea);
         entrega.setAlumno(alumno);
         entrega.setFechaEntrega(LocalDateTime.now());
-        
+
         entrega.setCalificacion(null);
         entrega.setComentarioProfesor(null);
 
@@ -102,7 +102,7 @@ public class EntregaService {
     public List<EntregaResponseDTO> listarPorTarea(Long idTarea) {
         Tarea tarea = buscarTareaInterna(idTarea);
         entregaValidator.validarPermisosGestion(SecurityUtils.getUsuarioAutenticado(), tarea);
-        
+
         return entregaRepository.findByTareaId(idTarea).stream()
                 .map(entregaMapper::toResponse)
                 .collect(Collectors.toList());
@@ -113,7 +113,7 @@ public class EntregaService {
     /**
      * Actualiza el texto de una entrega realizada por un alumno.
      *
-     * @param id Identificador de la entrega.
+     * @param id  Identificador de la entrega.
      * @param dto Datos actualizados.
      * @return DTO de la entrega modificada.
      */
@@ -129,7 +129,7 @@ public class EntregaService {
     /**
      * Asigna una calificación y un comentario a una entrega.
      *
-     * @param id Identificador de la entrega.
+     * @param id  Identificador de la entrega.
      * @param dto Datos de la calificación.
      * @return DTO de la entrega calificada.
      */
@@ -140,7 +140,7 @@ public class EntregaService {
 
         entrega.setCalificacion(dto.getCalificacion());
         entrega.setComentarioProfesor(dto.getComentarioProfesor());
-        
+
         return entregaMapper.toResponse(entregaRepository.save(entrega));
     }
 
@@ -155,14 +155,18 @@ public class EntregaService {
     public void eliminar(Long id) {
         Entrega entrega = buscarEntregaInterna(id);
         entregaValidator.validarPermisosGestion(SecurityUtils.getUsuarioAutenticado(), entrega.getTarea());
-        
+
         entregaRepository.delete(entrega);
     }
 
     // --- MÉTODOS PRIVADOS ---
 
     /**
-     * Busca una tarea en la base de datos.
+     * Realiza una búsqueda interna de una tarea por su identificador único.
+     * 
+     * @param id Identificador único de la tarea.
+     * @return Entidad Tarea recuperada del repositorio.
+     * @throws ResourceNotFoundException si la tarea no existe en la base de datos.
      */
     private Tarea buscarTareaInterna(Long id) {
         return tareaRepository.findById(id)
@@ -170,7 +174,11 @@ public class EntregaService {
     }
 
     /**
-     * Busca una entrega en la base de datos.
+     * Realiza una búsqueda interna de una entrega por su identificador único.
+     * 
+     * @param id Identificador único de la entrega.
+     * @return Entidad Entrega encontrada.
+     * @throws ResourceNotFoundException si la entrega no existe.
      */
     private Entrega buscarEntregaInterna(Long id) {
         return entregaRepository.findById(id)

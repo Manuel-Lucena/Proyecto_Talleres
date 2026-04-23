@@ -67,9 +67,10 @@ public class UsuarioService {
     }
 
     /**
-     * Registra un nuevo usuario en el sistema con cifrado de contraseña y gestión de imagen.
+     * Registra un nuevo usuario en el sistema con cifrado de contraseña y gestión
+     * de imagen.
      *
-     * @param dto Datos del nuevo usuario.
+     * @param dto     Datos del nuevo usuario.
      * @param archivo Imagen opcional de perfil.
      * @return Respuesta con token de acceso tras registro exitoso.
      * @throws DuplicateResourceException Si el email ya está en uso.
@@ -83,10 +84,10 @@ public class UsuarioService {
         usuario.setRol(obtenerRolInterno(dto.getIdRol()));
         usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
         usuario.setActivo(true);
-        
+
         usuario = usuarioRepository.save(usuario);
         gestionarImagenPerfilInterno(usuario, archivo);
-        
+
         return mapearAuthResponse(usuario);
     }
 
@@ -178,8 +179,8 @@ public class UsuarioService {
     /**
      * Actualiza el perfil de un usuario con blindaje de seguridad interna.
      *
-     * @param id ID del usuario a modificar.
-     * @param dto Nuevos datos.
+     * @param id      ID del usuario a modificar.
+     * @param dto     Nuevos datos.
      * @param archivo Nueva imagen opcional.
      * @return Usuario actualizado con nuevo token JWT.
      */
@@ -248,8 +249,8 @@ public class UsuarioService {
 
         tokenRepository.save(tokenEntity);
         String urlFront = "http://localhost:4200/reset-password?token=" + token;
-        
-        emailService.enviarCorreo(usuario.getEmail(), "Restablecer contraseña", "recuperar-password", 
+
+        emailService.enviarCorreo(usuario.getEmail(), "Restablecer contraseña", "recuperar-password",
                 Map.of("usuario", usuario, "url", urlFront));
     }
 
@@ -276,21 +277,52 @@ public class UsuarioService {
 
     // --- MÉTODOS PRIVADOS DE APOYO ---
 
+
+    /**
+     * Realiza una búsqueda interna de un usuario por su identificador único.
+     *
+     * @param id Identificador del usuario.
+     * @return Entidad Usuario encontrada.
+     * @throws ResourceNotFoundException si el usuario no existe en la base de
+     *                                   datos.
+     */
     private Usuario buscarPorIdInterno(Long id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
     }
 
+    /**
+     * Recupera un usuario a partir de su dirección de correo electrónico.
+     *
+     * @param email Correo electrónico del usuario.
+     * @return Entidad Usuario asociada al email.
+     * @throws ResourceNotFoundException si no existe un usuario con dicho correo.
+     */
     private Usuario buscarPorEmailInterno(String email) {
         return usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con email: " + email));
     }
 
+    /**
+     * Obtiene la entidad de un Rol específico por su ID.
+     *
+     * @param idRol Identificador del rol.
+     * @return Entidad Rol encontrada.
+     * @throws ResourceNotFoundException si el rol solicitado no existe.
+     */
     private Rol obtenerRolInterno(Long idRol) {
         return rolRepository.findById(idRol)
                 .orElseThrow(() -> new ResourceNotFoundException("Rol no encontrado con ID: " + idRol));
     }
 
+    /**
+     * Procesa y almacena físicamente la imagen de perfil de un usuario.
+     * * Si el archivo es válido, genera un nombre único, lo persiste en el sistema
+     * de archivos y actualiza la ruta en el objeto de usuario.
+     *
+     * @param usuario Entidad del usuario a la que se vinculará la imagen.
+     * @param archivo Archivo binario recibido en la petición.
+     */
     private void gestionarImagenPerfilInterno(Usuario usuario, MultipartFile archivo) {
         if (archivo != null && !archivo.isEmpty()) {
             String nombreImagen = "user_" + usuario.getId() + ".jpg";
@@ -299,6 +331,14 @@ public class UsuarioService {
         }
     }
 
+    /**
+     * Transforma una entidad Usuario en un objeto de respuesta de autenticación.
+     * * Incluye la generación del token JWT y la extracción de datos básicos
+     * como el nombre y el rol para el cliente.
+     *
+     * @param usuario Entidad del usuario autenticado.
+     * @return DTO con el token y metadatos del usuario.
+     */
     private AuthResponseDTO mapearAuthResponse(Usuario usuario) {
         AuthResponseDTO response = new AuthResponseDTO();
         response.setToken(jwtService.generateToken(usuario));

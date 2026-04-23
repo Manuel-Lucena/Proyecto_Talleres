@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../interfaces/ApiResponse.Interface';
 import { MensajeRequest, MensajeResponse } from '../interfaces/Mensaje.Interface';
+import { environment } from '../../environments/environment';
 
 /**
  * Servicio encargado de la mensajería interna y el muro de los talleres.
@@ -11,7 +12,7 @@ import { MensajeRequest, MensajeResponse } from '../interfaces/Mensaje.Interface
 @Injectable({ providedIn: 'root' })
 export class MensajeService {
   /** URL base para los endpoints de la API de mensajes */
-  private apiUrl = 'http://localhost:8080/api/mensajes';
+  private apiUrl = `${environment.apiUrl}/mensajes`;
 
   constructor(private http: HttpClient) { }
 

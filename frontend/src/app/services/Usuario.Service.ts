@@ -4,6 +4,7 @@ import { Observable, tap } from 'rxjs';
 import { ApiResponse } from '../interfaces/ApiResponse.Interface';
 import { LoginRequest, AuthResponse, PasswordChangeRequest } from '../interfaces/Auth.Interface';
 import { UsuarioResponse, UsuarioRequest } from '../interfaces/Usuario.Interface';
+import { environment } from '../../environments/environment';
 
 /**
  * Servicio encargado de la gestión de usuarios y autenticación.
@@ -11,7 +12,7 @@ import { UsuarioResponse, UsuarioRequest } from '../interfaces/Usuario.Interface
  */
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
-  private apiUrl = 'http://localhost:8080/api/usuarios';
+  private apiUrl = `${environment.apiUrl}/usuarios`;
 
   constructor(private http: HttpClient) { }
 

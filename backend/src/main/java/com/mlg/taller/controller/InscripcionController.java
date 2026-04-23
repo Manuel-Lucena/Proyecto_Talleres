@@ -127,6 +127,24 @@ public class InscripcionController {
     }
 
     /**
+     * Verifica si un taller nuevo se solapa con los horarios de los talleres
+     * en los que el usuario ya está inscrito.
+     *
+     * @param idUsuario ID del alumno.
+     * @param idTaller  ID del taller al que se quiere inscribir.
+     * @return Respuesta con un booleano y el nombre del taller en conflicto si
+     *         existe.
+     */
+    @GetMapping("/validar-solapamiento/usuario/{idUsuario}/taller/{idTaller}")
+    public ApiResponse<Map<String, Object>> validarSolapamiento(
+            @PathVariable Long idUsuario,
+            @PathVariable Long idTaller) {
+        return ApiResponse.success(
+                inscripcionService.validarSolapamientoHorarios(idUsuario, idTaller),
+                "Validación de horarios completada");
+    }
+
+    /**
      * Genera el recibo oficial de inscripción en formato PDF para el alumno.
      * Incluye detalles del pago, datos del usuario y confirmación de la plaza
      * para que sirva como justificante legal.

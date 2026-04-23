@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../interfaces/ApiResponse.Interface';
 import { TareaRequest, TareaResponse } from '../interfaces/Tarea.Interface';
+import { environment } from '../../environments/environment';
 
 /**
  * Servicio para la gestión de tareas académicas dentro de los talleres.
@@ -11,7 +12,7 @@ import { TareaRequest, TareaResponse } from '../interfaces/Tarea.Interface';
 @Injectable({ providedIn: 'root' })
 export class TareaService {
   /** URL base para los endpoints de la API de tareas */
-  private apiUrl = 'http://localhost:8080/api/tareas';
+  private apiUrl = `${environment.apiUrl}/tareas`;
 
   constructor(private http: HttpClient) { }
 
@@ -32,7 +33,7 @@ export class TareaService {
   listarVisibles(idTaller: number): Observable<ApiResponse<TareaResponse[]>> {
     return this.http.get<ApiResponse<TareaResponse[]>>(`${this.apiUrl}/taller/${idTaller}/visibles`);
   }
-  
+
   /**
      * Obtiene la información detallada de una tarea específica por su ID.
      * @param id Identificador único de la tarea.

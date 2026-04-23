@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../interfaces/ApiResponse.Interface';
 import { EntregaRequest, EntregaResponse } from '../interfaces/Entrega.Interface';
+import { environment } from '../../environments/environment';
 
 /**
  * Servicio encargado de gestionar las entregas de tareas por parte de los alumnos.
@@ -11,7 +12,7 @@ import { EntregaRequest, EntregaResponse } from '../interfaces/Entrega.Interface
 @Injectable({ providedIn: 'root' })
 export class EntregaService {
 
-    private apiUrl = 'http://localhost:8080/api/entregas';
+    private apiUrl = `${environment.apiUrl}/entregas`;
 
     constructor(private http: HttpClient) { }
 

@@ -4,6 +4,9 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TokenService } from '../../../services/Token.Service';
 import { UsuarioService } from '../../../services/Usuario.Service';
 import { UsuarioResponse } from '../../../interfaces/Usuario.Interface';
+import { NotificacionService } from '../../../services/Notificacion.Service';
+import { Notificacion } from "../../dialogs/mensaje/notificacion";
+import { Confirmacion } from "../../dialogs/confirmacion/confirmacion";
 
 /**
  * COMPONENTE ESTRUCTURAL: Navegación Principal (Navbar).
@@ -15,7 +18,7 @@ import { UsuarioResponse } from '../../../interfaces/Usuario.Interface';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive, Confirmacion],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss'
 })
@@ -30,12 +33,14 @@ export class Navbar implements OnInit {
    * @param router Gestión de redirección hacia pasarelas de acceso.
    * @param tokenService Interfaz de acceso a la persistencia local del JWT.
    * @param usuarioService Servicio de dominio para la gestión de cuentas.
+   * @param notify Servicio centralizado para feedback visual.
    * @param cdr Trigger manual para asegurar la paridad vista-modelo en cargas asíncronas.
    */
   constructor(
     private router: Router,
     public tokenService: TokenService,
     private usuarioService: UsuarioService,
+    private notify: NotificacionService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -94,11 +99,18 @@ export class Navbar implements OnInit {
    * 2. Resetea el estado interno del componente para seguridad de datos.
    * 3. Expulsa al usuario hacia la vista de login.
    */
-  public logout(): void {
-    this.tokenService.logOut();
-    this.isLogged = false;
-    this.usuarioData = undefined;
-    this.mostrarDropdown = false;
-    this.router.navigate(['/login']);
+  public async logout(): Promise<void> {
+
+    const confirmar = await this.notify.confirmar({
+      titulo: 'Cerrar Sesión',
+      mensaje: '¿Estás seguro de que deseas salir de Aula Viva?'
+    });
+
+    if (confirmar) {
+      this.tokenService.logOut();
+      this.isLogged = false;
+      this.usuarioData = undefined;
+      this.router.navigate(['/login']);
+    }
   }
 }

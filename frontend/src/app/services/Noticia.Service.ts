@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../interfaces/ApiResponse.Interface';
 import { NoticiaResponse } from '../interfaces/Noticia.Interface';
+import { environment } from '../../environments/environment';
 
 /**
  * Servicio para la gestión del tablón de noticias y comunicaciones globales.
@@ -11,7 +12,7 @@ import { NoticiaResponse } from '../interfaces/Noticia.Interface';
 @Injectable({ providedIn: 'root' })
 export class NoticiaService {
   /** URL base para los endpoints de la API de noticias */
-  private apiUrl = 'http://localhost:8080/api/noticias';
+  private apiUrl = `${environment.apiUrl}/noticias`;
 
   constructor(private http: HttpClient) {}
 

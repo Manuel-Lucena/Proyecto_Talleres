@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * Servicio para la gestión de archivos adjuntos a los materiales educativos.
  *
- * Gestiona el ciclo de vida de los recursos físicos delegando las validaciones 
+ * Gestiona el ciclo de vida de los recursos físicos delegando las validaciones
  * de seguridad en el validador y la persistencia en disco en FileUtil.
  */
 @Service
@@ -41,7 +41,7 @@ public class ArchivoMaterialService {
     /**
      * Guarda un archivo físico y registra su vinculación con un material.
      *
-     * @param dto Datos del registro.
+     * @param dto  Datos del registro.
      * @param file Archivo binario recibido.
      * @return DTO del archivo registrado.
      */
@@ -90,7 +90,7 @@ public class ArchivoMaterialService {
     public List<ArchivoMaterialResponseDTO> listarPorMaterial(Long idMaterial) {
         Material material = buscarMaterialInterno(idMaterial);
         archivoMaterialValidator.validarAccesoLectura(material);
-        
+
         return archivoMaterialRepository.findByMaterialId(idMaterial).stream()
                 .map(archivoMaterialMapper::toResponse)
                 .collect(Collectors.toList());
@@ -110,7 +110,7 @@ public class ArchivoMaterialService {
 
         String rutaCompleta = archivo.getRutaArchivo();
         String nombreFisico = rutaCompleta.substring(rutaCompleta.lastIndexOf("/") + 1);
-        
+
         fileUtil.eliminar(FOLDER, nombreFisico, false);
         archivoMaterialRepository.delete(archivo);
     }
@@ -118,7 +118,13 @@ public class ArchivoMaterialService {
     // --- MÉTODOS PRIVADOS ---
 
     /**
-     * Búsqueda interna de materiales.
+     * Realiza una búsqueda interna de un material educativo por su identificador
+     * único.
+     * 
+     * @param id Identificador único del material.
+     * @return Entidad Material recuperada del repositorio.
+     * @throws ResourceNotFoundException si el material no existe en la base de
+     *                                   datos.
      */
     private Material buscarMaterialInterno(Long id) {
         return materialRepository.findById(id)
@@ -126,7 +132,11 @@ public class ArchivoMaterialService {
     }
 
     /**
-     * Búsqueda interna de archivos.
+     * Realiza una búsqueda interna de un archivo de material por su identificador.
+     * 
+     * @param id Identificador único del archivo de material.
+     * @return Entidad ArchivoMaterial encontrada.
+     * @throws ResourceNotFoundException si el archivo no existe.
      */
     private ArchivoMaterial buscarArchivoInterno(Long id) {
         return archivoMaterialRepository.findById(id)
@@ -134,10 +144,14 @@ public class ArchivoMaterialService {
     }
 
     /**
-     * Extrae la extensión de un nombre de archivo.
+     * Extrae de forma segura la extensión de un nombre de archivo.
+     * 
+     * @param nombre Nombre original del archivo (ej. "guia_estudio.PDF").
+     * @return Extensión del archivo en minúsculas (ej. "pdf") o cadena vacía si no
+     *         posee.
      */
     private String obtenerExtension(String nombre) {
-        return (nombre != null && nombre.contains(".")) ? 
-                nombre.substring(nombre.lastIndexOf(".") + 1).toLowerCase() : "";
+        return (nombre != null && nombre.contains(".")) ? nombre.substring(nombre.lastIndexOf(".") + 1).toLowerCase()
+                : "";
     }
 }

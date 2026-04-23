@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiResponse } from '../interfaces/ApiResponse.Interface'; 
+import { ApiResponse } from '../interfaces/ApiResponse.Interface';
 import { ArchivoMaterialResponse } from '../interfaces/Archivo.Interface';
+import { environment } from '../../environments/environment';
 
 /**
  * Servicio encargado de la gestión de archivos adjuntos a los materiales didácticos.
@@ -14,7 +15,7 @@ import { ArchivoMaterialResponse } from '../interfaces/Archivo.Interface';
 export class ArchivoMaterialService {
 
   /** URL base para los endpoints de la API de archivos de material */
-  private readonly URL = 'http://localhost:8080/api/archivos-material';
+  private URL = `${environment.apiUrl}/archivos-material`;
 
   constructor(private http: HttpClient) { }
 

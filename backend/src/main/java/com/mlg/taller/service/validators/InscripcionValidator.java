@@ -1,6 +1,7 @@
 package com.mlg.taller.service.validators;
 
 import com.mlg.taller.exception.BadRequestException;
+import com.mlg.taller.model.entities.Horario;
 import com.mlg.taller.model.entities.Inscripcion;
 import com.mlg.taller.model.entities.Taller;
 import com.mlg.taller.model.entities.Usuario;
@@ -115,5 +116,49 @@ public class InscripcionValidator {
             throw new BadRequestException(
                     "El usuario ya cuenta con una inscripción (activa o inactiva) en este taller.");
         }
+    }
+
+    /**
+     * Compara los horarios de un taller nuevo frente a un taller donde el usuario
+     * ya está matriculado para detectar colisiones.
+     * * Se considera solapamiento si los talleres coinciden en el mismo día de la
+     * semana
+     * y el intervalo de tiempo entre inicio y fin se cruza.
+     *
+     * @param nuevo    Taller al que se desea inscribir.
+     * @param inscrito Taller en el que ya participa el usuario.
+     * @return true si existe un conflicto horario, false en caso contrario.
+     */
+    
+    /**
+     * Compara los horarios de un taller nuevo frente a los de un taller ya
+     * inscrito.
+     * Al ser una relación de uno a muchos, se verifica si cualquier sesión del
+     * taller nuevo choca con cualquier sesión del taller inscrito.
+     *
+     * @param nuevo    Taller al que se desea inscribir.
+     * @param inscrito Taller en el que ya participa el usuario.
+     * @return true si existe al menos un conflicto horario, false en caso
+     *         contrario.
+     */
+    public boolean verificarSolapamiento(Taller nuevo, Taller inscrito) {
+        if (nuevo.getHorarios() == null || inscrito.getHorarios() == null) {
+            return false;
+        }
+
+        for (Horario hNuevo : nuevo.getHorarios()) {
+            for (Horario hInscrito : inscrito.getHorarios()) {
+
+                if (hNuevo.getDiaSemana().equalsIgnoreCase(hInscrito.getDiaSemana())) {
+
+                    boolean cruce = hNuevo.getHoraInicio().isBefore(hInscrito.getHoraFin()) &&
+                            hNuevo.getHoraFin().isAfter(hInscrito.getHoraInicio());
+
+                    if (cruce)
+                        return true; 
+                }
+            }
+        }
+        return false;
     }
 }
