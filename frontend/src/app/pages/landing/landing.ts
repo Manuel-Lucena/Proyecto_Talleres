@@ -90,16 +90,18 @@ export class Landing implements OnInit {
    * @param datos Objeto FormData que incluye el cuerpo de la noticia y el archivo binario.
    */
   onPublicarNoticia(datos: FormData): void {
-    const accion = this.noticiaSeleccionada 
-      ? this.noticiaService.actualizar(this.noticiaSeleccionada.idNoticia, datos) 
+    const accion = this.noticiaSeleccionada
+      ? this.noticiaService.actualizar(this.noticiaSeleccionada.idNoticia, datos)
       : this.noticiaService.crear(datos);
 
     accion.subscribe({
-      next: () => {
+      next: (res) => {
         this.cerrarModal();
-        setTimeout(() => {
-          this.cargarNoticias();
-        }, 800);
+        // 1. Recargamos los datos
+        this.cargarNoticias();
+
+        // 2. Opcional: Si ves que tarda en aparecer, sube el tiempo del timeout
+        // pero con la barra '/' en el HTML debería ir mucho mejor.
       },
       error: (err) => console.error("Error en la persistencia de noticia:", err)
     });

@@ -164,6 +164,7 @@ export class AulaDetalle implements OnInit {
       this.editando = true;
       this.cargando = false;
       this.recurso = { titulo: '', visible: true };
+      this.form.updateValueAndValidity();
     } else {
       this.cargarDatos(Number(idRecursoRaw));
     }
@@ -423,7 +424,10 @@ export class AulaDetalle implements OnInit {
    * y procesa la cola de archivos (borrado y subida).
    */
   async guardarTodo(): Promise<void> {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     this.cargando = true;
 
     const v = this.form.value;
@@ -437,7 +441,7 @@ export class AulaDetalle implements OnInit {
       payload.contenido = v.descripcion;
     } else {
       payload.descripcion = v.descripcion;
-      payload.fechaEntrega = v.fechaEntrega;
+      payload.fechaEntrega = v.fechaEntrega === '' ? null : v.fechaEntrega;
       payload.extensionesPermitidas = v.extensionesPermitidas;
     }
 
@@ -581,9 +585,11 @@ export class AulaDetalle implements OnInit {
    * Revierte los cambios no guardados o vuelve atrás si es una creación.
    */
   cancelar(): void {
-    if (this.esNuevo) this.volver();
-    else {
+    if (this.esNuevo) {
+      this.volver();
+    } else {
       this.editando = false;
+      this.form.reset();
       this.cargarDatos(this.recurso.idTarea || this.recurso.id);
     }
   }

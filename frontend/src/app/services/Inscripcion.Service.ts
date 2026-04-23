@@ -49,7 +49,7 @@ export class InscripcionService {
     * @returns Observable con los talleres asociados a ese usuario.
     */
   validarSolapamiento(idUsuario: number, idTaller: number): Observable<ApiResponse<any>> {
-    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/validar-solapamiento/${idUsuario}/${idTaller}`);
+    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/validar-solapamiento/usuario/${idUsuario}/taller/${idTaller}`);
   }
 
   /**

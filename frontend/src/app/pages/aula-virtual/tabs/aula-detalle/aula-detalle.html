@@ -40,7 +40,7 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <button class="dropdown-item text-danger" (click)="eliminarRecurso()">
+                            <button class="dropdown-item error-message" (click)="eliminarRecurso()">
                                 <i class="bi bi-trash3 me-2"></i> Eliminar
                             </button>
                         </li>
@@ -66,6 +66,9 @@
                     <div *ngIf="esNuevo || editando" [formGroup]="form" class="mt-2">
                         <input type="text" formControlName="titulo" class="form-control-titulo-edit"
                             [placeholder]="'Título de la ' + tipo + '...'">
+                        <small class="error-message" *ngIf="form.get('titulo')?.invalid && form.get('titulo')?.touched">
+                            * El título es obligatorio
+                        </small>
                     </div>
                 </div>
 
@@ -91,6 +94,10 @@
                     <div class="mb-4">
                         <label class="label-form">Descripción / Instrucciones</label>
                         <textarea formControlName="descripcion" class="form-control-custom" rows="8"></textarea>
+                        <small class="error-message"
+                            *ngIf="form.get('descripcion')?.invalid && form.get('descripcion')?.touched">
+                            * La descripción es obligatoria
+                        </small>
                     </div>
 
                     <div class="row" *ngIf="tipo === 'tarea'">
@@ -193,8 +200,8 @@
 
             <div class="footer-save-central" *ngIf="editando">
                 <button (click)="cancelar()" class="btn-cancelar">Cancelar</button>
-                <button (click)="guardarTodo()" class="btn-publicar" [disabled]="cargando">
-                    {{ esNuevo ? 'Publicar Ahora' : 'Guardar Cambios' }}
+                <button (click)="guardarTodo()" class="btn-publicar" [disabled]="cargando || form.invalid"> {{ esNuevo ?
+                    'Publicar Ahora' : 'Guardar Cambios' }}
                 </button>
             </div>
 

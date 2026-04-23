@@ -141,7 +141,7 @@ public class NoticiaService {
                 fileUtil.eliminar(FOLDER, noticia.getImagenUrl(), true);
             }
 
-            String nombreImagen = "noticia_" + noticia.getId() + "_" + System.currentTimeMillis() + ".jpg";
+            String nombreImagen = "noticia_" + noticia.getId() + ".jpg";
             fileUtil.guardar(archivo, FOLDER, nombreImagen, true);
             noticia.setImagenUrl(nombreImagen);
         }

@@ -439,6 +439,16 @@
 .btn-publicar {
   @include m.boton-primario;
   padding: 0.8rem 3rem;
+
+
+  &:disabled {
+    background-color: #e4e6eb;
+    color: #bcc0c4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    border-color: #d8dadf;
+  }
 }
 
 .btn-cancelar {
@@ -635,5 +645,24 @@
   .seccion-tabla-moodle .wrapper-tabla .tabla-custom td.col-gris {
     width: 150px;
     font-size: 0.85rem;
+  }
+}
+
+
+.card-tarea-principal {
+  
+
+  .error-message {
+    color: v.$color-secundario-calido-1; 
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: block;
+    margin-top: 5px;
+    animation: fadeInError 0.3s ease;
+  }
+
+  input.ng-invalid.ng-touched, 
+  textarea.ng-invalid.ng-touched {
+    border-color: v.$color-secundario-calido-1;
   }
 }

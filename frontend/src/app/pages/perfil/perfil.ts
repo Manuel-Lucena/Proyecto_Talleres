@@ -9,6 +9,7 @@ import { Navbar } from "../../components/layout/navbar/navbar";
 import { UsuarioResponse } from '../../interfaces/Usuario.Interface';
 import { Confirmacion } from "../../components/dialogs/confirmacion/confirmacion";
 import { Notificacion } from "../../components/dialogs/mensaje/notificacion";
+import { Router } from '@angular/router';
 
 /**
  * Componente para la gestión integral del perfil del usuario autenticado.
@@ -34,13 +35,15 @@ export class Perfil implements OnInit {
    * @param tokenService Gestión de JWT y datos de sesión local.
    * @param notify Servicio centralizado para feedback visual.
    * @param cdr Forzado de detección de cambios en respuestas asíncronas.
+   * 
    */
   constructor(
     private fb: FormBuilder,
     private usuarioService: UsuarioService,
     private tokenService: TokenService,
     private notify: NotificacionService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) { }
 
   /**
@@ -76,7 +79,7 @@ export class Perfil implements OnInit {
         next: (res) => {
           if (res.data) {
             this.usuario = res.data;
-            this.perfilForm.patchValue(this.usuario); // Sincroniza datos con el formulario
+            this.perfilForm.patchValue(this.usuario);
             this.cdr.detectChanges();
           }
         },
@@ -111,7 +114,7 @@ export class Perfil implements OnInit {
     if (control.errors['required']) return 'Este campo es obligatorio';
     if (control.errors['email']) return 'Email inválido';
     if (control.errors['invalidTel']) return 'Teléfono no válido';
-    
+
     return 'Campo inválido';
   }
 
@@ -166,7 +169,7 @@ export class Perfil implements OnInit {
       idRol: idRol
     };
     fd.append('usuario', new Blob([JSON.stringify(usuarioDTO)], { type: 'application/json' }));
-    
+
     return fd;
   }
 
@@ -181,13 +184,14 @@ export class Perfil implements OnInit {
     this.usuarioService.actualizarUsuario(id, fd).subscribe({
       next: (res) => {
         if (res.data) {
-          // Si el servidor emite un nuevo token (por cambio de email/datos), se actualiza localmente
+
           if (res.data.token) localStorage.setItem('token', res.data.token);
-          
+
           this.usuario = res.data;
           this.perfilForm.patchValue(this.usuario);
+     
           this.cdr.detectChanges();
-          this.notify.mostrar({ titulo: 'Éxito', mensaje: 'Perfil actualizado', tipo: 'exito' });
+
         }
       },
       error: () => {
@@ -200,14 +204,14 @@ export class Perfil implements OnInit {
    * Finaliza la sesión del usuario tras confirmación.
    */
   async logout(): Promise<void> {
-    const confirmar = await this.notify.confirmar({ 
-      titulo: 'Cerrar Sesión', 
-      mensaje: '¿Estás seguro de que deseas salir?' 
+    const confirmar = await this.notify.confirmar({
+      titulo: 'Cerrar Sesión',
+      mensaje: '¿Estás seguro de que deseas salir?'
     });
 
     if (confirmar) {
       this.tokenService.logOut();
-      window.location.href = '/login';
+      this.router.navigate(['/login']);
     }
   }
 }
