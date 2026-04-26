@@ -7,26 +7,43 @@ import { NoticiaResponse } from '../../../../interfaces/Noticia.Interface';
 import { FormNoticia } from '../../../../components/forms/form-noticia/form-noticia';
 import { Notificacion } from "../../../../components/dialogs/mensaje/notificacion";
 import { Confirmacion } from "../../../../components/dialogs/confirmacion/confirmacion";
+import { PaginatePipe } from '../../../../pipes/PaginatePipe';
 
 /**
  * Componente administrativo para la gestión del tablón de anuncios y noticias.
- * Centraliza las funciones de redacción, publicación con imágenes, edición
+ * Centraliza las funciones de redacción, publicación con imágenes, edición 
  * y moderación de contenidos informativos del sistema.
  */
 @Component({
   selector: 'app-admin-noticias',
   standalone: true,
-  imports: [CommonModule, FormsModule, FormNoticia, Notificacion, Confirmacion],
+  imports: [CommonModule, FormsModule, FormNoticia, Notificacion, Confirmacion, PaginatePipe],
   templateUrl: './admin-noticias.html',
   styleUrl: './admin-noticias.scss'
 })
 export class AdminNoticias implements OnInit {
 
+  /** Utilidad para que el HTML pueda usar funciones matemáticas en la paginación */
+  protected readonly Math = Math;
+
   // --- Propiedades de Datos ---
   noticias: NoticiaResponse[] = []; // Colección de noticias recuperadas del servidor
 
+  // --- Control de Paginación ---
+  /** Página actual del listado */
+  paginaActual: number = 1;
+  /** Cantidad de registros visibles por página */
+  registrosPorPagina: number = 5;
+
   // --- Estado de la Interfaz ---
-  busqueda: string = '';           // Término vinculado al input de búsqueda (Two-way binding)
+  /** Texto reactivo del input de búsqueda con reset de página */
+  private _busqueda: string = '';
+  get busqueda(): string { return this._busqueda; }
+  set busqueda(value: string) {
+    this._busqueda = value;
+    this.paginaActual = 1; 
+  }
+
   mostrarModal: boolean = false;    // Estado de visibilidad del componente modal de formulario
   noticiaSeleccionada: NoticiaResponse | null = null; // Buffer para distinguir entre Alta y Edición
 
@@ -55,7 +72,7 @@ export class AdminNoticias implements OnInit {
     this.noticiaService.listar().subscribe({
       next: (res) => {
         this.noticias = res.data;
-        this.cdr.detectChanges(); 
+        this.cdr.detectChanges();
       }
     });
   }
@@ -104,29 +121,17 @@ export class AdminNoticias implements OnInit {
       // Flujo de Actualización
       this.noticiaService.actualizar(this.noticiaSeleccionada.idNoticia, fd).subscribe({
         next: () => {
-          this.notificacionService.mostrar({ 
-            titulo: 'Éxito', 
-            mensaje: 'Noticia actualizada correctamente', 
-            tipo: 'exito' 
-          });
+          this.notificacionService.mostrar({ titulo: 'Éxito', mensaje: 'Noticia actualizada correctamente', tipo: 'exito' });
           this.mostrarModal = false;
           this.cargarNoticias();
         },
-        error: () => this.notificacionService.mostrar({ 
-          titulo: 'Error', 
-          mensaje: 'No se pudo actualizar la noticia', 
-          tipo: 'error' 
-        })
+        error: () => this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'No se pudo actualizar la noticia', tipo: 'error' })
       });
     } else {
       // Flujo de Creación
       this.noticiaService.crear(fd).subscribe({
         next: () => {
-          this.notificacionService.mostrar({ 
-            titulo: 'Publicado', 
-            mensaje: 'La noticia se ha lanzado con éxito', 
-            tipo: 'exito' 
-          });
+          this.notificacionService.mostrar({ titulo: 'Publicado', mensaje: 'La noticia se ha lanzado con éxito', tipo: 'exito' });
           this.mostrarModal = false;
           this.cargarNoticias();
         }
@@ -148,11 +153,7 @@ export class AdminNoticias implements OnInit {
       if (confirmado) {
         this.noticiaService.eliminar(id).subscribe({
           next: () => {
-            this.notificacionService.mostrar({ 
-              titulo: 'Borrada', 
-              mensaje: 'Publicación eliminada del sistema', 
-              tipo: 'exito' 
-            });
+            this.notificacionService.mostrar({ titulo: 'Borrada', mensaje: 'Publicación eliminada del sistema', tipo: 'exito' });
             this.cargarNoticias();
           }
         });

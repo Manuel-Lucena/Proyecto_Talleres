@@ -1,0 +1,152 @@
+/* ==========================================================================
+   VISTA: DETALLE DE NOTICIA / LECTURA
+   Layout optimizado para la lectura extendida con impacto visual.
+   ========================================================================== */
+@use '../../../styles/variables' as v;
+@use '../../../styles/mixins' as m;
+
+// 1. ESTRUCTURA DE SOPORTE
+.noticia-detalle-wrapper {
+    background-color: v.$color-fondo-pagina;
+    min-height: 85vh;
+    padding: 3rem 1.5rem;
+    font-family: v.$fuente-lectura;
+
+    @media (max-width: 768px) {
+        padding: 1.5rem 1rem;
+    }
+}
+
+.contenedor-noticia {
+    max-width: 850px; 
+    margin: 0 auto;
+}
+
+// 2. NAVEGACIÓN Y ACCIONES PREVIAS
+.nav-retorno {
+    margin-bottom: 2rem;
+
+    .btn-volver-atras {
+        background: none;
+        border: none;
+        color: v.$color-secundario-frio-2;
+        font-family: v.$fuente-enfasis;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        padding: 0.5rem 0;
+
+        i {
+            color: v.$color-marca-principal;
+            font-size: 1.2rem;
+        }
+
+        &:hover {
+            color: v.$color-marca-principal;
+            transform: translateX(-5px);
+        }
+    }
+}
+
+// 3. CUERPO DE LA NOTICIA (CARD EDITORIAL)
+.cuerpo-noticia {
+    @include m.card-elevada; // Consistencia con tus cards de admin y landing
+    background: v.$color-neutro-max;
+    border: none;
+    overflow: hidden;
+
+    // --- CONTENEDOR DE IMAGEN IMPACTO ---
+    .imagen-destacada-container {
+        width: 100%;
+        height: 420px;
+        background-color: #f0f0f0;
+        overflow: hidden;
+
+        @media (max-width: 768px) {
+            height: 250px;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+    }
+
+    // --- CABECERA DE CONTENIDO ---
+    .entrada-header {
+        padding: 3.5rem 4.5rem 1.5rem 4.5rem;
+
+        @media (max-width: 768px) {
+            padding: 2rem 1.5rem 1rem 1.5rem;
+        }
+
+        .badge-noticia {
+            background-color: rgba(v.$color-marca-principal, 0.1);
+            color: v.$color-marca-principal;
+            padding: 0.4rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: v.$fuente-enfasis;
+        }
+
+        .titulo-noticia {
+            @include m.titulo-seccion(v.$color-secundario-frio-2);
+            margin: 1.2rem 0;
+            font-size: 3rem;
+            line-height: 1.1;
+
+            @media (max-width: 768px) {
+                font-size: 1.8rem;
+            }
+        }
+
+        .meta-data {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: v.$color-superficie-suave;
+            font-weight: 600;
+            font-size: 0.9rem;
+
+            .item-meta {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+
+                i {
+                    color: v.$color-marca-principal;
+                }
+            }
+
+            .separador-punto {
+                width: 4px;
+                height: 4px;
+                background: v.$color-superficie-suave;
+                border-radius: 50%;
+            }
+        }
+    }
+
+    // --- TEXTO PRINCIPAL ---
+    .contenido-principal {
+        padding: 0 4.5rem 4.5rem 4.5rem;
+        font-family: v.$fuente-lectura;
+        font-size: 1.2rem;
+        line-height: 1.8;
+        color: v.$color-superficie-oscura;
+        white-space: pre-line; 
+
+        @media (max-width: 768px) {
+            padding: 0 1.5rem 2.5rem 1.5rem;
+            font-size: 1.1rem;
+        }
+    }
+}

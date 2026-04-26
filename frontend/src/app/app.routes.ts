@@ -18,11 +18,13 @@ import { AulaParticipantes } from './pages/aula-virtual/tabs/aula-participantes/
 import { AccesoDenegado } from './pages/acceso-denegado/acceso-denegado';
 import { SolicitarRecuperacion } from './pages/solicitar-recuperacion/solicitar-recuperacion';
 import { CambiarPassword } from './pages/cambiar-password/cambiar-password';
+import { NoticiaDetalle } from './pages/noticia-detalle/noticia-detalle';
 
 export const routes: Routes = [
     // --- RUTAS PÚBLICAS ---
     { path: '', redirectTo: '/landing', pathMatch: 'full' },
     { path: 'landing', component: Landing },
+    { path: 'noticia/:id', component: NoticiaDetalle },
     { path: 'talleres-explorar', component: TalleresExplorar },
     { path: 'login', component: Login },
     { path: 'no-autorizado', component: AccesoDenegado },

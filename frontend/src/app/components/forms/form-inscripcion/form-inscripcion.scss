@@ -2,210 +2,218 @@
    SISTEMA DE MODALES: PROCESO DE PAGO / CHECKOUT (ESTÁNDAR)
    Diseño de alta conversión con resumen visual y sección de pago segura.
    ========================================================================== */
-
 @use '../../../../styles/variables' as v;
 @use '../../../../styles/mixins' as m;
 @use '../../../../styles/formularios' as f;
 
 // 1. ESTRUCTURA GLOBAL
 .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(v.$color-secundario-frio-2, 0.7);
-    backdrop-filter: blur(4px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
+  position: fixed;
+  inset: 0;
+  background: rgba(v.$color-secundario-frio-2, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
 }
 
 .modal-body {
-    @include m.animacion-entrada;
-    background: v.$color-neutro-max;
-    max-width: 900px;
-    width: 95%;
-    padding: 0;
-    overflow: hidden;
-    border-radius: v.$radio-curvatura * 2;
-    box-shadow: v.$sombra-nivel-3;
-    position: relative;
+  @include m.animacion-entrada;
+  background: v.$color-neutro-max;
+  max-width: 900px;
+  width: 95%;
+  padding: 0;
+  overflow: hidden;
+  border-radius: v.$radio-curvatura * 2;
+  box-shadow: v.$sombra-nivel-3;
+  position: relative;
 
-    .btn-close {
-        position: absolute;
-        top: 1.2rem;
-        right: 1.2rem;
-        z-index: 100;
-        @include m.boton-cerrar-circular; 
-    }
+  .btn-close {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    z-index: 100;
+    @include m.boton-cerrar-circular;
+  }
 }
 
 // 2. LAYOUT DE DOBLE COLUMNA (Resumen | Pago)
 .checkout-layout {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    min-height: 550px;
-
-    @media (max-width: 768px) {
-        grid-template-columns: 1fr;
-    }
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  min-height: 550px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 // --------------------------------------------------------------------------
 // 3. COLUMNA IZQUIERDA: RESUMEN DE COMPRA
 // --------------------------------------------------------------------------
 .resumen-checkout-taller {
-    background: v.$color-fondo-pagina;
-    border-right: 1px solid rgba(v.$color-secundario-frio-2, 0.05);
-    padding: 3rem 2.5rem;
+  background: v.$color-fondo-pagina;
+  border-right: 1px solid rgba(v.$color-secundario-frio-2, 0.05);
+  padding: 3rem 2.5rem;
+  min-width: 0; // Evita que el grid se desborde por contenido largo
 
-    .mini-card-info {
-        .img-preview {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            border-radius: v.$radio-curvatura;
-            margin-bottom: 2rem;
-            box-shadow: v.$sombra-nivel-1;
-        }
+  .mini-card-info {
+    min-width: 0; // Protección para textos hijos
 
-        .etiqueta-pago {
-            font-family: v.$fuente-enfasis;
-            font-size: 0.75rem;
-            font-weight: 800;
-            color: v.$color-marca-principal;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
-
-        .nombre-taller {
-            font-family: v.$fuente-enfasis;
-            font-size: v.$tamaño-titular-md;
-            color: v.$color-secundario-frio-2;
-            margin: 0.5rem 0;
-            font-weight: 800;
-            line-height: 1.2;
-        }
-
-        .profesor-taller {
-            color: v.$color-superficie-suave;
-            font-size: 0.95rem;
-            font-family: v.$fuente-lectura;
-        }
+    .img-preview {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: v.$radio-curvatura;
+      margin-bottom: 2rem;
+      box-shadow: v.$sombra-nivel-1;
     }
+
+    .etiqueta-pago {
+      font-family: v.$fuente-enfasis;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: v.$color-marca-principal;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .nombre-taller {
+      font-family: v.$fuente-enfasis;
+      font-size: v.$tamaño-titular-md;
+      color: v.$color-secundario-frio-2;
+      margin: 0.5rem 0;
+      font-weight: 800;
+      line-height: 1.2;
+      
+      // Control de desbordamiento
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      overflow: hidden;
+    }
+
+    .profesor-taller {
+      color: v.$color-superficie-suave;
+      font-size: 0.95rem;
+      font-family: v.$fuente-lectura;
+      word-wrap: break-word;
+    }
+  }
 }
 
 // Separador decorativo estilo ticket
 .separador-puntos {
-    border-top: 2px dashed rgba(v.$color-secundario-frio-2, 0.1);
-    margin: 2.5rem 0;
+  border-top: 2px dashed rgba(v.$color-secundario-frio-2, 0.1);
+  margin: 2.5rem 0;
 }
 
 .fila-total {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-    span {
-        font-family: v.$fuente-enfasis;
-        font-weight: 700;
-        color: v.$color-secundario-frio-2;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-    }
+  span {
+    font-family: v.$fuente-enfasis;
+    font-weight: 700;
+    color: v.$color-secundario-frio-2;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+  }
 
-    .precio-destacado {
-        font-family: v.$fuente-enfasis;
-        font-size: 2.5rem;
-        color: v.$color-marca-oscuro;
-        font-weight: 900;
-    }
+  .precio-destacado {
+    font-family: v.$fuente-enfasis;
+    font-size: 2.5rem;
+    color: v.$color-marca-oscuro;
+    font-weight: 900;
+  }
 }
 
 // --------------------------------------------------------------------------
 // 4. COLUMNA DERECHA: PROCESO DE PAGO
 // --------------------------------------------------------------------------
 .seccion-formulario-pago {
-    padding: 3.5rem 3rem;
+  padding: 3.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+
+  .titulo-formulario {
+    font-family: v.$fuente-enfasis;
+    font-size: 1.8rem;
+    color: v.$color-secundario-frio-2;
+    margin-bottom: 1.5rem;
+  }
+
+  // Bloque de confianza (Trust Signals)
+  .alerta-seguridad {
     display: flex;
-    flex-direction: column;
+    gap: 15px;
+    padding: 1.25rem;
+    background: rgba(v.$color-marca-principal, 0.06);
+    border-radius: v.$radio-curvatura;
+    color: v.$color-secundario-frio-2;
+    align-items: center;
+    border: 1px solid rgba(v.$color-marca-principal, 0.1);
 
-    .titulo-formulario {
-        font-family: v.$fuente-enfasis;
-        font-size: 1.8rem;
-        color: v.$color-secundario-frio-2;
-        margin-bottom: 1.5rem;
+    i {
+      color: v.$color-marca-principal;
+      font-size: 2rem;
     }
 
-    // Bloque de confianza (Trust Signals)
-    .alerta-seguridad {
-        display: flex;
-        gap: 15px;
-        padding: 1.25rem;
-        background: rgba(v.$color-marca-principal, 0.06);
-        border-radius: v.$radio-curvatura;
-        color: v.$color-secundario-frio-2;
-        align-items: center;
-        border: 1px solid rgba(v.$color-marca-principal, 0.1);
-
-        i {
-            color: v.$color-marca-principal;
-            font-size: 2rem;
-        }
-
-        p {
-            margin: 0;
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
-        small {
-            display: block;
-            margin-top: 4px;
-            color: v.$color-superficie-suave;
-            font-family: monospace;
-            font-weight: 600;
-        }
+    p {
+      margin: 0;
+      font-weight: 700;
+      font-size: 0.9rem;
     }
+
+    small {
+      display: block;
+      margin-top: 4px;
+      color: v.$color-superficie-suave;
+      font-family: monospace;
+      font-weight: 600;
+    }
+  }
 }
 
 // Visualizador de precio final antes de confirmar
 .input-checkout-grande {
-    background: v.$color-fondo-pagina;
-    border: 2px solid v.$color-marca-principal;
-    padding: 1.5rem;
-    border-radius: v.$radio-curvatura;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 0.5rem;
+  background: v.$color-fondo-pagina;
+  border: 2px solid v.$color-marca-principal;
+  padding: 1.5rem;
+  border-radius: v.$radio-curvatura;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
 
-    span {
-        font-family: v.$fuente-enfasis;
-        font-size: 2.2rem;
-        font-weight: 900;
-        color: v.$color-secundario-frio-2;
-    }
+  span {
+    font-family: v.$fuente-enfasis;
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: v.$color-secundario-frio-2;
+  }
 
-    small {
-        font-family: v.$fuente-enfasis;
-        font-weight: 800;
-        color: v.$color-superficie-suave;
-        text-transform: uppercase;
-        font-size: 0.8rem;
-    }
+  small {
+    font-family: v.$fuente-enfasis;
+    font-weight: 800;
+    color: v.$color-superficie-suave;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+  }
 }
 
 // 5. ACCIÓN FINAL
 .btn-pagar-checkout {
-    @include m.boton-inscripcion-aula; 
-    width: 100%;
-    padding: 1.2rem;
-    font-size: 1.1rem;
-    margin-top: 2rem;
+  @include m.boton-inscripcion-aula;
+  width: 100%;
+  padding: 1.2rem;
+  font-size: 1.1rem;
+  margin-top: 2rem;
 
-    &:disabled {
-        filter: grayscale(1);
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
+  &:disabled {
+    filter: grayscale(1);
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }

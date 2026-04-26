@@ -10,6 +10,7 @@ import { FormTaller } from '../../../../components/forms/form-taller/form-taller
 import { Confirmacion } from "../../../../components/dialogs/confirmacion/confirmacion";
 import { Notificacion } from "../../../../components/dialogs/mensaje/notificacion";
 import { Router } from '@angular/router';
+import { PaginatePipe } from '../../../../pipes/PaginatePipe';
 
 /**
  * Componente administrativo para la gestión integral del catálogo de talleres.
@@ -19,18 +20,34 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-admin-talleres',
   standalone: true,
-  imports: [CommonModule, FormsModule, FormTaller, Confirmacion, Notificacion],
+  // AGREGADO: PaginatePipe en los imports para que funcione el símbolo "|" en el HTML
+  imports: [CommonModule, FormsModule, FormTaller, Confirmacion, Notificacion, PaginatePipe], 
   templateUrl: './admin-talleres.html',
   styleUrl: './admin-talleres.scss'
 })
 export class AdminTalleres implements OnInit {
+  /** Utilidad para que el HTML pueda usar funciones matemáticas en la paginación */
+  protected readonly Math = Math;
 
   // --- Colecciones de Datos ---
   talleres: TallerResponse[] = [];     // Listado maestro de talleres obtenidos del servidor
   profesores: UsuarioResponse[] = [];   // Usuarios con rol de profesor (ID: 2) para el select
 
+  // --- Control de Paginación ---
+  /** Página actual del listado */
+  paginaActual: number = 1;
+  /** Cantidad de registros visibles por página */
+  registrosPorPagina: number = 5;
+
   // --- Estado de Búsqueda y Filtros ---
-  busqueda: string = '';               // Texto reactivo del input de búsqueda
+  /** Texto reactivo del input de búsqueda con reset de página */
+  private _busqueda: string = '';
+  get busqueda(): string { return this._busqueda; }
+  set busqueda(value: string) {
+    this._busqueda = value;
+    this.paginaActual = 1;
+  }
+
   criterioBusqueda: string = 'todos';    // Ámbito: 'nombre', 'profesor' o 'todos'
 
   // --- Control de Interfaz (Modales) ---
@@ -73,11 +90,7 @@ export class AdminTalleres implements OnInit {
         this.talleres = [...res.data]; // Spread operator para asegurar nueva referencia
         this.cdr.detectChanges();
       },
-      error: () => this.notificacionService.mostrar({ 
-        titulo: 'Error', 
-        mensaje: 'No se pudieron cargar los talleres', 
-        tipo: 'error' 
-      })
+      error: () => this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'No se pudieron cargar los talleres', tipo: 'error' })
     });
   }
 
@@ -105,11 +118,9 @@ export class AdminTalleres implements OnInit {
   get talleresFiltrados() {
     const term = this.busqueda.toLowerCase().trim();
     if (!term) return this.talleres;
-
     return this.talleres.filter(t => {
       const nombreTaller = (t.nombre || '').toLowerCase();
       const nombreProfesor = (t.nombreCompletoProfesor || '').toLowerCase();
-
       switch (this.criterioBusqueda) {
         case 'nombre':   return nombreTaller.includes(term);
         case 'profesor': return nombreProfesor.includes(term);
@@ -143,7 +154,7 @@ export class AdminTalleres implements OnInit {
   }
 
   /**
-   * Prepara la edición cargando una copia profunda del taller para evitar 
+   * Prepara la edición cargando una copia profunda del taller para evitar
    * mutaciones accidentales en la lista de la tabla.
    */
   abrirEditar(t: TallerResponse) {
@@ -159,14 +170,9 @@ export class AdminTalleres implements OnInit {
   ejecutarGuardado(fd: FormData): void {
     const id = this.tallerSeleccionado?.idTaller;
     const peticion$ = id ? this.tallerService.actualizar(id, fd) : this.tallerService.crear(fd);
-
     peticion$.subscribe({
       next: () => {
-        this.notificacionService.mostrar({ 
-          titulo: 'Éxito', 
-          mensaje: id ? 'Taller actualizado correctamente' : 'Taller creado con éxito', 
-          tipo: 'exito' 
-        });
+        this.notificacionService.mostrar({ titulo: 'Éxito', mensaje: id ? 'Taller actualizado correctamente' : 'Taller creado con éxito', tipo: 'exito' });
         this.mostrarModal = false;
         this.cargarTalleres();
       }
@@ -187,11 +193,7 @@ export class AdminTalleres implements OnInit {
       if (confirmado) {
         this.tallerService.eliminar(id).subscribe({
           next: () => {
-            this.notificacionService.mostrar({ 
-              titulo: 'Borrado', 
-              mensaje: 'Taller eliminado del sistema', 
-              tipo: 'exito' 
-            });
+            this.notificacionService.mostrar({ titulo: 'Borrado', mensaje: 'Taller eliminado del sistema', tipo: 'exito' });
             this.cargarTalleres();
           }
         });

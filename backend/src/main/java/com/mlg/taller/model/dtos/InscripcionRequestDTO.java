@@ -12,7 +12,6 @@ import lombok.Data;
 public class InscripcionRequestDTO {
 
     /** Identificador del alumno que se inscribe. */
-    @NotNull(message = "El ID de usuario es obligatorio")
     private Long idUsuario;
 
     /** Identificador del taller seleccionado. */

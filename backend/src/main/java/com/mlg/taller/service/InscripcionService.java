@@ -1,5 +1,6 @@
 package com.mlg.taller.service;
 
+import com.mlg.taller.exception.BadRequestException;
 import com.mlg.taller.exception.ResourceNotFoundException;
 import com.mlg.taller.model.dtos.InscripcionRequestDTO;
 import com.mlg.taller.model.dtos.InscripcionResponseDTO;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,28 +46,50 @@ public class InscripcionService {
 
     /**
      * Registra una nueva inscripción individual en el sistema.
-     * 
-     * El proceso incluye: validación de duplicados, persistencia, generación
-     * de comprobante de pago en PDF y envío de notificación por email.
+     *
+     * El proceso incluye: validación de rol de alumno, control de duplicados,
+     * persistencia, generación de comprobante de pago en PDF y envío de
+     * notificación por email.
      *
      * @param dto Datos de la inscripción.
      * @return DTO con la información de la inscripción confirmada.
      */
     @Transactional
     public InscripcionResponseDTO inscribir(InscripcionRequestDTO dto) {
+        // 1. Validaciones de seguridad y obtención de entidades
         Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
         inscripcionValidator.validarPropiedadOSolicitante(solicitante, dto.getIdUsuario());
 
         Usuario usuario = buscarUsuarioInterno(dto.getIdUsuario());
         Taller taller = buscarTallerInterno(dto.getIdTaller());
-        inscripcionValidator.verificarDuplicado(usuario.getId(), taller.getId());
 
-        Inscripcion inscripcion = inscripcionMapper.toEntity(dto, usuario, taller);
+        inscripcionValidator.validarPerfilInscribible(usuario);
+
+        // 2. BUSQUEDA DE REGISTRO PREVIO (Usando la Query Nativa del repositorio)
+        // Esto es clave: si existe (aunque sea inactiva), JPA la recupera con su ID
+        Inscripcion inscripcion = inscripcionRepository.findByUsuarioIdAndTallerId(usuario.getId(), taller.getId())
+                .orElse(null);
+
+        if (inscripcion != null) {
+
+            if (inscripcion.isActiva()) {
+                throw new BadRequestException("Ya tienes una plaza activa en este taller.");
+            }
+            inscripcion.setActiva(true);
+            inscripcion.setMontoPagado(dto.getMontoPagado());
+            inscripcion.setOrderId(dto.getOrderId());
+            inscripcion.setFechaInscripcion(LocalDateTime.now());
+        } else {
+
+            inscripcion = inscripcionMapper.toEntity(dto, usuario, taller);
+        }
+
         Inscripcion guardada = inscripcionRepository.save(inscripcion);
         InscripcionResponseDTO response = inscripcionMapper.toResponse(guardada);
 
         byte[] pdfFactura = pdfService.generarBytesPdf("factura-inscripcion", Map.of(
-                "inscripcion", response, "usuario", usuario));
+                "inscripcion", response,
+                "usuario", usuario));
 
         emailService.enviarCorreoConAdjunto(
                 usuario.getEmail(),
@@ -79,33 +104,43 @@ public class InscripcionService {
 
     /**
      * Procesa múltiples inscripciones de forma masiva.
-     * 
-     * Realiza validaciones de duplicados por cada registro y envía
-     * notificaciones simples de confirmación.
+     *
+     * Realiza validaciones de rol de alumno y duplicados por cada registro del
+     * lote,
+     * asegurando la integridad de los datos y enviando notificaciones simples
+     * de confirmación.
      *
      * @param dtos Lista de peticiones de inscripción.
      * @return Lista de respuestas procesadas con éxito.
      */
     @Transactional
     public List<InscripcionResponseDTO> inscribirMasivo(List<InscripcionRequestDTO> dtos) {
-        return dtos.stream().map(dto -> {
+        List<InscripcionResponseDTO> resultados = new ArrayList<>();
+
+        for (InscripcionRequestDTO dto : dtos) {
+
             Usuario usuario = usuarioRepository.findByEmail(dto.getEmailUsuario())
                     .orElseThrow(
                             () -> new ResourceNotFoundException("Usuario no encontrado: " + dto.getEmailUsuario()));
+
             Taller taller = buscarTallerInterno(dto.getIdTaller());
 
-            inscripcionValidator.verificarDuplicado(usuario.getId(), taller.getId());
+            inscripcionValidator.verificarDuplicado(usuario.getId(), taller.getId(), usuario.getEmail());
+            inscripcionValidator.validarPerfilInscribible(usuario);
 
             Inscripcion inscripcion = inscripcionMapper.toEntity(dto, usuario, taller);
             Inscripcion guardada = inscripcionRepository.save(inscripcion);
+            InscripcionResponseDTO response = inscripcionMapper.toResponse(guardada);
 
-            emailService.enviarCorreo(usuario.getEmail(),
-                    "Confirmación de plaza: " + taller.getNombre(),
+            resultados.add(response);
+
+            emailService.enviarCorreo(
+                    usuario.getEmail(),
+                    "¡Bienvenido al taller! - " + taller.getNombre(),
                     "mail/confirmacion-inscripcion",
                     Map.of("usuario", usuario, "taller", taller));
-
-            return inscripcionMapper.toResponse(guardada);
-        }).collect(Collectors.toList());
+        }
+        return resultados;
     }
 
     // --- MÉTODOS GET ---
@@ -118,7 +153,7 @@ public class InscripcionService {
     public List<InscripcionResponseDTO> listarTodas() {
         Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
         if (!solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN")) {
-            throw new com.mlg.taller.exception.BadRequestException("Acceso denegado al listado global.");
+            throw new BadRequestException("Acceso denegado al listado global.");
         }
         return inscripcionRepository.findAll().stream()
                 .map(inscripcionMapper::toResponse)
@@ -136,7 +171,14 @@ public class InscripcionService {
     @Transactional(readOnly = true)
     public List<InscripcionResponseDTO> listarPorTaller(Long idTaller) {
         Taller taller = buscarTallerInterno(idTaller);
-        inscripcionValidator.validarAccesoListaTaller(SecurityUtils.getUsuarioAutenticado(), taller);
+        Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
+        inscripcionValidator.validarAccesoListaTaller(solicitante, taller);
+
+        if (solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN")) {
+            return inscripcionRepository.findByTallerIdForAdmin(idTaller).stream()
+                    .map(inscripcionMapper::toResponse)
+                    .collect(Collectors.toList());
+        }
 
         return inscripcionRepository.findByTallerId(idTaller).stream()
                 .map(inscripcionMapper::toResponse)
@@ -164,8 +206,17 @@ public class InscripcionService {
      */
     @Transactional(readOnly = true)
     public List<InscripcionResponseDTO> listarPorUsuario(Long idUsuario) {
-        inscripcionValidator.validarPropiedadOSolicitante(SecurityUtils.getUsuarioAutenticado(), idUsuario);
+        Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
+        inscripcionValidator.validarPropiedadOSolicitante(solicitante, idUsuario);
+
+        if (solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN")) {
+            return inscripcionRepository.findByUsuarioIdForAdmin(idUsuario).stream()
+                    .map(inscripcionMapper::toResponse)
+                    .collect(Collectors.toList());
+        }
+
         return inscripcionRepository.findByUsuarioId(idUsuario).stream()
+                .filter(Inscripcion::isActiva)
                 .map(inscripcionMapper::toResponse)
                 .collect(Collectors.toList());
     }
@@ -181,10 +232,10 @@ public class InscripcionService {
      */
     @Transactional(readOnly = true)
     public Map<String, Object> validarSolapamientoHorarios(Long idUsuario, Long idTaller) {
-    
+
         Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
         inscripcionValidator.validarPropiedadOSolicitante(solicitante, idUsuario);
- 
+
         Taller tallerNuevo = buscarTallerInterno(idTaller);
         List<Inscripcion> inscripcionesActivas = inscripcionRepository.findByUsuarioId(idUsuario)
                 .stream()
@@ -194,11 +245,9 @@ public class InscripcionService {
         for (Inscripcion registro : inscripcionesActivas) {
             Taller tallerInscrito = registro.getTaller();
 
-         
             if (tallerInscrito.getId().equals(idTaller))
                 continue;
 
-           
             if (inscripcionValidator.verificarSolapamiento(tallerNuevo, tallerInscrito)) {
                 return Map.of(
                         "hayConflicto", true,
@@ -279,21 +328,35 @@ public class InscripcionService {
      * Elimina físicamente el registro de inscripción y notifica al usuario.
      * * @param id ID de la inscripción.
      */
+
     @Transactional
     public void eliminar(Long id) {
+        Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
+
         Inscripcion inscripcion = buscarInscripcionInterna(id);
-        Usuario usuario = inscripcion.getUsuario();
+
+
+        String emailAlumno = inscripcion.getUsuario().getEmail();
+        String nombreTaller = inscripcion.getTaller().getNombre();
+
+        Usuario usuarioAlumno = inscripcion.getUsuario();
         Taller taller = inscripcion.getTaller();
 
-        inscripcionRepository.delete(inscripcion);
+        if (solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN")) {
+  
+            inscripcionRepository.eliminarAdmin(id);
+        } else {
+            inscripcionRepository.desactivarInscripcion(id);
+        }
 
-        emailService.enviarCorreo(usuario.getEmail(), "Baja de taller", "mail/baja-taller",
-                Map.of("usuario", usuario, "taller", taller));
+
+        emailService.enviarCorreo(
+                emailAlumno,
+                "Baja de taller: " + nombreTaller,
+                "mail/baja-taller",
+                Map.of("usuario", usuarioAlumno, "taller", taller));
     }
-
     // --- MÉTODOS PRIVADOS ---
-
-    // --- MÉTODOS PRIVADOS DE APOYO ---
 
     /**
      * Realiza una búsqueda interna de un usuario por su identificador único.

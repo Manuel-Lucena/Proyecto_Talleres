@@ -84,6 +84,19 @@ public class UsuarioController {
     }
 
     /**
+     * Endpoint de gestión administrativa que recupera el universo total de
+     * usuarios.
+     * 
+     * * @return ApiResponse con la lista de todos los usuarios (activos e
+     * inactivos).
+     */
+    @GetMapping("/admin/alumnos")
+    public ApiResponse<List<UsuarioResponseDTO>> listarAlumnosAdmin() {
+        List<UsuarioResponseDTO> alumnos = usuarioService.listarTodosAlumnosAdmin();
+        return ApiResponse.success(alumnos, "Listado completo de alumnos (incluyendo inactivos) obtenido");
+    }
+
+    /**
      * Obtiene los usuarios matriculados en un taller específico.
      * 
      * @param idTaller ID del taller.
@@ -130,7 +143,6 @@ public class UsuarioController {
     }
 
     // --- MÉTODOS PUT ---
-
 
     /**
      * Actualiza la información de un usuario existente.

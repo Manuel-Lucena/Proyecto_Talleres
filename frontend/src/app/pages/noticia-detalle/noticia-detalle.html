@@ -1,0 +1,42 @@
+<app-navbar></app-navbar>
+
+<main class="noticia-detalle-wrapper">
+    <div *ngIf="cargando" class="text-center p-5">
+        <div class="spinner-border text-success"></div>
+    </div>
+
+    <div class="contenedor-noticia fade-in" *ngIf="!cargando && noticia">
+        <nav class="nav-retorno">
+            <button routerLink="/landing" class="btn-volver-atras">
+                <i class="bi bi-arrow-left"></i> Volver al portal
+            </button>
+        </nav>
+
+        <article class="cuerpo-noticia">
+            <div class="imagen-destacada-container">
+                <img [src]="(noticia.imagenUrl && noticia.imagenUrl !== 'null' && noticia.imagenUrl !== '') 
+                    ? '/noticias/' + noticia.imagenUrl 
+                    : '/noticias/default-noticia.png'" alt="Imagen de la noticia">
+            </div>
+
+            <header class="entrada-header">
+                <span class="badge-noticia">Actualidad Educativa</span>
+                <h1 class="titulo-noticia">{{ noticia.titulo }}</h1>
+                <div class="meta-data">
+                    <span class="item-meta">
+                        <i class="bi bi-calendar3"></i>
+                        {{ noticia.fechaPublicacion | date:"d 'de' MMMM, y" }}
+                    </span>
+                    <div class="separador-punto"></div>
+                    <span class="item-meta">Aula Viva Noticias</span>
+                </div>
+            </header>
+
+            <section class="contenido-principal">
+                {{ noticia.contenido }}
+            </section>
+        </article>
+    </div>
+</main>
+
+<app-footer></app-footer>

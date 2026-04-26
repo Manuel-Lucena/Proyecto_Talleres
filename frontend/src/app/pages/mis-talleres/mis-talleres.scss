@@ -2,7 +2,6 @@
    PÁGINA: MIS TALLERES (DASHBOARD ALUMNO)
    Listado de inscripciones con acciones de gestión rápida.
    ========================================================================== */
-
 @use '../../../styles/variables' as v;
 @use '../../../styles/mixins' as m;
 
@@ -37,6 +36,10 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     gap: 2rem;
+
+    @media (max-width: 450px) {
+        grid-template-columns: 1fr;
+    }
 }
 
 // 2. TARJETA DE INSCRIPCIÓN (COMPUESTA)
@@ -50,7 +53,7 @@
     border: 1px solid #eee;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     transition: border-color 0.3s ease;
-    height: 100%; 
+    height: 100%;
 
     &:hover {
         border-color: v.$color-marca-principal;
@@ -74,10 +77,11 @@
         align-items: flex-start;
         flex-grow: 1;
         gap: 15px;
+        min-width: 0; // Permite que el contenido flex se comprima
 
         .texto {
             flex: 1;
-            min-width: 0; 
+            min-width: 0; // Crucial para que el texto respete el contenedor
 
             h3 {
                 font-family: v.$fuente-enfasis;
@@ -86,6 +90,10 @@
                 font-size: 1.3rem;
                 font-weight: 800;
                 line-height: 1.2;
+
+                // Prevención de desbordamiento por nombres largos
+                word-wrap: break-word;
+                overflow-wrap: break-word;
             }
         }
 
@@ -93,6 +101,7 @@
             margin: 6px 0 0;
             font-size: 0.9rem;
             color: #777;
+            word-wrap: break-word;
         }
 
         .fecha-info {
@@ -113,7 +122,7 @@
         border-top: 1px solid #f0f0f0;
         padding: 15px 0;
         background-color: #fafafa;
-        margin-top: auto; 
+        margin-top: auto;
         width: 100%;
 
         .accion-item {

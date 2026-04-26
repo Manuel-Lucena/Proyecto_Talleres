@@ -1,6 +1,5 @@
 /* ==========================================================================
    VISTA: GESTIÓN DE USUARIOS (SISTEMA DE TABLA MAESTRA)
-   Layout de alta densidad con scroll interno y cabecera pegajosa (sticky).
    ========================================================================== */
 
 @use '../../../../../styles/variables' as v;
@@ -8,362 +7,412 @@
 
 // 1. CONTENEDOR PRINCIPAL
 .admin-wrapper {
-    padding: 2.5rem;
-    background-color: v.$color-fondo-pagina;
-    height: 100vh; // Altura fija para forzar el scroll interno en la tabla
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    overflow: hidden; // Evita el scroll de la página completa
-    max-width: 100vw;
-    @include m.animacion-entrada;
+  padding: 2.5rem;
+  background-color: v.$color-fondo-pagina;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-width: 100vw;
+  @include m.animacion-entrada;
 
-    @media (max-width: 992px) {
-        padding: 1rem;
-        height: auto; // En móvil soltamos la altura para scroll natural
-        min-height: 100vh;
-        overflow-y: auto;
-    }
+  @media (max-width: 992px) {
+    padding: 1.5rem 1rem;
+    height: auto;
+    min-height: 100vh;
+  }
 }
 
 // 2. CABECERA DE ACCIONES (Título + Botones)
 .admin-header {
-    flex-shrink: 0; 
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 2rem;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+  gap: 1.5rem;
+
+  @media (max-width: 992px) {
+    flex-direction: column;
+    align-items: stretch;
     gap: 1.5rem;
+  }
+
+  .title-group {
+    .txt-h1 {
+      font-family: v.$fuente-enfasis;
+      font-weight: 800;
+      font-size: v.$tamaño-titular-xl;
+      color: v.$color-secundario-frio-2;
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .txt-bajada {
+      color: v.$color-superficie-suave;
+      font-size: 1rem;
+      margin-top: 4px;
+    }
+  }
+
+  .d-flex.gap-2 {
+    display: flex;
+    gap: 0.75rem;
+    align-items: stretch;
 
     @media (max-width: 992px) {
-        flex-direction: column;
-        align-items: flex-start;
+      width: 100%;
     }
 
-    .title-group {
-        .txt-h1 {
-            font-family: v.$fuente-enfasis;
-            font-weight: 800;
-            font-size: v.$tamaño-titular-xl;
-            color: v.$color-secundario-frio-2;
-            margin: 0;
-            line-height: 1.1;
-        }
-
-        .txt-bajada {
-            color: v.$color-superficie-suave;
-            font-size: 1rem;
-            margin-top: 4px;
-        }
+    @media (max-width: 600px) {
+      flex-direction: column;
     }
 
-    // Estilos de botones de acción superior
-    .d-flex.gap-2 {
-        display: flex;
-        gap: 0.75rem;
+    .btn-primario-aula,
+    .btn-secundario-aula {
+      height: 52px !important;
+      min-height: 52px;
+      margin: 0;
+      padding: 0 1.5rem;
+      border-radius: v.$radio-curvatura;
+      font-family: v.$fuente-enfasis;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      flex: 1;
+      width: 100%;
+      box-sizing: border-box;
 
-        .btn-primario-aula,
-        .btn-secundario-aula {
-            height: 48px;
-            border-radius: v.$radio-curvatura;
-            font-family: v.$fuente-enfasis;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-
-        .btn-primario-aula {
-            @include m.boton-primario;
-            padding: 0 1.8rem;
-            border: none;
-        }
-
-        .btn-secundario-aula {
-            background: white;
-            border: 1px solid #e2e8f0;
-            color: v.$color-secundario-frio-2;
-            padding: 0 1.5rem;
-            box-shadow: v.$sombra-nivel-1;
-
-            i {
-                color: v.$color-marca-principal;
-                font-size: 1.2rem;
-            }
-
-            &:hover {
-                border-color: v.$color-marca-principal;
-                transform: translateY(-2px);
-            }
-        }
+      .btn-text {
+        display: inline-block;
+        line-height: 1;
+      }
     }
+
+    .btn-primario-aula {
+      @include m.boton-primario;
+      border: 1px solid transparent;
+    }
+
+    .btn-secundario-aula {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0;
+      color: v.$color-secundario-frio-2;
+      box-shadow: v.$sombra-nivel-1;
+
+      i {
+        color: v.$color-marca-principal;
+        font-size: 1.2rem;
+      }
+
+      &:hover {
+        border-color: v.$color-marca-principal;
+        background: #f8fafc !important;
+        transform: translateY(-2px);
+      }
+    }
+  }
 }
 
-// 3. BARRA DE HERRAMIENTAS (Buscador y Filtros)
+// 3. BARRA DE HERRAMIENTAS
 .admin-toolbar {
-    flex-shrink: 0;
-    padding: 1rem 1.5rem;
-    display: flex;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-    background: white;
-    border-radius: v.$radio-curvatura;
-    box-shadow: v.$sombra-nivel-1;
-    align-items: center;
+  flex-shrink: 0;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  background: white;
+  border-radius: v.$radio-curvatura;
+  box-shadow: v.$sombra-nivel-1;
+  align-items: center;
 
-    @media (max-width: 768px) {
-        flex-direction: column;
-    }
-
-    // Buscador de doble zona (Criterio + Input)
-    .search-group {
-        display: flex;
-        flex: 2;
-        background: #fcfcfc;
-        border: 1px solid #e2e8f0;
-        border-radius: v.$radio-curvatura;
-        overflow: hidden;
-        width: 100%;
-
-        &:focus-within {
-            border-color: v.$color-marca-principal;
-        }
-
-        .criteria-box {
-            width: 140px;
-            border-right: 1px solid #e2e8f0;
-
-            .select-criteria {
-                border: none;
-                background: #f1f5f9;
-                height: 100%;
-                width: 100%;
-                padding: 0 15px;
-                font-size: 0.85rem;
-                font-weight: 600;
-            }
-        }
-
-        .search-box {
-            flex: 1;
-            position: relative;
-            display: flex;
-            align-items: center;
-
-            i {
-                position: absolute;
-                left: 15px;
-                color: v.$color-marca-principal;
-            }
-
-            .input-aula {
-                border: none;
-                padding-left: 45px;
-                width: 100%;
-                height: 45px;
-                background: transparent;
-            }
-        }
-    }
-
-    .filter-box {
-        flex: 1;
-        position: relative;
-        width: 100%;
-
-        i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: v.$color-marca-principal;
-            z-index: 2;
-        }
-
-        .select-aula {
-            @include m.estilo-input-base;
-            padding-left: 45px;
-            width: 100%;
-            height: 47px;
-        }
-    }
-}
-
-// 4. CONTENEDOR DE TABLA (CARD)
-.admin-card {
-    background: white;
-    border-radius: v.$radio-curvatura;
-    box-shadow: v.$sombra-nivel-1;
-    flex: 1; 
-    display: flex;
+  @media (max-width: 768px) {
     flex-direction: column;
+    padding: 1.5rem;
+  }
+
+  .search-group {
+    display: flex;
+    flex: 2;
+    background: #fcfcfc;
+    border: 1px solid #e2e8f0;
+    border-radius: v.$radio-curvatura;
     overflow: hidden;
-    min-height: 0; 
-
-    // Wrapper con scrollbars personalizados
-    .table-responsive {
-        width: 100%;
-        overflow-x: auto;
-        overflow-y: auto; 
-        flex: 1;
-        display: block;
-
-        &::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        &::-webkit-scrollbar-thumb {
-            background: #e0e0e0;
-            border-radius: 10px;
-        }
-    }
-}
-
-// 5. ESTILOS DE LA TABLA
-.admin-table {
     width: 100%;
-    border-collapse: collapse;
-    min-width: 1000px;
-    flex-shrink: 0; 
 
-    thead {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        background: #fafafa;
-        box-shadow: 0 1px 0 #eee;
+    .criteria-box {
+      width: 140px;
+      border-right: 1px solid #e2e8f0;
+      background: #f1f5f9;
 
-        th {
-            padding: 1.2rem;
-            text-align: left;
-            color: v.$color-superficie-suave;
-            font-family: v.$fuente-enfasis;
-            font-size: 0.75rem;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
+      .select-criteria {
+        border: none;
+        background: transparent;
+        height: 48px;
+        width: 100%;
+        padding: 0 10px 0 15px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        outline: none;
+        cursor: pointer;
+      }
     }
 
-    td {
-        padding: 1rem 1.2rem;
-        border-bottom: 1px solid #f5f5f5;
-        vertical-align: middle;
-        color: v.$color-secundario-frio-2;
+    .search-box {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      i {
+        position: absolute;
+        left: 15px;
+        color: v.$color-marca-principal;
+      }
+
+      .input-aula {
+        border: none;
+        padding-left: 45px;
+        width: 100%;
+        height: 48px;
+        background: transparent;
+        outline: none;
+      }
     }
+  }
+
+  // Ajuste específico para alineación vertical de selects
+  .filter-box {
+    flex: 1;
+    position: relative;
+    width: 100%;
+
+    i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: v.$color-marca-principal;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .select-aula {
+      @include m.estilo-input-base;
+      padding-left: 45px !important;
+      padding-top: 0 !important;    // Corregimos el pegado arriba
+      padding-bottom: 0 !important; // Corregimos el pegado arriba
+      width: 100%;
+      height: 50px !important;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      line-height: 50px; // Alinea el texto al centro de la altura del box
+    }
+  }
 }
 
-// 6. CELDAS ESPECIALES
+// 4. TABLA
+.admin-card {
+  background: white;
+  border-radius: v.$radio-curvatura;
+  box-shadow: v.$sombra-nivel-1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    flex: 1;
+  }
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1000px;
+
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #fafafa;
+
+    th {
+      padding: 1.2rem;
+      text-align: left;
+      color: v.$color-superficie-suave;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+  }
+
+  td {
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid #f5f5f5;
+    vertical-align: middle;
+    color: v.$color-secundario-frio-2;
+  }
+}
+
+// 5. PERFIL DE USUARIO (COLUMNA 1)
 .user-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 300px; 
 
-    .avatar-frame {
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 2px solid #f1f5f9;
+  .avatar-frame {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid #f1f5f9;
 
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
+  }
 
-    .user-meta {
-        display: flex;
-        flex-direction: column;
-
-        .u-name {
-            font-weight: 700;
-            font-size: 0.95rem;
-        }
-
-        .u-email {
-            font-size: 0.8rem;
-            color: v.$color-superficie-suave;
-        }
-    }
-}
-
-.contact-vertical {
+  .user-meta {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    min-width: 0; 
 
-    .contact-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.85rem;
-        color: #64748b;
-
-        i {
-            color: v.$color-marca-principal;
-        }
+    .u-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
+
+    .u-email {
+      font-size: 0.8rem;
+      color: v.$color-superficie-suave;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 }
 
-// Estados de insignias por rol
+// 6. ROLES Y ACCIONES
 .badge-rol {
-    padding: 6px 14px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  display: inline-block;
+
+  &.admin {
+    background: rgba(v.$color-secundario-frio-2, 0.1);
+    color: v.$color-secundario-frio-2;
+  }
+
+  &.profesor {
+    background: rgba(v.$color-marca-principal, 0.1);
+    color: v.$color-marca-principal;
+  }
+
+  &.alumno {
+    background: rgba(v.$color-secundario-calido-2, 0.1);
+    color: v.$color-secundario-calido-2;
+  }
+}
+
+.actions-group {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+
+  .btn-tool {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid #edf2f7;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      border-color: v.$color-marca-principal;
+      color: v.$color-marca-principal;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// 7. SISTEMA DE INTERRUPTOR (TOGGLE)
+.status-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+
+  .toggle-track {
+    width: 42px;
+    height: 22px;
+    background: #e2e8f0;
     border-radius: 20px;
-    font-size: 0.65rem;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .toggle-handle {
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .status-label {
+    font-size: 0.75rem;
     font-weight: 800;
     text-transform: uppercase;
-    display: inline-block;
+    color: v.$color-superficie-suave;
+    min-width: 60px;
+  }
 
-    &.admin {
-        background: rgba(v.$color-secundario-frio-2, 0.1);
-        color: v.$color-secundario-frio-2;
+  &.active {
+    .toggle-track {
+      background: v.$color-marca-principal;
     }
 
-    &.profesor {
-        background: rgba(v.$color-marca-principal, 0.1);
-        color: v.$color-marca-principal;
+    .toggle-handle {
+      left: 23px;
     }
 
-    &.alumno {
-        background: rgba(v.$color-secundario-calido-2, 0.1);
-        color: v.$color-secundario-calido-2;
+    .status-label {
+      color: v.$color-marca-principal;
     }
+  }
 }
 
-// Botones de acción en fila
-.actions-group {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-
-    .btn-tool {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        border: 1px solid #edf2f7;
-        background: white;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: 0.2s;
-
-        &:hover {
-            border-color: v.$color-marca-principal;
-            color: v.$color-marca-principal;
-            transform: translateY(-2px);
-        }
-
-        &.delete:hover {
-            border-color: v.$color-secundario-calido-1;
-            color: v.$color-secundario-calido-1;
-            background: #fff5f5;
-        }
-    }
+.admin-pagination {
+  @include m.estilo-paginacion-admin;
 }

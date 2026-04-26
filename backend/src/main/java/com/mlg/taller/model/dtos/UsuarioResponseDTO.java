@@ -42,6 +42,10 @@ public class UsuarioResponseDTO {
     /** Ruta o URL de la imagen de perfil almacenada en el servidor. */
     private String fotoPerfilRuta;
 
+    
+     /** Estado de la cuenta */
+    private boolean activo;
+
     /** * Token de acceso JWT. 
      * @note Se incluye opcionalmente tras el registro o login inicial.
      */

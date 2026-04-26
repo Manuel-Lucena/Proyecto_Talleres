@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angula
 import { UsuarioRequest } from '../../../interfaces/Usuario.Interface';
 import { Validator } from '../../../validators/Validator';
 import { FormErrorService } from '../../../services/FormError.Service';
+import { TokenService } from '../../../services/Token.Service';
 
 /**
  * GESTOR DE ALUMNOS: Formulario para el alta, edición y gestión de perfiles de estudiantes.
@@ -16,7 +17,6 @@ import { FormErrorService } from '../../../services/FormError.Service';
   styleUrl: './form-alumno.scss',
 })
 export class FormAlumno implements OnInit {
-
   // --- Propiedades de Entrada y Salida ---
   @Input() usuarioParaEditar: any | null = null;    // Datos para la carga en modo edición
   @Output() usuarioGuardado = new EventEmitter<FormData>(); // Emisión de datos hacia el componente padre
@@ -25,6 +25,7 @@ export class FormAlumno implements OnInit {
   // --- Propiedades de Estado y UI ---
   fileSeleccionado: File | null = null;             // Referencia al archivo de imagen en memoria
   verPassword: boolean = false;                     // Flag de control para visibilidad de campos de texto
+  esAdmin: boolean = false;                         // Flag para determinar privilegios de edición de rol
 
   /** Estructura reactiva con validaciones de identidad y seguridad */
   form = new FormGroup({
@@ -41,8 +42,14 @@ export class FormAlumno implements OnInit {
 
   /**
    * @param errorService Gestor de mensajes de validación para el template.
+   * @param tokenService Servicio para la verificación de roles del usuario activo.
    */
-  constructor(public errorService: FormErrorService) {}
+  constructor(
+    public errorService: FormErrorService,
+    private tokenService: TokenService
+  ) { 
+    this.esAdmin = this.tokenService.getRol() === 'ADMIN';
+  }
 
   /**
    * Ciclo de vida: Inicia la carga de datos y ajusta los requisitos de seguridad según el modo.
@@ -101,7 +108,7 @@ export class FormAlumno implements OnInit {
       telefono: raw.telefono!,
       direccion: raw.direccion!,
       password: raw.password || undefined,
-      idRol: raw.idRol || 3
+      idRol: Number(raw.idRol) || 3
     };
 
     formData.append('usuario', new Blob([JSON.stringify(usuarioDTO)], { type: 'application/json' }));

@@ -37,6 +37,7 @@ public interface TallerMapper {
     @Mapping(target = "activo", ignore = true)
     @Mapping(target = "fotoRuta", ignore = true)
     @Mapping(target = "inscripciones", ignore = true)
+    @Mapping(target = "horarios", ignore = true)
     Taller toEntity(TallerRequestDTO dto);
 
     /**
@@ -47,5 +48,6 @@ public interface TallerMapper {
     @Mapping(target = "activo", ignore = true)
     @Mapping(target = "fotoRuta", ignore = true)
     @Mapping(target = "inscripciones", ignore = true)
+    @Mapping(target = "horarios", ignore = true)
     void updateEntityFromDto(TallerRequestDTO dto, @MappingTarget Taller taller);
 }

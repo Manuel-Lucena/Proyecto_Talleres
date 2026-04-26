@@ -41,7 +41,9 @@
 
   </div>
 
-  <div class="sin-datos" *ngIf="!cargando && filas.length === 0">
-    <p>No se han encontrado actividades calificables.</p>
+ <div class="sin-datos" *ngIf="!cargando && filas.length === 0">
+    <i class="bi bi-clipboard-x"></i>
+    <h3>Expediente vacío</h3>
+    <p>Aún no tienes actividades calificadas en este taller. Las notas aparecerán aquí en cuanto el profesor evalúe tus entregas.</p>
   </div>
 </div>

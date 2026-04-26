@@ -65,6 +65,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
+    min-width: 0; // Crucial para permitir que los hijos flex se compriman
   }
 }
 
@@ -184,8 +185,11 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    min-width: 0; // Crucial para que el texto no empuje el contenedor
 
     .cuerpo-superior {
+      min-width: 0;
+
       .periodo-curso {
         display: flex;
         align-items: center;
@@ -232,12 +236,18 @@
       color: v.$color-secundario-frio-2;
       font-weight: 800;
       margin-top: 5px;
+      // Arreglo desbordamiento
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
 
     .descripcion-curso {
       color: #666;
       margin-top: 10px;
       @include m.limitar-lineas(2);
+      // Arreglo desbordamiento
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
   }
 
@@ -251,17 +261,19 @@
 
     .precio-inscripcion {
       display: flex;
-      justify-content: space-between; 
+      justify-content: space-between;
       align-items: center;
-      width: 100%; 
+      width: 100%;
       gap: 25px;
 
-      // Estilo para el bloque de plazas 
+      // Estilo para el bloque de plazas
       .detalles-tecnicos {
         color: #777;
         font-size: 0.9rem;
-        
-        i { color: v.$color-marca-principal; }
+
+        i {
+          color: v.$color-marca-principal;
+        }
 
         span.sin-plazas {
           color: #e74c3c;
@@ -283,17 +295,20 @@
 
         .btn-inscripcion {
           @include m.boton-inscripcion-aula;
+
           &.ya-inscrito {
             background-color: #27ae60;
             color: white;
             border: none;
             cursor: default;
             opacity: 0.9;
+
             &:hover {
               transform: none;
               box-shadow: none;
             }
           }
+
           &:disabled {
             filter: grayscale(0.5);
           }
@@ -325,13 +340,13 @@
       padding-top: 20px;
 
       .precio-inscripcion {
-        flex-direction: column; 
-        align-items: flex-start; 
+        flex-direction: column;
+        align-items: flex-start;
         gap: 15px;
 
         .accion-compra {
-          width: 100%; 
-          justify-content: space-between; 
+          width: 100%;
+          justify-content: space-between;
           align-items: center;
         }
 

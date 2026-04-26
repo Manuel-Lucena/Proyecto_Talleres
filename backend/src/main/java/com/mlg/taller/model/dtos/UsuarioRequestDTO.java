@@ -46,6 +46,9 @@ public class UsuarioRequestDTO {
     @Pattern(regexp = "^\\d{9}$", message = "El teléfono debe tener exactamente 9 dígitos")
     private String telefono;
 
+     /** Estado de la cuenta */
+    private Boolean activo;
+
     /** * Contraseña de acceso. 
      * @constraints Mínimo 6 caracteres. Se recomienda hashing (BCrypt) en el service.
      */

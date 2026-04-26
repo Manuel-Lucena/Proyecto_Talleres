@@ -61,6 +61,16 @@ export class UsuarioService {
 
 
   /**
+   * Obtiene el listado completo de ALUMNOS para el panel de administración.
+   * Este método ignora el filtro de 'activos' del backend para permitir 
+   * la gestión y reactivación de usuarios pausados.
+   * @returns Observable con la lista total de alumnos (0 y 1).
+   */
+  listarAlumnosAdmin(): Observable<ApiResponse<UsuarioResponse[]>> {
+    return this.http.get<ApiResponse<UsuarioResponse[]>>(`${this.apiUrl}/admin/alumnos`);
+  }
+
+  /**
      * Obtiene una lista de usuarios filtrados por su identificador de rol.
      * @param idRol ID del rol por el cual filtrar.
      * @returns Observable con la respuesta de la API que contiene el array de usuarios.
@@ -68,6 +78,8 @@ export class UsuarioService {
   listarPorRol(idRol: number): Observable<ApiResponse<UsuarioResponse[]>> {
     return this.http.get<ApiResponse<UsuarioResponse[]>>(`${this.apiUrl}/rol/${idRol}`);
   }
+
+
 
 
   /**

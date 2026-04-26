@@ -44,7 +44,9 @@
             <p>{{ noticia.contenido | slice:0:110 }}...</p>
 
             <div class="card-footer-actions">
-              <button type="button" class="btn-read">Leer noticia</button>
+              <button type="button" class="btn-read" [routerLink]="['/noticia', noticia.idNoticia]">
+                Leer noticia
+              </button>
 
               @if (tokenService.getRol()?.toLowerCase() === 'admin') {
               <button type="button" class="btn-edit-icon" (click)="abrirEditar(noticia)" title="Editar">

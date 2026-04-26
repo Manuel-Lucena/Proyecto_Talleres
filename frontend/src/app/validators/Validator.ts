@@ -27,7 +27,7 @@ export class Validator {
    * @returns True si el patrón coincide (8 números + letra o Letra + 7 números + letra).
    */
   static isDni(value: string): boolean {
-    const regex = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$|^[XYZ][0-9]{7}[TRWAGMYFPDXBNJZSQVHLCKE]$/i;
+    const regex = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$|^[XYZ][0-9]{7}[TRWAGMYFPDXBNJZSQVHLCKE]$/;
     return regex.test(value);
   }
 

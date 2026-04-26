@@ -92,10 +92,15 @@ export class FormCargaUsuarios {
 
   /**
    * Transforma el texto plano en objetos tipados y ejecuta la validación de cada fila.
+   * Incluye detección de duplicados dentro del propio archivo CSV.
    */
   private parsearCSV(texto: string): void {
     const lineas = texto.split(/\r?\n/);
     const filasDato = lineas.slice(1).filter(l => l.trim() !== '');
+
+    // Sets auxiliares para detectar duplicidad interna en el archivo
+    const dnisVistos = new Set<string>();
+    const emailsVistos = new Set<string>();
 
     this.usuariosPrevia = filasDato.map(linea => {
       const col = linea.split(',').map(c => c.trim());
@@ -110,7 +115,26 @@ export class FormCargaUsuarios {
         dniError: false,
         emailError: false
       };
+
       this.validarFila(u);
+
+      // --- Validación de duplicados internos ---
+      const dniKey = u.dni.toUpperCase();
+      const emailKey = u.email.toLowerCase();
+
+      if (dnisVistos.has(dniKey)) {
+        u.errores.push('DNI duplicado en el CSV');
+        u.dniError = true;
+      }
+      if (emailsVistos.has(emailKey)) {
+        u.errores.push('Email duplicado en el CSV');
+        u.emailError = true;
+      }
+
+      dnisVistos.add(dniKey);
+      emailsVistos.add(emailKey);
+      // -----------------------------------------
+
       if (u.errores.length === 0) u.seleccionado = true;
       return u;
     });
@@ -127,7 +151,7 @@ export class FormCargaUsuarios {
     if (u.dniError) u.errores.push('DNI/NIE inválido');
     if (!Validator.hasMinLength(u.nombre, 2)) u.errores.push('Nombre corto');
     if (u.emailError) u.errores.push('Email inválido');
-    
+
     if (u.errores.length > 0) u.seleccionado = false;
   }
 
@@ -137,16 +161,20 @@ export class FormCargaUsuarios {
 
   /**
    * Coordina el envío de los usuarios seleccionados hacia el servidor.
+   * Captura errores de restricción de base de datos (Duplicate entry).
    */
   async confirmarCarga(): Promise<void> {
     const seleccionados = this.usuariosPrevia.filter(u => u.seleccionado);
-    const ok = await this.notificacion.confirmar({ 
-      titulo: 'Confirmar carga', 
-      mensaje: `¿Deseas importar ${seleccionados.length} usuarios?` 
+
+    const ok = await this.notificacion.confirmar({
+      titulo: 'Confirmar carga',
+      mensaje: `¿Deseas importar ${seleccionados.length} usuarios?`
     });
 
     if (!ok) return;
+
     this.procesando = true;
+
 
     const data = seleccionados.map(u => ({
       dni: u.dni,
@@ -154,7 +182,7 @@ export class FormCargaUsuarios {
       apellidos: u.apellidos,
       email: u.email,
       idRol: u.rol === 'Profesor' ? 2 : 3,
-      password: u.dni
+
     }));
 
     this.usuarioService.crearVariosUsuarios(data).subscribe({
@@ -163,9 +191,48 @@ export class FormCargaUsuarios {
         this.guardado.emit(res.data);
         this.cerrar.emit();
       },
-      error: () => {
+      error: (err) => {
         this.procesando = false;
-        this.notificacion.mostrar({ titulo: 'Error', mensaje: 'Fallo en la carga masiva.', tipo: 'error' });
+
+
+        let errorBackend = err.error?.message || '';
+
+
+        let mensajeAlerta = 'Fallo en la carga masiva. Revisa la conexión.';
+
+
+        const esDuplicado = errorBackend.includes('Duplicate entry') ||
+          errorBackend.includes('ya está registrado') ||
+          errorBackend.includes('constraint');
+
+        if (esDuplicado) {
+
+          const matchesComillas = errorBackend.match(/'([^']+)'/);
+          const matchesEmail = errorBackend.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+
+          const valorConflictivo = matchesComillas ? matchesComillas[1] : (matchesEmail ? matchesEmail[0] : '');
+
+          mensajeAlerta = valorConflictivo
+            ? `El dato "${valorConflictivo}" ya está registrado en el sistema.`
+            : errorBackend;
+
+
+          this.usuariosPrevia.forEach(u => {
+            if (u.dni === valorConflictivo || u.email === valorConflictivo) {
+              u.errores = ['Ya registrado en la base de datos'];
+              u.dniError = (u.dni === valorConflictivo);
+              u.emailError = (u.email === valorConflictivo);
+              u.seleccionado = false;
+            }
+          });
+        }
+
+        this.notificacion.mostrar({
+          titulo: 'Conflicto de Datos',
+          mensaje: mensajeAlerta,
+          tipo: 'error'
+        });
+
         this.cdr.detectChanges();
       }
     });
@@ -183,6 +250,38 @@ export class FormCargaUsuarios {
    */
   haySeleccionados(): boolean {
     return this.totalSeleccionados() > 0;
+  }
+
+  /**
+ * Alterna la selección de todos los usuarios que no tengan errores.
+ * @param event Evento del checkbox maestro.
+ */
+  toggleTodos(event: any): void {
+    const check = event.target.checked;
+    this.usuariosPrevia.forEach(u => {
+      if (u.errores.length === 0) {
+        u.seleccionado = check;
+      }
+    });
+  }
+
+  /**
+   * Indica si todos los registros válidos están seleccionados.
+   * @returns boolean
+   */
+  todosSeleccionados(): boolean {
+    const validos = this.usuariosPrevia.filter(u => u.errores.length === 0);
+    return validos.length > 0 && validos.every(u => u.seleccionado);
+  }
+
+  /**
+   * Estado indeterminado para el checkbox maestro (si hay algunos seleccionados pero no todos).
+   * @returns boolean
+   */
+  algunosSeleccionados(): boolean {
+    const seleccionados = this.totalSeleccionados();
+    const validos = this.usuariosPrevia.filter(u => u.errores.length === 0).length;
+    return seleccionados > 0 && seleccionados < validos;
   }
 
   /**

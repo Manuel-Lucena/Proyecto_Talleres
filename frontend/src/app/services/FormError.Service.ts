@@ -6,7 +6,7 @@ import { FormGroup } from '@angular/forms';
  * Proporciona métodos para determinar cuándo mostrar un error y qué mensaje proyectar.
  */
 @Injectable({
-  providedIn: 'root' 
+  providedIn: 'root'
 })
 export class FormErrorService {
 
@@ -32,11 +32,11 @@ export class FormErrorService {
   public getErrorMessage(form: FormGroup, controlName: string): string {
     // 1. Obtención del control individual
     const control = form.get(controlName);
-    
+
     // --- Lógica de errores específicos del control ---
     if (control && control.errors) {
       const errors = control.errors;
-      
+      if (errors['repetido']) return errors['repetido'];
       if (errors['required']) return 'Este campo es obligatorio';
       if (errors['email']) return 'Email inválido';
       if (errors['minlength']) {
@@ -51,7 +51,7 @@ export class FormErrorService {
     if (controlName === 'fechaFin' && form.hasError('fechaInvalida')) {
       return 'La hora de fin debe ser posterior';
     }
-    
+
     return 'Campo no válido';
   }
 }

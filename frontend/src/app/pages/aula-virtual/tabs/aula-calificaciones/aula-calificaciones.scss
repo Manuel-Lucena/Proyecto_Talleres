@@ -47,7 +47,7 @@
     gap: 0.7rem;
 
     .fila-nota {
-        @include m.card-aula-viva; 
+        @include m.card-aula-viva;
         grid-template-columns: 1.5fr 2fr 80px;
         padding: 1.2rem 2rem;
         border-radius: 8px;
@@ -116,21 +116,41 @@
 }
 
 // 3. ESTADOS DE CARGA Y VACÍO
-.loading-wrapper {
+.loading-wrapper,
+.sin-datos {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 5rem;
+    text-align: center;
+    padding: 5rem 2rem;
+
+    i {
+        font-size: 3.5rem;
+        color: v.$color-superficie-suave;
+        opacity: 0.2; // El toque sutil que querías
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    h3 {
+        font-family: v.$fuente-enfasis;
+        color: v.$color-secundario-frio-2;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    p {
+        color: v.$color-superficie-suave;
+        max-width: 400px;
+        margin: 0 auto;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
 
     .spinner-border {
         color: v.$color-marca-principal;
         margin-bottom: 1rem;
     }
-}
-
-.sin-datos {
-    text-align: center;
-    padding: 3rem;
-    color: #94a3b8;
 }

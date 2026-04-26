@@ -92,14 +92,19 @@
               <div class="accion-compra">
                 <span class="moneda">{{ taller.precio }}€</span>
                 <button class="btn-inscripcion"
-                  [disabled]="taller.plazasDisponibles === 0 || estaInscrito(taller.nombre)"
+                  [disabled]="taller.plazasDisponibles === 0 || estaInscrito(taller.nombre) || !esAlumno"
                   [class.ya-inscrito]="estaInscrito(taller.nombre)"
-                  (click)="!estaInscrito(taller.nombre) ? abrirInscripcion(taller) : null">
+                  (click)="(!estaInscrito(taller.nombre) && esAlumno) ? abrirInscripcion(taller) : null">
+
                   <ng-container *ngIf="estaInscrito(taller.nombre)">
                     <i class="bi bi-check-circle-fill"></i> Ya inscrito
                   </ng-container>
+
                   <ng-container *ngIf="!estaInscrito(taller.nombre)">
-                    {{ taller.plazasDisponibles > 0 ? 'Inscribirme' : 'Agotado' }}
+                    <span *ngIf="!esAlumno && taller.plazasDisponibles > 0">Solo Alumnos</span>
+                    <span *ngIf="esAlumno || taller.plazasDisponibles === 0">
+                      {{ taller.plazasDisponibles > 0 ? 'Inscribirme' : 'Agotado' }}
+                    </span>
                   </ng-container>
                 </button>
               </div>
@@ -111,8 +116,9 @@
   </div>
 </div>
 
-<app-form-taller *ngIf="mostrarModalForm" [tallerParaEditar]="tallerSeleccionado" (cerrar)="mostrarModalForm = false"
-  (guardado)="guardarCambios($event)"></app-form-taller>
+<app-form-taller *ngIf="mostrarModalForm" [tallerParaEditar]="tallerSeleccionado" [profesores]="profesores"
+  (cerrar)="mostrarModalForm = false" (guardado)="guardarCambios($event)">
+</app-form-taller>
 <app-form-inscripcion *ngIf="mostrarModalInscripcion" [tallerParaInscribir]="tallerSeleccionado"
   (cerrar)="mostrarModalInscripcion = false" (guardado)="finalizarInscripcion($event)"></app-form-inscripcion>
 <app-horario-taller *ngIf="mostrarModalHorarios && tallerSeleccionado" [idTaller]="tallerSeleccionado.idTaller"

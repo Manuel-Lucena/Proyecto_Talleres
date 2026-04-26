@@ -106,9 +106,23 @@ public class UsuarioService {
 
             Usuario usuario = usuarioMapper.toEntity(dto);
             usuario.setRol(obtenerRolInterno(dto.getIdRol()));
-            usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
             usuario.setActivo(true);
-            return usuarioMapper.toResponse(usuarioRepository.save(usuario));
+
+            String passwordPlano = generarPasswordAleatorio();
+
+            usuario.setPassword(passwordEncoder.encode(passwordPlano));
+
+            Usuario guardado = usuarioRepository.save(usuario);
+
+            emailService.enviarCorreo(
+                    guardado.getEmail(),
+                    "Tu cuenta ha sido creada",
+                    "mail/bienvenida",
+                    Map.of(
+                            "usuario", guardado,
+                            "password", passwordPlano));
+
+            return usuarioMapper.toResponse(guardado);
         }).collect(Collectors.toList());
     }
 
@@ -122,6 +136,17 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public List<UsuarioResponseDTO> listarTodos() {
         return usuarioRepository.findAll().stream()
+                .map(usuarioMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Obtiene todos los alumnos del sistema, incluyendo los inactivos.
+     * Método exclusivo para gestión administrativa.
+     */
+    @Transactional(readOnly = true)
+    public List<UsuarioResponseDTO> listarTodosAlumnosAdmin() {
+        return usuarioRepository.findAllAlumnosAdmin().stream()
                 .map(usuarioMapper::toResponse)
                 .collect(Collectors.toList());
     }
@@ -187,15 +212,15 @@ public class UsuarioService {
     @Transactional
     public UsuarioResponseDTO actualizar(Long id, UsuarioRequestDTO dto, MultipartFile archivo) {
         Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
-        Usuario objetivo = buscarPorIdInterno(id);
 
-        // 🛡️ Delegamos validación de permisos y unicidad al validador
+        Usuario objetivo = usuarioRepository.findByIdAdmin(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
+
+        usuarioValidator.validarEstadoDesactivacion(objetivo, dto);
         usuarioValidator.validarPermisosActualizacion(solicitante, objetivo, dto);
         usuarioValidator.validarCambioDatosUnicos(dto, objetivo);
-
         usuarioMapper.updateEntityFromDto(dto, objetivo);
 
-        // Lógica de negocio: Solo ADMIN cambia roles
         if (dto.getIdRol() != null && solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN")) {
             objetivo.setRol(obtenerRolInterno(dto.getIdRol()));
         }
@@ -206,7 +231,6 @@ public class UsuarioService {
 
         gestionarImagenPerfilInterno(objetivo, archivo);
         Usuario guardado = usuarioRepository.save(objetivo);
-
         UsuarioResponseDTO response = usuarioMapper.toResponse(guardado);
         response.setToken(jwtService.generateToken(guardado));
         return response;
@@ -221,11 +245,14 @@ public class UsuarioService {
      */
     @Transactional
     public void eliminar(Long id) {
-        Usuario usuario = buscarPorIdInterno(id);
+        Usuario usuario = usuarioRepository.findByIdAdmin(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
+
         if (usuario.getFotoPerfilRuta() != null) {
             fileUtil.eliminar(FOLDER, usuario.getFotoPerfilRuta(), true);
         }
-        usuarioRepository.delete(usuario);
+
+        usuarioRepository.eliminarAdmin(id);
     }
 
     // --- MÉTODOS DE RECUPERACIÓN DE CONTRASEÑA ---
@@ -277,7 +304,6 @@ public class UsuarioService {
 
     // --- MÉTODOS PRIVADOS DE APOYO ---
 
-
     /**
      * Realiza una búsqueda interna de un usuario por su identificador único.
      *
@@ -287,7 +313,7 @@ public class UsuarioService {
      *                                   datos.
      */
     private Usuario buscarPorIdInterno(Long id) {
-        return usuarioRepository.findById(id)
+        return usuarioRepository.findByIdAdmin(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
     }
 
@@ -299,7 +325,7 @@ public class UsuarioService {
      * @throws ResourceNotFoundException si no existe un usuario con dicho correo.
      */
     private Usuario buscarPorEmailInterno(String email) {
-        return usuarioRepository.findByEmail(email)
+        return usuarioRepository.findByEmailAdmin(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con email: " + email));
     }
 
@@ -347,5 +373,14 @@ public class UsuarioService {
             response.setRol(usuario.getRol().getNombre());
         }
         return response;
+    }
+
+    /**
+     * Genera una cadena de 6 caracteres alfanuméricos
+     * 
+     * @return Cadena con la contraseña del usuario
+     */
+    private String generarPasswordAleatorio() {
+        return UUID.randomUUID().toString().substring(0, 6);
     }
 }

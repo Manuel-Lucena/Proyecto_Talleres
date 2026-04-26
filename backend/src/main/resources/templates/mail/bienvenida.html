@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1 th:text="'¡Hola, ' + ${usuario.nombre} + '!'"></h1>
+    <p>Tu cuenta ha sido creada con éxito.</p>
+    <p>Tu contraseña temporal es: <strong th:text="${password}"></strong></p>
+    <p>Saludos, el equipo de administración.</p>
+</body>
+</html>

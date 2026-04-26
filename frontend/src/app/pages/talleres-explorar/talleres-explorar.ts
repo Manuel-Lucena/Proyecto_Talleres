@@ -8,13 +8,14 @@ import { TallerService } from "../../services/Taller.Service";
 import { TokenService } from "../../services/Token.Service";
 import { InscripcionService } from "../../services/Inscripcion.Service";
 import { NotificacionService } from "../../services/Notificacion.Service";
+import { UsuarioService } from "../../services/Usuario.Service";
 import { TallerResponse } from "../../interfaces/Taller.Interface";
+import { UsuarioResponse } from "../../interfaces/Usuario.Interface";
 import { FormTaller } from "../../components/forms/form-taller/form-taller";
 import { FormInscripcion } from "../../components/forms/form-inscripcion/form-inscripcion";
 import { Confirmacion } from "../../components/dialogs/confirmacion/confirmacion";
 import { Notificacion } from "../../components/dialogs/mensaje/notificacion";
 import { HorarioTaller } from "../../components/dialogs/horario-taller/horario-taller";
-
 
 /**
  * Componente principal para la exploración, filtrado y gestión de talleres.
@@ -24,19 +25,27 @@ import { HorarioTaller } from "../../components/dialogs/horario-taller/horario-t
   selector: 'app-talleres-explorar',
   standalone: true,
   imports: [
-    CommonModule, RouterModule, ReactiveFormsModule, Navbar, Footer,
-    FormTaller, FormInscripcion, Confirmacion, Notificacion,
+    CommonModule,
+    RouterModule,
+    ReactiveFormsModule,
+    Navbar,
+    Footer,
+    FormTaller,
+    FormInscripcion,
+    Confirmacion,
+    Notificacion,
     HorarioTaller
   ],
   templateUrl: './talleres-explorar.html',
   styleUrl: './talleres-explorar.scss',
 })
 export class TalleresExplorar implements OnInit {
-
   // --- Propiedades de Datos ---
   talleres: TallerResponse[] = [];            // Listado maestro obtenido del servidor
   talleresFiltrados: TallerResponse[] = [];   // Listado procesado para mostrar en la vista
-  misTalleresInscritosNombres: string[] = []; // Almacena nombre de talleres para control de botones
+  misTalleresIds: any[] = [];              // Almacena Id de talleres para control de botones
+  profesores: UsuarioResponse[] = [];         // Listado de profesores para el formulario
+  esAlumno: boolean = false;
 
   // --- Propiedades de Estado y UI ---
   filtroForm: FormGroup;                      // Control reactivo de los filtros
@@ -53,6 +62,7 @@ export class TalleresExplorar implements OnInit {
     private tallerService: TallerService,
     private tokenService: TokenService,
     private inscripcionService: InscripcionService,
+    private usuarioService: UsuarioService,
     private notify: NotificacionService,
     private cdr: ChangeDetectorRef,
     private fb: FormBuilder
@@ -71,6 +81,7 @@ export class TalleresExplorar implements OnInit {
   ngOnInit(): void {
     this.comprobarPermisos();
     this.cargarTalleres();
+    this.cargarProfesores();
 
     // Si hay sesión activa, recuperamos inscripciones para deshabilitar botones
     if (this.tokenService.isLogged()) {
@@ -80,6 +91,23 @@ export class TalleresExplorar implements OnInit {
     // Suscripción reactiva a los cambios del formulario de filtros
     this.filtroForm.valueChanges.subscribe(() => {
       this.aplicarFiltros();
+    });
+  }
+
+  // ===========================================================================
+  // --- CARGA DE DATOS ---
+  // ===========================================================================
+
+  /**
+   * Carga la lista de usuarios con rol profesor para el componente de creación.
+   */
+  cargarProfesores(): void {
+    this.usuarioService.listar().subscribe({
+      next: (res) => {
+        const datos = res.data || [];
+        this.profesores = datos.filter((u: any) => u.rol === 'PROFESOR' || u.rol === 'ADMIN');
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -96,26 +124,24 @@ export class TalleresExplorar implements OnInit {
 
     this.inscripcionService.listarPorUsuario(idUsuario).subscribe({
       next: (res) => {
-        const datos = res.data || [];
-
-        if (Array.isArray(datos)) {
-          this.misTalleresInscritosNombres = datos
-            .map((ins: any) => ins.nombreTaller)
-            .filter(nombre => !!nombre);
-          this.cdr.detectChanges();
-        }
-      }
+        const inscripciones = res.data || [];
+        this.misTalleresIds = inscripciones.map((ins: any) => ins.nombreTaller);
+        this.aplicarFiltros();
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error al cargar inscripciones', err)
     });
   }
 
   /**
    * Comprueba si un taller específico ya está en la lista de inscritos del usuario.
-   * @param idTaller ID del taller a verificar.
+   * @param nombreTaller nombre del taller a verificar.
    */
   estaInscrito(nombreTaller: string): boolean {
-    if (!nombreTaller) return false;
-    return this.misTalleresInscritosNombres.includes(nombreTaller);
+    if (!nombreTaller || !this.misTalleresIds) return false;
+    return this.misTalleresIds.includes(nombreTaller);
   }
+
 
   // ===========================================================================
   // --- LÓGICA DE NEGOCIO Y FILTROS ---
@@ -127,6 +153,7 @@ export class TalleresExplorar implements OnInit {
   comprobarPermisos(): void {
     const rol = this.tokenService.getRol();
     this.puedeGestionar = (rol === 'ADMIN' || rol === 'PROFESOR');
+    this.esAlumno = (rol === 'ALUMNO');
   }
 
   /**
@@ -153,13 +180,10 @@ export class TalleresExplorar implements OnInit {
   aplicarFiltros(): void {
     const { texto, precioMax, soloDisponibles } = this.filtroForm.value;
     const buscar = texto.toLowerCase();
-
     this.talleresFiltrados = this.talleres.filter(t => {
-      const coincideTexto = t.nombre.toLowerCase().includes(buscar) ||
-        t.descripcion.toLowerCase().includes(buscar);
+      const coincideTexto = t.nombre.toLowerCase().includes(buscar) || t.descripcion.toLowerCase().includes(buscar);
       const coincidePrecio = t.precio <= precioMax;
       const coincidePlazas = soloDisponibles ? t.plazasDisponibles > 0 : true;
-
       return coincideTexto && coincidePrecio && coincidePlazas;
     });
   }
@@ -199,7 +223,6 @@ export class TalleresExplorar implements OnInit {
   guardarCambios(fd: FormData): void {
     const id = this.tallerSeleccionado?.idTaller;
     const peticion = id ? this.tallerService.actualizar(id, fd) : this.tallerService.crear(fd);
-
     peticion.subscribe({
       next: () => {
         this.notify.mostrar({ titulo: 'Éxito', mensaje: 'Operación realizada', tipo: 'exito' });
@@ -219,24 +242,14 @@ export class TalleresExplorar implements OnInit {
       this.notify.mostrar({ titulo: 'Atención', mensaje: 'Inicia sesión para inscribirte', tipo: 'error' });
       return;
     }
-
     const idUsuario = this.tokenService.getId();
     if (!idUsuario) return;
-
     this.inscripcionService.validarSolapamiento(idUsuario, taller.idTaller).subscribe({
       next: async (res) => {
         if (res.data && res.data.hayConflicto) {
-          const continuar = await this.notify.confirmar({
-            titulo: '¡Conflicto de Horarios!',
-            mensaje: `Este taller coincide en el tiempo con "${res.data.tallerConflicto}". ¿Deseas inscribirte de todas formas?`,
-            textoConfirmar: 'Sí, continuar',
-            textoCancelar: 'No, revisar'
-          });
-
+          const continuar = await this.notify.confirmar({ titulo: '¡Conflicto de Horarios!', mensaje: `Este taller coincide en el tiempo con "${res.data.tallerConflicto}". ¿Deseas inscribirte de todas formas?`, textoConfirmar: 'Sí, continuar', textoCancelar: 'No, revisar' });
           if (!continuar) return;
         }
-
-      
         this.tallerSeleccionado = { ...taller };
         this.mostrarModalInscripcion = true;
         this.cdr.detectChanges();
@@ -249,9 +262,9 @@ export class TalleresExplorar implements OnInit {
   }
 
   /**
- * Abre el visualizador de horarios para un taller específico.
- * @param taller 
- */
+   * Abre el visualizador de horarios para un taller específico.
+   * @param taller
+   */
   verHorarios(taller: TallerResponse): void {
     this.tallerSeleccionado = { ...taller };
     this.mostrarModalHorarios = true;
@@ -278,11 +291,7 @@ export class TalleresExplorar implements OnInit {
    * @param taller Taller a eliminar.
    */
   async eliminarTaller(taller: TallerResponse): Promise<void> {
-    const confirmar = await this.notify.confirmar({
-      titulo: 'Eliminar',
-      mensaje: `¿Borrar "${taller.nombre}"?`
-    });
-
+    const confirmar = await this.notify.confirmar({ titulo: 'Eliminar', mensaje: `¿Borrar "${taller.nombre}"?` });
     if (confirmar) {
       this.tallerService.eliminar(taller.idTaller).subscribe({
         next: () => {

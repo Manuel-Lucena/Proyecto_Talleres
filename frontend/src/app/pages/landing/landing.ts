@@ -6,6 +6,7 @@ import { NoticiaService } from '../../services/Noticia.Service';
 import { TokenService } from '../../services/Token.Service';
 import { NoticiaResponse } from '../../interfaces/Noticia.Interface';
 import { FormNoticia } from '../../components/forms/form-noticia/form-noticia';
+import { RouterModule } from '@angular/router';
 
 /**
  * Componente principal de la aplicación (Página de Inicio).
@@ -16,7 +17,7 @@ import { FormNoticia } from '../../components/forms/form-noticia/form-noticia';
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [Navbar, CommonModule, Footer, FormNoticia],
+  imports: [Navbar, CommonModule, Footer, FormNoticia, RouterModule,],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
 })
@@ -37,6 +38,7 @@ export class Landing implements OnInit {
   constructor(
     private noticiaService: NoticiaService,
     public tokenService: TokenService,
+
     private cdr: ChangeDetectorRef
   ) { }
 

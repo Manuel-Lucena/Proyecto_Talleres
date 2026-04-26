@@ -12,7 +12,7 @@
   background-color: $color-fondo-pagina;
   min-height: 100vh;
   font-family: $fuente-lectura;
-  @include animacion-entrada; 
+  @include animacion-entrada;
 
   @media (max-width: 768px) {
     padding: 1.5rem;
@@ -22,7 +22,7 @@
 // 2. ENCABEZADO CON NAVEGACIÓN
 .admin-header {
   display: flex;
-  justify-content: flex-start; 
+  justify-content: flex-start;
   align-items: center;
   margin-bottom: 2rem;
   gap: 1.5rem;
@@ -30,6 +30,7 @@
   .btn-back {
     width: 45px;
     height: 45px;
+    flex-shrink: 0;
     border-radius: $radio-curvatura;
     border: 1px solid #eee;
     background: white;
@@ -65,19 +66,31 @@
   }
 }
 
-// 3. REJILLA DE HORARIOS (EL MOTOR VISUAL)
+// 3. REJILLA DE HORARIOS
 .schedule-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 1rem;
   align-items: start;
 
-  @media (max-width: 1200px) {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  @media (max-width: 1600px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media (max-width: 1100px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 800px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
   }
 }
 
-// 4. COLUMNA DE DÍA (CONTENEDOR)
+// 4. COLUMNA DE DÍA
 .day-column {
   background: white;
   border-radius: $radio-curvatura;
@@ -111,45 +124,62 @@
   }
 }
 
-// 5. TARJETAS DE SESIÓN
+// 5. TARJETAS DE SESIÓN (SIN HOVER DE ELEVACIÓN)
 .session-card {
   @include card-elevada;
-  padding: 1rem;
-  border-left: 4px solid $color-marca-principal; 
+  padding: 0.8rem 32px 0.8rem 0.8rem;
+  border-left: 4px solid $color-marca-principal;
   position: relative;
-
-  &:hover {
-    transform: translateY(-2px); 
-  }
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  transition: none; // Eliminamos transiciones innecesarias
 
   .session-time {
     font-family: $fuente-enfasis;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     color: $color-secundario-frio-2;
-    display: block;
+    white-space: nowrap;
+    overflow: visible;
+
+    @media (max-width: 1450px) and (min-width: 1400px),
+    (max-width: 1150px) and (min-width: 1100px) {
+      font-size: 0.75rem;
+    }
   }
 
-  // Botón de eliminar
+  // Botón de eliminar (Hover independiente)
   .btn-delete-session {
     position: absolute;
-    top: 8px;
     right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
     background: transparent;
     border: none;
-    color: #ddd;
+    color: #ccc;
     cursor: pointer;
     transition: 0.2s;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+    z-index: 5;
 
     &:hover {
-      color: $color-secundario-calido-1; 
+      color: $color-secundario-calido-1;
+      transform: translateY(-50%) scale(1.2);
     }
   }
 }
 
-// 6. BOTÓN DE AÑADIR (PLACEHOLDER)
+// 6. BOTÓN DE AÑADIR
 .btn-add-slot {
-  border: 2px dashed #eee; 
+  border: 2px dashed #eee;
   background: transparent;
   padding: 0.8rem;
   border-radius: $radio-curvatura;

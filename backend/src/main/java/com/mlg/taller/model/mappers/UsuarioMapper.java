@@ -44,7 +44,6 @@ public interface UsuarioMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "rol", ignore = true)
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "activo", ignore = true)
     @Mapping(target = "authorities", ignore = true)
     @Mapping(target = "fotoPerfilRuta", ignore = true)
     void updateEntityFromDto(UsuarioRequestDTO dto, @MappingTarget Usuario usuario);

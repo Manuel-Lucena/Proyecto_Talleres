@@ -2,234 +2,238 @@
    VISTA: GESTIÓN DE NOTICIAS / NOVEDADES (ADMIN)
    Layout optimizado para contenido editorial con previsualización de imágenes.
    ========================================================================== */
-
 @use '../../../../../styles/variables' as v;
 @use '../../../../../styles/mixins' as m;
 
-// 1. ESTRUCTURA DE SOPORTE (Consistencia con el panel de administración)
+// 1. ESTRUCTURA DE SOPORTE 
 .admin-wrapper {
-    padding: 2.5rem;
-    background-color: v.$color-fondo-pagina;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    font-family: v.$fuente-lectura;
-    overflow: hidden;
-
-    @media (max-width: 768px) {
-        padding: 1.5rem;
-    }
+  padding: 2.5rem;
+  background-color: v.$color-fondo-pagina;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  font-family: v.$fuente-lectura;
+  overflow: hidden;
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
 }
 
 // 2. CABECERA DE LA SECCIÓN
 .admin-header {
-    flex-shrink: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 2rem;
-
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+  gap: 1rem;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  .title-group {
     .txt-h1 {
-        font-family: v.$fuente-enfasis;
-        font-weight: 700;
-        font-size: v.$tamaño-titular-xl;
-        color: v.$color-secundario-frio-2;
-        margin: 0;
+      font-family: v.$fuente-enfasis;
+      font-weight: 700;
+      font-size: v.$tamaño-titular-xl;
+      color: v.$color-secundario-frio-2;
+      margin: 0;
+      @media (max-width: 480px) {
+        font-size: 1.8rem;
+      }
     }
-
     .txt-bajada {
-        color: v.$color-superficie-suave;
-        font-size: 1rem;
+      color: v.$color-superficie-suave;
+      font-size: 1rem;
+      margin: 0;
     }
-
-    .btn-primario-aula {
-        @include m.boton-primario;
-        display: flex;
-        align-items: center;
-        padding: 0.8rem 1.5rem;
-
-        .btn-text {
-            margin-left: 12px;
-            font-family: v.$fuente-enfasis;
-            font-weight: 600;
-        }
+  }
+  .btn-primario-aula {
+    @include m.boton-primario;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1.5rem;
+    white-space: nowrap;
+    @media (max-width: 768px) {
+      width: 100%;
+      padding: 1rem;
     }
+    .btn-text {
+      margin-left: 12px;
+      font-family: v.$fuente-enfasis;
+      font-weight: 600;
+    }
+  }
 }
 
 // 3. BARRA DE HERRAMIENTAS (TOOLBAR)
 .admin-toolbar {
-    flex-shrink: 0;
-    padding: 0.8rem 1.5rem;
+  flex-shrink: 0;
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  margin-bottom: 1.5rem;
+  align-items: center;
+  background: white;
+  border-radius: v.$radio-curvatura;
+  box-shadow: v.$sombra-nivel-1;
+  .search-box {
+    position: relative;
+    flex: 1;
     display: flex;
-    margin-bottom: 1.5rem;
     align-items: center;
-    background: white;
-    border-radius: v.$radio-curvatura;
-    box-shadow: v.$sombra-nivel-1;
-
-    .search-box {
-        position: relative;
-        flex: 1;
-        display: flex;
-        align-items: center;
-
-        i {
-            position: absolute;
-            left: 15px;
-            color: v.$color-marca-principal;
-            z-index: 2;
-        }
-
-        .input-aula {
-            @include m.estilo-input-base;
-            padding-left: 45px;
-            width: 100%;
-        }
+    i {
+      position: absolute;
+      left: 15px;
+      color: v.$color-marca-principal;
+      z-index: 2;
     }
+    .input-aula {
+      @include m.estilo-input-base;
+      padding-left: 45px;
+      width: 100%;
+    }
+  }
 }
 
 // 4. CONTENEDOR DE LA TABLA (CARD)
 .admin-card {
-    background: white;
-    border-radius: v.$radio-curvatura;
-    box-shadow: v.$sombra-nivel-1;
-    flex: 1;
-    overflow-y: auto;
-    min-height: 0;
+  background: white;
+  border-radius: v.$radio-curvatura;
+  box-shadow: v.$sombra-nivel-1;
+  flex: 1;
+  display: flex;          
+  flex-direction: column; 
+  min-height: 0;
+  overflow: hidden;       
 
-    // Scrollbar personalizado para no romper la estética
-    &::-webkit-scrollbar {
-        width: 6px;
-    }
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #e0e0e0;
+    border-radius: 10px;
+  }
 
-    &::-webkit-scrollbar-thumb {
-        background: #e0e0e0;
-        border-radius: 10px;
-    }
-
-    .table-responsive {
-        width: 100%;
-        overflow-x: auto;
-    }
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;     
+    flex: 1;               
+  }
 }
 
 // 5. ESTILOS DE LA TABLA EDITORIAL
 .admin-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 850px;
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 850px;
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #fafafa;
+    box-shadow: 0 1px 0 #eee;
+  }
+  th {
+    padding: 1.2rem;
+    text-align: left;
+    color: v.$color-superficie-suave;
+    font-family: v.$fuente-enfasis;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+  td {
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid #f8f8f8;
+    vertical-align: middle;
+    color: v.$color-secundario-frio-2;
+  }
 
-    thead {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        background: #fafafa;
-        box-shadow: 0 1px 0 #eee;
+  // --- MINIATURA DE LA NOTICIA ---
+  .img-preview-table {
+    width: 70px;
+    height: 45px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
+  }
 
-    th {
-        padding: 1.2rem;
-        text-align: left;
-        color: v.$color-superficie-suave;
-        font-family: v.$fuente-enfasis;
-        font-size: 0.75rem;
-        text-transform: uppercase;
+  // --- INFORMACIÓN DE LA NOTICIA (META) ---
+  .news-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    .u-name {
+      font-weight: 700;
+      font-family: v.$fuente-enfasis;
+      font-size: 0.95rem;
     }
-
-    td {
-        padding: 1rem 1.2rem;
-        border-bottom: 1px solid #f8f8f8;
-        vertical-align: middle;
-        color: v.$color-secundario-frio-2;
+    .u-date-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: v.$color-superficie-suave;
+      i {
+        color: v.$color-marca-principal;
+      }
     }
+  }
 
-    // --- MINIATURA DE LA NOTICIA ---
-    .img-preview-table {
-        width: 70px;
-        height: 45px;
-        border-radius: 8px;
-        overflow: hidden;
-        flex-shrink: 0;
+  // --- RESUMEN DE TEXTO ---
+  .txt-resumen {
+    font-size: 0.85rem;
+    color: v.$color-superficie-suave;
+    @include m.limitar-lineas(2);
+    max-width: 350px;
+    margin: 0;
+  }
 
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-    }
-
-    // --- INFORMACIÓN DE LA NOTICIA (META) ---
-    .news-meta {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-
-        .u-name {
-            font-weight: 700;
-            font-family: v.$fuente-enfasis;
-            font-size: 0.95rem;
-        }
-
-        .u-date-tag {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.75rem;
-            color: v.$color-superficie-suave;
-
-            i {
-                color: v.$color-marca-principal;
-            }
-        }
-    }
-
-    // --- RESUMEN DE TEXTO ---
-    .txt-resumen {
-        font-size: 0.85rem;
-        color: v.$color-superficie-suave;
-        @include m.limitar-lineas(2);
-        max-width: 350px;
-        margin: 0;
-    }
-
-    // --- ALINEACIÓN DE LA COLUMNA DE ACCIONES ---
-    // En lugar de usar la clase .text-right, aplicamos el estilo a la última celda
-    th:last-child,
-    td:last-child {
-        text-align: right;
-    }
+  th:last-child, td:last-child {
+    text-align: right;
+  }
 }
 
 // 6. BOTONERA DE ACCIONES
 .actions-group {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  .btn-tool {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #eee;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
     display: flex;
-    gap: 8px;
-    justify-content: flex-end; 
-
-    .btn-tool {
-        width: 36px;
-        height: 36px;
-        border: 1px solid #eee;
-        background: white;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        &:hover {
-            border-color: v.$color-marca-principal;
-            color: v.$color-marca-principal;
-            transform: translateY(-2px);
-        }
-
-        &.delete:hover {
-            background: #fff1f1;
-            color: v.$color-secundario-calido-1;
-            border-color: v.$color-secundario-calido-1;
-        }
+    align-items: center;
+    justify-content: center;
+    &:hover {
+      border-color: v.$color-marca-principal;
+      color: v.$color-marca-principal;
+      transform: translateY(-2px);
     }
+    &.delete:hover {
+      background: #fff1f1;
+      color: v.$color-secundario-calido-1;
+      border-color: v.$color-secundario-calido-1;
+    }
+  }
+}
+
+// 7. PAGINACIÓN (CENTRALIZADA VÍA MIXIN)
+.admin-pagination {
+  @include m.estilo-paginacion-admin;
+  flex-shrink: 0; 
 }

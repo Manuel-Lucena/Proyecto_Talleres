@@ -54,6 +54,8 @@ export class MisTalleres implements OnInit {
 
     if (rol === 'ADMIN') {
       this.cargarTodosLosTalleres();
+    } else if (rol === 'PROFESOR' && idUsuario) {
+      this.cargarTalleresProfesor(Number(idUsuario)); // <--- Nueva llamada
     } else if (idUsuario) {
       this.cargarMisTalleres(Number(idUsuario));
     } else {
@@ -95,6 +97,27 @@ export class MisTalleres implements OnInit {
       },
       error: (err) => {
         console.error("Error cargando talleres", err);
+        this.cargando = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  /**
+   * Recupera del backend los talleres asignados al profesor actual.
+   * Filtra aquellos cursos donde el usuario figura como docente responsable.
+   * @param idProfesor Identificador numérico del docente extraído del TokenService.
+   */
+  cargarTalleresProfesor(idProfesor: number): void {
+    this.cargando = true;
+    this.tallerService.listarPorProfesor(idProfesor).subscribe({
+      next: (resp) => {
+        this.talleres = resp.data;
+        this.cargando = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error("Error cargando talleres del profesor", err);
         this.cargando = false;
         this.cdr.detectChanges();
       }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UsuarioService } from '../../../../services/Usuario.Service';
@@ -9,6 +9,7 @@ import { FormCargaUsuarios } from '../../../../components/forms/form-carga-usuar
 import { Confirmacion } from "../../../../components/dialogs/confirmacion/confirmacion";
 import { Notificacion } from "../../../../components/dialogs/mensaje/notificacion";
 import { Router } from '@angular/router';
+import { PaginatePipe } from '../../../../pipes/PaginatePipe';
 
 /**
  * Componente de gestión administrativa para el control de usuarios.
@@ -18,24 +19,62 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-admin-usuarios',
   standalone: true,
-  imports: [CommonModule, FormsModule, FormAlumno, FormCargaUsuarios, Confirmacion, Notificacion],
+  imports: [CommonModule, FormsModule, FormAlumno, FormCargaUsuarios, Confirmacion, Notificacion, PaginatePipe],
   templateUrl: './admin-usuarios.html',
   styleUrl: './admin-usuarios.scss'
 })
 export class AdminUsuarios implements OnInit {
+  // --- Referencias de Componentes ---
+  /** Referencia al formulario hijo para gestionar validaciones manuales desde el servidor */
+  @ViewChild(FormAlumno) formAlumno!: FormAlumno;
+  /** Utilidad para que el HTML pueda usar funciones matemáticas en la paginación */
+  protected readonly Math = Math;
 
   // --- Propiedades de Datos ---
-  usuarios: UsuarioResponse[] = []; // Colección maestra de usuarios desde el backend
+  /** Colección maestra de usuarios obtenida desde el backend */
+  usuarios: UsuarioResponse[] = [];
+
+  // --- Control de Paginación ---
+  /** Página actual del listado */
+  paginaActual: number = 1;
+  /** Cantidad de registros visibles por página */
+  registrosPorPagina: number = 7;
 
   // --- Estado de Filtros y Búsqueda ---
-  busqueda: string = '';           // Texto introducido en el buscador
-  filtroRol: string = '';          // Rol seleccionado (ADMIN, PROFESOR, ALUMNO o vacío)
-  criterioBusqueda: string = 'todos'; // Selector de campo (nombre, dni, email)
+  /** Texto introducido por el usuario en el campo de búsqueda */
+  private _busqueda: string = '';
+  get busqueda(): string { return this._busqueda; }
+  set busqueda(value: string) {
+    this._busqueda = value;
+    this.paginaActual = 1; // Resetea a la primera página al realizar una nueva búsqueda
+  }
+
+  /** Rol seleccionado para el filtrado (ADMIN, PROFESOR, ALUMNO o vacío) */
+  private _filtroRol: string = '';
+  get filtroRol(): string { return this._filtroRol; }
+  set filtroRol(value: string) {
+    this._filtroRol = value;
+    this.paginaActual = 1; // Resetea a la primera página al cambiar el filtro de rol
+  }
+
+  /** Estado seleccionado para el filtrado (todos, activo o inactivo) */
+  private _filtroEstado: string = 'todos';
+  get filtroEstado(): string { return this._filtroEstado; }
+  set filtroEstado(value: string) {
+    this._filtroEstado = value;
+    this.paginaActual = 1; // Resetea a la primera página al cambiar el filtro de estado
+  }
+
+  /** Selector del campo por el cual realizar la búsqueda (nombre, dni, email o todos) */
+  criterioBusqueda: string = 'todos';
 
   // --- Gestión de UI y Modales ---
-  mostrarModal: boolean = false;         // Control de visibilidad del formulario de usuario
-  mostrarModalCarga: boolean = false;    // Control de visibilidad para carga masiva
-  usuarioSeleccionado: UsuarioResponse | null = null; // Buffer para edición
+  /** Control de visibilidad para el modal del formulario de usuario (crear/editar) */
+  mostrarModal: boolean = false;
+  /** Control de visibilidad para el modal de carga masiva de archivos */
+  mostrarModalCarga: boolean = false;
+  /** Almacena los datos del usuario seleccionado para su edición; null para creación */
+  usuarioSeleccionado: UsuarioResponse | null = null;
 
   /**
    * @param usuarioService Operaciones de comunicación con la API de usuarios.
@@ -51,7 +90,7 @@ export class AdminUsuarios implements OnInit {
   ) { }
 
   /**
-   * Ciclo de vida: Carga la lista inicial de usuarios al montar el componente.
+   * Ciclo de vida: Inicializa el componente cargando el listado completo de usuarios.
    */
   ngOnInit(): void {
     this.cargarUsuarios();
@@ -59,13 +98,24 @@ export class AdminUsuarios implements OnInit {
 
   /**
    * Solicita al servidor el listado completo de usuarios.
+   * Se aplica normalización de datos para convertir el estado del backend (0/1 o string)
+   * en un valor booleano nativo de JavaScript para el correcto funcionamiento de la UI.
    */
   cargarUsuarios(): void {
-    this.usuarioService.listar().subscribe({
+    this.usuarioService.listarAlumnosAdmin().subscribe({
       next: (res) => {
-        this.usuarios = [...res.data];
+        this.usuarios = res.data.map((u: any) => ({
+          ...u,
+          // Normalización: Asegura que el valor sea booleano independientemente del formato de la API
+          activo: u.activo === 1 || u.activo === true || u.activo === 'true' || u.activo === '1'
+        })).sort((a: any, b: any) => {
+          // Ordenación inicial: Activos primero, luego por nombre
+          if (a.activo === b.activo) return a.nombre.localeCompare(b.nombre);
+          return a.activo ? -1 : 1;
+        });
         this.cdr.detectChanges();
-      }
+      },
+      error: (err) => console.error('Error al cargar usuarios:', err)
     });
   }
 
@@ -74,37 +124,38 @@ export class AdminUsuarios implements OnInit {
   // ===========================================================================
 
   /**
-   * Getter reactivo que devuelve la lista de usuarios procesada.
-   * Se ejecuta automáticamente cuando cambian los inputs de búsqueda o filtros.
+   * Getter reactivo que devuelve la lista de usuarios procesada según los filtros de búsqueda, rol y estado.
+   * @returns {UsuarioResponse[]} Lista filtrada de usuarios.
    */
-  get usuariosFiltrados() {
+  get usuariosFiltrados(): UsuarioResponse[] {
     const term = this.busqueda.toLowerCase().trim();
-
     return this.usuarios.filter(u => {
-      // 1. Filtro por Rol
+      // Filtro de Rol
       const cumpleRol = this.filtroRol === '' || u.nombreRol === this.filtroRol;
       if (!cumpleRol) return false;
 
-      // 2. Filtro por Término de Búsqueda
+      // Filtro de Estado
+      const cumpleEstado = this.filtroEstado === 'todos' || (this.filtroEstado === 'activo' && u.activo) || (this.filtroEstado === 'inactivo' && !u.activo);
+      if (!cumpleEstado) return false;
+
+      // Filtro de Término de Búsqueda
       if (!term) return true;
 
       switch (this.criterioBusqueda) {
-        case 'nombre': 
-          return (u.nombre + ' ' + u.apellidos).toLowerCase().includes(term);
-        case 'dni': 
-          return u.dni.toLowerCase().includes(term);
-        case 'email': 
-          return u.email.toLowerCase().includes(term);
-        default: // Búsqueda global en todos los campos
-          return (u.nombre + u.apellidos + u.dni + u.email).toLowerCase().includes(term);
+        case 'nombre': return (u.nombre + ' ' + u.apellidos).toLowerCase().includes(term);
+        case 'dni': return u.dni.toLowerCase().includes(term);
+        case 'email': return u.email.toLowerCase().includes(term);
+        default: return (u.nombre + ' ' + u.apellidos + u.dni + u.email).toLowerCase().includes(term);
       }
     });
+    // NO se aplica sort aquí para evitar que el usuario cambie de posición al editar su estado
   }
 
   /**
-   * Ajusta el placeholder del buscador según el criterio de filtrado seleccionado.
+   * Define el texto de ayuda del input de búsqueda según el criterio seleccionado.
+   * @returns {string} Texto para el atributo placeholder.
    */
-  getPlaceholder() {
+  getPlaceholder(): string {
     switch (this.criterioBusqueda) {
       case 'nombre': return 'Buscar por nombre...';
       case 'dni': return 'Buscar por DNI...';
@@ -118,70 +169,95 @@ export class AdminUsuarios implements OnInit {
   // ===========================================================================
 
   /**
-   * Inicializa el flujo para crear un nuevo usuario.
+   * Prepara el estado para la creación de un nuevo usuario abriendo el modal correspondiente.
    */
-  abrirCrear() {
+  abrirCrear(): void {
     this.usuarioSeleccionado = null;
     this.mostrarModal = true;
   }
 
   /**
-   * Prepara el formulario para editar un usuario existente.
-   * @param u El usuario cargado desde la fila de la tabla.
+   * Carga los datos de un usuario en el buffer de edición y abre el modal.
+   * @param {UsuarioResponse} u Usuario a editar.
    */
-  abrirEditar(u: UsuarioResponse) {
+  abrirEditar(u: UsuarioResponse): void {
     this.usuarioSeleccionado = JSON.parse(JSON.stringify(u));
     this.mostrarModal = true;
   }
 
   /**
-   * Procesa la persistencia de datos (Creación o Actualización).
-   * @param fd FormData que contiene el DTO del usuario y la imagen opcional.
+   * Procesa el guardado de datos (creación o actualización) enviando el FormData al servicio.
+   * @param {FormData} fd Objeto FormData que contiene los datos del usuario y opcionalmente la foto.
    */
   ejecutarGuardado(fd: FormData): void {
     const esEdicion = !!this.usuarioSeleccionado;
-    
-    // Selección dinámica de la petición según el contexto
-    const peticion$ = (esEdicion 
-      ? this.usuarioService.actualizarUsuario(this.usuarioSeleccionado!.idUsuario, fd) 
-      : this.usuarioService.crearUsuario(fd)) as import('rxjs').Observable<any>;
-
+    const peticion$ = (esEdicion ? this.usuarioService.actualizarUsuario(this.usuarioSeleccionado!.idUsuario, fd) : this.usuarioService.crearUsuario(fd)) as import('rxjs').Observable<any>;
     peticion$.subscribe({
-      next: () => {
+      next: (res: any) => {
         this.notificacionService.mostrar({
           titulo: 'Éxito',
           mensaje: esEdicion ? 'Usuario actualizado correctamente' : 'Usuario creado con éxito',
           tipo: 'exito'
         });
         this.mostrarModal = false;
-        this.cargarUsuarios();
+
+        if (esEdicion) {
+          const index = this.usuarios.findIndex(u => u.idUsuario === this.usuarioSeleccionado?.idUsuario);
+          if (index !== -1) {
+            // Actualización local para mantener la posición en la tabla
+            this.usuarios[index] = { ...this.usuarios[index], ...res.data };
+          }
+        } else {
+          this.cargarUsuarios();
+        }
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        const mensajeError = err.error?.mensaje || 'No se pudo completar la operación.';
-        this.notificacionService.mostrar({ titulo: 'Error', mensaje: mensajeError, tipo: 'error' });
+        const msg = err.error?.message || err.error?.mensaje || "";
+        if (msg.toLowerCase().includes('email')) {
+          this.formAlumno.form.get('email')?.setErrors({ repetido: 'Este email ya está registrado' });
+          this.formAlumno.form.get('email')?.markAsTouched();
+        }
+        if (msg.toLowerCase().includes('dni') || msg.toLowerCase().includes('identificación')) {
+          this.formAlumno.form.get('dni')?.setErrors({ repetido: 'Este DNI ya está registrado' });
+          this.formAlumno.form.get('dni')?.markAsTouched();
+        }
+        if (!msg.toLowerCase().includes('email') && !msg.toLowerCase().includes('dni') && !msg.toLowerCase().includes('identificación')) {
+          const mensajeError = msg || 'No se pudo completar la operación.';
+          this.notificacionService.mostrar({ titulo: 'Error', mensaje: mensajeError, tipo: 'error' });
+        }
+        this.cdr.detectChanges();
       }
     });
   }
 
   /**
-   * Realiza un "soft delete" o reactivación cambiando el flag 'activo' del usuario.
-   * @param u Usuario a modificar.
+   * Cambia el estado de actividad de un usuario.
+   * @param {UsuarioResponse} u Usuario al que se le desea cambiar el estado.
+   * @note Realiza una actualización parcial enviando un DTO con el nuevo estado.
    */
-  toggleEstado(u: UsuarioResponse) {
+  toggleEstado(u: UsuarioResponse): void {
     this.notificacionService.confirmar({
       titulo: u.activo ? 'Dar de baja' : 'Reactivar',
       mensaje: `¿Deseas cambiar el estado de ${u.nombre}?`,
     }).then((confirmado) => {
       if (confirmado) {
+        const nuevoEstado = !u.activo;
+        const idRolCalculado = (u as any).idRol || (u.nombreRol === 'ADMIN' ? 1 : u.nombreRol === 'PROFESOR' ? 2 : 3);
+        const dto = { dni: u.dni, nombre: u.nombre, apellidos: u.apellidos, email: u.email, direccion: u.direccion, telefono: u.telefono, activo: nuevoEstado, idRol: idRolCalculado };
         const fd = new FormData();
-        const dto = { ...u, activo: !u.activo, idRol: (u as any).idRol || 3 };
-        
         fd.append('usuario', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
-        
         this.usuarioService.actualizarUsuario(u.idUsuario, fd).subscribe({
           next: () => {
-            this.notificacionService.mostrar({ titulo: 'Éxito', mensaje: 'Estado actualizado', tipo: 'exito' });
-            this.cargarUsuarios();
+            // Actualización local inmediata: el usuario permanece en su fila
+            u.activo = nuevoEstado;
+            this.notificacionService.mostrar({ titulo: 'Éxito', mensaje: 'Estado actualizado correctamente', tipo: 'exito' });
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            const mensajeServer = err.error?.message || err.error?.mensaje || 'No se pudo actualizar el estado.';
+            this.notificacionService.mostrar({ titulo: 'Acción denegada', mensaje: mensajeServer, tipo: 'error' });
+            this.cdr.detectChanges();
           }
         });
       }
@@ -189,10 +265,10 @@ export class AdminUsuarios implements OnInit {
   }
 
   /**
-   * Ejecuta la eliminación definitiva de un registro en la base de datos.
-   * @param id ID único del usuario.
+   * Elimina un usuario del sistema tras confirmación.
+   * @param {number} id Identificador único del usuario.
    */
-  eliminarUsuario(id: number) {
+  eliminarUsuario(id: number): void {
     this.notificacionService.confirmar({
       titulo: '¿Eliminar?',
       mensaje: 'Esta acción es irreversible y eliminará todos los datos asociados.',
@@ -209,9 +285,10 @@ export class AdminUsuarios implements OnInit {
   }
 
   /**
-   * Redirige a la vista detallada de inscripciones del usuario seleccionado.
+   * Navega a la vista detallada de inscripciones de un usuario específico.
+   * @param {number} idUsuario Identificador del usuario.
    */
-  verInscripciones(idUsuario: number) {
+  verInscripciones(idUsuario: number): void {
     this.router.navigate(['/panel-admin/usuarios', idUsuario, 'inscripciones']);
   }
 }

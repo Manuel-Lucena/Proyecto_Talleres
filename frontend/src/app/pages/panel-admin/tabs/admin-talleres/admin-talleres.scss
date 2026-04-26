@@ -2,7 +2,6 @@
    VISTA: GESTIÓN DE TALLERES (ADMIN DASHBOARD)
    Estructura de tabla avanzada con visualización de métricas y estados.
    ========================================================================== */
-
 @use '../../../../../styles/variables' as v;
 @use '../../../../../styles/mixins' as m;
 
@@ -10,12 +9,12 @@
 .admin-wrapper {
     padding: 2.5rem;
     background-color: v.$color-fondo-pagina;
-    height: 100vh; 
+    height: 100vh;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
     font-family: v.$fuente-lectura;
-    overflow: hidden; 
+    overflow: hidden; // Evita scroll doble, el scroll lo manejará la card interna
 
     @media (max-width: 768px) {
         padding: 1.5rem;
@@ -29,26 +28,48 @@
     justify-content: space-between;
     align-items: flex-end;
     margin-bottom: 2rem;
+    gap: 1.5rem;
 
-    .txt-h1 {
-        font-family: v.$fuente-enfasis;
-        font-weight: 700;
-        font-size: v.$tamaño-titular-xl;
-        color: v.$color-secundario-frio-2;
-        margin: 0;
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.2rem;
+        margin-bottom: 1.5rem;
     }
 
-    .txt-bajada {
-        color: v.$color-superficie-suave;
-        font-size: 1rem;
+    .title-group {
+        .txt-h1 {
+            font-family: v.$fuente-enfasis;
+            font-weight: 700;
+            font-size: v.$tamaño-titular-xl;
+            color: v.$color-secundario-frio-2;
+            margin: 0;
+
+            @media (max-width: 480px) {
+                font-size: 1.8rem;
+            }
+        }
+
+        .txt-bajada {
+            color: v.$color-superficie-suave;
+            font-size: 1rem;
+            margin: 0;
+        }
     }
 
     .btn-primario-aula {
         @include m.boton-primario;
         display: flex;
         align-items: center;
+        justify-content: center;
         padding: 0.8rem 1.5rem;
         gap: 10px;
+        white-space: nowrap;
+
+        @media (max-width: 768px) {
+            width: 100%;
+            padding: 1rem;
+        }
 
         .btn-text {
             font-family: v.$fuente-enfasis;
@@ -81,7 +102,6 @@
             box-shadow: 0 0 0 3px rgba(v.$color-marca-principal, 0.1);
         }
 
-        // Selector de criterio (Nombre, ID, etc.)
         .criteria-box {
             width: 140px;
             border-right: 1px solid #e2e8f0;
@@ -91,14 +111,13 @@
                 background-color: #f1f5f9;
                 height: 100%;
                 width: 100%;
-                padding: 0 32px 0 15px; 
+                padding: 0 32px 0 15px;
                 font-size: 0.85rem;
                 font-weight: 600;
                 cursor: pointer;
                 color: v.$color-secundario-frio-2;
                 outline: none;
                 appearance: none;
-
                 background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
                 background-repeat: no-repeat;
                 background-position: right 12px center;
@@ -139,9 +158,11 @@
     background: white;
     border-radius: v.$radio-curvatura;
     box-shadow: v.$sombra-nivel-1;
-    flex: 1;
-    overflow-y: auto;
-    min-height: 0;
+    flex: 1; // Ocupa el espacio restante del wrapper
+    display: flex; // Activa flexbox interno
+    flex-direction: column; // Apila tabla (arriba) y paginación (abajo)
+    min-height: 0; // Permite que el contenido se encoja correctamente
+    overflow: hidden; // El scroll se delega a .table-responsive
 
     &::-webkit-scrollbar {
         width: 6px;
@@ -155,6 +176,8 @@
     .table-responsive {
         width: 100%;
         overflow-x: auto;
+        overflow-y: auto; // Scroll vertical solo aquí
+        flex: 1; // La tabla crece y empuja la paginación al final
     }
 }
 
@@ -202,6 +225,8 @@
         gap: 1rem;
         align-items: center;
         text-align: left;
+        min-width: 0;
+        max-width: 350px;
 
         .img-frame {
             width: 60px;
@@ -217,18 +242,27 @@
             }
         }
 
+        .workshop-info {
+            min-width: 0;
+            flex: 1;
+        }
+
         .t-name {
             display: block;
             font-weight: 700;
             font-family: v.$fuente-enfasis;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
         }
 
         .t-desc {
             font-size: 0.75rem;
             color: v.$color-superficie-suave;
-            @include m.limitar-lineas(1); 
-            max-width: 220px;
+            @include m.limitar-lineas(1);
             margin: 0;
+            word-wrap: break-word;
         }
     }
 
@@ -238,9 +272,18 @@
         align-items: center;
         gap: 8px;
         font-size: 0.85rem;
+        min-width: 0;
+        max-width: 200px;
 
         i {
             color: v.$color-marca-principal;
+            flex-shrink: 0;
+        }
+
+        span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
 
@@ -251,6 +294,7 @@
         .d-range {
             font-weight: 600;
             font-size: 0.85rem;
+            white-space: nowrap;
         }
 
         .d-year {
@@ -322,4 +366,10 @@
             border-color: v.$color-secundario-calido-1;
         }
     }
+}
+
+// 7. PAGINACIÓN (CENTRALIZADA VÍA MIXIN)
+.admin-pagination {
+    @include m.estilo-paginacion-admin;
+    flex-shrink: 0; 
 }

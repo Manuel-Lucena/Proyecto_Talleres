@@ -15,7 +15,6 @@ import { TallerResponse } from '../../../interfaces/Taller.Interface';
   styleUrl: './form-inscripcion.scss'
 })
 export class FormInscripcion implements OnInit {
-
   // --- Propiedades de Entrada y Salida ---
   @Input() tallerParaInscribir: TallerResponse | null = null; // Taller seleccionado para nueva inscripción
   @Input() inscripcionParaEditar: any = null;                // Datos de carga para edición (Admin)
@@ -24,6 +23,7 @@ export class FormInscripcion implements OnInit {
 
   // --- Propiedades de Estado ---
   inscripcionForm!: FormGroup;                                // Instancia del formulario reactivo
+  cargando: boolean = false;                                  // Estado de carga para el proceso de envío
 
   /**
    * @param fb Constructor de la estructura de controles.
@@ -70,8 +70,7 @@ export class FormInscripcion implements OnInit {
         montoPagado: this.tallerParaInscribir.precio,
         orderId: 'PAY-' + Math.random().toString(36).toUpperCase().substring(2, 10)
       });
-    } 
-    else if (this.inscripcionParaEditar) {
+    } else if (this.inscripcionParaEditar) {
       this.inscripcionForm.patchValue(this.inscripcionParaEditar);
     }
   }
@@ -90,9 +89,11 @@ export class FormInscripcion implements OnInit {
 
   /**
    * Valida la integridad de la inscripción y emite el objeto para su procesamiento.
+   * Activa el estado de carga para indicar el proceso de envío (email/registro).
    */
   enviar(): void {
     if (this.inscripcionForm.valid) {
+      this.cargando = true; // Iniciamos estado de espera
       this.guardado.emit(this.inscripcionForm.value);
     }
   }

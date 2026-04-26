@@ -62,7 +62,6 @@ public class EmailService {
             
         } catch (MessagingException e) {
             log.error("Error al construir el email para {}: {}", to, e.getMessage());
-            // Lanzamos RuntimeException para que no te pida 'throws' ni 'try-catch' fuera
             throw new RuntimeException("Error técnico en el servicio de correo", e);
         }
     }

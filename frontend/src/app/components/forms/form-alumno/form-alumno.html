@@ -2,7 +2,9 @@
     <div class="modal-body" (click)="$event.stopPropagation()">
 
         <div class="cabecera-formulario">
-            <h4 class="titulo-formulario">Registro de Alumno</h4>
+            <h4 class="titulo-formulario">
+                {{ usuarioParaEditar ? 'Editar Perfil' : 'Registro de Usuario' }}
+            </h4>
             <div class="linea-decorativa"></div>
         </div>
 
@@ -14,28 +16,31 @@
                     <input type="text" formControlName="nombre" class="input-personalizado"
                         [class.is-invalid]="errorService.mostrarError(form, 'nombre')">
                     <div class="error-container">
-                        @if (errorService.mostrarError(form, 'nombre')) { 
-                            <span class="error-message">{{ errorService.getErrorMessage(form, 'nombre') }}</span> 
+                        @if (errorService.mostrarError(form, 'nombre')) {
+                        <span class="error-message">{{ errorService.getErrorMessage(form, 'nombre') }}</span>
                         }
                     </div>
                 </div>
+
                 <div class="campo-formulario">
                     <label>Apellidos</label>
                     <input type="text" formControlName="apellidos" class="input-personalizado"
                         [class.is-invalid]="errorService.mostrarError(form, 'apellidos')">
                     <div class="error-container">
-                        @if (errorService.mostrarError(form, 'apellidos')) { 
-                            <span class="error-message">{{ errorService.getErrorMessage(form, 'apellidos') }}</span> 
+                        @if (errorService.mostrarError(form, 'apellidos')) {
+                        <span class="error-message">{{ errorService.getErrorMessage(form, 'apellidos') }}</span>
                         }
                     </div>
                 </div>
+
                 <div class="campo-formulario">
                     <label>DNI / NIE</label>
                     <input type="text" formControlName="dni" class="input-personalizado"
-                        [class.is-invalid]="errorService.mostrarError(form, 'dni')" placeholder="12345678X">
+                        [class.is-invalid]="errorService.mostrarError(form, 'dni') || form.get('dni')?.hasError('repetido')"
+                        placeholder="12345678X">
                     <div class="error-container">
-                        @if (errorService.mostrarError(form, 'dni')) { 
-                            <span class="error-message">{{ errorService.getErrorMessage(form, 'dni') }}</span> 
+                        @if (errorService.mostrarError(form, 'dni') || form.get('dni')?.hasError('repetido')) {
+                        <span class="error-message">{{ errorService.getErrorMessage(form, 'dni') }}</span>
                         }
                     </div>
                 </div>
@@ -45,10 +50,11 @@
                 <div class="campo-formulario">
                     <label>Email</label>
                     <input type="email" formControlName="email" class="input-custom"
-                        [class.is-invalid]="errorService.mostrarError(form, 'email')" placeholder="correo@ejemplo.com">
+                        [class.is-invalid]="errorService.mostrarError(form, 'email') || form.get('email')?.hasError('repetido')"
+                        placeholder="correo@ejemplo.com">
                     <div class="error-container">
-                        @if (errorService.mostrarError(form, 'email')) { 
-                            <span class="error-message">{{ errorService.getErrorMessage(form, 'email') }}</span>
+                        @if (errorService.mostrarError(form, 'email') || form.get('email')?.hasError('repetido')) {
+                        <span class="error-message">{{ errorService.getErrorMessage(form, 'email') }}</span>
                         }
                     </div>
                 </div>
@@ -58,8 +64,8 @@
                     <input type="tel" formControlName="telefono" class="input-custom"
                         [class.is-invalid]="errorService.mostrarError(form, 'telefono')" placeholder="600 000 000">
                     <div class="error-container">
-                        @if (errorService.mostrarError(form, 'telefono')) { 
-                            <span class="error-message">{{ errorService.getErrorMessage(form, 'telefono') }}</span> 
+                        @if (errorService.mostrarError(form, 'telefono')) {
+                        <span class="error-message">{{ errorService.getErrorMessage(form, 'telefono') }}</span>
                         }
                     </div>
                 </div>
@@ -67,16 +73,18 @@
                 <div class="campo-formulario">
                     <label>Dirección</label>
                     <input type="text" formControlName="direccion" class="input-custom"
-                        [class.is-invalid]="errorService.mostrarError(form, 'direccion')" placeholder="Calle Ejemplo, 12">
+                        [class.is-invalid]="errorService.mostrarError(form, 'direccion')"
+                        placeholder="Calle Ejemplo, 12">
                     <div class="error-container">
-                        @if (errorService.mostrarError(form, 'direccion')) { 
-                            <span class="error-message">{{ errorService.getErrorMessage(form, 'direccion') }}</span> 
+                        @if (errorService.mostrarError(form, 'direccion')) {
+                        <span class="error-message">{{ errorService.getErrorMessage(form, 'direccion') }}</span>
                         }
                     </div>
                 </div>
             </div>
 
-            <div class="fila-formulario" *ngIf="!usuarioParaEditar">
+            @if (!usuarioParaEditar) {
+            <div class="fila-formulario">
                 <div class="campo-formulario">
                     <label>Contraseña</label>
                     <div class="posicion-relativa">
@@ -88,11 +96,12 @@
                         </button>
                     </div>
                     <div class="error-container">
-                        @if (errorService.mostrarError(form, 'password')) { 
-                            <span class="error-message">{{ errorService.getErrorMessage(form, 'password') }}</span> 
+                        @if (errorService.mostrarError(form, 'password')) {
+                        <span class="error-message">{{ errorService.getErrorMessage(form, 'password') }}</span>
                         }
                     </div>
                 </div>
+
                 <div class="campo-formulario">
                     <label>Repetir Contraseña</label>
                     <input type="password" formControlName="repetirPassword" class="input-custom"
@@ -100,16 +109,27 @@
                         placeholder="••••••">
                     <div class="error-container">
                         @if (form.hasError('passwordMismatch') && form.get('repetirPassword')?.touched) {
-                            <span class="error-message">Las contraseñas no coinciden</span>
-                        }
-                        @else if (errorService.mostrarError(form, 'repetirPassword')) {
-                            <span class="error-message">{{ errorService.getErrorMessage(form, 'repetirPassword') }}</span>
+                        <span class="error-message">Las contraseñas no coinciden</span>
+                        } @else if (errorService.mostrarError(form, 'repetirPassword')) {
+                        <span class="error-message">{{ errorService.getErrorMessage(form, 'repetirPassword') }}</span>
                         }
                     </div>
                 </div>
             </div>
+            }
 
             <div class="fila-formulario">
+
+                @if (esAdmin) {
+                <div class="campo-formulario">
+                    <label>Asignar Rol</label>
+                    <select formControlName="idRol" class="input-custom">
+                        <option [value]="3">Alumno</option>
+                        <option [value]="2">Profesor</option>
+                    </select>
+                </div>
+                }
+
                 <div class="campo-formulario">
                     <label>Foto de perfil</label>
                     <div class="zona-subida-alumno" (click)="fileInput.click()">

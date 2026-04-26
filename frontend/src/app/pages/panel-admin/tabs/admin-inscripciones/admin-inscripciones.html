@@ -10,7 +10,7 @@
       </div>
     </div>
 
-    <div class="header-actions d-flex gap-2">
+    <div class="header-actions">
       @if (esVistaTaller && idTaller) {
       <button class="btn-header-pdf" (click)="descargarLista()" title="Descargar lista de asistencia"
         [disabled]="descargandoLista">
@@ -21,9 +21,7 @@
         <i class="bi bi-file-earmark-spreadsheet"></i>
         <span class="btn-text">Carga Masiva</span>
       </button>
-      }
-
-      @if (!esVistaProfesor) {
+      } @if (!esVistaProfesor) {
       <button class="btn-primario-aula" (click)="abrirInscripcion()">
         <i class="bi bi-plus-lg"></i>
         <span class="btn-text">Nueva Inscripción</span>
@@ -47,6 +45,17 @@
           [(ngModel)]="busqueda" class="input-aula">
       </div>
     </div>
+
+    <div class="d-flex gap-3 container-filters">
+      <div class="filter-box">
+        <i class="bi bi-filter-right"></i>
+        <select [(ngModel)]="filtroEstado" class="select-aula">
+          <option value="todos">Todos los estados</option>
+          <option value="activa">Solo Activas</option>
+          <option value="baja">Solo Bajas</option>
+        </select>
+      </div>
+    </div>
   </section>
 
   @if (cargando) {
@@ -55,7 +64,7 @@
     <span class="ms-3">Cargando registros...</span>
   </div>
   } @else {
-  <div class="admin-card">
+  <div class="admin-card shadow-1">
     <div class="table-responsive">
       <table class="admin-table">
         <thead>
@@ -66,7 +75,7 @@
             <th>Monto</th>
             <th>Pago</th>
             <th>Estado Alta</th>
-            <th class="text-center">Acciones</th>
+            <th class="text-right">Acciones</th>
             } @else {
             <th>Estado</th>
             <th class="text-center">Info</th>
@@ -74,11 +83,13 @@
           </tr>
         </thead>
         <tbody>
-          @for (ins of inscripcionesFiltradas; track ins.idInscripcion) {
+          @for (ins of inscripcionesFiltradas | paginate:registrosPorPagina:paginaActual; track ins.idInscripcion) {
           <tr>
             <td>
               <div class="item-info">
-                <span class="main-text">{{ esVistaTaller ? ins.emailUsuario : ins.nombreTaller }}</span>
+                <span class="main-text" [title]="esVistaTaller ? ins.emailUsuario : ins.nombreTaller">
+                  {{ esVistaTaller ? ins.emailUsuario : ins.nombreTaller }}
+                </span>
               </div>
             </td>
             <td>
@@ -86,7 +97,6 @@
                 <span class="d-main">{{ ins.fechaInscripcion | date:'dd/MM/yyyy' }}</span>
               </div>
             </td>
-
             @if (!esVistaProfesor) {
             <td><span class="price-tag">{{ ins.montoPagado }}€</span></td>
             <td>
@@ -100,7 +110,7 @@
                 {{ ins.activa ? 'ACTIVA' : 'BAJA' }}
               </span>
             </td>
-            <td>
+            <td class="text-right">
               <div class="actions-group">
                 <button class="btn-tool" (click)="descargarFactura(ins.idInscripcion)" title="Descargar Factura"
                   [disabled]="descargandoFacturaId === ins.idInscripcion">
@@ -117,9 +127,7 @@
               </div>
             </td>
             } @else {
-            <td>
-              <span class="badge-aula success">DOCENTE</span>
-            </td>
+            <td><span class="badge-aula success">DOCENTE</span></td>
             <td class="text-center">
               <span class="text-muted small">Gestionar en Talleres</span>
             </td>
@@ -135,6 +143,34 @@
           }
         </tbody>
       </table>
+    </div>
+
+    <div class="admin-pagination" *ngIf="inscripcionesFiltradas.length > 0">
+      <div class="pagination-info">
+        Mostrando <strong>{{ (paginaActual - 1) * registrosPorPagina + 1 }}</strong> a <strong>{{ Math.min(paginaActual
+          * registrosPorPagina, inscripcionesFiltradas.length) }}</strong> de <strong>{{ inscripcionesFiltradas.length
+          }}</strong> registros
+      </div>
+      <div class="pagination-controls">
+        <div class="page-selector">
+          <span>Página</span>
+          <select class="select-pag" [(ngModel)]="paginaActual">
+            @for (p of [].constructor(Math.ceil(inscripcionesFiltradas.length / registrosPorPagina)); track $index) {
+            <option [value]="$index + 1">{{ $index + 1 }}</option>
+            }
+          </select>
+          <span>de {{ Math.ceil(inscripcionesFiltradas.length / registrosPorPagina) }}</span>
+        </div>
+        <div class="d-flex gap-1">
+          <button class="btn-pag" [disabled]="paginaActual === 1" (click)="paginaActual = paginaActual - 1">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <button class="btn-pag" [disabled]="paginaActual * registrosPorPagina >= inscripcionesFiltradas.length"
+            (click)="paginaActual = paginaActual + 1">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
   }
