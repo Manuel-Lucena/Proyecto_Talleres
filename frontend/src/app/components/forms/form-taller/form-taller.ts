@@ -5,13 +5,14 @@ import { FormErrorService } from '../../../services/FormError.Service';
 import { Validator } from '../../../validators/Validator';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { UsuarioResponse } from '../../../interfaces/Usuario.Interface';
+import { FormLabel } from '../../dialogs/form-label/form-label';
 
 /** * FORMULARIO DE TALLERES: Gestor para el alta y modificación de datos de talleres. 
  */
 @Component({
   selector: 'app-form-taller',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgSelectModule],
+  imports: [CommonModule, ReactiveFormsModule, NgSelectModule, FormLabel],
   providers: [DatePipe],
   templateUrl: './form-taller.html',
   styleUrl: './form-taller.scss'

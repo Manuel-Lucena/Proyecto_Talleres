@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { NoticiaResponse } from '../../../interfaces/Noticia.Interface';
 import { FormErrorService } from '../../../services/FormError.Service';
+import { FormLabel } from '../../dialogs/form-label/form-label';
 
 /**
  * FORMULARIO DE NOTICIAS: Gestor para la creación y edición de entradas informativas.
@@ -10,7 +11,7 @@ import { FormErrorService } from '../../../services/FormError.Service';
 @Component({
   selector: 'app-form-noticia',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormLabel],
   templateUrl: './form-noticia.html',
   styleUrl: './form-noticia.scss',
 })

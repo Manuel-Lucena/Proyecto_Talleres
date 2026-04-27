@@ -1,0 +1,10 @@
+<div class="form-label-wrapper">
+  <label [for]="forId">{{ texto }}</label>
+  
+  <span *ngIf="requerido" 
+        class="required-mark" 
+        [title]="ayuda || 'Este campo es obligatorio'">
+    *
+    <i *ngIf="ayuda" class="bi bi-info-circle info-icon"></i>
+  </span>
+</div>

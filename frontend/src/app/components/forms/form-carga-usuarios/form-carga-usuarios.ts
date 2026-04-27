@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Validator } from '../../../validators/Validator';
 import { UsuarioService } from '../../../services/Usuario.Service';
 import { NotificacionService } from '../../../services/Notificacion.Service';
+import { FormLabel } from '../../dialogs/form-label/form-label';
 
 interface UsuarioImportar {
   dni: string;
@@ -23,7 +24,7 @@ interface UsuarioImportar {
 @Component({
   selector: 'app-form-carga-usuarios',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FormLabel],
   templateUrl: './form-carga-usuarios.html',
   styleUrl: './form-carga-usuarios.scss'
 })

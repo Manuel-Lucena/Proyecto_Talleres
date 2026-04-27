@@ -5,6 +5,7 @@ import { EntregaService } from '../../../services/Entrega.Service';
 import { ArchivoEntregaService } from '../../../services/ArchivoEntrega.Service';
 import { TokenService } from '../../../services/Token.Service';
 import { lastValueFrom } from 'rxjs';
+import { FormLabel } from '../../dialogs/form-label/form-label';
 
 /**
  * GESTOR DE ENTREGAS: Formulario para la subida de tareas, gestión de archivos y textos del alumno.
@@ -12,7 +13,7 @@ import { lastValueFrom } from 'rxjs';
 @Component({
   selector: 'app-form-entrega',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, FormLabel],
   templateUrl: './form-entrega.html',
   styleUrl: './form-entrega.scss'
 })

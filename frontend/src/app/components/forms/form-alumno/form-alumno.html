@@ -12,8 +12,8 @@
 
             <div class="fila-formulario">
                 <div class="campo-formulario">
-                    <label>Nombre</label>
-                    <input type="text" formControlName="nombre" class="input-personalizado"
+                    <app-form-label texto="Nombre" [requerido]="true" forId="nombre"></app-form-label>
+                    <input type="text" id="nombre" formControlName="nombre" class="input-personalizado"
                         [class.is-invalid]="errorService.mostrarError(form, 'nombre')">
                     <div class="error-container">
                         @if (errorService.mostrarError(form, 'nombre')) {
@@ -23,8 +23,8 @@
                 </div>
 
                 <div class="campo-formulario">
-                    <label>Apellidos</label>
-                    <input type="text" formControlName="apellidos" class="input-personalizado"
+                    <app-form-label texto="Apellidos" [requerido]="true" forId="apellidos"></app-form-label>
+                    <input type="text" id="apellidos" formControlName="apellidos" class="input-personalizado"
                         [class.is-invalid]="errorService.mostrarError(form, 'apellidos')">
                     <div class="error-container">
                         @if (errorService.mostrarError(form, 'apellidos')) {
@@ -34,8 +34,9 @@
                 </div>
 
                 <div class="campo-formulario">
-                    <label>DNI / NIE</label>
-                    <input type="text" formControlName="dni" class="input-personalizado"
+                    <app-form-label texto="DNI / NIE" [requerido]="true" ayuda="Formato válido: 12345678X"
+                        forId="dni"></app-form-label>
+                    <input type="text" id="dni" formControlName="dni" class="input-personalizado"
                         [class.is-invalid]="errorService.mostrarError(form, 'dni') || form.get('dni')?.hasError('repetido')"
                         placeholder="12345678X">
                     <div class="error-container">
@@ -48,8 +49,9 @@
 
             <div class="fila-formulario">
                 <div class="campo-formulario">
-                    <label>Email</label>
-                    <input type="email" formControlName="email" class="input-custom"
+                    <app-form-label texto="Email" [requerido]="true" ayuda="Ejemplo: usuario@taller.com"
+                        forId="email"></app-form-label>
+                    <input type="email" id="email" formControlName="email" class="input-custom"
                         [class.is-invalid]="errorService.mostrarError(form, 'email') || form.get('email')?.hasError('repetido')"
                         placeholder="correo@ejemplo.com">
                     <div class="error-container">
@@ -60,8 +62,8 @@
                 </div>
 
                 <div class="campo-formulario">
-                    <label>Teléfono</label>
-                    <input type="tel" formControlName="telefono" class="input-custom"
+                    <app-form-label texto="Teléfono" ayuda="Mínimo 9 dígitos" forId="telefono"></app-form-label>
+                    <input type="tel" id="telefono" formControlName="telefono" class="input-custom"
                         [class.is-invalid]="errorService.mostrarError(form, 'telefono')" placeholder="600 000 000">
                     <div class="error-container">
                         @if (errorService.mostrarError(form, 'telefono')) {
@@ -71,8 +73,8 @@
                 </div>
 
                 <div class="campo-formulario">
-                    <label>Dirección</label>
-                    <input type="text" formControlName="direccion" class="input-custom"
+                    <app-form-label texto="Dirección" forId="direccion"></app-form-label>
+                    <input type="text" id="direccion" formControlName="direccion" class="input-custom"
                         [class.is-invalid]="errorService.mostrarError(form, 'direccion')"
                         placeholder="Calle Ejemplo, 12">
                     <div class="error-container">
@@ -86,9 +88,10 @@
             @if (!usuarioParaEditar) {
             <div class="fila-formulario">
                 <div class="campo-formulario">
-                    <label>Contraseña</label>
+                    <app-form-label texto="Contraseña" [requerido]="true" ayuda="Mínimo 6 caracteres"
+                        forId="password"></app-form-label>
                     <div class="posicion-relativa">
-                        <input [type]="verPassword ? 'text' : 'password'" formControlName="password"
+                        <input [type]="verPassword ? 'text' : 'password'" id="password" formControlName="password"
                             class="input-custom" [class.is-invalid]="errorService.mostrarError(form, 'password')"
                             placeholder="••••••">
                         <button type="button" class="btn-ver-pass" (click)="verPassword = !verPassword">
@@ -103,8 +106,9 @@
                 </div>
 
                 <div class="campo-formulario">
-                    <label>Repetir Contraseña</label>
-                    <input type="password" formControlName="repetirPassword" class="input-custom"
+                    <app-form-label texto="Repetir Contraseña" [requerido]="true"
+                        forId="repetirPassword"></app-form-label>
+                    <input type="password" id="repetirPassword" formControlName="repetirPassword" class="input-custom"
                         [class.is-invalid]="errorService.mostrarError(form, 'repetirPassword') || (form.hasError('passwordMismatch') && form.get('repetirPassword')?.touched)"
                         placeholder="••••••">
                     <div class="error-container">
@@ -119,19 +123,17 @@
             }
 
             <div class="fila-formulario">
-
                 @if (esAdmin) {
                 <div class="campo-formulario">
-                    <label>Asignar Rol</label>
-                    <select formControlName="idRol" class="input-custom">
+                    <app-form-label texto="Asignar Rol" forId="idRol"></app-form-label>
+                    <select id="idRol" formControlName="idRol" class="input-custom">
                         <option [value]="3">Alumno</option>
                         <option [value]="2">Profesor</option>
                     </select>
                 </div>
                 }
-
                 <div class="campo-formulario">
-                    <label>Foto de perfil</label>
+                    <app-form-label texto="Foto de perfil" ayuda="Formatos permitidos: JPG, PNG"></app-form-label>
                     <div class="zona-subida-alumno" (click)="fileInput.click()">
                         <input type="file" #fileInput (change)="onFileSelected($event)" hidden accept="image/*">
                         <i class="bi bi-camera-fill me-2"></i>

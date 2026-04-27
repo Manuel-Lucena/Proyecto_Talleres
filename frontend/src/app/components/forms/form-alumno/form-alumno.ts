@@ -5,6 +5,7 @@ import { UsuarioRequest } from '../../../interfaces/Usuario.Interface';
 import { Validator } from '../../../validators/Validator';
 import { FormErrorService } from '../../../services/FormError.Service';
 import { TokenService } from '../../../services/Token.Service';
+import { FormLabel } from '../../dialogs/form-label/form-label';
 
 /**
  * GESTOR DE ALUMNOS: Formulario para el alta, edición y gestión de perfiles de estudiantes.
@@ -12,7 +13,7 @@ import { TokenService } from '../../../services/Token.Service';
 @Component({
   selector: 'app-form-alumno',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormLabel],
   templateUrl: './form-alumno.html',
   styleUrl: './form-alumno.scss',
 })

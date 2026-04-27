@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Validator } from '../../../validators/Validator';
 import { InscripcionService } from '../../../services/Inscripcion.Service';
 import { NotificacionService } from '../../../services/Notificacion.Service';
+import { FormLabel } from '../../dialogs/form-label/form-label';
 
 interface InscripcionImportar {
   email: string;
@@ -23,7 +24,7 @@ interface InscripcionImportar {
 @Component({
   selector: 'app-form-carga-inscripciones',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FormLabel],
   templateUrl: './form-carga-inscripciones.html',
   styleUrl: './form-carga-inscripciones.scss'
 })

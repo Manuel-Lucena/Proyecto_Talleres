@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { FormErrorService } from '../../../services/FormError.Service';
 import { Validator } from '../../../validators/Validator';
+import { FormLabel } from '../../dialogs/form-label/form-label';
 
 /**
  * GESTOR DE HORARIOS: Formulario para la planificación de sesiones semanales en talleres.
@@ -10,7 +11,7 @@ import { Validator } from '../../../validators/Validator';
 @Component({
   selector: 'app-form-horario',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormLabel],
   templateUrl: './form-horario.html',
   styleUrl: './form-horario.scss',
 })

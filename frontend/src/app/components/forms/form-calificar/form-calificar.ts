@@ -5,6 +5,7 @@ import { EntregaService } from '../../../services/Entrega.Service';
 import { ArchivoEntregaService } from '../../../services/ArchivoEntrega.Service';
 import { ArchivoService } from '../../../services/Archivo.Service';
 import { FormErrorService } from '../../../services/FormError.Service';
+import { FormLabel } from '../../dialogs/form-label/form-label';
 
 /**
  * GESTOR DE CALIFICACIONES: Formulario para la evaluación de entregas y feedback del profesor.
@@ -12,7 +13,7 @@ import { FormErrorService } from '../../../services/FormError.Service';
 @Component({
   selector: 'app-form-calificar',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormLabel],
   templateUrl: './form-calificar.html',
   styleUrl: './form-calificar.scss'
 })

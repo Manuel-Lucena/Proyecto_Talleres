@@ -1,16 +1,14 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
   <div class="modal-body" (click)="$event.stopPropagation()">
-    
     <button class="btn-close" (click)="cerrar.emit()">&times;</button>
 
     <div class="calificar-layout" *ngIf="entrega">
-      
+
       <aside class="entrega-contexto">
         <header class="header-seccion">
           <span class="badge-alumno">Entrega del Alumno</span>
           <h2>Revisar Material</h2>
         </header>
-
         <div class="contenido-entrega">
           <div class="bloque-info">
             <label>Comentarios del alumno</label>
@@ -18,14 +16,11 @@
               {{ entrega.textoEntrega || 'El alumno no ha adjuntado comentarios adicionales.' }}
             </div>
           </div>
-
           <div class="bloque-info" *ngIf="archivosAlumno.length > 0">
             <label>Material adjunto ({{ archivosAlumno.length }})</label>
             <div class="grid-archivos">
-              <div *ngFor="let a of archivosAlumno" 
-                   (click)="descargarArchivo(a)" 
-                   class="tarjeta-archivo"
-                   title="Descargar archivo">
+              <div *ngFor="let a of archivosAlumno" (click)="descargarArchivo(a)" class="tarjeta-archivo"
+                title="Descargar archivo">
                 <i class="bi bi-file-earmark-arrow-down"></i>
                 <div class="file-meta">
                   <span class="file-name">{{ a.nombre }}</span>
@@ -44,15 +39,18 @@
         </header>
 
         <form [formGroup]="form" (ngSubmit)="guardarNota()">
-          
+
           <div class="campo-nota">
-            <label>Puntuación Final</label>
+            <app-form-label texto="Puntuación Final" [requerido]="true"
+              ayuda="Escala de 0 a 10. Se permiten hasta dos decimales." forId="calificacion">
+            </app-form-label>
+
             <div class="input-nota-wrapper">
-              <input type="number" formControlName="calificacion" 
-                     placeholder="0.00"
-                     [class.is-invalid]="errorService.mostrarError(form, 'calificacion')">
+              <input type="number" id="calificacion" formControlName="calificacion" placeholder="0.00"
+                [class.is-invalid]="errorService.mostrarError(form, 'calificacion')">
               <span class="puntos-tag">/ 10</span>
             </div>
+
             <div class="error-container">
               <span *ngIf="errorService.mostrarError(form, 'calificacion')" class="error-message">
                 {{ errorService.getErrorMessage(form, 'calificacion') }}
@@ -61,10 +59,12 @@
           </div>
 
           <div class="campo-feedback">
-            <label>Retroalimentación para el alumno</label>
-            <textarea formControlName="comentarioProfesor" 
-                      rows="6" 
-                      placeholder="Escribe aquí tus observaciones, puntos de mejora o felicitaciones..."></textarea>
+            <app-form-label texto="Retroalimentación para el alumno"
+              ayuda="Escribe aquí tus observaciones, puntos de mejora o felicitaciones para motivar al alumno."
+              forId="feedback">
+            </app-form-label>
+            <textarea id="feedback" formControlName="comentarioProfesor" rows="6"
+              placeholder="Escribe aquí tus observaciones..."></textarea>
           </div>
 
           <div class="acciones-evaluacion">
@@ -74,9 +74,9 @@
             </button>
             <button type="button" (click)="cerrar.emit()" class="btn-link-cancelar">Volver sin guardar</button>
           </div>
+
         </form>
       </section>
-
     </div>
   </div>
 </div>

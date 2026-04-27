@@ -1,23 +1,29 @@
 <div class="modal-overlay">
   <div class="modal-body modal-body-wide" (click)="$event.stopPropagation()">
-
     <button class="btn-close" (click)="cerrar.emit()"><i class="bi bi-x"></i></button>
 
     <div class="modal-header-simple">
-      <h2 class="titulo-formulario">Gestor de Importación Masiva</h2>
+      <h2 class="titulo-formulario">Registro Masivo</h2>
       <p class="subtitulo">Verifica que el DNI, Email y Formatos sean correctos. Los datos en rojo deben ser corregidos
         para poder seleccionarlos.</p>
     </div>
 
-    <div class="barra-carga">
-      <div class="input-file-wrapper">
-        <i class="bi bi-file-earmark-arrow-up"></i>
-        <input type="file" (change)="onFileSelected($event)" accept=".csv">
-        <span class="file-custom">{{ archivoNombre || 'Seleccionar archivo .csv...' }}</span>
+    <div class="seccion-ingesta">
+      <app-form-label texto="Archivo de Usuarios (.csv)" [requerido]="true"
+        ayuda="El CSV debe contener: DNI, Nombre, Apellidos, Email y Rol (Alumno/Profesor).">
+      </app-form-label>
+
+      <div class="barra-carga">
+        <div class="input-file-wrapper">
+          <i class="bi bi-file-earmark-arrow-up"></i>
+          <input type="file" (change)="onFileSelected($event)" accept=".csv">
+          <span class="file-custom">{{ archivoNombre || 'Seleccionar archivo .csv...' }}</span>
+        </div>
+        <button class="btn-procesar" [disabled]="!archivoNombre" (click)="procesarArchivo()">
+          <i class="bi bi-gear-wide-connected"></i>
+          <span>Analizar Datos</span>
+        </button>
       </div>
-      <button class="btn-procesar" [disabled]="!archivoNombre" (click)="procesarArchivo()">
-        <i class="bi bi-gear-wide-connected"></i> Analizar Datos
-      </button>
     </div>
 
     <div class="contenedor-editor" *ngIf="usuariosPrevia.length > 0">
@@ -79,6 +85,5 @@
         <span *ngIf="procesando" class="spinner-border spinner-border-sm"></span>
       </button>
     </div>
-
   </div>
 </div>

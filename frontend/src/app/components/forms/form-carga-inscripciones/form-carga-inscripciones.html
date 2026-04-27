@@ -7,15 +7,22 @@
       <p class="subtitulo">Taller: <strong>{{ nombreTaller }}</strong></p>
     </div>
 
-    <div class="barra-carga">
-      <div class="input-file-wrapper">
-        <i class="bi bi-file-earmark-check-fill"></i>
-        <input type="file" (change)="onFileSelected($event)" accept=".csv" class="input-oculto">
-        <span class="file-custom">{{ archivoNombre || 'Seleccionar archivo .csv...' }}</span>
+    <div class="seccion-ingesta">
+      <app-form-label texto="Archivo de Inscripciones (.csv)" [requerido]="true"
+        ayuda="El CSV debe contener las columnas: Email, Nombre (opcional), Monto y Método de Pago (Transferencia/Tarjeta/Efectivo).">
+      </app-form-label>
+
+      <div class="barra-carga">
+        <div class="input-file-wrapper">
+          <i class="bi bi-file-earmark-check-fill"></i>
+          <input type="file" (change)="onFileSelected($event)" accept=".csv" class="input-oculto">
+          <span class="file-custom">{{ archivoNombre || 'Seleccionar archivo .csv...' }}</span>
+        </div>
+        <button class="btn-procesar" [disabled]="!archivoNombre" (click)="procesarArchivo()">
+          <i class="bi bi-gear-wide-connected"></i>
+          <span>Analizar</span>
+        </button>
       </div>
-      <button class="btn-procesar" [disabled]="!archivoNombre" (click)="procesarArchivo()">
-        <i class="bi bi-gear-wide-connected"></i> Analizar
-      </button>
     </div>
 
     <div class="contenedor-editor" *ngIf="inscripcionesPrevia.length > 0">
@@ -24,8 +31,8 @@
           <thead>
             <tr>
               <th class="col-check">
-                <input type="checkbox" [checked]="todosSeleccionados()" 
-                       [indeterminate]="algunosSeleccionados()" (change)="toggleTodos($event)">
+                <input type="checkbox" [checked]="todosSeleccionados()" [indeterminate]="algunosSeleccionados()"
+                  (change)="toggleTodos($event)">
               </th>
               <th>Email Alumno</th>
               <th>Nombre</th>
@@ -69,8 +76,10 @@
 
     <div class="acciones-form">
       <button type="button" class="btn-cancelar" (click)="cerrar.emit()">Cancelar</button>
-      <button type="button" class="btn-guardar" [disabled]="!haySeleccionados() || procesando" (click)="confirmarCarga()">
-        <span>Inscribir {{ totalSeleccionados() }} alumnos</span>
+      <button type="button" class="btn-guardar" [disabled]="!haySeleccionados() || procesando"
+        (click)="confirmarCarga()">
+        <span *ngIf="!procesando">Inscribir {{ totalSeleccionados() }} alumnos</span>
+        <span *ngIf="procesando" class="spinner-border spinner-border-sm"></span>
       </button>
     </div>
   </div>

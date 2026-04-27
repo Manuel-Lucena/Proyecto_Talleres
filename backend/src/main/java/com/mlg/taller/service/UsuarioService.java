@@ -62,7 +62,10 @@ public class UsuarioService {
     public AuthResponseDTO login(LoginRequestDTO dto) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword()));
-        Usuario usuario = buscarPorEmailInterno(dto.getEmail());
+
+        Usuario usuario = usuarioRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con email: " + dto.getEmail()));
+
         return mapearAuthResponse(usuario);
     }
 

@@ -6,6 +6,7 @@ import { TallerService } from '../../../services/Taller.Service';
 import { UsuarioService } from '../../../services/Usuario.Service';
 import { TallerResponse } from '../../../interfaces/Taller.Interface';
 import { UsuarioResponse } from '../../../interfaces/Usuario.Interface';
+import { FormLabel } from '../../dialogs/form-label/form-label';
 
 /**
  * GESTOR DE INSCRIPCIONES MANUALES: Formulario para la matriculación administrativa de alumnos.
@@ -13,7 +14,7 @@ import { UsuarioResponse } from '../../../interfaces/Usuario.Interface';
 @Component({
   selector: 'app-form-inscripcion-admin',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgSelectModule],
+  imports: [CommonModule, ReactiveFormsModule, NgSelectModule, FormLabel],
   templateUrl: './form-inscripcion-admin.html',
   styleUrl: './form-inscripcion-admin.scss'
 })

@@ -1,6 +1,5 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
   <div class="modal-body-admin" (click)="$event.stopPropagation()">
-    
     <button class="btn-close-modal" (click)="cerrar.emit()">
       <i class="bi bi-x-lg"></i>
     </button>
@@ -24,40 +23,40 @@
     </div>
 
     <form [formGroup]="inscripcionForm" (ngSubmit)="enviar()">
-      
+
       <div class="campo-formulario mb-4" *ngIf="!usuarioParaInscribir">
-        <label>Buscar Alumno</label>
-        <ng-select 
-          [items]="usuarios"
-          bindLabel="email" 
-          bindValue="idUsuario"
-          formControlName="idUsuario"
+        <app-form-label texto="Buscar Alumno" [requerido]="true"
+          ayuda="Busca por email o nombre.">
+        </app-form-label>
+        <ng-select [items]="usuarios" bindLabel="email" bindValue="idUsuario" formControlName="idUsuario"
           placeholder="Escriba email o nombre del alumno">
         </ng-select>
       </div>
 
       <div class="campo-formulario mb-4" *ngIf="!tallerParaInscribir">
-        <label>Seleccionar Taller</label>
-        <ng-select 
-          [items]="talleres"
-          bindLabel="nombre"
-          bindValue="idTaller"
-          formControlName="idTaller"
+        <app-form-label texto="Seleccionar Taller" [requerido]="true"
+          ayuda="Elige el curso en el que quieres matricular al alumno.">
+        </app-form-label>
+        <ng-select [items]="talleres" bindLabel="nombre" bindValue="idTaller" formControlName="idTaller"
           placeholder="Seleccione el curso">
         </ng-select>
       </div>
 
       <div class="fila-formulario">
         <div class="campo-formulario">
-          <label>Importe Recibido</label>
+          <app-form-label texto="Importe Recibido" [requerido]="true"
+            ayuda="Cantidad abonada por el alumno." forId="monto">
+          </app-form-label>
           <div class="input-currency-wrapper">
-            <input type="number" formControlName="montoPagado">
+            <input type="number" id="monto" formControlName="montoPagado">
             <span class="currency-tag">€</span>
           </div>
         </div>
 
         <div class="campo-formulario">
-          <label>Referencia Administrativa</label>
+          <app-form-label texto="Referencia Administrativa" [requerido]="true"
+            ayuda="Código único de seguimiento para esta transacción.">
+          </app-form-label>
           <div class="order-id-box">
             <code>{{ inscripcionForm.get('orderId')?.value }}</code>
             <button type="button" (click)="generarOrderId()" title="Regenerar código">
@@ -75,7 +74,6 @@
           Confirmar Matrícula
         </button>
       </div>
-
     </form>
   </div>
 </div>

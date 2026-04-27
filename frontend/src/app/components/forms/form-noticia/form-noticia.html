@@ -3,52 +3,56 @@
     <button type="button" class="btn-close" (click)="cerrarModal()">&times;</button>
 
     <div class="noticia-grid-container">
-      
       <div class="noticia-form-col">
         <h4 class="titulo-formulario">{{ noticiaParaEditar ? 'Editar' : 'Nueva' }} Noticia</h4>
-        
+
         <form [formGroup]="form" class="form-flex" (submit)="$event.preventDefault()">
-          
+
           <div class="campo-formulario">
-            <label>TÍTULO DE LA NOTICIA</label>
-            <input type="text" 
-                   formControlName="titulo" 
-                   class="input-personalizado" 
-                   [class.is-invalid]="errorService.mostrarError(form, 'titulo')"
-                   placeholder="Ej: Gran apertura...">
+            <app-form-label texto="TÍTULO DE LA NOTICIA" [requerido]="true"
+              ayuda="Mínimo 5 caracteres para un título descriptivo" forId="tituloNoticia">
+            </app-form-label>
+            <input type="text" id="tituloNoticia" formControlName="titulo" class="input-personalizado"
+              [class.is-invalid]="errorService.mostrarError(form, 'titulo')" placeholder="Ej: Gran apertura...">
             <div class="error-container">
-              @if (errorService.mostrarError(form, 'titulo')) { 
-                <span class="error-message">{{ errorService.getErrorMessage(form, 'titulo') }}</span> 
+              @if (errorService.mostrarError(form, 'titulo')) {
+              <span class="error-message">{{ errorService.getErrorMessage(form, 'titulo') }}</span>
               }
             </div>
           </div>
-          
+
           <div class="campo-formulario">
-            <label>CONTENIDO</label>
-            <textarea formControlName="contenido" 
-                      class="input-personalizado" 
-                      [class.is-invalid]="errorService.mostrarError(form, 'contenido')"
-                      rows="9" 
-                      placeholder="Escribe aquí el cuerpo de la noticia..."></textarea>
+            <app-form-label texto="CONTENIDO" [requerido]="true"
+              ayuda="Redacta el cuerpo de la noticia. Se verá reflejado en la vista previa a la derecha."
+              forId="contenidoNoticia">
+            </app-form-label>
+            <textarea id="contenidoNoticia" formControlName="contenido" class="input-personalizado"
+              [class.is-invalid]="errorService.mostrarError(form, 'contenido')" rows="9"
+              placeholder="Escribe aquí el cuerpo de la noticia..."></textarea>
             <div class="error-container">
-              @if (errorService.mostrarError(form, 'contenido')) { 
-                <span class="error-message">{{ errorService.getErrorMessage(form, 'contenido') }}</span> 
+              @if (errorService.mostrarError(form, 'contenido')) {
+              <span class="error-message">{{ errorService.getErrorMessage(form, 'contenido') }}</span>
               }
             </div>
           </div>
-          
-          <div class="zona-subida-noticia" (click)="fileInput.click()">
-            <input type="file" #fileInput (change)="onFileSelected($event)" hidden accept="image/*">
-            <i class="bi bi-image me-2"></i> 
-            <span>{{ fileSeleccionado ? fileSeleccionado.name : 'Cambiar imagen destacada' }}</span>
+
+          <div class="campo-formulario">
+            <app-form-label texto="IMAGEN DESTACADA"
+              ayuda="Se recomienda una imagen horizontal para que luzca mejor en la tarjeta">
+            </app-form-label>
+            <div class="zona-subida-noticia" (click)="fileInput.click()">
+              <input type="file" #fileInput (change)="onFileSelected($event)" hidden accept="image/*">
+              <i class="bi bi-image me-2"></i>
+              <span>{{ fileSeleccionado ? fileSeleccionado.name : 'Cambiar imagen destacada' }}</span>
+            </div>
           </div>
+
         </form>
       </div>
 
       <div class="noticia-preview-col">
         <div class="preview-top-content">
           <p class="preview-label">VISTA PREVIA</p>
-          
           <div class="vista-previa-tarjeta">
             <div class="img-contenedor">
               <img [src]="imagenPreview || '/icons/Logo.png'">
@@ -61,16 +65,12 @@
         </div>
 
         <div class="acciones-finales">
-          <button type="button" 
-                  class="btn-guardar-noticia" 
-                  [disabled]="form.invalid" 
-                  (click)="enviar()">
+          <button type="button" class="btn-guardar-noticia" [disabled]="form.invalid" (click)="enviar()">
             <i class="bi bi-check-circle-fill me-2"></i>
             {{ noticiaParaEditar ? 'GUARDAR CAMBIOS' : 'PUBLICAR AHORA' }}
           </button>
         </div>
       </div>
-
     </div>
   </div>
 </div>

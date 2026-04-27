@@ -1,6 +1,5 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
   <div class="modal-body" (click)="$event.stopPropagation()">
-
     <button class="btn-close" (click)="cerrar.emit()">
       <i class="bi bi-x-lg"></i>
     </button>
@@ -17,15 +16,23 @@
 
     <div class="modal-content-body">
       <div class="seccion-input">
-        <label class="label-custom">Aclaraciones o comentarios</label>
-        <textarea [(ngModel)]="textoEntrega" class="textarea-entrega" rows="3"
-          placeholder="Escribe aquí cualquier observación sobre tu entrega...">
+        <app-form-label 
+          texto="Aclaraciones o comentarios" 
+          ayuda="Puedes añadir una breve explicación sobre tu entrega o dudas que hayas tenido."
+          forId="aclaraciones">
+        </app-form-label>
+        <textarea id="aclaraciones" [(ngModel)]="textoEntrega" class="textarea-entrega" rows="3" 
+                  placeholder="Escribe aquí cualquier observación sobre tu entrega...">
         </textarea>
       </div>
 
       <div class="seccion-archivos">
-        <label class="label-custom">Archivos adjuntos</label>
-
+        <app-form-label 
+          texto="Archivos adjuntos" 
+          [requerido]="!entregaExistente"
+          ayuda="Formatos permitidos: PDF, DOCX, ZIP. Tamaño máximo por archivo: 10MB.">
+        </app-form-label>
+        
         <div class="dropzone-entrega">
           <input type="file" multiple (change)="onFileChange($event)" class="input-hidden">
           <div class="dropzone-info">
@@ -38,7 +45,6 @@
         </div>
 
         <div class="grid-archivos-entregados" *ngIf="archivosExistentes.length > 0 || nuevosArchivos.length > 0">
-
           <div *ngFor="let arch of archivosExistentes" class="file-chip existente">
             <i class="bi bi-file-earmark-check"></i>
             <span class="name">{{ arch.nombre }}</span>
@@ -54,7 +60,6 @@
               <i class="bi bi-x-circle"></i>
             </button>
           </div>
-
         </div>
       </div>
     </div>

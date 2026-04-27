@@ -1,0 +1,29 @@
+.form-label-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-weight: 500;
+
+  label {
+    margin: 0;
+    cursor: pointer;
+    color: #333;
+    font-size: 0.95rem;
+  }
+
+  .required-mark {
+    color: #dc3545; // Rojo
+    cursor: help;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+
+    .info-icon {
+      font-size: 0.8rem;
+      margin-left: 2px;
+      color: #6c757d; 
+    }
+  }
+}

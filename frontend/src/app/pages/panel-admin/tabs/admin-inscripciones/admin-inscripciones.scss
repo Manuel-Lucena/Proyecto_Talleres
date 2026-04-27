@@ -1,9 +1,11 @@
 /* ========================================================================== 
-   VISTA: GESTIÓN DE INSCRIPCIONES (ADMIN) - SINCRONIZADA CON USUARIOS
+   VISTA: GESTIÓN DE INSCRIPCIONES (ADMIN) 
+   Layout administrativo con control de colisiones y responsive anticipado.
    ========================================================================== */
 @use '../../../../../styles/variables' as v;
 @use '../../../../../styles/mixins' as m;
 
+// 1. ESTRUCTURA DE SOPORTE Y CONTENEDOR PRINCIPAL
 .admin-wrapper {
   padding: 2.5rem;
   background-color: v.$color-fondo-pagina;
@@ -23,30 +25,37 @@
   }
 }
 
+// 2. CABECERA DE PÁGINA (CONTROL DE COLISIONES)
 .admin-header {
   flex-shrink: 0;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   margin-bottom: 2rem;
   gap: 1.5rem;
+  width: 100%;
 
-  @media (max-width: 992px) {
+  // Salto vertical anticipado (1350px) para evitar overlap de botones y título
+  @media (max-width: 1350px) {
     flex-direction: column;
     align-items: stretch;
+    gap: 1.5rem;
   }
 
+  // Grupo Izquierdo: Retorno y Títulos
   .header-left {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 1.2rem;
+    min-width: 0;
 
     .btn-back {
       width: 40px;
       height: 40px;
+      flex-shrink: 0;
       border-radius: 8px;
       border: 1px solid #ddd;
-      background: white;
+      background: v.$color-neutro-max;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -78,49 +87,57 @@
     }
   }
 
+  // Acciones Globales (Botones de Inscripción y Exportación)
   .header-actions {
     display: flex;
     gap: 0.75rem;
-    align-items: stretch;
+    align-items: center;
+    flex-shrink: 0;
+
+    @media (max-width: 1350px) {
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
 
     @media (max-width: 600px) {
       flex-direction: column;
+      width: 100%;
     }
 
     .btn-primario-aula,
     .btn-header-pdf,
     .btn-header-masivo {
-      height: 52px !important;
-      min-height: 52px;
+      height: 52px;
       padding: 0 1.5rem;
       border-radius: v.$radio-curvatura;
       font-family: v.$fuente-enfasis;
       font-weight: 700;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 12px;
       cursor: pointer;
       transition: all 0.3s ease;
       white-space: nowrap;
+      font-size: 0.9rem;
+
+      @media (max-width: 600px) {
+        width: 100%;
+      }
 
       &:hover:not(:disabled) {
         transform: translateY(-2px);
-      }
-
-      &:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
       }
     }
 
     .btn-primario-aula {
       @include m.boton-primario;
+      background-color: #00d64f;
       border: 1px solid transparent;
     }
 
     .btn-header-pdf {
-      background: white !important;
+      background: v.$color-neutro-max;
       border: 1px solid #e2e8f0;
       color: v.$color-secundario-frio-2;
       box-shadow: v.$sombra-nivel-1;
@@ -132,43 +149,40 @@
 
       &:hover:not(:disabled) {
         border-color: #e11d48;
-        background: #f8fafc !important;
       }
     }
 
     .btn-header-masivo {
-      background: #15803d !important;
-      color: white;
+      background: #15803d;
+      color: v.$color-neutro-max;
       border: none;
       box-shadow: v.$sombra-nivel-1;
 
-      i {
-        font-size: 1.2rem;
-      }
-
       &:hover:not(:disabled) {
-        background: #166534 !important;
+        background: #166534;
       }
     }
   }
 }
 
+// 3. BARRA DE HERRAMIENTAS (BÚSQUEDA Y FILTROS)
 .admin-toolbar {
   flex-shrink: 0;
   padding: 1.2rem 1.5rem;
   display: flex;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
-  background: white;
+  background: v.$color-neutro-max;
   border-radius: v.$radio-curvatura;
   box-shadow: v.$sombra-nivel-1;
   align-items: center;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     flex-direction: column;
-    padding: 1.5rem;
+    align-items: stretch;
   }
 
+  // Input de búsqueda con prefijo de criterio
   .search-group {
     display: flex;
     flex: 2;
@@ -185,18 +199,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-
+      flex-shrink: 0;
       .fixed-criteria {
         display: flex;
         align-items: center;
         gap: 8px;
-        font-size: 0.9rem;
         font-weight: 600;
         color: v.$color-secundario-frio-2;
-
-        i {
-          color: v.$color-marca-principal;
-        }
+        i { color: v.$color-marca-principal; }
       }
     }
 
@@ -205,13 +215,7 @@
       position: relative;
       display: flex;
       align-items: center;
-
-      i {
-        position: absolute;
-        left: 15px;
-        color: v.$color-marca-principal;
-      }
-
+      i { position: absolute; left: 15px; color: v.$color-marca-principal; }
       .input-aula {
         border: none;
         padding-left: 45px;
@@ -223,19 +227,28 @@
     }
   }
 
-  .container-filters {
-    flex: 1;
 
-    @media (max-width: 768px) {
-      width: 100%;
-    }
+  .container-filters {
+    display: flex;
+    gap: 1rem;
+    flex: 1;
+    @media (max-width: 600px) { flex-direction: column; }
   }
 
   .filter-box {
     flex: 1;
     position: relative;
-    width: 100%;
-
+    
+    .select-aula {
+      @include m.estilo-input-base;
+      padding-left: 45px;
+      padding-right: 10px; 
+      width: 100%;
+      height: 50px;
+      cursor: pointer;
+      background-color: v.$color-neutro-max;
+    }
+    
     i {
       position: absolute;
       left: 15px;
@@ -243,31 +256,14 @@
       transform: translateY(-50%);
       color: v.$color-marca-principal;
       z-index: 2;
-      pointer-events: none;
-    }
-
-    .select-aula {
-      @include m.estilo-input-base;
-      padding-left: 45px !important;
-      padding-top: 0 !important;
-      padding-bottom: 0 !important;
-      width: 100%;
-      height: 50px !important;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      line-height: 50px;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 15px center;
-      background-size: 12px;
+      pointer-events: none; 
     }
   }
 }
 
+// 4. ÁREA DE DATOS (TABLA EDITORIAL)
 .admin-card {
-  background: white;
+  background: v.$color-neutro-max;
   border-radius: v.$radio-curvatura;
   box-shadow: v.$sombra-nivel-1;
   flex: 1;
@@ -278,7 +274,6 @@
   .table-responsive {
     width: 100%;
     overflow-x: auto;
-    overflow-y: auto;
     flex: 1;
   }
 }
@@ -314,20 +309,10 @@
   .main-text {
     font-weight: 700;
     font-family: v.$fuente-enfasis;
-    display: inline-block;
-    max-width: 400px; 
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: middle;
-  }
-
-  .price-tag {
-    font-weight: 800;
-    font-family: v.$fuente-enfasis;
   }
 }
 
+// 5. COMPONENTES DE ESTADO Y UTILIDADES
 .badge-aula {
   padding: 6px 14px;
   border-radius: 20px;
@@ -345,11 +330,6 @@
     background: rgba(v.$color-secundario-frio-1, 0.1);
     color: v.$color-secundario-frio-1;
   }
-
-  &.warning {
-    background: rgba(v.$color-secundario-calido-1, 0.1);
-    color: v.$color-secundario-calido-1;
-  }
 }
 
 .actions-group {
@@ -362,7 +342,7 @@
     height: 36px;
     border-radius: 10px;
     border: 1px solid #edf2f7;
-    background: white;
+    background: v.$color-neutro-max;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -374,23 +354,18 @@
       color: v.$color-marca-principal;
       transform: translateY(-2px);
     }
-
-    &.delete:hover {
-      border-color: v.$color-secundario-calido-1;
-      color: v.$color-secundario-calido-1;
-      background: #fff5f5;
-    }
   }
 }
 
 .text-right {
-  text-align: right !important;
+  text-align: right;
 }
 
 .admin-pagination {
   @include m.estilo-paginacion-admin;
 }
 
+// Animaciones
 .spin {
   animation: rotation 1s infinite linear;
   display: inline-block;

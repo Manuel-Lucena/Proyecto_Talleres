@@ -1,13 +1,11 @@
 /* ==========================================================================
    SISTEMA DE MODALES: GESTOR DE IMPORTACIÓN MASIVA
-   Interfaz de análisis, validación y edición de tablas de datos (Excel/CSV).
    ========================================================================== */
-
 @use '../../../../styles/variables' as v;
 @use '../../../../styles/mixins' as m;
 @use '../../../../styles/formularios' as f;
 
-// 1. OVERLAY 
+// 1. OVERLAY
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -20,23 +18,27 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
+    padding: 1rem; // Reducido para móviles
     @include m.animacion-entrada;
 }
 
-// 2. CUERPO DEL GESTOR 
+// 2. CUERPO DEL GESTOR
 .modal-body {
     background: v.$color-neutro-max;
     width: 100%;
-    max-width: 950px; 
-    max-height: 90vh;
+    max-width: 1000px;
+    max-height: 95vh;
     border-radius: v.$radio-curvatura * 2;
     box-shadow: v.$sombra-nivel-3;
-    padding: 3rem;
+    padding: 2rem; // Ajustado
     position: relative;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+
+    @media (min-width: 768px) {
+        padding: 3rem;
+    }
 
     .btn-close {
         position: absolute;
@@ -50,33 +52,45 @@
 
 // 3. CABECERA TÉCNICA
 .modal-header-simple {
-    margin-bottom: 2rem;
-    text-align: left;
+    margin-bottom: 1.5rem;
 
     .titulo-formulario {
         font-family: v.$fuente-enfasis;
-        font-size: 1.8rem;
+        font-size: 1.6rem;
         color: v.$color-secundario-frio-2;
         margin-bottom: 0.5rem;
     }
 
     .subtitulo {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         color: v.$color-superficie-suave;
-        font-weight: 500;
+        line-height: 1.4;
     }
 }
 
-// 4. BARRA DE CARGA E INGESTA DE ARCHIVOS
+// 4. BARRA DE CARGA E INGESTA (CON SOPORTE LABEL)
+.seccion-ingesta {
+    margin-bottom: 1.5rem;
+
+    app-form-label {
+        margin-bottom: 0.8rem;
+        display: block;
+    }
+}
+
 .barra-carga {
     display: flex;
+    flex-direction: column; // Móvil por defecto
     gap: 1rem;
     background: v.$color-fondo-pagina;
-    padding: 1.2rem;
+    padding: 1rem;
     border-radius: v.$radio-curvatura;
-    margin-bottom: 1.5rem;
-    align-items: center;
-    border: 1px solid rgba(v.$color-secundario-frio-2, 0.05);
+    border: 1px solid rgba(v.$color-secundario-frio-2, 0.1);
+
+    @media (min-width: 600px) {
+        flex-direction: row;
+        align-items: center;
+    }
 
     .input-file-wrapper {
         flex-grow: 1;
@@ -88,15 +102,9 @@
         display: flex;
         align-items: center;
         padding: 0 1rem;
-        transition: all 0.3s ease;
-
-        &:hover {
-            border-color: v.$color-marca-principal;
-        }
 
         i {
             color: v.$color-marca-principal;
-            font-size: 1.2rem;
             margin-right: 12px;
         }
 
@@ -108,160 +116,140 @@
         }
 
         .file-custom {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: v.$color-secundario-frio-2;
             font-weight: 700;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
 
     .btn-procesar {
-        @include m.boton-primario; 
+        @include m.boton-primario;
         height: 48px;
-        padding: 0 2rem;
         margin: 0;
-        font-size: 0.9rem;
-        white-space: nowrap;
+        width: 100%; // Full width en móvil
+
+        @media (min-width: 600px) {
+            width: auto;
+        }
     }
 }
 
-// --------------------------------------------------------------------------
 // 5. EDITOR DE DATOS (TABLA DINÁMICA)
-// --------------------------------------------------------------------------
 .contenedor-editor {
     border: 1px solid #eef0f2;
     border-radius: v.$radio-curvatura;
     background: white;
     margin-bottom: 2rem;
-    flex-grow: 1;
+    overflow: hidden; // Para que el scroll no rompa el borde
 
     .scroll-tabla {
         max-height: 400px;
+        overflow-x: auto; // Crucial para responsive
         overflow-y: auto;
-
-   
-        &::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        &::-webkit-scrollbar-thumb {
-            background: #ddd;
-            border-radius: 10px;
-        }
     }
 
     .tabla-editable {
         width: 100%;
+        min-width: 800px; // Evita que las columnas se colapsen
         border-collapse: collapse;
 
-   
         th {
             position: sticky;
             top: 0;
             background: #f8fafc;
             padding: 1rem;
-            text-align: left;
             font-size: 0.7rem;
-            font-weight: 800;
             color: v.$color-superficie-suave;
             text-transform: uppercase;
-            letter-spacing: 1px;
             border-bottom: 2px solid #eef0f2;
             z-index: 5;
         }
 
         td {
-            padding: 0.5rem 1rem;
+            padding: 0.5rem;
             border-bottom: 1px solid #f1f4f8;
 
             input,
             select {
                 width: 100%;
                 border: 1px solid transparent;
-                padding: 8px;
-                border-radius: 4px;
-                font-size: 0.85rem;
-                color: v.$color-secundario-frio-2;
-                background: transparent;
+                padding: 6px;
+                font-size: 0.8rem;
 
-                &:focus,
-                &:hover {
+                &:focus {
+                    border-color: v.$color-marca-principal;
                     background: white;
-                    border-color: rgba(v.$color-marca-principal, 0.3);
-                    outline: none;
                 }
 
-                // Error específico en celda
                 &.input-error {
                     color: v.$color-secundario-calido-1;
                     border-color: v.$color-secundario-calido-1;
-                    background: rgba(v.$color-secundario-calido-1, 0.02);
                 }
             }
 
             &.col-check {
-                width: 50px;
+                width: 40px;
                 text-align: center;
             }
 
-            // Indicadores de estado de fila
             .error-tag {
                 color: v.$color-secundario-calido-1;
-                font-size: 0.75rem;
+                font-size: 0.7rem;
                 font-weight: 700;
-                display: flex;
-                align-items: center;
-                gap: 5px;
             }
 
             .ok-tag {
                 color: v.$color-secundario-calido-2;
-                font-size: 0.75rem;
+                font-size: 0.7rem;
                 font-weight: 700;
-                display: flex;
-                align-items: center;
-                gap: 5px;
             }
-        }
-
-        tr:hover td {
-            background-color: #f9fbff;
-        }
-
-    
-        .row-invalid td {
-            background-color: rgba(v.$color-secundario-calido-1, 0.01);
         }
     }
 }
 
-// 6. ACCIONES FINALES 
+// 6. ACCIONES FINALES
 .acciones-form {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr;
-    gap: 1.5rem;
-    padding-top: 1rem;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    padding-top: 1.5rem;
     border-top: 1px solid #eee;
 
+    @media (max-width: 600px) {
+        button {
+            flex: 1;
+            font-size: 0.85rem;
+            padding: 0 0.5rem;
+        }
+    }
+
+    @media (min-width: 600px) {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+    }
+
     button {
-        height: 54px;
+        height: 50px;
         border-radius: v.$radio-curvatura;
         font-family: v.$fuente-enfasis;
         font-weight: 700;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: none;
-        transition: 0.3s;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
 
     .btn-cancelar {
         background: v.$color-fondo-pagina;
         color: v.$color-superficie-suave;
-        cursor: pointer;
+        border: none;
 
         &:hover {
             background: #e2e8f0;
-            color: v.$color-secundario-frio-2;
         }
     }
 
@@ -272,7 +260,6 @@
         &:disabled {
             background: #e0e0e0;
             color: #999;
-            cursor: not-allowed;
             box-shadow: none;
             transform: none;
         }
