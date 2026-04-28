@@ -53,7 +53,7 @@
 
 // 3. CUERPO DE LA NOTICIA (CARD EDITORIAL)
 .cuerpo-noticia {
-    @include m.card-elevada; // Consistencia con tus cards de admin y landing
+    @include m.card-elevada; 
     background: v.$color-neutro-max;
     border: none;
     overflow: hidden;

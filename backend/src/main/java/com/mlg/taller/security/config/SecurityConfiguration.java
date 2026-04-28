@@ -28,11 +28,11 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. AÑADE ESTO: Activa CORS con la configuración que definimos abajo
+                
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // 2. AÑADE ESTO: Permite todas las peticiones de tipo OPTIONS (Preflight)
+                      // Permite todas las peticiones de tipo OPTIONS (Preflight)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // =========================================================

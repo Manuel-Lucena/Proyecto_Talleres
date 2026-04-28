@@ -85,7 +85,6 @@ export class TokenService {
   isLogged(): boolean {
     const dec = this.decode();
     if (!dec) return false;
-    // Multiplicamos por 1000 porque 'exp' está en segundos y Date.now() en milisegundos
     return (dec.exp * 1000) > Date.now();
   }
 
