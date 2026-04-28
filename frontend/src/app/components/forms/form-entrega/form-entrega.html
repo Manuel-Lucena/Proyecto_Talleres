@@ -1,5 +1,5 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
-  <div class="modal-body" (click)="$event.stopPropagation()">
+  <div class="modal-body" (click)="$event.stopPropagation()" [formGroup]="entregaForm">
     <button class="btn-close" (click)="cerrar.emit()">
       <i class="bi bi-x-lg"></i>
     </button>
@@ -21,18 +21,27 @@
           ayuda="Puedes añadir una breve explicación sobre tu entrega o dudas que hayas tenido."
           forId="aclaraciones">
         </app-form-label>
-        <textarea id="aclaraciones" [(ngModel)]="textoEntrega" class="textarea-entrega" rows="3" 
-                  placeholder="Escribe aquí cualquier observación sobre tu entrega...">
+        
+        <textarea 
+          id="aclaraciones" 
+          formControlName="textoEntrega" 
+          class="textarea-entrega" 
+          rows="3" 
+          placeholder="Escribe aquí cualquier observación sobre tu entrega...">
         </textarea>
+        
+        <div *ngIf="entregaForm.get('textoEntrega')?.invalid && entregaForm.get('textoEntrega')?.touched" class="text-danger small mt-1">
+          El comentario es obligatorio (mínimo 10 caracteres).
+        </div>
       </div>
 
       <div class="seccion-archivos">
         <app-form-label 
           texto="Archivos adjuntos" 
-          [requerido]="!entregaExistente"
+          [requerido]="!entregaExistente" 
           ayuda="Formatos permitidos: PDF, DOCX, ZIP. Tamaño máximo por archivo: 10MB.">
         </app-form-label>
-        
+
         <div class="dropzone-entrega">
           <input type="file" multiple (change)="onFileChange($event)" class="input-hidden">
           <div class="dropzone-info">
@@ -69,7 +78,10 @@
         <button type="button" class="btn-cancelar" (click)="cerrar.emit()">
           Cancelar
         </button>
-        <button (click)="enviar()" class="btn-enviar-final" [disabled]="cargando">
+        <button 
+          (click)="enviar()" 
+          class="btn-enviar-final" 
+          [disabled]="cargando || entregaForm.invalid">
           <span *ngIf="!cargando">
             {{ entregaExistente ? 'Guardar cambios' : 'Enviar tarea' }}
           </span>

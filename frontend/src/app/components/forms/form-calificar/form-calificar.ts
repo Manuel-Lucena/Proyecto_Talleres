@@ -18,7 +18,6 @@ import { FormLabel } from '../../dialogs/form-label/form-label';
   styleUrl: './form-calificar.scss'
 })
 export class FormCalificar implements OnInit {
-
   // --- Propiedades de Entrada y Salida ---
   @Input() entrega: any;                         // Datos de la entrega para calificar
   @Output() cerrar = new EventEmitter<void>();    // Notificador de cierre de modal
@@ -30,8 +29,13 @@ export class FormCalificar implements OnInit {
 
   /** Estructura reactiva con reglas de evaluación */
   form = new FormGroup({
-    calificacion: new FormControl('', { validators: [Validators.required, Validators.min(0), Validators.max(10)], updateOn: 'blur' }),
-    comentarioProfesor: new FormControl('', { updateOn: 'blur' })
+    calificacion: new FormControl('', { 
+      validators: [Validators.required, Validators.min(0), Validators.max(10)], 
+      updateOn: 'blur' 
+    }),
+    comentarioProfesor: new FormControl('', { 
+      updateOn: 'blur' 
+    })
   });
 
   /**

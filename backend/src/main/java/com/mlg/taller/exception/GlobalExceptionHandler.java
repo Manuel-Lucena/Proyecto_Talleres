@@ -17,10 +17,33 @@ import java.util.Map;
  * Service
  * y los transforma en una respuesta estandarizada mediante ApiResponse.
  */
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     // --- MANEJO DE ERRORES DE CLIENTE (4xx) ---
+
+    /**
+     * Gestiona los errores de validación de los campos de los DTOs (@Valid).
+     * Construye un mapa detallado de "campo: error" para facilitar el feedback en
+     * formularios.
+     * 
+     * @param ex Excepción lanzada automáticamente por Spring al fallar la
+     *           validación.
+     * @return Respuesta 400 con el detalle de errores por campo.
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errores = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String campo = ((FieldError) error).getField();
+            String mensaje = error.getDefaultMessage();
+            errores.put(campo, mensaje);
+        });
+
+        return ApiResponse.error("Errores de validación", errores, HttpStatus.BAD_REQUEST.value());
+    }
 
     /**
      * Gestiona los casos donde el recurso solicitado no existe en la base de datos.
@@ -57,28 +80,6 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<Void> handleBadRequest(BadRequestException ex) {
         return ApiResponse.error(ex.getMessage(), HttpStatus.BAD_REQUEST.value());
-    }
-
-    /**
-     * Gestiona los errores de validación de los campos de los DTOs (@Valid).
-     * Construye un mapa detallado de "campo: error" para facilitar el feedback en
-     * formularios.
-     * 
-     * @param ex Excepción lanzada automáticamente por Spring al fallar la
-     *           validación.
-     * @return Respuesta 400 con el detalle de errores por campo.
-     */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiResponse<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errores = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String campo = ((FieldError) error).getField();
-            String mensaje = error.getDefaultMessage();
-            errores.put(campo, mensaje);
-        });
-
-        return ApiResponse.error("Errores de validación", errores, HttpStatus.BAD_REQUEST.value());
     }
 
     /**

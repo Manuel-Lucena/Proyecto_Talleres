@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EntregaService } from '../../../services/Entrega.Service';
 import { ArchivoEntregaService } from '../../../services/ArchivoEntrega.Service';
 import { TokenService } from '../../../services/Token.Service';
@@ -18,7 +18,6 @@ import { FormLabel } from '../../dialogs/form-label/form-label';
   styleUrl: './form-entrega.scss'
 })
 export class FormEntrega implements OnInit {
-
   // --- Propiedades de Entrada y Salida ---
   @Input() recurso: any;                         // Contexto de la tarea actual
   @Input() entregaExistente: any = null;          // Datos para la carga en modo edición
@@ -27,28 +26,43 @@ export class FormEntrega implements OnInit {
   @Output() cerrar = new EventEmitter<void>();    // Notificador de cierre de modal
 
   // --- Propiedades de Datos y UI ---
-  textoEntrega: string = '';                      // Cuerpo de texto de la respuesta
+  entregaForm!: FormGroup;                        // Grupo de control reactivo
   nuevosArchivos: File[] = [];                    // Buffer temporal de ficheros a subir
   paraEliminar: number[] = [];                    // Registro de IDs marcados para borrado
   cargando: boolean = false;                      // Flag de control para el estado de envío
 
   /**
+   * @param fb Constructor de formularios reactivos.
    * @param entregaService Operaciones de persistencia para la entidad Entrega.
    * @param archivoEntregaService Gestión del almacenamiento de ficheros asociados.
    * @param tokenService Proveedor de identidad del alumno autenticado.
    */
   constructor(
+    private fb: FormBuilder,
     private entregaService: EntregaService,
     private archivoEntregaService: ArchivoEntregaService,
     private tokenService: TokenService
-  ) {}
+  ) {
+    this.initForm();
+  }
+
+  /**
+   * Inicializa la estructura del formulario reactivo con sus validaciones.
+   */
+  private initForm(): void {
+    this.entregaForm = this.fb.group({
+      textoEntrega: ['', [Validators.required, Validators.minLength(10)]]
+    });
+  }
 
   /**
    * Ciclo de vida: Inicia la carga del texto de entrega si existe una versión previa.
    */
   ngOnInit(): void {
     if (this.entregaExistente) {
-      this.textoEntrega = this.entregaExistente.textoEntrega || '';
+      this.entregaForm.patchValue({
+        textoEntrega: this.entregaExistente.textoEntrega || ''
+      });
     }
   }
 
@@ -89,6 +103,8 @@ export class FormEntrega implements OnInit {
    * Coordina el flujo de persistencia: actualización de texto, borrado de archivos y subida de nuevos.
    */
   async enviar(): Promise<void> {
+    if (this.entregaForm.invalid) return;
+
     const idUsuario = this.tokenService.getId();
     const idTarea = this.recurso?.idTarea || this.recurso?.id;
 
@@ -98,6 +114,7 @@ export class FormEntrega implements OnInit {
     }
 
     this.cargando = true;
+    const datosEntrega = this.entregaForm.value;
 
     try {
       let idEntrega: number;
@@ -105,17 +122,17 @@ export class FormEntrega implements OnInit {
       if (this.entregaExistente) {
         // Flujo de Actualización
         idEntrega = this.entregaExistente.idEntrega;
-        await lastValueFrom(this.entregaService.actualizar(idEntrega, { textoEntrega: this.textoEntrega }));
-        
+        await lastValueFrom(this.entregaService.actualizar(idEntrega, datosEntrega));
+
         for (const idF of this.paraEliminar) {
           await lastValueFrom(this.archivoEntregaService.eliminar(idF));
         }
       } else {
         // Flujo de Creación Inicial
-        const resp = await lastValueFrom(this.entregaService.enviar({ 
-          idTarea: idTarea, 
-          idUsuario: idUsuario, 
-          textoEntrega: this.textoEntrega 
+        const resp = await lastValueFrom(this.entregaService.enviar({
+          idTarea: idTarea,
+          idUsuario: idUsuario,
+          textoEntrega: datosEntrega.textoEntrega
         }));
         idEntrega = resp.data.idEntrega;
       }
@@ -127,7 +144,6 @@ export class FormEntrega implements OnInit {
 
       this.guardado.emit();
       this.cerrar.emit();
-
     } catch (e) {
       console.error("CRITICAL: Fallo en el proceso de entrega", e);
     } finally {
