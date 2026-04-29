@@ -73,7 +73,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
      * * @return Lista completa de usuarios (activos e inactivos).
      */
     @Query(value = "SELECT * FROM usuario", nativeQuery = true)
-    List<Usuario> findAllAlumnosAdmin();
+    List<Usuario> findAllAdmin();
 
     /**
      * Busca un usuario por su ID saltándose las restricciones de estado de

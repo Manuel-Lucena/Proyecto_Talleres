@@ -149,7 +149,7 @@ public class UsuarioService {
      */
     @Transactional(readOnly = true)
     public List<UsuarioResponseDTO> listarTodosAlumnosAdmin() {
-        return usuarioRepository.findAllAlumnosAdmin().stream()
+        return usuarioRepository.findAllAdmin().stream()
                 .map(usuarioMapper::toResponse)
                 .collect(Collectors.toList());
     }

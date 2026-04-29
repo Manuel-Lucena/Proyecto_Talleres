@@ -33,7 +33,6 @@ public class EmailController {
         datos.put("rol", "ALUMNO");
 
         // 2. Llamamos al servicio
-        // "email-bienvenida" es el nombre del archivo en src/main/resources/templates/
         emailService.enviarCorreo(
             destinatario, 
             "Prueba de Conexión - Taller UP", 
