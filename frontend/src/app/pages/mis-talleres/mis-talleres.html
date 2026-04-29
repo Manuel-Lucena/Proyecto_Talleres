@@ -19,7 +19,8 @@
         <div class="card-inscripcion" *ngFor="let item of talleres" (click)="entrarAlAula(item.idTaller)">
 
             <div class="banner-taller">
-                <img [src]="'/talleres/' + item.fotoRuta" alt="Portada">
+                <img [src]="item?.fotoRuta ? '/talleres/' + item.fotoRuta : '/talleres/taller_default.png'"
+                    alt="Portada">
             </div>
 
             <div class="info-cuerpo">
@@ -55,9 +56,6 @@
 
 <app-footer></app-footer>
 
-<app-horario-taller 
-  *ngIf="mostrarModalHorario" 
-  [idTaller]="idTallerSeleccionado" 
-  [nombreTaller]="nombreTallerSeleccionado"
-  (cerrar)="mostrarModalHorario = false">
+<app-horario-taller *ngIf="mostrarModalHorario" [idTaller]="idTallerSeleccionado"
+    [nombreTaller]="nombreTallerSeleccionado" (cerrar)="mostrarModalHorario = false">
 </app-horario-taller>

@@ -45,7 +45,8 @@
             <td class="col-main">
               <div class="workshop-item">
                 <div class="img-frame">
-                  <img [src]="t.fotoRuta ? '/talleres/' + t.fotoRuta : 'assets/default-taller.png'" alt="Taller">
+                  <img [src]="t?.fotoRuta ? '/talleres/' + t.fotoRuta : '/talleres/taller_default.png'"
+                    alt="Portada">
                 </div>
                 <div class="workshop-info">
                   <span class="t-name">{{ t.nombre }}</span>
@@ -100,8 +101,8 @@
 
     <div class="admin-pagination" *ngIf="talleresFiltrados.length > 0">
       <div class="pagination-info">
-        Mostrando <strong>{{ (paginaActual - 1) * registrosPorPagina + 1 }}</strong> 
-        a <strong>{{ Math.min(paginaActual * registrosPorPagina, talleresFiltrados.length) }}</strong> 
+        Mostrando <strong>{{ (paginaActual - 1) * registrosPorPagina + 1 }}</strong>
+        a <strong>{{ Math.min(paginaActual * registrosPorPagina, talleresFiltrados.length) }}</strong>
         de <strong>{{ talleresFiltrados.length }}</strong> talleres
       </div>
 
@@ -110,7 +111,7 @@
           <span>Página</span>
           <select class="select-pag" [(ngModel)]="paginaActual">
             @for (p of [].constructor(Math.ceil(talleresFiltrados.length / registrosPorPagina)); track $index) {
-              <option [value]="$index + 1">{{ $index + 1 }}</option>
+            <option [value]="$index + 1">{{ $index + 1 }}</option>
             }
           </select>
           <span>de {{ Math.ceil(talleresFiltrados.length / registrosPorPagina) }}</span>
@@ -120,8 +121,7 @@
           <button class="btn-pag" [disabled]="paginaActual === 1" (click)="paginaActual = paginaActual - 1">
             <i class="bi bi-chevron-left"></i>
           </button>
-          <button class="btn-pag" 
-            [disabled]="paginaActual * registrosPorPagina >= talleresFiltrados.length" 
+          <button class="btn-pag" [disabled]="paginaActual * registrosPorPagina >= talleresFiltrados.length"
             (click)="paginaActual = paginaActual + 1">
             <i class="bi bi-chevron-right"></i>
           </button>
@@ -132,12 +132,9 @@
 </div>
 
 @if (mostrarModal) {
-  <app-form-taller 
-    [tallerParaEditar]="tallerSeleccionado" 
-    [profesores]="profesores" 
-    (cerrar)="mostrarModal = false" 
-    (guardado)="ejecutarGuardado($event)">
-  </app-form-taller>
+<app-form-taller [tallerParaEditar]="tallerSeleccionado" [profesores]="profesores" (cerrar)="mostrarModal = false"
+  (guardado)="ejecutarGuardado($event)">
+</app-form-taller>
 }
 
 <app-confirmacion></app-confirmacion>

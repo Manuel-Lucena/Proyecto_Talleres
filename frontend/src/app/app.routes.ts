@@ -1,131 +1,114 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/AuthGuard';
 
-// Imports de componentes (Eager Loading para rutas principales)
-import { Landing } from './pages/landing/landing';
-import { Login } from './pages/login/login';
-import { PanelAdmin } from './pages/panel-admin/panel-admin';
-import { Perfil } from './pages/perfil/perfil';
-import { TalleresExplorar } from './pages/talleres-explorar/talleres-explorar';
-import { MisTalleres } from './pages/mis-talleres/mis-talleres';
-import { Calendario } from './pages/calendario/calendario';
-import { AulaVirtual } from './pages/aula-virtual/aula-virtual';
-import { AulaMuro } from './pages/aula-virtual/tabs/aula-muro/aula-muro';
-import { AulaForo } from './pages/aula-virtual/tabs/aula-foro/aula-foro';
-import { AulaTareas } from './pages/aula-virtual/tabs/aula-tareas/aula-tareas';
-import { AulaMateriales } from './pages/aula-virtual/tabs/aula-materiales/aula-materiales';
-import { AulaParticipantes } from './pages/aula-virtual/tabs/aula-participantes/aula-participantes';
-import { AccesoDenegado } from './pages/acceso-denegado/acceso-denegado';
-import { SolicitarRecuperacion } from './pages/solicitar-recuperacion/solicitar-recuperacion';
-import { CambiarPassword } from './pages/cambiar-password/cambiar-password';
-import { NoticiaDetalle } from './pages/noticia-detalle/noticia-detalle';
-
 export const routes: Routes = [
-    // --- RUTAS PÚBLICAS ---
-    { path: '', redirectTo: '/landing', pathMatch: 'full' },
-    { path: 'landing', component: Landing },
-    { path: 'noticia/:id', component: NoticiaDetalle },
-    { path: 'talleres-explorar', component: TalleresExplorar },
-    { path: 'login', component: Login },
-    { path: 'no-autorizado', component: AccesoDenegado },
-    { path: 'solicitar-recuperacion', component: SolicitarRecuperacion },
-    { path: 'reset-password', component: CambiarPassword },
+  // --- RUTAS PÚBLICAS ---
+  { path: '', redirectTo: '/landing', pathMatch: 'full' },
+  
+  // Estas dos las dejamos fijas (Eager) para que la entrada sea rápida
+  { path: 'landing', loadComponent: () => import('./pages/landing/landing').then(m => m.Landing) },
+  { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.Login) },
 
-    // --- RUTAS PROTEGIDAS (Cualquier usuario logueado) ---
-    { path: 'perfil', component: Perfil, canActivate: [authGuard] },
-    { path: 'mis-talleres', component: MisTalleres, canActivate: [authGuard] },
-    {
-        path: 'calendario',
-        component: Calendario,
-        canActivate: [authGuard],
-        children: [
-            { path: '', redirectTo: 'talleres', pathMatch: 'full' },
-            {
-                path: 'talleres',
-                loadComponent: () => import('./pages/calendario/tabs/calendario-talleres/calendario-talleres').then(m => m.CalendarioTalleres)
-            },
-            {
-                path: 'tareas',
-                loadComponent: () => import('./pages/calendario/tabs/calendario-tareas/calendario-tareas').then(m => m.CalendarioTareas)
-            }
-        ]
-    },
+  // --- EL RESTO PASA A LAZY LOADING (Esto es lo que arregla el Performance) ---
+  { 
+    path: 'noticia/:id', 
+    loadComponent: () => import('./pages/noticia-detalle/noticia-detalle').then(m => m.NoticiaDetalle) 
+  },
+  { 
+    path: 'talleres-explorar', 
+    loadComponent: () => import('./pages/talleres-explorar/talleres-explorar').then(m => m.TalleresExplorar) 
+  },
+  { 
+    path: 'no-autorizado', 
+    loadComponent: () => import('./pages/acceso-denegado/acceso-denegado').then(m => m.AccesoDenegado) 
+  },
+  { 
+    path: 'solicitar-recuperacion', 
+    loadComponent: () => import('./pages/solicitar-recuperacion/solicitar-recuperacion').then(m => m.SolicitarRecuperacion) 
+  },
+  { 
+    path: 'reset-password', 
+    loadComponent: () => import('./pages/cambiar-password/cambiar-password').then(m => m.CambiarPassword) 
+  },
 
-    // --- RUTA PANEL ADMIN (Solo ADMIN) ---
-    {
-        path: 'panel-admin',
-        component: PanelAdmin,
-        canActivate: [authGuard],
-        data: { roles: ['ADMIN'] },
-        children: [
-            { path: '', redirectTo: 'talleres', pathMatch: 'full' },
-            {
-                path: 'talleres',
-                loadComponent: () => import('./pages/panel-admin/tabs/admin-talleres/admin-talleres').then(m => m.AdminTalleres)
-            },
-            {
-                path: 'talleres/:idTaller/inscripciones',
-                loadComponent: () => import('./pages/panel-admin/tabs/admin-inscripciones/admin-inscripciones').then(m => m.AdminInscripciones)
-            },
-            {
-                path: 'usuarios/:idUsuario/inscripciones',
-                loadComponent: () => import('./pages/panel-admin/tabs/admin-inscripciones/admin-inscripciones').then(m => m.AdminInscripciones)
-            },
-            {
-                path: 'talleres/:id/horario',
-                loadComponent: () => import('./pages/panel-admin/tabs/admin-horarios/admin-horarios').then(m => m.AdminHorarios)
-            },
-            {
-                path: 'usuarios',
-                loadComponent: () => import('./pages/panel-admin/tabs/admin-usuarios/admin-usuarios').then(m => m.AdminUsuarios)
-            },
-            {
-                path: 'noticias',
-                loadComponent: () => import('./pages/panel-admin/tabs/admin-noticias/admin-noticias').then(m => m.AdminNoticias)
-            }
-        ]
-    },
+  // --- RUTAS PROTEGIDAS ---
+  { 
+    path: 'perfil', 
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/perfil/perfil').then(m => m.Perfil) 
+  },
+  { 
+    path: 'mis-talleres', 
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/mis-talleres/mis-talleres').then(m => m.MisTalleres) 
+  },
 
-    // --- RUTA AULA VIRTUAL (Acceso general + restricciones internas) ---
-    {
-        path: 'aula-virtual/:id',
-        component: AulaVirtual,
-        canActivate: [authGuard],
-        children: [
-            { path: '', redirectTo: 'muro', pathMatch: 'full' },
-            { path: 'muro', component: AulaMuro, data: { breadcrumb: 'Muro' } },
-            { path: 'foro', component: AulaForo, data: { breadcrumb: 'Foro' } },
-            { path: 'tareas', component: AulaTareas, data: { breadcrumb: 'Tareas' } },
-            { path: 'recursos', component: AulaMateriales, data: { breadcrumb: 'Materiales' } },
-            { path: 'participantes', component: AulaParticipantes, data: { breadcrumb: 'Participantes' } },
+  { 
+    path: 'calendario', 
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/calendario/calendario').then(m => m.Calendario),
+    children: [
+      { path: '', redirectTo: 'talleres', pathMatch: 'full' },
+      { path: 'talleres', loadComponent: () => import('./pages/calendario/tabs/calendario-talleres/calendario-talleres').then(m => m.CalendarioTalleres) },
+      { path: 'tareas', loadComponent: () => import('./pages/calendario/tabs/calendario-tareas/calendario-tareas').then(m => m.CalendarioTareas) }
+    ]
+  },
 
-            // Solo Profesores y Admins pueden ver seguimiento y crear contenido nuevo
-            {
-                path: 'tareas/:idRecurso/seguimiento',
-                canActivate: [authGuard],
-                data: { roles: ['ADMIN', 'PROFESOR'], breadcrumb: 'Seguimiento' },
-                loadComponent: () => import('./pages/aula-virtual/tabs/aula-tarea-seguimiento/aula-tarea-seguimiento').then(m => m.AulaTareaSeguimiento)
-            },
-            {
-                path: 'detalle/:tipo/nuevo',
-                canActivate: [authGuard],
-                data: { roles: ['ADMIN', 'PROFESOR'], breadcrumb: 'Nuevo' },
-                loadComponent: () => import('./pages/aula-virtual/tabs/aula-detalle/aula-detalle').then(m => m.AulaDetalle)
-            },
-            {
-                path: 'detalle/:tipo/:idRecurso',
-                canActivate: [authGuard],
-                data: { breadcrumb: 'Cargando...' },
-                loadComponent: () => import('./pages/aula-virtual/tabs/aula-detalle/aula-detalle').then(m => m.AulaDetalle)
-            },
-            {
-                path: 'calificaciones',
-                loadComponent: () => import('./pages/aula-virtual/tabs/aula-calificaciones/aula-calificaciones').then(m => m.AulaCalificaciones),
-                data: { breadcrumb: 'Calificaciones' }
-            }
-        ]
-    },
+  // --- RUTA PANEL ADMIN ---
+  { 
+    path: 'panel-admin', 
+    canActivate: [authGuard], 
+    data: { roles: ['ADMIN'] },
+    loadComponent: () => import('./pages/panel-admin/panel-admin').then(m => m.PanelAdmin),
+    children: [
+      { path: '', redirectTo: 'talleres', pathMatch: 'full' },
+      { path: 'talleres', loadComponent: () => import('./pages/panel-admin/tabs/admin-talleres/admin-talleres').then(m => m.AdminTalleres) },
+      { path: 'talleres/:idTaller/inscripciones', loadComponent: () => import('./pages/panel-admin/tabs/admin-inscripciones/admin-inscripciones').then(m => m.AdminInscripciones) },
+      { path: 'usuarios/:idUsuario/inscripciones', loadComponent: () => import('./pages/panel-admin/tabs/admin-inscripciones/admin-inscripciones').then(m => m.AdminInscripciones) },
+      { path: 'talleres/:id/horario', loadComponent: () => import('./pages/panel-admin/tabs/admin-horarios/admin-horarios').then(m => m.AdminHorarios) },
+      { path: 'usuarios', loadComponent: () => import('./pages/panel-admin/tabs/admin-usuarios/admin-usuarios').then(m => m.AdminUsuarios) },
+      { path: 'noticias', loadComponent: () => import('./pages/panel-admin/tabs/admin-noticias/admin-noticias').then(m => m.AdminNoticias) }
+    ]
+  },
 
-    // Comodín para rutas no encontradas
-    { path: '**', redirectTo: '/landing' }
+  // --- RUTA AULA VIRTUAL ---
+  { 
+    path: 'aula-virtual/:id', 
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/aula-virtual/aula-virtual').then(m => m.AulaVirtual),
+    children: [
+      { path: '', redirectTo: 'muro', pathMatch: 'full' },
+      { path: 'muro', loadComponent: () => import('./pages/aula-virtual/tabs/aula-muro/aula-muro').then(m => m.AulaMuro), data: { breadcrumb: 'Muro' } },
+      { path: 'foro', loadComponent: () => import('./pages/aula-virtual/tabs/aula-foro/aula-foro').then(m => m.AulaForo), data: { breadcrumb: 'Foro' } },
+      { path: 'tareas', loadComponent: () => import('./pages/aula-virtual/tabs/aula-tareas/aula-tareas').then(m => m.AulaTareas), data: { breadcrumb: 'Tareas' } },
+      { path: 'recursos', loadComponent: () => import('./pages/aula-virtual/tabs/aula-materiales/aula-materiales').then(m => m.AulaMateriales), data: { breadcrumb: 'Materiales' } },
+      { path: 'participantes', loadComponent: () => import('./pages/aula-virtual/tabs/aula-participantes/aula-participantes').then(m => m.AulaParticipantes), data: { breadcrumb: 'Participantes' } },
+      
+      { 
+        path: 'tareas/:idRecurso/seguimiento', 
+        canActivate: [authGuard], 
+        data: { roles: ['ADMIN', 'PROFESOR'], breadcrumb: 'Seguimiento' },
+        loadComponent: () => import('./pages/aula-virtual/tabs/aula-tarea-seguimiento/aula-tarea-seguimiento').then(m => m.AulaTareaSeguimiento)
+      },
+      { 
+        path: 'detalle/:tipo/nuevo', 
+        canActivate: [authGuard], 
+        data: { roles: ['ADMIN', 'PROFESOR'], breadcrumb: 'Nuevo' },
+        loadComponent: () => import('./pages/aula-virtual/tabs/aula-detalle/aula-detalle').then(m => m.AulaDetalle)
+      },
+      { 
+        path: 'detalle/:tipo/:idRecurso', 
+        canActivate: [authGuard], 
+        data: { breadcrumb: 'Cargando...' },
+        loadComponent: () => import('./pages/aula-virtual/tabs/aula-detalle/aula-detalle').then(m => m.AulaDetalle)
+      },
+      { 
+        path: 'calificaciones', 
+        loadComponent: () => import('./pages/aula-virtual/tabs/aula-calificaciones/aula-calificaciones').then(m => m.AulaCalificaciones),
+        data: { breadcrumb: 'Calificaciones' } 
+      }
+    ]
+  },
+
+  { path: '**', redirectTo: '/landing' }
 ];

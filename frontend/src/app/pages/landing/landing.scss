@@ -19,16 +19,18 @@
         display: flex;
         align-items: center;
 
-        &::before {
-            content: '';
+        // NUEVO: La imagen ahora es un elemento real del DOM
+        .hero-bg-img {
             position: absolute;
             inset: 0;
-            background: url('/images/banner.jpg') center 20% / cover;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 20%;
             opacity: 0.5;
             z-index: 1;
         }
 
-      
         &::after {
             content: '';
             position: absolute;
@@ -41,6 +43,7 @@
             position: relative;
             z-index: 3;
         }
+
 
         .hero-text {
             .h1-title {
@@ -193,7 +196,7 @@
                     font-weight: 800;
                     color: $color-secundario-frio-2;
                     margin-bottom: 1rem;
-                    @include limitar-lineas(2); 
+                    @include limitar-lineas(2);
                 }
 
                 p {

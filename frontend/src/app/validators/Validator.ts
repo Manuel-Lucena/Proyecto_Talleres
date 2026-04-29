@@ -37,10 +37,10 @@ export class Validator {
    * @returns True si es un teléfono válido.
    */
   static isTelefono(value: string): boolean {
-    const regex = /^\d{9}$/;
-    return regex.test(value);
+    if (!value) return false;
+    const soloNumeros = value.replace(/\D/g, '');
+    return soloNumeros.length === 9;
   }
-
   /**
    * Valida una longitud mínima eliminando espacios en blanco innecesarios.
    * @param value El texto a evaluar.

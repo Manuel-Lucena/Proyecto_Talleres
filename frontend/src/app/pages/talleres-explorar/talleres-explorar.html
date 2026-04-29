@@ -61,8 +61,8 @@
         </div>
 
         <div class="imagen-container">
-          <img [src]="taller.fotoRuta ? '/talleres/' + taller.fotoRuta : '/talleres/default-taller.png'" alt="Portada"
-            class="taller-img">
+        <img [src]="taller?.fotoRuta ? '/talleres/' + taller.fotoRuta : '/talleres/taller_default.png'"
+                    alt="Portada">
           <div class="badge-profesor">Prof. {{ taller.nombreCompletoProfesor }}</div>
         </div>
 
