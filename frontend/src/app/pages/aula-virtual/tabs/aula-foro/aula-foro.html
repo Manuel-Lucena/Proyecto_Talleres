@@ -1,59 +1,41 @@
 <div class="foro-container fade-in">
-
-    <header class="foro-header">
+  <header class="foro-header">
+    <div class="header-content">
+      <div>
         <h2>Foro de Discusión</h2>
         <p>Participa, pregunta dudas o comparte recursos con tus compañeros.</p>
-    </header>
-
-    <div class="publicar-seccion">
-        <div class="input-wrapper">
-            <textarea [(ngModel)]="nuevoMensaje" 
-                      placeholder="Escribe un nuevo tema o mensaje..." 
-                      rows="3"></textarea>
-            
-            <div class="footer-publicar">
-                <small class="char-count">{{ nuevoMensaje.length }} caracteres</small>
-                <button class="btn-publicar" (click)="enviarMensaje()" [disabled]="!nuevoMensaje.trim()">
-                    <i class="bi bi-send-fill"></i> Publicar en el foro
-                </button>
-            </div>
-        </div>
+      </div>
+      <button *ngIf="tokenService.esAdmin" 
+              class="btn-limpiar" (click)="limpiarForo()">
+        <i class="bi bi-trash3-fill"></i> Limpiar Foro
+      </button>
     </div>
+  </header>
 
-    <div class="mensajes-feed">
-        <div *ngIf="cargando" class="loading-state">
-            <div class="spinner-border" role="status"></div>
-            <span>Cargando conversaciones...</span>
+  <div class="mensajes-feed">
+    <div class="mensaje-item" *ngFor="let m of mensajes">
+      <article class="mensaje-card">
+        <div class="card-header">
+          <div class="avatar-wrapper">
+             </div>
+          <div class="meta">
+            <span class="nombre">{{ m.nombreAutor }}</span>
+            <span class="fecha">
+              <i class="bi bi-clock"></i> {{ m.fechaEnvio | date:'dd MMM, yyyy • HH:mm' }}
+            </span>
+          </div>
+
+          <div class="acciones-mensaje" *ngIf="m.idUsuario === tokenService.getId() || tokenService.esAdmin">
+            <button class="btn-eliminar" (click)="eliminarMensaje(m.idMensaje)" title="Eliminar mensaje">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
         </div>
-
-        <div class="mensaje-item" *ngFor="let m of mensajes">
-            <article class="mensaje-card">
-                <div class="card-header">
-                    <div class="avatar-wrapper">
-                        <img #imgForo
-                             [src]="m.idUsuario ? '/usuarios/user_' + m.idUsuario + '.jpg' : '/usuarios/Predeterminada.png'"
-                             (error)="imgForo.src = '/usuarios/Predeterminada.png'"
-                             alt="Avatar">
-                    </div>
-                    <div class="meta">
-                        <span class="nombre">{{ m.nombreAutor }}</span>
-                        <span class="fecha">
-                            <i class="bi bi-clock"></i> {{ m.fechaEnvio | date:'dd MMM, yyyy • HH:mm' }}
-                        </span>
-                    </div>
-                </div>
-
-                <div class="contenido">
-                    <p>{{ m.contenido }}</p>
-                </div>
-                
-                </article>
+        <div class="contenido">
+          <p>{{ m.contenido }}</p>
         </div>
-
-        <div class="empty-foro" *ngIf="!cargando && mensajes.length === 0">
-            <i class="bi bi-chat-dots"></i>
-            <h3>Silencio en el aula...</h3>
-            <p>Aún no hay hilos de conversación. ¡Inicia el primero!</p>
-        </div>
+      </article>
+    </div>
+    
     </div>
 </div>

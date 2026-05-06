@@ -58,6 +58,13 @@
               ENTRAR <i class="bi bi-arrow-right-short ms-2"></i>
             </button>
 
+            <div class="text-center mt-3">
+              <span class="small text-muted">¿Solo quieres echar un vistazo?</span>
+              <a [routerLink]="['/landing']" class="d-block small fw-bold enlace-invitado text-decoration-none">
+                EXPLORAR NOTICIAS Y TALLERES
+              </a>
+            </div>
+
             <div class="text-center mt-4 pt-3 border-top">
               <p class="small text-muted mb-2">¿Eres nuevo alumno?</p>
               <button type="button" (click)="abrirRegistro()" class="btn btn-outline-success btn-sm px-4 fw-bold">

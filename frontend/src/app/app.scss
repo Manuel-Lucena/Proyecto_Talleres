@@ -1,13 +1,10 @@
 @use '../styles/variables' as v;
 
 .accessibility-container {
-    // Esto es lo que hace que "siga" a la pantalla
     position: fixed;
     bottom: 20px;
     left: 20px;
-    z-index: 9999; // Para que esté por encima de todo
-
-    // Evitamos que cualquier padre con 'transform' nos mueva
+    z-index: 9999;
     display: block;
 
     .accessibility-btn {

@@ -2,9 +2,11 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { firstValueFrom } from 'rxjs'; // Importación necesaria para evitar el deprecated
 import { MensajeService } from '../../../../services/Mensaje.Service';
 import { TokenService } from '../../../../services/Token.Service';
 import { MensajeResponse, MensajeRequest } from '../../../../interfaces/Mensaje.Interface';
+import { NotificacionService } from '../../../../services/Notificacion.Service';
 
 /**
  * COMPONENTE DE INTERACCIÓN: Foro de Discusión.
@@ -21,7 +23,6 @@ import { MensajeResponse, MensajeRequest } from '../../../../interfaces/Mensaje.
   styleUrl: './aula-foro.scss',
 })
 export class AulaForo implements OnInit {
-
   // --- Propiedades de Datos ---
   idTaller!: number;                          // Identificador de contexto del taller padre
   mensajes: MensajeResponse[] = [];           // Historial cronológico de la conversación
@@ -35,13 +36,15 @@ export class AulaForo implements OnInit {
    * @param mensajeService Abstracción de la API para operaciones de mensajería.
    * @param tokenService Proveedor de identidad para el tracking de autoría.
    * @param cdr Trigger manual para asegurar la consistencia del DOM tras envíos rápidos.
+   * @param notify Servicio centralizado para feedback visual.
    */
   constructor(
     private route: ActivatedRoute,
     private mensajeService: MensajeService,
-    private tokenService: TokenService,
-    private cdr: ChangeDetectorRef
-  ) {}
+    public tokenService: TokenService,
+    private cdr: ChangeDetectorRef,
+    private notify: NotificacionService,
+  ) { }
 
   /**
    * Ciclo de vida: Inicializa el componente resolviendo el ID del taller mediante 
@@ -102,5 +105,79 @@ export class AulaForo implements OnInit {
       },
       error: (err) => console.error('Error al persistir el mensaje:', err)
     });
+  }
+
+  // ===========================================================================
+  // --- GESTIÓN DE ELIMINACIÓN CON MODALES ---
+  // ===========================================================================
+
+  /**
+   * Elimina un mensaje individual tras confirmación del usuario.
+   */
+  async eliminarMensaje(idMensaje: number): Promise<void> {
+    const confirmar = await this.notify.confirmar({
+      titulo: 'Eliminar Mensaje',
+      mensaje: '¿Estás seguro de que deseas borrar este mensaje? Esta acción no se puede deshacer.'
+    });
+
+    if (confirmar) {
+      this.mensajeService.eliminar(idMensaje).subscribe({
+        next: () => {
+          this.mensajes = this.mensajes.filter(m => m.idMensaje !== idMensaje);
+          this.notify.mostrar({
+            titulo: 'Eliminado',
+            mensaje: 'El mensaje ha sido borrado correctamente.',
+            tipo: 'exito'
+          });
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.notify.mostrar({
+            titulo: 'Error',
+            mensaje: 'No se pudo eliminar el mensaje.',
+            tipo: 'error'
+          });
+          console.error(err);
+        }
+      });
+    }
+  }
+
+  /**
+   * Limpia el foro completo (Solo para personal de gestión).
+   */
+  async limpiarForo(): Promise<void> {
+    const confirmar = await this.notify.confirmar({
+      titulo: 'Limpiar Foro Completo',
+      mensaje: 'Vas a borrar TODOS los mensajes de este taller. ¿Estás totalmente seguro?'
+    });
+
+    if (confirmar) {
+      this.cargando = true;
+      // Usamos firstValueFrom para evitar el uso de .toPromise() (deprecated)
+      const promesasBorrado = this.mensajes.map(m => firstValueFrom(this.mensajeService.eliminar(m.idMensaje)));
+
+      try {
+        await Promise.all(promesasBorrado);
+        
+        this.mensajes = []; // Limpiamos la lista local
+        this.notify.mostrar({
+          titulo: 'Foro Limpio',
+          mensaje: 'Se han eliminado todos los mensajes del taller.',
+          tipo: 'exito'
+        });
+      } catch (error) {
+        this.notify.mostrar({
+          titulo: 'Error parcial',
+          mensaje: 'Algunos mensajes no pudieron eliminarse. Recarga la página.',
+          tipo: 'error'
+        });
+        // Recargamos para ver qué ha quedado
+        this.cargarMensajes();
+      } finally {
+        this.cargando = false;
+        this.cdr.detectChanges();
+      }
+    }
   }
 }

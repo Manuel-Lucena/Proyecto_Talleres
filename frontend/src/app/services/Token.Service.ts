@@ -52,6 +52,14 @@ export class TokenService {
   }
 
   /**
+ * Verifica si el usuario es específicamente Administrador.
+ * @returns true si el rol es ADMIN.
+ */
+  get esAdmin(): boolean {
+    return this.getRol() === 'ADMIN';
+  }
+
+  /**
    * Obtiene el rol asignado al usuario desde el token.
    * Soporta las claves 'role' o 'rol' para mayor compatibilidad con el backend.
    * @returns Nombre del rol (ej: 'ADMIN', 'PROFESOR', 'ALUMNO') o null.

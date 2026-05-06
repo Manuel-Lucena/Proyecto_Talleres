@@ -43,7 +43,8 @@ export class Perfil implements OnInit {
     private tokenService: TokenService,
     private notify: NotificacionService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+  
   ) { }
 
   /**

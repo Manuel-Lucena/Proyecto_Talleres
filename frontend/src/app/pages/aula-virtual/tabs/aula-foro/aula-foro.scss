@@ -2,12 +2,11 @@
    COMPONENTE: MURO / FORO DE CONSULTAS (AULA VIRTUAL)
    Diseño de feed de mensajes con editor de publicaciones y sistema de hilos.
    ========================================================================== */
-
 @use '../../../../../styles/variables' as v;
 @use '../../../../../styles/mixins' as m;
 
 .foro-container {
-    max-width: 900px; 
+    max-width: 900px;
     margin: 0 auto;
     padding: 1.5rem 2.5rem;
 }
@@ -15,6 +14,14 @@
 // 1. ENCABEZADO DEL FORO
 .foro-header {
     margin-bottom: 2.5rem;
+
+    // Contenedor para alinear título y botón de limpiar
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
 
     h2 {
         @include m.titulo-seccion(v.$color-secundario-frio-2);
@@ -26,6 +33,34 @@
         color: v.$color-superficie-suave;
         font-family: v.$fuente-lectura;
         margin: 0;
+    }
+
+    // Botón de limpieza masiva
+    .btn-limpiar {
+        background: transparent;
+        border: none;
+        color: v.$color-superficie-suave; 
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        font-family: v.$fuente-enfasis;
+        font-weight: 700;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+
+        &:hover {
+            background: rgba(#ff5252, 0.05); 
+            color: #ff5252; 
+
+        }
+
+        &:active {
+            background: rgba(#ff5252, 0.1);
+            transform: scale(0.98); 
+        }
     }
 }
 
@@ -45,7 +80,7 @@
         min-height: 100px;
         margin-bottom: 1.2rem;
         font-family: v.$fuente-lectura;
-        resize: none; 
+        resize: none;
         padding: 1rem;
 
         &:focus {
@@ -83,6 +118,7 @@
     border-radius: 16px;
     border: 1px solid rgba(0, 0, 0, 0.05);
     margin-bottom: 1.5rem;
+    position: relative; // Para posicionamiento interno si fuera necesario
 
     // --- Header del Mensaje (Autor e Info) ---
     .card-header {
@@ -92,7 +128,7 @@
         margin-bottom: 1.2rem;
 
         .avatar-wrapper {
-            width: 54px; 
+            width: 54px;
             height: 54px;
             flex-shrink: 0;
             border-radius: 14px;
@@ -110,6 +146,7 @@
             display: flex;
             flex-direction: column;
             gap: 2px;
+            flex-grow: 1; // Toma el espacio disponible para empujar la papelera
 
             .nombre {
                 font-family: v.$fuente-enfasis;
@@ -126,21 +163,46 @@
                 gap: 5px;
             }
         }
+
+        // Contenedor de acciones (Papelera)
+        .acciones-mensaje {
+            .btn-eliminar {
+                background: transparent;
+                border: none;
+                color: #ddd;
+                padding: 8px;
+                font-size: 1.2rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 8px;
+
+                &:hover {
+                    color: #ff5252;
+                    background: rgba(#ff5252, 0.05);
+                }
+            }
+        }
     }
 
     // --- Cuerpo del Mensaje ---
     .contenido {
         font-family: v.$fuente-lectura;
-        line-height: 1.7; 
+        line-height: 1.7;
         color: v.$color-superficie-oscura;
         padding-bottom: 0.5rem;
 
-        p { margin: 0; }
+        p {
+            margin: 0;
+        }
     }
 }
 
 // 4. ESTADOS DE CARGA Y VACÍO
-.loading-state, .empty-foro {
+.loading-state,
+.empty-foro {
     text-align: center;
     padding: 5rem 2rem;
     color: v.$color-superficie-suave;
@@ -164,12 +226,30 @@
 
 // 5. RESPONSIVE
 @media (max-width: 768px) {
-    .foro-container { padding: 1rem; }
-    .mensaje-card { padding: 1.2rem; }
-    
-    .mensaje-card .card-header .avatar-wrapper {
-        width: 48px;
-        height: 48px;
-        border-radius: 10px;
+    .foro-container {
+        padding: 1rem;
+    }
+
+    .foro-header {
+        .header-content {
+            flex-direction: column;
+            align-items: flex-start;
+
+            .btn-limpiar {
+                margin-top: 1rem;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    }
+
+    .mensaje-card {
+        padding: 1.2rem;
+
+        .card-header .avatar-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+        }
     }
 }

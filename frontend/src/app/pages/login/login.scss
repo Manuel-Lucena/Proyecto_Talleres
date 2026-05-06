@@ -119,6 +119,20 @@ h1 {
   }
 }
 
+
+.enlace-invitado {
+  color: v.$color-marca-principal; 
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: v.$color-secundario-frio-2; 
+    transform: translateY(-1px);
+    text-decoration: underline;
+  }
+}
+
 // Estado de error en inputs
 .is-invalid {
   border-color: v.$danger;
