@@ -189,7 +189,13 @@ export class Perfil implements OnInit {
 
           this.usuario = res.data;
           this.perfilForm.patchValue(this.usuario);
-     
+
+          this.notify.mostrar({
+            titulo: '¡Éxito!',
+            mensaje: 'Tu perfil se ha actualizado correctamente',
+            tipo: 'exito'
+          });
+
           this.cdr.detectChanges();
 
         }

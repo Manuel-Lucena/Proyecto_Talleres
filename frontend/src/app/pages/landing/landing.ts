@@ -7,6 +7,8 @@ import { TokenService } from '../../services/Token.Service';
 import { NoticiaResponse } from '../../interfaces/Noticia.Interface';
 import { FormNoticia } from '../../components/forms/form-noticia/form-noticia';
 import { RouterModule } from '@angular/router';
+import { Confirmacion } from "../../components/dialogs/confirmacion/confirmacion";
+import { Notificacion } from "../../components/dialogs/mensaje/notificacion";
 
 /**
  * Componente principal de la aplicación (Página de Inicio).
@@ -17,7 +19,7 @@ import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [Navbar, CommonModule, Footer, FormNoticia, RouterModule,],
+  imports: [Navbar, CommonModule, Footer, FormNoticia, RouterModule, Confirmacion, Notificacion],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
 })
