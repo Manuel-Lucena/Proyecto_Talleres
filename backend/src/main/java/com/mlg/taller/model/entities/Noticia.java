@@ -6,7 +6,8 @@ import java.time.LocalDate;
 
 /**
  * Entidad para la publicación de novedades y comunicados oficiales.
- * Permite mantener informada a la comunidad de usuarios sobre eventos o cambios.
+ * Permite mantener informada a la comunidad de usuarios sobre eventos o
+ * cambios.
  */
 @Entity
 @Table(name = "NOTICIA")
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Noticia {
 
+    /** Identificador único de la noticia. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_noticia")

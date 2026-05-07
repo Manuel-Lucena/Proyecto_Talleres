@@ -58,7 +58,7 @@ export class AulaParticipantes implements OnInit {
 
   /**
    * Ejecuta la petición al servicio de usuarios y aplica la lógica de filtrado reactivo.
-   * * TÉCNICA: Se utiliza el discriminador 'nombreRol' para segregar el payload 
+   * * Se utiliza el discriminador 'nombreRol' para segregar el payload 
    * y alimentar las listas específicas de la interfaz de usuario.
    */
   cargarParticipantes(): void {

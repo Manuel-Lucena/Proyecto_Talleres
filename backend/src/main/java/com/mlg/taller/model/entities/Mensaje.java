@@ -5,7 +5,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 /**
- * Entidad que registra las comunicaciones dentro del foro o chat de un taller específico.
+ * Entidad que registra las comunicaciones dentro del foro o chat de un taller
+ * específico.
  */
 @Entity
 @Table(name = "MENSAJE")
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Mensaje {
 
+    /** Identificador único del mensaje. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_mensaje")

@@ -84,7 +84,7 @@ export class AulaTareaSeguimiento implements OnInit {
         const listaUsuarios = res.usuarios?.data || [];
         const listaEntregas = res.entregas?.data || [];
 
-        // MAPEO DE LISTADO: Vinculamos cada alumno con su entrega (si existe)
+   
         this.filas = listaUsuarios
           .filter((u: any) => u.nombreRol?.toUpperCase() === 'ALUMNO')
           .map((alumno: any) => {

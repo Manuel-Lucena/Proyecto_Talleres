@@ -17,9 +17,7 @@ public class TareaAsignadaRequestDTO {
     @NotNull(message = "El ID de la tarea es obligatorio")
     private Long idTarea;
 
-    /**
-     * * Listado de identificadores de los alumnos seleccionados.
-     */
+    /** Listado de identificadores de los alumnos seleccionados. */
     @NotEmpty(message = "La lista de IDs de alumnos no puede estar vacía")
     private List<Long> alumnoIds;
 }

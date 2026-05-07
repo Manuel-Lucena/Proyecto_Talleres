@@ -55,7 +55,7 @@ export class MisTalleres implements OnInit {
     if (rol === 'ADMIN') {
       this.cargarTodosLosTalleres();
     } else if (rol === 'PROFESOR' && idUsuario) {
-      this.cargarTalleresProfesor(Number(idUsuario)); // <--- Nueva llamada
+      this.cargarTalleresProfesor(Number(idUsuario));
     } else if (idUsuario) {
       this.cargarMisTalleres(Number(idUsuario));
     } else {

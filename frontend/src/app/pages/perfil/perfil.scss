@@ -150,7 +150,7 @@
             }
         }
 
-        // 2. CUERPO DEL FORMULARIO (MAIN CONTENT)
+        // 2. CUERPO DEL FORMULARIO 
         .main-form {
             flex: 1;
             padding: 4rem;
@@ -224,7 +224,7 @@
     }
 }
 
-// 3. RESPONSIVE: De Split a Stack
+// 3. RESPONSIVE
 @media (max-width: 1024px) {
     .perfil-full-container .split-layout {
         flex-direction: column;

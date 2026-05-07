@@ -71,7 +71,6 @@ export class FormAlumno implements OnInit {
   private cargarDatosEdicion(): void {
     this.form.patchValue(this.usuarioParaEditar);
     
-    // En edición, la contraseña es opcional; se eliminan validadores obligatorios
     this.form.get('password')?.clearValidators();
     this.form.get('repetirPassword')?.clearValidators();
     this.form.updateValueAndValidity();

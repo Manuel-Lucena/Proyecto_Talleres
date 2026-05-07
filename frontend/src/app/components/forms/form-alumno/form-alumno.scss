@@ -11,25 +11,23 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(v.$color-secundario-frio-2, 0.7); // Azul oscuro institucional con transparencia
+    background: rgba(v.$color-secundario-frio-2, 0.7);
     backdrop-filter: blur(4px);
     z-index: 10000;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
-    
-    // Animación de entrada de la biblioteca de mixins
     @include m.animacion-entrada;
 }
 
-// 2. CUERPO DEL MODAL (HERENCIA DE FORMULARIOS)
+// 2. CUERPO DEL MODAL 
 .modal-body {
-    @include f.estilo-contenedor-formulario; // Reutiliza el diseño base de formularios
+    @include f.estilo-contenedor-formulario; 
     width: 100%;
     max-width: 900px;
     max-height: 95vh;
-    overflow-y: auto; // Scroll interno para formularios largos
+    overflow-y: auto;
     box-shadow: v.$sombra-nivel-3;
     border: none;
 }
@@ -38,7 +36,6 @@
 .input-personalizado, .input-custom {
     @include m.estilo-input-base;
 
-    // Estado de error (Validación)
     &.is-invalid {
         border-color: v.$color-secundario-calido-1;
         background-color: rgba(v.$color-secundario-calido-1, 0.02);
@@ -51,7 +48,6 @@
     display: flex;
     align-items: center;
 
-    // Botón para mostrar/ocultar contraseña
     .btn-ver-pass {
         position: absolute;
         right: 1rem;
@@ -127,7 +123,7 @@
         @include m.boton-primario;
         padding: 0.8rem 3rem;
 
-        // Gestión de estado deshabilitado (Botón gris y sin eventos)
+     
         &:disabled {
             filter: grayscale(1);
             opacity: 0.5;

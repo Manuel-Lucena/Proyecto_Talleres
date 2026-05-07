@@ -37,7 +37,6 @@ export class PanelAdmin {
   toggleMenuMovil(): void {
     this.menuMovilAbierto = !this.menuMovilAbierto;
 
-    // --- Lógica de manipulación de Scroll (UX) ---
     if (this.menuMovilAbierto) {
       document.body.style.overflow = 'hidden';
     } else {

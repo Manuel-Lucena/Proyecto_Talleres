@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Entidad que define los niveles de permisos en el sistema.
+ * 
  * @example 'ADMIN', 'PROFESOR', 'ALUMNO'.
  */
 @Entity
@@ -15,7 +16,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Rol {
-    
+
+    /** Identificador único del rol. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_rol")

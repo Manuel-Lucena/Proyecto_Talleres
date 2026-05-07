@@ -8,8 +8,7 @@ export class BreadcrumbService {
   // 1. El Subject que maneja el dato (privado)
   private recursoNombreSource = new BehaviorSubject<string>('');
 
-  // 2. El Observable al que se suscribe el AulaVirtual (público)
-  // ESTA ES LA PROPIEDAD QUE TE DABA ERROR
+  // 2. El Observable al que se suscribe el AulaVirtual
   recursoNombre$ = this.recursoNombreSource.asObservable();
 
   constructor() {}

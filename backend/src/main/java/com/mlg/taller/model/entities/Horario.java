@@ -16,6 +16,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 public class Horario {
 
+    /** Identificador único del horario. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_horario")

@@ -4,8 +4,6 @@
    ========================================================================== */
 
 :root {
-  // Variable CSS controlada desde Angular (updateContrast)
-  // Valor por defecto: 100% (Normal)
   --app-contrast: 100%;
 }
 
@@ -16,7 +14,7 @@
  */
 .app-content-wrapper {
   filter: contrast(var(--app-contrast));
-  transition: filter 0.3s ease; // Transición suave al cambiar ajustes
+  transition: filter 0.3s ease; 
   min-height: 100vh;
 }
 

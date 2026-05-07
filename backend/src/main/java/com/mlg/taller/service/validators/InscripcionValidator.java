@@ -7,6 +7,9 @@ import com.mlg.taller.model.entities.Taller;
 import com.mlg.taller.model.entities.Usuario;
 import com.mlg.taller.repositories.InscripcionRepository;
 import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Component;
 
 /**
@@ -173,5 +176,28 @@ public class InscripcionValidator {
      */
     public Inscripcion buscarRegistroPrevio(Long idUsuario, Long idTaller) {
         return inscripcionRepository.findByUsuarioIdAndTallerId(idUsuario, idTaller).orElse(null);
+    }
+
+    /**
+     * Valida si el taller se encuentra dentro de las fechas permitidas para la
+     * inscripción.
+     * * Un usuario estándar solo puede inscribirse si la fecha actual es anterior
+     * o igual a la fecha de fin del taller. El ADMINISTRADOR ignora esta
+     * restricción
+     * para permitir gestiones extemporáneas o correcciones manuales.
+     * * @param solicitante Usuario que realiza la petición.
+     * 
+     * @param taller Taller al que se desea inscribir.
+     * @throws BadRequestException si el taller ya ha finalizado y el solicitante no
+     *                             es ADMIN.
+     */
+    public void validarFechaInscripcion(Usuario solicitante, Taller taller) {
+        boolean esAdmin = solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN");
+        LocalDateTime ahora = LocalDateTime.now();
+
+        if (!esAdmin && ahora.isAfter(taller.getFechaFin().atTime(23, 59, 59))) {
+            throw new BadRequestException("El periodo de inscripción para el taller '" +
+                    taller.getNombre() + "' ha finalizado.");
+        }
     }
 }

@@ -8,7 +8,8 @@ import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDateTime;
 
 /**
- * Entidad que vincula a un alumno con un taller mediante un proceso de matrícula.
+ * Entidad que vincula a un alumno con un taller mediante un proceso de
+ * matrícula.
  * Implementa 'Soft Delete' para mantener registros históricos de transacciones.
  */
 
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Inscripcion {
 
+    /** Identificador único de la Inscripcion. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_inscripcion")
@@ -50,7 +52,10 @@ public class Inscripcion {
     @Column(name = "estado_pago")
     private EstadoPago estadoPago;
 
-    /** Identificador único de transacción proporcionado por la pasarela de pagos externa. */
+    /**
+     * Identificador único de transacción proporcionado por la pasarela de pagos
+     * externa.
+     */
     @Column(name = "order_id", unique = true)
     private String orderId;
 
@@ -58,8 +63,10 @@ public class Inscripcion {
     @Column(name = "fecha_pago")
     private LocalDateTime fechaPago;
 
-    /** * Indicador de borrado lógico. 
-     * Permite invalidar inscripciones sin eliminarlas físicamente de la base de datos.
+    /**
+     * * Indicador de borrado lógico.
+     * Permite invalidar inscripciones sin eliminarlas físicamente de la base de
+     * datos.
      */
     @Builder.Default
     @Column(nullable = false)

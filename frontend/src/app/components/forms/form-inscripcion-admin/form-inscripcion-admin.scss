@@ -138,7 +138,6 @@
     max-width: 480px;
     margin-inline: auto;
 
-    // Colapso a vertical en móviles
     @media (max-width: 480px) {
         flex-direction: column-reverse;
         max-width: 100%;

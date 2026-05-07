@@ -17,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Entrega {
 
+    /** Identificador único de la entrega. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_entrega")
@@ -47,7 +48,8 @@ public class Entrega {
     @Column(name = "comentario_profesor", columnDefinition = "TEXT")
     private String comentarioProfesor;
 
-    /** * Listado de archivos adjuntos a esta entrega específica.
+    /**
+     * * Listado de archivos adjuntos a esta entrega específica.
      * Incluye borrado en cascada para mantener la integridad de los ficheros.
      */
     @OneToMany(mappedBy = "entrega", cascade = CascadeType.ALL, orphanRemoval = true)

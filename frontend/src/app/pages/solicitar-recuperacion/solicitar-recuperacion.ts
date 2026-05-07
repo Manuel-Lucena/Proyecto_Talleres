@@ -42,14 +42,11 @@ export class SolicitarRecuperacion {
       this.usuarioService.solicitarRecuperacion(email).subscribe({
         next: () => this.finalizarProceso(),
         error: (err) => {
-          // LÓGICA DE SEGURIDAD: 
-          // Se muestra éxito incluso si el correo no existe para evitar enumeración de usuarios.
           console.warn('Error controlado por seguridad', err);
           this.finalizarProceso();
         }
       });
     } else {
-      // Si el formulario es inválido, marcamos los campos para mostrar los errores visuales
       this.recoveryForm.markAllAsTouched();
     }
   }
@@ -62,7 +59,6 @@ export class SolicitarRecuperacion {
     this.loading = false;
     this.enviado = true;
     
-    // Deshabilitamos el input de email para confirmar visualmente el fin del proceso
     this.recoveryForm.get('email')?.disable();
   }
 }

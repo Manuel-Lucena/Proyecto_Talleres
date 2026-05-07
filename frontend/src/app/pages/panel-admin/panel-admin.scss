@@ -127,7 +127,7 @@
   }
 }
 
-// 4. ÁREA DE TRABAJO (CONTENIDO DINÁMICO)
+// 4. ÁREA DE TRABAJO 
 .contenido-principal-admin {
   flex: 1;
   padding: 40px;
@@ -145,13 +145,10 @@
     height: calc(100vh - 80px);
     padding-top: 30px;
 
-    // Se activa cuando el usuario pulsa el toggle
     &.movil-show {
       left: 0;
     }
   }
-
-  // Capa de fondo oscura al abrir menú en móvil
   .sidebar-overlay {
     display: none;
     position: fixed;
@@ -166,7 +163,6 @@
   }
 }
 
-// Botón flotante para abrir el menú en móviles
 .btn-movil-toggle {
   display: none;
   position: fixed;

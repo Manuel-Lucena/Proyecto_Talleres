@@ -61,8 +61,7 @@
         </div>
 
         <div class="imagen-container">
-        <img [src]="taller?.fotoRuta ? '/talleres/' + taller.fotoRuta : '/talleres/taller_default.png'"
-                    alt="Portada">
+          <img [src]="taller?.fotoRuta ? '/talleres/' + taller.fotoRuta : '/talleres/taller_default.png'" alt="Portada">
           <div class="badge-profesor">Prof. {{ taller.nombreCompletoProfesor }}</div>
         </div>
 
@@ -92,17 +91,23 @@
               <div class="accion-compra">
                 <span class="moneda">{{ taller.precio }}€</span>
                 <button class="btn-inscripcion"
-                  [disabled]="taller.plazasDisponibles === 0 || estaInscrito(taller.nombre) || !esAlumno"
+                  [disabled]="taller.plazasDisponibles === 0 || estaInscrito(taller.nombre) || !esAlumno || tallerFinalizado(taller.fechaFin)"
                   [class.ya-inscrito]="estaInscrito(taller.nombre)"
-                  (click)="(!estaInscrito(taller.nombre) && esAlumno) ? abrirInscripcion(taller) : null">
+                  [class.finalizado]="tallerFinalizado(taller.fechaFin)"
+                  (click)="(!estaInscrito(taller.nombre) && esAlumno && !tallerFinalizado(taller.fechaFin)) ? abrirInscripcion(taller) : null">
 
                   <ng-container *ngIf="estaInscrito(taller.nombre)">
                     <i class="bi bi-check-circle-fill"></i> Ya inscrito
                   </ng-container>
 
                   <ng-container *ngIf="!estaInscrito(taller.nombre)">
-                    <span *ngIf="!esAlumno && taller.plazasDisponibles > 0">Solo Alumnos</span>
-                    <span *ngIf="esAlumno || taller.plazasDisponibles === 0">
+                    <span *ngIf="tallerFinalizado(taller.fechaFin)">Finalizado</span>
+
+                    <span *ngIf="!tallerFinalizado(taller.fechaFin) && !esAlumno && taller.plazasDisponibles > 0">
+                      Solo Alumnos
+                    </span>
+
+                    <span *ngIf="!tallerFinalizado(taller.fechaFin) && (esAlumno || taller.plazasDisponibles === 0)">
                       {{ taller.plazasDisponibles > 0 ? 'Inscribirme' : 'Agotado' }}
                     </span>
                   </ng-container>

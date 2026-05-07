@@ -106,10 +106,10 @@ export class AdminUsuarios implements OnInit {
       next: (res) => {
         this.usuarios = res.data.map((u: any) => ({
           ...u,
-          // Normalización: Asegura que el valor sea booleano independientemente del formato de la API
+       
           activo: u.activo === 1 || u.activo === true || u.activo === 'true' || u.activo === '1'
         })).sort((a: any, b: any) => {
-          // Ordenación inicial: Activos primero, luego por nombre
+    
           if (a.activo === b.activo) return a.nombre.localeCompare(b.nombre);
           return a.activo ? -1 : 1;
         });
@@ -130,15 +130,12 @@ export class AdminUsuarios implements OnInit {
   get usuariosFiltrados(): UsuarioResponse[] {
     const term = this.busqueda.toLowerCase().trim();
     return this.usuarios.filter(u => {
-      // Filtro de Rol
       const cumpleRol = this.filtroRol === '' || u.nombreRol === this.filtroRol;
       if (!cumpleRol) return false;
 
-      // Filtro de Estado
       const cumpleEstado = this.filtroEstado === 'todos' || (this.filtroEstado === 'activo' && u.activo) || (this.filtroEstado === 'inactivo' && !u.activo);
       if (!cumpleEstado) return false;
 
-      // Filtro de Término de Búsqueda
       if (!term) return true;
 
       switch (this.criterioBusqueda) {
@@ -148,7 +145,6 @@ export class AdminUsuarios implements OnInit {
         default: return (u.nombre + ' ' + u.apellidos + u.dni + u.email).toLowerCase().includes(term);
       }
     });
-    // NO se aplica sort aquí para evitar que el usuario cambie de posición al editar su estado
   }
 
   /**
@@ -204,7 +200,6 @@ export class AdminUsuarios implements OnInit {
         if (esEdicion) {
           const index = this.usuarios.findIndex(u => u.idUsuario === this.usuarioSeleccionado?.idUsuario);
           if (index !== -1) {
-            // Actualización local para mantener la posición en la tabla
             this.usuarios[index] = { ...this.usuarios[index], ...res.data };
           }
         } else {
@@ -249,7 +244,6 @@ export class AdminUsuarios implements OnInit {
         fd.append('usuario', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
         this.usuarioService.actualizarUsuario(u.idUsuario, fd).subscribe({
           next: () => {
-            // Actualización local inmediata: el usuario permanece en su fila
             u.activo = nuevoEstado;
             this.notificacionService.mostrar({ titulo: 'Éxito', mensaje: 'Estado actualizado correctamente', tipo: 'exito' });
             this.cdr.detectChanges();

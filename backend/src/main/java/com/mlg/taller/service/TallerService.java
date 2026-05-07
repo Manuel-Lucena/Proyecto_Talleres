@@ -48,7 +48,6 @@ public class TallerService {
      */
     @Transactional
     public TallerResponseDTO crear(TallerRequestDTO dto, MultipartFile archivo) {
-        // Blindaje: Solo administradores pueden crear la oferta formativa
         tallerValidator.validarEsAdmin(SecurityUtils.getUsuarioAutenticado());
         tallerValidator.validarFechas(dto.getFechaInicio(), dto.getFechaFin());
 

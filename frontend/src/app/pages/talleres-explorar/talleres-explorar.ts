@@ -189,6 +189,17 @@ export class TalleresExplorar implements OnInit {
   }
 
   /**
+ * Determina si un taller ha finalizado según la fecha actual.
+ * @param fechaFin string o Date de finalización del taller.
+ */
+  tallerFinalizado(fechaFin: any): boolean {
+    if (!fechaFin) return false;
+    const hoy = new Date();
+    const fin = new Date(fechaFin);
+    return hoy > fin;
+  }
+
+  /**
    * Limpia los inputs del formulario de filtros.
    */
   limpiarFiltros(): void {
@@ -237,7 +248,6 @@ export class TalleresExplorar implements OnInit {
    * @param taller Taller al que se desea apuntar el usuario.
    */
   async abrirInscripcion(taller: TallerResponse): Promise<void> {
-    // 1. Validar que esté logueado
     if (!this.tokenService.isLogged()) {
       this.notify.mostrar({ titulo: 'Atención', mensaje: 'Inicia sesión para inscribirte', tipo: 'error' });
       return;

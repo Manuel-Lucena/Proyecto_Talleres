@@ -10,7 +10,7 @@
     width: 100%;
 }
 
-// 1. ESTADO DE CARGA (Skeleton / Spinner)
+// 1. ESTADO DE CARGA 
 .loading-wrapper {
     display: flex;
     flex-direction: column;
@@ -29,12 +29,12 @@
     flex-direction: column;
 }
 
-// 2. TARJETA DE ACTIVIDAD (FEED ITEM)
+// 2. TARJETA DE ACTIVIDAD
 .actividad-card {
     display: grid;
-    grid-template-columns: 1fr auto; // Contenido a la izquierda, Meta a la derecha
+    grid-template-columns: 1fr auto; 
     align-items: center;
-    padding: 1.6rem 2.5rem; // Consistencia con Detalle y Recursos
+    padding: 1.6rem 2.5rem; 
     background: white;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     cursor: pointer;
@@ -42,7 +42,6 @@
 
     &:hover {
         background-color: #fcfcfc;
-        // El "inset" crea la línea lateral de marca sin desplazar el contenido
         box-shadow: inset 6px 0 0 v.$color-marca-principal;
 
         .main-info .titulo {
@@ -62,7 +61,7 @@
         gap: 1.8rem;
         min-width: 0;
 
-        // Contenedor del icono (Estandarizado a 54px/14px)
+        // Contenedor del icono 
         .icon-container {
             width: 54px;
             height: 54px;
@@ -104,7 +103,7 @@
             gap: 12px;
             margin-bottom: 4px;
 
-            // Etiquetas de categoría (Mismo estilo que badges del detalle)
+            // Etiquetas de categoría
             .tipo-tag {
                 font-family: v.$fuente-enfasis;
                 font-size: 0.65rem;
@@ -193,7 +192,7 @@
 
         .card-meta {
             justify-content: space-between;
-            padding-left: 60px; // Alineado con el inicio del texto (54px + gap)
+            padding-left: 60px;
 
             .flecha-link {
                 display: none;
@@ -208,7 +207,6 @@
    Ajuste para que el Muro coincida con el diseño de Materiales/Biblioteca
    ========================================================================== */
 
-// Cambiamos .sin-actividad por .sin-datos para que coincida con tu HTML actual
 .sin-datos {
     display: flex;
     flex-direction: column;
@@ -231,7 +229,6 @@
         }
     }
 
-    // El título "Aún no hay actividad"
     h3 {
         font-family: v.$fuente-enfasis;
         font-weight: 800;    
@@ -240,7 +237,6 @@
         margin: 0 0 0.5rem 0; 
     }
 
-    // El texto de bajada
     p {
         font-family: v.$fuente-lectura;
         font-size: 1.05rem;

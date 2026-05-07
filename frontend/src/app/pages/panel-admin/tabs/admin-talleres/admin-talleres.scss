@@ -220,7 +220,7 @@
         }
     }
 
-    // --- BLOQUE DE TALLER (IMAGEN + TÍTULO) ---
+    // --- BLOQUE DE TALLER  ---
     .workshop-item {
         display: flex;
         gap: 1rem;
@@ -369,7 +369,7 @@
     }
 }
 
-// 7. PAGINACIÓN (CENTRALIZADA VÍA MIXIN)
+// 7. PAGINACIÓN
 .admin-pagination {
     @include m.estilo-paginacion-admin;
     flex-shrink: 0;

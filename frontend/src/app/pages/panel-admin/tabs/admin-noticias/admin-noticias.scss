@@ -1,6 +1,5 @@
 /* ==========================================================================
    VISTA: GESTIÓN DE NOTICIAS / NOVEDADES (ADMIN)
-   Layout optimizado para contenido editorial con previsualización de imágenes.
    ========================================================================== */
 @use '../../../../../styles/variables' as v;
 @use '../../../../../styles/mixins' as m;
@@ -69,7 +68,7 @@
   }
 }
 
-// 3. BARRA DE HERRAMIENTAS (TOOLBAR)
+// 3. BARRA DE HERRAMIENTAS
 .admin-toolbar {
   flex-shrink: 0;
   padding: 0.8rem 1.5rem;
@@ -98,7 +97,7 @@
   }
 }
 
-// 4. CONTENEDOR DE LA TABLA (CARD)
+// 4. CONTENEDOR DE LA TABLA
 .admin-card {
   background: white;
   border-radius: v.$radio-curvatura;
@@ -167,7 +166,7 @@
     }
   }
 
-  // --- INFORMACIÓN DE LA NOTICIA (META) ---
+  // --- INFORMACIÓN DE LA NOTICIA ---
   .news-meta {
     display: flex;
     flex-direction: column;
@@ -232,7 +231,7 @@
   }
 }
 
-// 7. PAGINACIÓN (CENTRALIZADA VÍA MIXIN)
+// 7. PAGINACIÓN
 .admin-pagination {
   @include m.estilo-paginacion-admin;
   flex-shrink: 0; 

@@ -10,12 +10,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import java.time.LocalDateTime;
 
-/**
- * Mapper para el proceso de matriculación de alumnos.
- * Centraliza la lógica de inicialización de pagos y fechas de inscripción.
- */
-@Mapper(componentModel = "spring", imports = { LocalDateTime.class, EstadoPago.class })
-public interface InscripcionMapper {
+    /**
+    * Mapper para el proceso de matriculación de alumnos.
+    * Centraliza la lógica de inicialización de pagos y fechas de inscripción.
+    */
+    @Mapper(componentModel = "spring", imports = { LocalDateTime.class, EstadoPago.class })
+    public interface InscripcionMapper {
 
     @Mapping(target = "idInscripcion", source = "id")
     @Mapping(target = "nombreUsuario", expression = "java(ins.getUsuario().getNombre() + \" \" + ins.getUsuario().getApellidos())")

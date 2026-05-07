@@ -13,7 +13,6 @@ export class App implements OnInit {
   showAccessMenu = false;
   contrastValue = 100;
 
-  // Variables para sincronizar el estado del menú con el localStorage
   currentDaltonism = 'none';
   currentFontSize = 'medium';
 

@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @Data
 public class PasswordResetRequestDTO {
-
+    /** Email del usuario . */
     @NotBlank(message = "El email es obligatorio")
     @Email(message = "Debe ser un formato de email válido")
     private String email;

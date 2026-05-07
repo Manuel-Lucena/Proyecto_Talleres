@@ -10,7 +10,7 @@
     background-color: $color-neutro-max;
     min-height: 100vh;
 
-    // --- 1. HERO SECTION (ZONA SLIM) ---
+    // --- 1. HERO SECTION ---
     .hero-zone-slim {
         position: relative;
         padding: clamp(60px, 10vh, 100px) 0;
@@ -19,7 +19,6 @@
         display: flex;
         align-items: center;
 
-        // NUEVO: La imagen ahora es un elemento real del DOM
         .hero-bg-img {
             position: absolute;
             inset: 0;
@@ -71,7 +70,6 @@
     .content-zone {
         padding: clamp(40px, 8vh, 80px) 0;
 
-        // Cabecera de sección con acciones dinámicas
         .header-seccion-noticias {
             display: flex;
             justify-content: space-between;
@@ -106,7 +104,6 @@
 
         }
 
-        // Botón de administración rápida
         .btn-add-news-mini {
             background: rgba($color-marca-principal, 0.1);
             border: 1px solid rgba($color-marca-principal, 0.2);
@@ -171,7 +168,7 @@
                 }
             }
 
-            // Efecto de zoom en la imagen al pasar por la card
+    
             &:hover .news-img {
                 transform: scale(1.05);
             }

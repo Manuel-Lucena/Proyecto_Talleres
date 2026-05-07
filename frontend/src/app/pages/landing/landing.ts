@@ -58,7 +58,6 @@ export class Landing implements OnInit {
   cargarNoticias(): void {
     this.noticiaService.listar().subscribe({
       next: (res) => {
-        // Inmutabilidad: Creamos una nueva referencia de array para asegurar el refresco en el HTML
         this.listaNoticias = [...res.data.slice(0, 6)];
         this.cdr.detectChanges();
       },
@@ -101,11 +100,8 @@ export class Landing implements OnInit {
     accion.subscribe({
       next: (res) => {
         this.cerrarModal();
-        // 1. Recargamos los datos
-        this.cargarNoticias();
 
-        // 2. Opcional: Si ves que tarda en aparecer, sube el tiempo del timeout
-        // pero con la barra '/' en el HTML debería ir mucho mejor.
+        this.cargarNoticias();
       },
       error: (err) => console.error("Error en la persistencia de noticia:", err)
     });

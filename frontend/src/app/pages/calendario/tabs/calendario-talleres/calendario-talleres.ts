@@ -57,7 +57,6 @@ export class CalendarioTalleres implements OnInit {
         this.todasMisInscripciones = resp.data;
         this.horariosParaMostrar = [...this.todasMisInscripciones];
         
-        // Utilizamos Set para garantizar que cada taller aparezca una sola vez en el filtro.
         this.talleresDisponibles = [...new Set(this.todasMisInscripciones.map(h => h.nombreTaller))];
         
         this.cargando = false;
@@ -122,7 +121,6 @@ export class CalendarioTalleres implements OnInit {
         link.download = `Mi_Agenda_${fecha}.pdf`;
         link.click();
         
-        // Liberación de memoria tras la descarga
         window.URL.revokeObjectURL(url);
       },
       error: (err) => {

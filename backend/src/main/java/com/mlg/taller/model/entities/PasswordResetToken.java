@@ -5,8 +5,10 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 /**
- * Entidad que gestiona los tokens temporales para la recuperación de contraseñas.
- * Permite desvincular la seguridad temporal de la información básica del usuario.
+ * Entidad que gestiona los tokens temporales para la recuperación de
+ * contraseñas.
+ * Permite desvincular la seguridad temporal de la información básica del
+ * usuario.
  */
 @Entity
 @Table(name = "PASSWORD_RESET_TOKEN")
@@ -16,6 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class PasswordResetToken {
 
+    /** Identificador único del token. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_token")
@@ -34,7 +37,9 @@ public class PasswordResetToken {
     @Column(name = "fecha_expiracion", nullable = false)
     private LocalDateTime fechaExpiracion;
 
-    /** * Comprueba si el token ha superado la fecha límite de uso.
+    /**
+     * * Comprueba si el token ha superado la fecha límite de uso.
+     * 
      * @return true si el token ya no es válido.
      */
     public boolean isExpirado() {

@@ -106,7 +106,6 @@ export class CalendarioTareas implements OnInit {
     const mes = this.fechaVisual.getMonth();
 
     const primerDiaMes = new Date(año, mes, 1);
-    // Ajuste: getDay() devuelve 0 para Domingo, convertimos a 0 para Lunes
     let diaInicio = primerDiaMes.getDay() - 1;
     if (diaInicio === -1) diaInicio = 6;
 

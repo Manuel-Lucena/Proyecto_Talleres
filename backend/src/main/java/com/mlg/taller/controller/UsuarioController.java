@@ -52,7 +52,7 @@ public class UsuarioController {
      * 
      * @return ApiResponse con la lista de usuarios creados.
      */
-    @PostMapping("/batch")
+    @PostMapping("/masivo")
     public ApiResponse<List<UsuarioResponseDTO>> registrarMasivo(@RequestBody @Valid List<UsuarioRequestDTO> usuarios) {
         List<UsuarioResponseDTO> creados = usuarioService.registrarMasivo(usuarios);
         return ApiResponse.success(creados, "Se han importado " + creados.size() + " usuarios correctamente");

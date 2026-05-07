@@ -6,7 +6,7 @@
 @use '../../../styles/variables' as v;
 @use '../../../styles/mixins' as m;
 
-// 1. CONTENEDOR PRINCIPAL (FONDO CON GRADIENTE Y PARALLAX SUTIL)
+// 1. CONTENEDOR PRINCIPAL
 .contenedor-login {
   min-height: 100vh;
   display: flex;
@@ -74,7 +74,6 @@ h1 {
   color: v.$color-marca-principal;
 }
 
-// Estructura de los inputs con el mixin oficial
 .custom-focus {
   @include m.input-group-personalizado;
 

@@ -16,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Material {
 
+    /** Identificador único del material. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_material")

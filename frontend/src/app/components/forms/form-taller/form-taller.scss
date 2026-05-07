@@ -1,6 +1,6 @@
 /* ==========================================================================
-   SISTEMA DE MODALES: CREACIÓN DE NOTICIAS Y TALLERES (WITH PREVIEW)
-   Layout dividido: Formulario de edición + Vista previa de tarjeta en tiempo real.
+   SISTEMA DE MODALES: CREACIÓN DE NOTICIAS Y TALLERES
+   Layout dividido: Formulario de edición + Vista previa de tarjeta.
    ========================================================================== */
 
 @use '../../../../styles/variables' as v;
@@ -32,7 +32,7 @@
     position: relative;
     overflow: hidden;
 
-    // Cabecera estilizada con borde de marca
+
     .cabecera-modal {
         padding: 1.5rem 2.5rem;
         border-bottom: 1px solid v.$color-fondo-pagina;
@@ -55,7 +55,7 @@
     }
 }
 
-// 2. GRID PRINCIPAL (FORM VS PREVIEW)
+// 2. GRID PRINCIPAL 
 .noticia-grid-container {
     display: grid;
     grid-template-columns: 1fr 340px;
@@ -158,7 +158,6 @@
     }
 }
 
-// Réplica de la tarjeta final del feed
 .vista-previa-tarjeta {
     @include m.card-elevada;
     background: white;
@@ -253,7 +252,7 @@
     }
 }
 
-// 6. ESTILOS PARA NG-SELECT (Personalización de librería externa)
+// 6. ESTILOS PARA NG-SELECT 
 .custom-ng-select {
     ::ng-deep .ng-select-container {
         @include m.estilo-input-base;

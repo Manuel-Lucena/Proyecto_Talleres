@@ -93,7 +93,7 @@ export class FormInscripcion implements OnInit {
    */
   enviar(): void {
     if (this.inscripcionForm.valid) {
-      this.cargando = true; // Iniciamos estado de espera
+      this.cargando = true; 
       this.guardado.emit(this.inscripcionForm.value);
     }
   }

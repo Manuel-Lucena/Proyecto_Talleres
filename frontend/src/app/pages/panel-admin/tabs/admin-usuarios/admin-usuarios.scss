@@ -25,7 +25,7 @@
   }
 }
 
-// 2. CABECERA DE ACCIONES (Título + Botones)
+// 2. CABECERA DE ACCIONES 
 .admin-header {
   flex-shrink: 0;
   display: flex;
@@ -188,7 +188,7 @@
     }
   }
 
-  // Ajuste específico para alineación vertical de selects
+ 
   .filter-box {
     flex: 1;
     position: relative;
@@ -267,7 +267,7 @@
   }
 }
 
-// 5. PERFIL DE USUARIO (COLUMNA 1)
+// 5. PERFIL DE USUARIO 
 .user-item {
   display: flex;
   align-items: center;
@@ -361,7 +361,7 @@
   }
 }
 
-// 7. SISTEMA DE INTERRUPTOR (TOGGLE)
+// 7. SISTEMA DE INTERRUPTOR 
 .status-toggle {
   display: flex;
   align-items: center;

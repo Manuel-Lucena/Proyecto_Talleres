@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SISTEMA DE MODALES: CONSULTA DE HORARIOS (CON MIXINS)
+   SISTEMA DE MODALES: CONSULTA DE HORARIOS 
    ========================================================================== */
 
 @import '../../../../styles/variables';
@@ -13,7 +13,6 @@
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    // Aplicamos la animación de entrada suave al overlay o al container
 }
 
 .modal-container {

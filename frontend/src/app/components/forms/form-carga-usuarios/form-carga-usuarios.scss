@@ -18,7 +18,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem; // Reducido para móviles
+    padding: 1rem;
     @include m.animacion-entrada;
 }
 
@@ -30,7 +30,7 @@
     max-height: 95vh;
     border-radius: v.$radio-curvatura * 2;
     box-shadow: v.$sombra-nivel-3;
-    padding: 2rem; // Ajustado
+    padding: 2rem; 
     position: relative;
     overflow-y: auto;
     display: flex;
@@ -68,7 +68,7 @@
     }
 }
 
-// 4. BARRA DE CARGA E INGESTA (CON SOPORTE LABEL)
+// 4. BARRA DE CARGA E INGESTA 
 .seccion-ingesta {
     margin-bottom: 1.5rem;
 
@@ -80,7 +80,7 @@
 
 .barra-carga {
     display: flex;
-    flex-direction: column; // Móvil por defecto
+    flex-direction: column;
     gap: 1rem;
     background: v.$color-fondo-pagina;
     padding: 1rem;
@@ -129,7 +129,7 @@
         @include m.boton-primario;
         height: 48px;
         margin: 0;
-        width: 100%; // Full width en móvil
+        width: 100%;
 
         @media (min-width: 600px) {
             width: auto;
@@ -143,17 +143,16 @@
     border-radius: v.$radio-curvatura;
     background: white;
     margin-bottom: 2rem;
-    overflow: hidden; // Para que el scroll no rompa el borde
-
+    overflow: hidden;
     .scroll-tabla {
         max-height: 400px;
-        overflow-x: auto; // Crucial para responsive
+        overflow-x: auto; 
         overflow-y: auto;
     }
 
     .tabla-editable {
         width: 100%;
-        min-width: 800px; // Evita que las columnas se colapsen
+        min-width: 800px;
         border-collapse: collapse;
 
         th {

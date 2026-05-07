@@ -25,7 +25,7 @@
   }
 }
 
-// 2. CABECERA DE PÁGINA (CONTROL DE COLISIONES)
+// 2. CABECERA DE PÁGINA
 .admin-header {
   flex-shrink: 0;
   display: flex;
@@ -35,7 +35,6 @@
   gap: 1.5rem;
   width: 100%;
 
-  // Salto vertical anticipado (1350px) para evitar overlap de botones y título
   @media (max-width: 1350px) {
     flex-direction: column;
     align-items: stretch;
@@ -87,7 +86,7 @@
     }
   }
 
-  // Acciones Globales (Botones de Inscripción y Exportación)
+  // Acciones Globales 
   .header-actions {
     display: flex;
     gap: 0.75rem;
@@ -165,7 +164,7 @@
   }
 }
 
-// 3. BARRA DE HERRAMIENTAS (BÚSQUEDA Y FILTROS)
+// 3. BARRA DE HERRAMIENTAS
 .admin-toolbar {
   flex-shrink: 0;
   padding: 1.2rem 1.5rem;
@@ -182,7 +181,6 @@
     align-items: stretch;
   }
 
-  // Input de búsqueda con prefijo de criterio
   .search-group {
     display: flex;
     flex: 2;
@@ -261,7 +259,7 @@
   }
 }
 
-// 4. ÁREA DE DATOS (TABLA EDITORIAL)
+// 4. ÁREA DE DATOS
 .admin-card {
   background: v.$color-neutro-max;
   border-radius: v.$radio-curvatura;
@@ -365,7 +363,6 @@
   @include m.estilo-paginacion-admin;
 }
 
-// Animaciones
 .spin {
   animation: rotation 1s infinite linear;
   display: inline-block;

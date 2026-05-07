@@ -38,7 +38,7 @@
   }
 }
 
-// 2. LAYOUT DE DOBLE COLUMNA (Resumen | Pago)
+// 2. LAYOUT DE DOBLE COLUMNA 
 .checkout-layout {
   display: grid;
   grid-template-columns: 1fr 1.2fr;
@@ -56,10 +56,10 @@
   background: v.$color-fondo-pagina;
   border-right: 1px solid rgba(v.$color-secundario-frio-2, 0.05);
   padding: 3rem 2.5rem;
-  min-width: 0; // Evita que el grid se desborde por contenido largo
+  min-width: 0;
 
   .mini-card-info {
-    min-width: 0; // Protección para textos hijos
+    min-width: 0; 
 
     .img-preview {
       width: 100%;
@@ -86,8 +86,6 @@
       margin: 0.5rem 0;
       font-weight: 800;
       line-height: 1.2;
-      
-      // Control de desbordamiento
       word-wrap: break-word;
       overflow-wrap: break-word;
       overflow: hidden;
@@ -102,7 +100,7 @@
   }
 }
 
-// Separador decorativo estilo ticket
+
 .separador-puntos {
   border-top: 2px dashed rgba(v.$color-secundario-frio-2, 0.1);
   margin: 2.5rem 0;
@@ -144,7 +142,7 @@
     margin-bottom: 1.5rem;
   }
 
-  // Bloque de confianza (Trust Signals)
+
   .alerta-seguridad {
     display: flex;
     gap: 15px;

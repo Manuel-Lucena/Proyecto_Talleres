@@ -16,8 +16,7 @@
     overflow: hidden;
 }
 
-// 2. HEADER / TOOLBAR (Contiene Título, Botón PDF y Filtro)
-// Organiza los controles superiores de forma flexible
+// 2. HEADER / TOOLBAR 
 .calendario-toolbar {
     padding: 30px 40px;
     display: flex;
@@ -86,8 +85,8 @@
             display: flex;
             align-items: center;
             background: white;
-            padding: 0 15px; // Espaciado interno para los iconos
-            border-radius: 12px; // Un poco más curvo para que sea más moderno
+            padding: 0 15px; 
+            border-radius: 12px; 
             border: 1.5px solid #e2e8f0;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             min-width: 300px;
@@ -110,7 +109,6 @@
                 margin-right: 8px;
             }
 
-            // Flecha personalizada 
             &::after {
                 content: '\F282';
                 font-family: "bootstrap-icons";
@@ -122,7 +120,6 @@
             }
         }
 
-        // EL ELEMENTO SELECT REAL
         .maquina-select {
             appearance: none;
             -webkit-appearance: none;
@@ -138,7 +135,6 @@
             font-size: 0.95rem;
             padding-right: 30px;
 
-            // Estilo para las opciones 
             option {
                 background: white;
                 color: v.$color-secundario-frio-2;
@@ -150,12 +146,11 @@
 }
 
 // 3. GRID DEL CALENDARIO
-// Crea las 6 columnas para los días de la semana
 .calendario-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    background-color: #cbd5e1; // Color de la línea igual al borde
-    gap: 1px; // Esto crea la línea fina
+    background-color: #cbd5e1;
+    gap: 1px;
 }
 
 .dia-columna {
@@ -184,7 +179,7 @@
     flex-grow: 1;
 }
 
-// 4. TARJETAS DE EVENTO (Talleres individuales)
+// 4. TARJETAS DE EVENTO 
 .evento-card {
     display: flex;
     background: white;
@@ -202,7 +197,6 @@
         border-color: rgba(v.$color-marca-principal, 0.2);
     }
 
-    // Línea de acento lateral en verde
     .card-line {
         width: 5px;
         background: v.$color-marca-principal;
@@ -243,7 +237,6 @@
 }
 
 // 6. RESPONSIVE
-// Adaptación para tablets y móviles
 @media (max-width: 1100px) {
     .calendario-grid {
         grid-template-columns: repeat(3, 1fr);

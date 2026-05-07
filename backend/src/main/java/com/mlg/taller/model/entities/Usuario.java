@@ -25,6 +25,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Usuario implements UserDetails {
 
+    /** Identificador único del usuario. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
@@ -81,7 +82,7 @@ public class Usuario implements UserDetails {
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-      
+
         return List.of(new SimpleGrantedAuthority("ROLE_" + rol.getNombre()));
     }
 

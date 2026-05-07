@@ -99,7 +99,7 @@ export class AdminNoticias implements OnInit {
    * Prepara el entorno para la creación de una nueva publicación.
    */
   abrirCrear() {
-    this.noticiaSeleccionada = null; // Al ser null, el formulario se comporta como "Nuevo"
+    this.noticiaSeleccionada = null; 
     this.mostrarModal = true;
   }
 
@@ -118,7 +118,6 @@ export class AdminNoticias implements OnInit {
    */
   ejecutarGuardado(fd: FormData): void {
     if (this.noticiaSeleccionada) {
-      // Flujo de Actualización
       this.noticiaService.actualizar(this.noticiaSeleccionada.idNoticia, fd).subscribe({
         next: () => {
           this.notificacionService.mostrar({ titulo: 'Éxito', mensaje: 'Noticia actualizada correctamente', tipo: 'exito' });
@@ -128,7 +127,6 @@ export class AdminNoticias implements OnInit {
         error: () => this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'No se pudo actualizar la noticia', tipo: 'error' })
       });
     } else {
-      // Flujo de Creación
       this.noticiaService.crear(fd).subscribe({
         next: () => {
           this.notificacionService.mostrar({ titulo: 'Publicado', mensaje: 'La noticia se ha lanzado con éxito', tipo: 'exito' });

@@ -137,7 +137,7 @@
         color: v.$color-superficie-oscura;
     }
 
-    // Celda de Usuario (Avatar + Nombre + Email)
+    // Celda de Usuario 
     .user-cell {
         display: flex;
         align-items: center;
@@ -198,7 +198,6 @@
         }
     }
 
-    // Fila en estado "No entregado"
     tr.fila-pendiente {
         background-color: #fcfcfc;
 

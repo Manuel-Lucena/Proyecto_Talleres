@@ -13,7 +13,7 @@ import java.util.List;
  * Controlador para la gestión de la mensajería y comunicación dentro de los
  * talleres.
  * Permite el envío de mensajes, la consulta de historiales por taller y la
- * moderación (eliminación) de los mismos.
+ * moderación de los mismos.
  */
 @RestController
 @RequestMapping("/api/mensajes")

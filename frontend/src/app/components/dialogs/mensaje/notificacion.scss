@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SISTEMA DE MODALES: NOTIFICACIONES DE FEEDBACK (CON ANIMACIÓN)
+   SISTEMA DE MODALES: NOTIFICACIONES DE FEEDBACK 
    Componente dinámico para mensajes de éxito, error o información.
    ========================================================================== */
 
@@ -17,7 +17,7 @@
     z-index: 99999;
 
     .modal-content {
-        @include animacion-entrada; // <--- Integración de tu mixin de biblioteca
+        @include animacion-entrada; 
         background: $color-neutro-max;
         padding: 2.5rem;
         border-radius: $radio-curvatura;
@@ -36,7 +36,7 @@
                 font-weight: 800;
                 margin-bottom: 0.8rem;
 
-                // Variantes de color según el estado semántico
+                // Variantes de color según el estado
                 &.exito { color: $color-marca-principal; }
                 &.error { color: $color-secundario-calido-1; }
                 &.info  { color: $color-secundario-frio-1; }
@@ -74,7 +74,6 @@
                 box-shadow: $sombra-nivel-2;
             }
 
-            // Eliminación del foco por defecto para limpieza visual
             &:focus {
                 outline: none;
                 box-shadow: none;

@@ -66,7 +66,7 @@ export class AulaMuro implements OnInit {
 
   /**
    * Coordina la carga paralela y la fusión de recursos didácticos.
-   * * TÉCNICA: Implementa una transformación de datos para inyectar un discriminador 
+   * * Transformación de datos para inyectar un discriminador 
    * de tipo ('TAREA' vs 'MATERIAL') y una propiedad de fecha común (fechaMuro).
    */
   cargarMuro(idTaller: number): void {

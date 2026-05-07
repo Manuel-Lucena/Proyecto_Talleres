@@ -87,7 +87,7 @@ export class AdminTalleres implements OnInit {
   cargarTalleres(): void {
     this.tallerService.listarTodos().subscribe({
       next: (res) => {
-        this.talleres = [...res.data]; // Spread operator para asegurar nueva referencia
+        this.talleres = [...res.data]; 
         this.cdr.detectChanges();
       },
       error: () => this.notificacionService.mostrar({ titulo: 'Error', mensaje: 'No se pudieron cargar los talleres', tipo: 'error' })

@@ -13,7 +13,6 @@ export class PaginatePipe implements PipeTransform {
   transform(items: any[], pageSize: number, currentPage: number): any[] {
     if (!items || items.length === 0) return [];
     
-    // Si pageSize es 0 o negativo, devolvemos todo por seguridad
     if (pageSize <= 0) return items;
 
     const startIndex = (currentPage - 1) * pageSize;

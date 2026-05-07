@@ -228,7 +228,9 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/descargas/**").authenticated()
 
                         .requestMatchers("/api/email/**").permitAll()
-                        // ... resto de tus rutas ...
+                 
+
+
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

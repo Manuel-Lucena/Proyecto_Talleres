@@ -13,15 +13,15 @@
 @mixin estilo-contenedor-formulario {
     background: $color-neutro-max;
     padding: 2.5rem;
-    border-radius: $radio-curvatura * 2; // Bordes más redondeados para formularios
+    border-radius: $radio-curvatura * 2;
     box-shadow: 0 10px 30px rgba($color-neutro-min, 0.08);
     border: 1px solid rgba($color-marca-principal, 0.1);
 
     &:hover {
-        transform: none; // Evitamos elevación extra para mantener usabilidad
+        transform: none; 
     }
 
-    // Título del formulario con línea decorativa lateral dinámica
+
     .titulo-formulario {
         font-family: $fuente-enfasis;
         font-size: $tamaño-titular-md;
@@ -41,7 +41,7 @@
         }
     }
 
-    // Layout de filas: Adaptativo para móviles
+    // Layout de filas: 
     .fila-formulario {
         display: flex;
         gap: 1.5rem;
@@ -64,11 +64,11 @@
             font-weight: 700;
             font-size: 0.75rem;
             color: $color-secundario-frio-2;
-            text-transform: uppercase; // Estilo minimalista y profesional
+            text-transform: uppercase; 
         }
 
         input, select, textarea {
-            @include estilo-input-base; // Mixin definido en _mixins.scss
+            @include estilo-input-base; 
         }
     }
 
@@ -80,7 +80,6 @@
     }
 }
 
-// Aplicación del mixin a la clase global
 .contenedor-formulario {
     @include estilo-contenedor-formulario;
 }
@@ -116,10 +115,10 @@
         max-width: 200px;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap; // Evita que nombres de archivos largos rompan el diseño
+        white-space: nowrap;
     }
 
-    // Efecto de interacción (Hover / Focus)
+    // Efecto de interacción 
     &:hover {
         background-color: rgba($color-marca-principal, 0.03);
         border-color: $color-marca-principal;
@@ -127,11 +126,11 @@
 
         i {
             color: $color-marca-principal;
-            transform: translateY(-3px); // Animación sutil de "salto"
+            transform: translateY(-3px);
         }
     }
 
-    // Estado cuando ya se ha seleccionado o detectado un archivo
+  
     &.archivo-listo {
         border-style: solid;
         border-color: #27ae60;

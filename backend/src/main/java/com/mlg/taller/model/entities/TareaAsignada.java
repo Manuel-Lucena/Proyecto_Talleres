@@ -15,6 +15,7 @@ import lombok.*;
 @AllArgsConstructor
 public class TareaAsignada {
 
+    /** Identificador único de la tarea asignada. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

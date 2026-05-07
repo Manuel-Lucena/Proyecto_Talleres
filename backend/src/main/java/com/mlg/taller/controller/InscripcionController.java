@@ -181,7 +181,7 @@ public class InscripcionController {
     }
 
     /**
-     * Endpoint para pausar/reactivar una inscripción (Toggle).
+     * Endpoint para pausar/reactivar una inscripción.
      * 
      * @param id Identificador de la inscripción.
      * @return Inscripción con el estado 'activa' cambiado.

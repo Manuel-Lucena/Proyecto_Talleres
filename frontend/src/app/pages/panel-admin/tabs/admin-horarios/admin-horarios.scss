@@ -1,6 +1,5 @@
 /* ==========================================================================
    VISTA: GESTIÓN DE HORARIOS / CALENDARIO (ADMIN)
-   Sistema de rejilla de 7 días con tarjetas de sesión dinámicas.
    ========================================================================== */
 
 @import '../../../../../styles/variables';
@@ -133,7 +132,7 @@
   min-height: 54px;
   display: flex;
   align-items: center;
-  transition: none; // Eliminamos transiciones innecesarias
+  transition: none;
 
   .session-time {
     font-family: $fuente-enfasis;
@@ -149,7 +148,7 @@
     }
   }
 
-  // Botón de eliminar (Hover independiente)
+  // Botón de eliminar
   .btn-delete-session {
     position: absolute;
     right: 8px;

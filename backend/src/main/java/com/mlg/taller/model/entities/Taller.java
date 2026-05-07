@@ -23,6 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Taller {
 
+    /** Identificador único del taller. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_taller")

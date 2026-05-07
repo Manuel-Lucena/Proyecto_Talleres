@@ -154,7 +154,7 @@ export class AdminInscripciones implements OnInit {
   }
 
   /**
-   * Flujo híbrido: Busca inscripciones de alumno, si no hay, busca talleres como docente.
+   * Busca inscripciones de alumno, si no hay, busca talleres como docente.
    * @param idUsuario ID del usuario para analizar su actividad */
   private cargarActividadUsuario(idUsuario: number): void {
     this.inscripcionService.listarPorUsuario(idUsuario).subscribe({
@@ -241,14 +241,13 @@ export class AdminInscripciones implements OnInit {
     const term = this.busqueda?.toLowerCase().trim();
 
     return this.inscripciones.filter(ins => {
-      // 1. Filtro por Estado
+
       const cumpleEstado = this.filtroEstado === 'todos' ||
         (this.filtroEstado === 'activa' && ins.activa) ||
         (this.filtroEstado === 'baja' && !ins.activa);
 
       if (!cumpleEstado) return false;
 
-      // 2. Filtro por Búsqueda (Texto)
       if (!term) return true;
 
       return this.esVistaTaller

@@ -1,6 +1,5 @@
 /* ==========================================================================
-   COMPONENTE: LISTADO DE TAREAS (AULA VIRTUAL)
-   Diseño de tarjetas de alta legibilidad con enfoque en fechas de entrega.
+   COMPONENTE: LISTADO DE TAREAS (AULA VIRTUAL).
    ========================================================================== */
 
 @use '../../../../../styles/variables' as v;
@@ -104,7 +103,7 @@
         }
     }
 
-    // --- BLOQUE LATERAL (Fecha Límite + Icono Acción) ---
+    // --- BLOQUE LATERAL ---
     .card-side {
         display: flex;
         align-items: center;
@@ -147,7 +146,7 @@
     }
 }
 
-// 3. RESPONSIVE DESIGN (Reorganización para móviles)
+// 3. RESPONSIVE DESIGN 
 @media (max-width: 768px) {
     .tarea-card {
         grid-template-columns: 1fr; 
@@ -184,7 +183,7 @@
     }
 }
 
-// 4. ESTADO VACÍO (Empty State)
+// 4. ESTADO VACÍO 
 .sin-datos {
     padding: 6rem 2rem;
     text-align: center;

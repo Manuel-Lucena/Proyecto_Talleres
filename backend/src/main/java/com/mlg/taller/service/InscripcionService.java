@@ -56,17 +56,17 @@ public class InscripcionService {
      */
     @Transactional
     public InscripcionResponseDTO inscribir(InscripcionRequestDTO dto) {
-        // 1. Validaciones de seguridad y obtención de entidades
+
         Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
         inscripcionValidator.validarPropiedadOSolicitante(solicitante, dto.getIdUsuario());
 
         Usuario usuario = buscarUsuarioInterno(dto.getIdUsuario());
         Taller taller = buscarTallerInterno(dto.getIdTaller());
 
+        inscripcionValidator.validarFechaInscripcion(solicitante, taller);
+
         inscripcionValidator.validarPerfilInscribible(usuario);
 
-        // 2. BUSQUEDA DE REGISTRO PREVIO (Usando la Query Nativa del repositorio)
-        // Esto es clave: si existe (aunque sea inactiva), JPA la recupera con su ID
         Inscripcion inscripcion = inscripcionRepository.findByUsuarioIdAndTallerId(usuario.getId(), taller.getId())
                 .orElse(null);
 
@@ -335,7 +335,6 @@ public class InscripcionService {
 
         Inscripcion inscripcion = buscarInscripcionInterna(id);
 
-
         String emailAlumno = inscripcion.getUsuario().getEmail();
         String nombreTaller = inscripcion.getTaller().getNombre();
 
@@ -343,12 +342,11 @@ public class InscripcionService {
         Taller taller = inscripcion.getTaller();
 
         if (solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN")) {
-  
+
             inscripcionRepository.eliminarAdmin(id);
         } else {
             inscripcionRepository.desactivarInscripcion(id);
         }
-
 
         emailService.enviarCorreo(
                 emailAlumno,

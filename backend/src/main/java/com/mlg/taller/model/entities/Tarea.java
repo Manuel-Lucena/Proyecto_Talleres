@@ -19,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Tarea {
 
+    /** Identificador único de la tarea. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_tarea")

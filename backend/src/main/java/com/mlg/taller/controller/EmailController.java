@@ -27,12 +27,10 @@ public class EmailController {
     @GetMapping("/test")
     public String enviarPrueba(@RequestParam String destinatario) {
         
-        // 1. Preparamos los datos que espera la plantilla HTML (nombre, rol, etc)
         Map<String, Object> datos = new HashMap<>();
         datos.put("nombre", "Usuario de Prueba");
         datos.put("rol", "ALUMNO");
 
-        // 2. Llamamos al servicio
         emailService.enviarCorreo(
             destinatario, 
             "Prueba de Conexión - Taller UP", 

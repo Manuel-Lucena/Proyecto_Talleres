@@ -115,23 +115,19 @@ export class AulaVirtual implements OnInit {
 
     const breadcrumbData = currentRoute?.snapshot.data['breadcrumb'];
 
-    // 1. Identificar la Sección Base
     if (this.router.url.includes('/detalle/material') || this.router.url.includes('/recursos')) {
       this.seccionActual = 'Materiales';
       this.seccionEnlace = 'recursos';
     } else if (this.router.url.includes('/detalle/tarea') || this.router.url.includes('/tareas')) {
       this.seccionActual = 'Tareas';
       this.seccionEnlace = 'tareas';
-    } else {
-      // Si es Muro, Foro, etc.
       this.seccionActual = breadcrumbData || '';
       this.seccionEnlace = this.router.url.split('/').pop() || '';
     }
 
-    // 2. Limpieza: Si NO estamos en un detalle, el nombre del recurso debe morir
     if (!this.router.url.includes('/detalle/') && !this.router.url.includes('/seguimiento')) {
       this.recursoNombre = '';
-      // No llames a setRecursoNombre('') aquí porque crearás un bucle infinito de eventos
+
     }
 
     this.cdr.detectChanges();

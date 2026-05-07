@@ -17,13 +17,12 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state) =
   }
 
   const rolesPermitidos: string[] = route.data['roles'];
-  // Obtenemos el rol y lo normalizamos a minúsculas
   const rolUsuario = (tokenService.getRol() ?? '').toLowerCase();
 
   /**
    * Modificamos la lógica de comprobación:
    * 1. Limpiamos el rol del usuario quitándole el prefijo 'role_' si lo tiene.
-   * 2. Comparamos de forma flexible.
+   * 2. Comparamos.
    */
   const tienePermiso = !rolesPermitidos || 
                        rolesPermitidos.length === 0 || 
@@ -38,6 +37,6 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state) =
   }
 
   console.error(`Acceso denegado: El rol [${rolUsuario}] no tiene permiso para ${state.url}`);
-  router.navigate(['/no-autorizado']); // O a una página de 403
+  router.navigate(['/no-autorizado']);
   return false;
 };

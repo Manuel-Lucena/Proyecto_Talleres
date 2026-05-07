@@ -83,7 +83,7 @@ export class AulaForo implements OnInit {
 
   /**
    * Procesa el envío de una nueva intervención.
-   * * TÉCNICA: Se utiliza un modelo de 'unshift' tras la confirmación del servidor 
+   * * Se utiliza un modelo de 'unshift' tras la confirmación del servidor 
    * para inyectar el nuevo objeto en la cabecera del array sin re-petición del listado.
    */
   enviarMensaje(): void {
@@ -154,13 +154,12 @@ export class AulaForo implements OnInit {
 
     if (confirmar) {
       this.cargando = true;
-      // Usamos firstValueFrom para evitar el uso de .toPromise() (deprecated)
       const promesasBorrado = this.mensajes.map(m => firstValueFrom(this.mensajeService.eliminar(m.idMensaje)));
 
       try {
         await Promise.all(promesasBorrado);
         
-        this.mensajes = []; // Limpiamos la lista local
+        this.mensajes = []; 
         this.notify.mostrar({
           titulo: 'Foro Limpio',
           mensaje: 'Se han eliminado todos los mensajes del taller.',
@@ -172,7 +171,6 @@ export class AulaForo implements OnInit {
           mensaje: 'Algunos mensajes no pudieron eliminarse. Recarga la página.',
           tipo: 'error'
         });
-        // Recargamos para ver qué ha quedado
         this.cargarMensajes();
       } finally {
         this.cargando = false;

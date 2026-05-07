@@ -48,7 +48,7 @@ export class UsuarioService {
    * @returns Observable con la respuesta de la API.
    */
   crearVariosUsuarios(usuarios: any[]): Observable<ApiResponse<UsuarioResponse[]>> {
-    return this.http.post<ApiResponse<UsuarioResponse[]>>(`${this.apiUrl}/batch`, usuarios);
+    return this.http.post<ApiResponse<UsuarioResponse[]>>(`${this.apiUrl}/masivo`, usuarios);
   }
 
   /**
@@ -144,7 +144,6 @@ export class UsuarioService {
    * @returns Observable con la respuesta de la operación.
    */
   restablecerPassword(datos: PasswordChangeRequest): Observable<ApiResponse<void>> {
-    // Enviamos el objeto { token, nuevaPassword }
     return this.http.post<ApiResponse<void>>(`${this.apiUrl}/password-reset-confirm`, datos);
   }
 

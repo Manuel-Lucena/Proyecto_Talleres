@@ -5,7 +5,6 @@ import { TokenService } from '../../../services/Token.Service';
 import { UsuarioService } from '../../../services/Usuario.Service';
 import { UsuarioResponse } from '../../../interfaces/Usuario.Interface';
 import { NotificacionService } from '../../../services/Notificacion.Service';
-import { Notificacion } from "../../dialogs/mensaje/notificacion";
 import { Confirmacion } from "../../dialogs/confirmacion/confirmacion";
 
 /**
@@ -61,8 +60,6 @@ export class Navbar implements OnInit {
 
   /**
    * Recupera la identidad completa del usuario a partir del ID codificado en el token.
-   * * TÉCNICA: Se emplea detectChanges para mitigar latencias en la actualización
-   * de la cabecera cuando los datos llegan tras el renderizado inicial.
    */
   private cargarDatos(): void {
     const userId = this.tokenService.getId();

@@ -4,12 +4,8 @@ import { authGuard } from './guards/AuthGuard';
 export const routes: Routes = [
   // --- RUTAS PÚBLICAS ---
   { path: '', redirectTo: '/landing', pathMatch: 'full' },
-  
-  // Estas dos las dejamos fijas (Eager) para que la entrada sea rápida
   { path: 'landing', loadComponent: () => import('./pages/landing/landing').then(m => m.Landing) },
   { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.Login) },
-
-  // --- EL RESTO PASA A LAZY LOADING (Esto es lo que arregla el Performance) ---
   { 
     path: 'noticia/:id', 
     loadComponent: () => import('./pages/noticia-detalle/noticia-detalle').then(m => m.NoticiaDetalle) 

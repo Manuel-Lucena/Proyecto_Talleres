@@ -122,7 +122,7 @@
     padding: 2rem;
     border-width: 2px;
 
-    // Input invisible para capturar el click en toda la zona
+   
     .input-hidden {
         position: absolute;
         inset: 0;
@@ -198,7 +198,6 @@
             }
         }
 
-        // Diferenciación de estado del archivo
         &.existente {
             border-left: 4px solid v.$color-secundario-calido-2;
         }
@@ -270,7 +269,7 @@
     }
 }
 
-// Animación local para la aparición de archivos
+// Animación para la aparición de archivos
 @keyframes slideIn {
     from {
         opacity: 0;

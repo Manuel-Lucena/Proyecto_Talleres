@@ -65,7 +65,7 @@
         }
     }
 
-    // Estilo especial para Profesores 
+    // Estilo para Profesores 
     &.teacher {
 
         background: linear-gradient(to right, rgba(v.$color-marca-principal, 0.02), white);
@@ -136,7 +136,7 @@
         }
     }
 
-    // Pequeño indicador de texto para el Rol
+    // Indicador de texto para el Rol
     .badge-rol {
         font-family: v.$fuente-enfasis;
         font-size: 0.6rem;

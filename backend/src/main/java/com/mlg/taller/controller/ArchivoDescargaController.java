@@ -88,7 +88,6 @@ public class ArchivoDescargaController {
         Path path = fileUtil.getRutaProtegida(partes[0], partes[1]);
         Resource recurso = new UrlResource(path.toUri());
 
-        // Verificación de integridad física del recurso
         if (!recurso.exists() || !recurso.isReadable()) {
             throw new ResourceNotFoundException("El archivo '" + nombreOriginal + "' no existe en el servidor");
         }
