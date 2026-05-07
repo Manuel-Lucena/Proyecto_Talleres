@@ -23,6 +23,7 @@ public interface MensajeMapper {
     @Mapping(target = "nombreTaller", source = "taller.nombre")
     @Mapping(target = "idUsuario", source = "autor.id")
     @Mapping(target = "nombreAutor", expression = "java(m.getAutor().getNombre() + \" \" + m.getAutor().getApellidos())")
+    @Mapping(target = "fotoPerfilAutor", source = "autor.fotoPerfilRuta")
     MensajeResponseDTO toResponse(Mensaje m);
 
     /**

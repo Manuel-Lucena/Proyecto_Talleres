@@ -16,6 +16,7 @@ export interface MensajeResponse {
   fechaEnvio: string; 
   idTaller: number;
   nombreTaller: string;
+  fotoPerfilAutor?: string;
   idUsuario: number;
   nombreAutor: string;
 }

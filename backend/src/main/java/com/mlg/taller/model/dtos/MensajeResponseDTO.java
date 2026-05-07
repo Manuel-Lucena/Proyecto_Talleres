@@ -5,7 +5,8 @@ import java.time.LocalDateTime;
 
 /**
  * DTO para la visualización de mensajes en el historial.
- * Aplana la información del autor para facilitar el renderizado de la interfaz de chat.
+ * Aplana la información del autor para facilitar el renderizado de la interfaz
+ * de chat.
  */
 @Data
 public class MensajeResponseDTO {
@@ -27,6 +28,9 @@ public class MensajeResponseDTO {
 
     /** ID del emisor del mensaje. */
     private Long idUsuario;
+
+    /** Foto de perfil del autor del mensaje */
+    private String fotoPerfilAutor;
 
     /** Nombre completo del autor (para mostrar junto al mensaje). */
     private String nombreAutor;

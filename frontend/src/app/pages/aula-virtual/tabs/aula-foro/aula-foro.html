@@ -5,19 +5,33 @@
         <h2>Foro de Discusión</h2>
         <p>Participa, pregunta dudas o comparte recursos con tus compañeros.</p>
       </div>
-      <button *ngIf="tokenService.esAdmin" 
-              class="btn-limpiar" (click)="limpiarForo()">
+      <button *ngIf="tokenService.esAdmin" class="btn-limpiar" (click)="limpiarForo()">
         <i class="bi bi-trash3-fill"></i> Limpiar Foro
       </button>
     </div>
   </header>
 
+  <section class="publicar-seccion">
+    <textarea [(ngModel)]="nuevoMensaje" placeholder="Escribe algo para el grupo..." maxlength="500">
+    </textarea>
+    <div class="footer-publicar">
+      <span class="char-count">{{ nuevoMensaje.length }} / 500</span>
+      <button class="btn-publicar" (click)="enviarMensaje()" [disabled]="!nuevoMensaje.trim()">
+        <i class="bi bi-send-fill"></i> Publicar
+      </button>
+    </div>
+  </section>
+
   <div class="mensajes-feed">
     <div class="mensaje-item" *ngFor="let m of mensajes">
       <article class="mensaje-card">
         <div class="card-header">
+
           <div class="avatar-wrapper">
-             </div>
+            <img #imgAutor [src]="m.fotoPerfilAutor ? '/usuarios/' + m.fotoPerfilAutor : '/usuarios/Predeterminada.png'"
+              (error)="imgAutor.src = '/usuarios/Predeterminada.png'" alt="Foto de perfil">
+          </div>
+
           <div class="meta">
             <span class="nombre">{{ m.nombreAutor }}</span>
             <span class="fecha">
@@ -31,11 +45,11 @@
             </button>
           </div>
         </div>
+
         <div class="contenido">
           <p>{{ m.contenido }}</p>
         </div>
       </article>
     </div>
-    
-    </div>
+  </div>
 </div>

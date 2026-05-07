@@ -3,6 +3,7 @@ package com.mlg.taller.repositories;
 import com.mlg.taller.model.entities.Tarea;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
@@ -29,7 +30,25 @@ public interface TareaRepository extends JpaRepository<Tarea, Long> {
      */
     List<Tarea> findByTallerIdAndVisibleTrue(Long tallerId);
 
-    @Query("SELECT t FROM Tarea t JOIN TareaAsignada ta ON ta.tarea.id = t.id " +
-            "WHERE t.taller.id = :idTaller AND ta.alumno.id = :idAlumno AND t.visible = true")
-    List<Tarea> findVisiblesParaAlumno(Long idTaller, Long idAlumno);
+    /**
+     * Recupera las tareas visibles para un alumno específico dentro de un taller.
+     * * Implementa una lógica de visibilidad híbrida:
+     * 1. La tarea debe pertenecer al taller y estar marcada como visible.
+     * 2. El alumno verá la tarea si existe una asignación explícita para él
+     * en TareaAsignada, O si la tarea no tiene ninguna asignación (tarea global).
+     *
+     * @param idTaller Identificador del taller.
+     * @param idAlumno Identificador del alumno que consulta sus tareas.
+     * @return Lista de tareas que el alumno tiene permiso para visualizar y
+     *         entregar.
+     */
+    @Query("SELECT t FROM Tarea t " +
+            "WHERE t.taller.id = :idTaller " +
+            "AND t.visible = true " +
+            "AND (" +
+            "  EXISTS (SELECT ta FROM TareaAsignada ta WHERE ta.tarea.id = t.id AND ta.alumno.id = :idAlumno) " +
+            "  OR " +
+            "  NOT EXISTS (SELECT ta FROM TareaAsignada ta WHERE ta.tarea.id = t.id)" +
+            ")")
+    List<Tarea> findVisiblesParaAlumno(@Param("idTaller") Long idTaller, @Param("idAlumno") Long idAlumno);
 }
