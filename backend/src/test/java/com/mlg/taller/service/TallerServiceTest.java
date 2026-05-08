@@ -43,7 +43,6 @@ public class TallerServiceTest {
     @InjectMocks
     private TallerService tallerService;
 
-    // Método de apoyo para simular el Admin
     private Usuario crearAdminMock() {
         Rol rol = new Rol();
         rol.setNombre("ADMIN");

@@ -26,11 +26,11 @@
           <a class="nav-link" routerLink="/landing" routerLinkActive="active-link">Inicio</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/talleres-explorar" routerLinkActive="active-link">Talleres</a>
+          <a class="nav-link" routerLink="/talleres-explorar" routerLinkActive="active-link">Ofertas</a>
         </li>
         @if (isLogged) {
         <li class="nav-item">
-          <a class="nav-link" routerLink="/mis-talleres" routerLinkActive="active-link">Mis Talleres</a>
+          <a class="nav-link" routerLink="/mis-talleres" routerLinkActive="active-link">Talleres</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" routerLink="/calendario" routerLinkActive="active-link">Calendario</a>
@@ -38,7 +38,7 @@
         }
         @if (tokenService.getRol()?.toLowerCase() === 'admin') {
         <li class="nav-item">
-          <a class="nav-link" routerLink="/panel-admin" routerLinkActive="active-link">Panel Admin</a>
+          <a class="nav-link" routerLink="/panel-admin" routerLinkActive="active-link">Panel</a>
         </li>
         }
       </ul>

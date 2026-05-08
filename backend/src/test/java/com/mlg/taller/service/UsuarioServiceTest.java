@@ -64,7 +64,7 @@ public class UsuarioServiceTest {
         Usuario user = new Usuario();
         user.setId(1L);
         
-        // El service usa buscarPorIdInterno -> findByIdAdmin
+
         when(usuarioRepository.findByIdAdmin(anyLong())).thenReturn(Optional.of(user));
         when(usuarioMapper.toResponse(any())).thenReturn(new UsuarioResponseDTO());
 
@@ -76,21 +76,18 @@ public class UsuarioServiceTest {
     @Test
     @DisplayName("PR-USU-04: Listado global de usuarios")
     void testListarTodos() {
-        // GIVEN
+
         Usuario u1 = new Usuario();
         Usuario u2 = new Usuario();
         List<Usuario> listaMock = Arrays.asList(u1, u2);
         
-        // IMPORTANTE: Tu service llama a findAll(), no a findAllAdmin()
+
         when(usuarioRepository.findAll()).thenReturn(listaMock);
 
-        // Forzamos al mapper a no devolver null
         when(usuarioMapper.toResponse(any())).thenReturn(new UsuarioResponseDTO());
 
-        // WHEN
         List<UsuarioResponseDTO> resultado = usuarioService.listarTodos();
 
-        // THEN
         assertNotNull(resultado);
         assertEquals(2, resultado.size(), "La lista debería tener 2 elementos");
     }

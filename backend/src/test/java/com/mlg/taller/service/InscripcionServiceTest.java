@@ -47,7 +47,6 @@ public class InscripcionServiceTest {
     @InjectMocks
     private InscripcionService inscripcionService;
 
-    // Método de apoyo para no repetir código de roles
     private Usuario crearUsuarioMock(Long id, String email, String nombreRol) {
         Rol rol = new Rol();
         rol.setId(1L);
@@ -88,10 +87,8 @@ public class InscripcionServiceTest {
             when(inscripcionMapper.toResponse(any())).thenReturn(new InscripcionResponseDTO());
             when(pdfService.generarBytesPdf(anyString(), anyMap())).thenReturn(new byte[0]);
 
-            // WHEN
             InscripcionResponseDTO result = inscripcionService.inscribir(dto);
 
-            // THEN
             assertNotNull(result);
             verify(emailService).enviarCorreoConAdjunto(any(), any(), any(), any(), any(), any());
         }

@@ -45,7 +45,7 @@ export class AulaVirtual implements OnInit {
     private router: Router,
     private tallerService: TallerService,
     private breadcrumbService: BreadcrumbService,
-    public tokenService: TokenService, 
+    public tokenService: TokenService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -118,11 +118,9 @@ export class AulaVirtual implements OnInit {
     if (this.router.url.includes('/detalle/material') || this.router.url.includes('/recursos')) {
       this.seccionActual = 'Materiales';
       this.seccionEnlace = 'recursos';
-    } else if (this.router.url.includes('/detalle/tarea') || this.router.url.includes('/tareas')) {
+    } else if (this.router.url.includes('/tareas')) {
       this.seccionActual = 'Tareas';
       this.seccionEnlace = 'tareas';
-      this.seccionActual = breadcrumbData || '';
-      this.seccionEnlace = this.router.url.split('/').pop() || '';
     }
 
     if (!this.router.url.includes('/detalle/') && !this.router.url.includes('/seguimiento')) {

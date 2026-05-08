@@ -1,14 +1,13 @@
-/* ==========================================================================
-   LAYOUT: PANEL DE ADMINISTRACIÓN
+/* ========================================================================== 
+   LAYOUT: PANEL DE ADMINISTRACIÓN 
    Sistema de navegación lateral colapsable con estados activo/móvil.
    ========================================================================== */
-
 @use '../../../styles/variables' as v;
 
-// 1. CONTENEDOR RAÍZ 
+// 1. CONTENEDOR RAÍZ
 .contenedor-admin {
   display: flex;
-  height: calc(100vh - 80px); 
+  height: calc(100vh - 80px);
   background-color: #f0f2f5;
   position: relative;
   overflow: hidden;
@@ -46,17 +45,17 @@
   display: flex;
   flex-direction: column;
   z-index: 100;
-  transition: width 0.3s ease; 
+  transition: width 0.3s linear, left 0.3s linear;
   position: sticky;
   top: 0;
   height: 100%;
-  overflow-y: auto; 
+  overflow-y: auto;
 
   .sidebar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 40px 25px 30px; 
+    padding: 40px 25px 30px;
 
     .etiqueta-seccion {
       font-family: v.$fuente-enfasis;
@@ -64,7 +63,7 @@
       text-transform: uppercase;
       color: rgba(255, 255, 255, 0.4);
       font-weight: 800;
-      letter-spacing: 1.5px; 
+      letter-spacing: 1.5px;
     }
 
     .btn-colapsar-pc {
@@ -81,7 +80,6 @@
       @media (max-width: 992px) {
         display: none;
       }
-
     }
   }
 }
@@ -101,7 +99,7 @@
     color: rgba(255, 255, 255, 0.7);
     font-family: v.$fuente-lectura;
     transition: 0.3s ease;
-    border-left: 4px solid transparent; 
+    border-left: 4px solid transparent;
 
     i {
       font-size: 1.2rem;
@@ -113,7 +111,6 @@
       padding-left: 35px;
     }
 
-    // ESTADO ACTIVO: Resalte visual de la sección actual
     &.activo {
       background-color: rgba(255, 255, 255, 0.1);
       color: white;
@@ -127,7 +124,7 @@
   }
 }
 
-// 4. ÁREA DE TRABAJO 
+// 4. ÁREA DE TRABAJO
 .contenido-principal-admin {
   flex: 1;
   padding: 40px;
@@ -140,25 +137,30 @@
 @media (max-width: 992px) {
   .barra-lateral-admin {
     position: fixed;
-    left: -280px; 
+    left: -280px;
     top: 80px;
     height: calc(100vh - 80px);
     padding-top: 30px;
-
     &.movil-show {
       left: 0;
     }
   }
+
   .sidebar-overlay {
-    display: none;
     position: fixed;
     inset: 80px 0 0 0;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(2px);
     z-index: 90;
+    // Transición de fundido
+    display: block;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s linear, visibility 0.3s linear;
 
     &.show {
-      display: block;
+      opacity: 1;
+      visibility: visible;
     }
   }
 }
@@ -176,6 +178,7 @@
   border: none;
   z-index: 200;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s linear;
 
   @media (max-width: 992px) {
     display: flex;

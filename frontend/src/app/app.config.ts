@@ -5,7 +5,6 @@ import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './interceptors/Auth.Interceptor';
 
-// --- IMPORTANTE: Configuración de Idioma ---
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 

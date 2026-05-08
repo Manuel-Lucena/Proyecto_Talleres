@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router'; // Importante para routerLink y router-outlet
+import { RouterModule } from '@angular/router';
 import { Navbar } from "../../components/layout/navbar/navbar";
 import { Footer } from "../../components/layout/footer/footer";
 

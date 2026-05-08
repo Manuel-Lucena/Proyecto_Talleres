@@ -16,14 +16,11 @@
                [src]="prof.fotoPerfilRuta ? '/usuarios/' + prof.fotoPerfilRuta : '/usuarios/Predeterminada.png'" 
                (error)="imgProfesor.src = '/usuarios/Predeterminada.png'" 
                [alt]="prof.nombre">
-          
-          <div class="status-indicator"></div>
         </div>
 
         <div class="info">
           <div class="name-row">
             <span class="name">{{ prof.nombre }} {{ prof.apellidos }}</span>
-            <span class="badge-rol teacher-badge">{{ prof.nombreRol }}</span>
           </div>
           <span class="email">
             <i class="bi bi-envelope"></i> {{ prof.email }}
@@ -57,7 +54,6 @@
         <div class="info">
           <div class="name-row">
             <span class="name">{{ alumno.nombre }} {{ alumno.apellidos }}</span>
-            <span class="badge-rol">ALUMNO</span>
           </div>
           <span class="email" *ngIf="alumno.email">
             <i class="bi bi-envelope"></i> {{ alumno.email }}

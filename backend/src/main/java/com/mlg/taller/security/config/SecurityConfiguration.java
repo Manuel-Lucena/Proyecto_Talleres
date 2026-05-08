@@ -244,11 +244,11 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Permite el origen de tu Angular
+
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-        // Permite los métodos que usas
+
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        // Importante: permite la cabecera Authorization (el Bearer token)
+    
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);
 

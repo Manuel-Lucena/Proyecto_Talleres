@@ -377,3 +377,33 @@
     }
   }
 }
+
+.alerta-vacia {
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+  padding: 80px 20px;     
+  width: 100%;
+  background: white;
+  border-radius: v.$radio-curvatura;
+  border: 1px solid #eee;  
+  box-shadow: v.$sombra-nivel-1;
+
+  .contenedor-vacio {
+    text-align: center;
+
+    i {
+      font-size: 3.5rem;   
+      color: #ccc;        
+      display: block;
+      margin-bottom: 15px;
+    }
+
+    p {
+      color: #666;
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin: 0;
+    }
+  }
+}

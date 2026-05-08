@@ -5,7 +5,7 @@ import com.mlg.taller.exception.DuplicateResourceException;
 import com.mlg.taller.model.dtos.UsuarioRequestDTO;
 import com.mlg.taller.model.entities.Usuario;
 import com.mlg.taller.repositories.UsuarioRepository;
-import com.mlg.taller.repositories.TallerRepository; // IMPORTANTE: Importar el repositorio de talleres
+import com.mlg.taller.repositories.TallerRepository; 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

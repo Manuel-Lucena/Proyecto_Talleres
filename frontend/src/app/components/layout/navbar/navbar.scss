@@ -13,10 +13,18 @@
     position: relative;
     z-index: 1001;
 
+    .navbar-toggler {
+
+        &:focus {
+            box-shadow: none;
+        }
+    }
+
     // 1. IDENTIDAD VISUAL 
     .logo-wrapper-static {
         height: 70px;
         width: 70px;
+
         img {
             height: 100%;
             width: 100%;
@@ -29,7 +37,10 @@
         height: 40px;
         background: #eee;
         margin: 0 20px;
-        @media (max-width: 576px) { display: none; }
+
+        @media (max-width: 576px) {
+            display: none;
+        }
     }
 
     .brand-text {
@@ -41,6 +52,7 @@
             margin: 0;
             line-height: 1;
         }
+
         p {
             font-size: 0.8rem;
             letter-spacing: 2px;
@@ -62,7 +74,7 @@
             position: relative;
             display: block;
 
-            @media (min-width: 992px) {
+            @media (min-width: 1200px) {
                 display: inline-block;
                 margin: 0 30px;
                 padding: 10px 0;
@@ -79,13 +91,19 @@
                 background-color: v.$color-marca-principal;
                 transition: width 0.3s ease-in-out;
                 border-radius: 2px;
-                
-                @media (max-width: 991px) { display: none; }
+
+                @media (max-width: 991px) {
+                    display: none;
+                }
             }
 
-            &:hover, &.active-link {
+            &:hover,
+            &.active-link {
                 color: v.$color-marca-principal;
-                &::after { width: 100%; }
+
+                &::after {
+                    width: 100%;
+                }
             }
         }
     }
@@ -104,7 +122,9 @@
             background: #f8f9fa;
             transition: 0.3s;
 
-            &:hover { background: #f1f1f1; }
+            &:hover {
+                background: #f1f1f1;
+            }
 
             .avatar-box {
                 width: 40px;
@@ -112,8 +132,12 @@
                 border-radius: 50%;
                 overflow: hidden;
                 border: 2px solid v.$color-marca-principal;
-                
-                img { width: 100%; height: 100%; object-fit: cover; }
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
             }
 
             .user-display-name {
@@ -123,7 +147,10 @@
 
             .arrow {
                 transition: transform 0.3s;
-                &.open { transform: rotate(180deg); } 
+
+                &.open {
+                    transform: rotate(180deg);
+                }
             }
         }
     }
@@ -155,6 +182,7 @@
     .dropdown-header-box {
         padding: 10px 0;
         text-align: center;
+
         .user-full-name {
             font-size: 1.1rem;
             font-weight: 800;
@@ -187,12 +215,12 @@
         transition: 0.3s;
 
         &:hover {
-            background: #f0fdf4; 
+            background: #f0fdf4;
             color: v.$color-marca-principal;
         }
 
         &.logout-btn {
-            color: v.$color-secundario-calido-1; 
+            color: v.$color-secundario-calido-1;
         }
     }
 }

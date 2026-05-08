@@ -16,6 +16,7 @@ import { FormInscripcion } from "../../components/forms/form-inscripcion/form-in
 import { Confirmacion } from "../../components/dialogs/confirmacion/confirmacion";
 import { Notificacion } from "../../components/dialogs/mensaje/notificacion";
 import { HorarioTaller } from "../../components/dialogs/horario-taller/horario-taller";
+import { PasarelaService } from '../../services/Pasarela.Service';
 
 /**
  * Componente principal para la exploración, filtrado y gestión de talleres.
@@ -65,6 +66,7 @@ export class TalleresExplorar implements OnInit {
     private usuarioService: UsuarioService,
     private notify: NotificacionService,
     private cdr: ChangeDetectorRef,
+    private pasarelaService: PasarelaService,
     private fb: FormBuilder
   ) {
     // Inicialización del formulario de filtros con valores por defecto
@@ -285,14 +287,32 @@ export class TalleresExplorar implements OnInit {
    * @param dto Datos de la transacción de inscripción.
    */
   finalizarInscripcion(dto: any): void {
-    this.inscripcionService.inscribir(dto).subscribe({
-      next: () => {
-        this.notify.mostrar({ titulo: '¡Éxito!', mensaje: 'Inscripción realizada', tipo: 'exito' });
+
+    this.cargando = true;
+
+    this.pasarelaService.procesarPago(dto).subscribe({
+      next: (res) => {
+        this.notify.mostrar({
+          titulo: '¡Pago Confirmado!',
+          mensaje: 'Te has inscrito correctamente. Revisa tu email para la factura.',
+          tipo: 'exito'
+        });
+
         this.mostrarModalInscripcion = false;
-        this.cargarTalleres();
+        this.cargarTalleres();        
         this.cargarMisInscripciones();
+        this.cargando = false;
+        this.cdr.detectChanges();
       },
-      error: () => this.notify.mostrar({ titulo: 'Error', mensaje: 'No se pudo procesar', tipo: 'error' })
+      error: (err) => {
+        this.cargando = false;
+        const msgError = err.error?.message || 'No se pudo procesar el pago';
+        this.notify.mostrar({
+          titulo: 'Error en el Pago',
+          mensaje: msgError,
+          tipo: 'error'
+        });
+      }
     });
   }
 

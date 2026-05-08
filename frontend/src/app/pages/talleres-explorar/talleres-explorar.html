@@ -40,8 +40,10 @@
 
     <main class="seccion-lista-cursos">
       <div class="alerta-vacia" *ngIf="talleresFiltrados.length === 0 && !cargando">
-        <i class="bi bi-search"></i>
-        <p>No hay talleres que coincidan con los filtros.</p>
+        <div class="contenedor-vacio">
+          <i class="bi bi-search"></i>
+          <p>No hay talleres que coincidan con los filtros.</p>
+        </div>
       </div>
 
       <div class="card-curso-horizontal" *ngFor="let taller of talleresFiltrados">

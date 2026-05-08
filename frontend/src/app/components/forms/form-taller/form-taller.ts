@@ -27,7 +27,7 @@ export class FormTaller implements OnInit {
 
   // --- Propiedades de Estado y UI --- 
   tallerForm!: FormGroup;                    // Instancia del control reactivo 
-  fotoPreview: string | null = null;         // URL temporal para la previsualización 
+  fotoPreview: string = '/talleres/taller_default.png';  // URL temporal para la previsualización 
   archivoSeleccionado: File | null = null;   // Referencia al archivo físico de imagen 
 
   /** * @param fb Constructor para la estructura de controles. 
@@ -43,7 +43,8 @@ export class FormTaller implements OnInit {
     this.initForm();
   }
 
-  /** * Ciclo de vida: Inicia la carga de datos en el formulario si se recibe un objeto para editar. 
+  /** 
+   ** Ciclo de vida: Inicia la carga de datos en el formulario si se recibe un objeto para editar. 
    */
   ngOnInit(): void {
     if (this.tallerParaEditar) {

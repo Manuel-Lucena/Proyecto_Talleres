@@ -1,11 +1,12 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
   <div class="modal-body" (click)="$event.stopPropagation()">
     <button class="btn-close" (click)="cerrar.emit()">&times;</button>
+
     <div class="checkout-layout">
       <aside class="resumen-checkout-taller" *ngIf="tallerParaInscribir">
         <div class="mini-card-info">
           <img
-            [src]="tallerParaInscribir.fotoRuta ? '/talleres/' + tallerParaInscribir.fotoRuta : 'assets/images/placeholder-taller.jpg'"
+            [src]="tallerParaInscribir.fotoRuta ? '/talleres/' + tallerParaInscribir.fotoRuta : '/talleres/taller_default.png'"
             class="img-preview" alt="Miniatura taller">
           <span class="etiqueta-pago">Tu suscripción</span>
           <h4 class="nombre-taller">{{ tallerParaInscribir.nombre }}</h4>
@@ -20,6 +21,7 @@
 
       <section class="seccion-formulario-pago">
         <h2 class="titulo-formulario">Finalizar Compra</h2>
+
         <form [formGroup]="inscripcionForm" (ngSubmit)="enviar()">
           <input type="hidden" formControlName="idUsuario">
           <input type="hidden" formControlName="idTaller">
@@ -28,15 +30,66 @@
             <i class="bi bi-shield-check"></i>
             <div>
               <p>Transacción Protegida</p>
-              <small>ID: {{ inscripcionForm.get('orderId')?.value }}</small>
+              <small>Simulación de pasarela bancaria segura</small>
             </div>
           </div>
 
-          <div class="campo-formulario">
-            <label>Monto a cargar en cuenta</label>
-            <div class="input-checkout-grande">
-              <span>{{ tallerParaInscribir?.precio }}</span>
-              <small>EUR</small>
+          <div class="grupo-campos-pago mt-4">
+            <div class="campo-formulario mb-3">
+              <app-form-label texto="Titular de la tarjeta" [requerido]="true" ayuda="Nombre completo del titular"
+                forId="titular"></app-form-label>
+              <input type="text" id="titular" formControlName="titular" class="form-control"
+                [class.is-invalid]="errorService.mostrarError(inscripcionForm, 'titular')" placeholder="Ej: Juan Pérez">
+              <div class="error-container">
+                @if (errorService.mostrarError(inscripcionForm, 'titular')) {
+                <span class="error-message">{{ errorService.getErrorMessage(inscripcionForm, 'titular') }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="campo-formulario mb-3">
+              <app-form-label texto="Número de Tarjeta" [requerido]="true" ayuda="Introduce los 16 dígitos sin espacios"
+                forId="numeroTarjeta"></app-form-label>
+              <input type="text" id="numeroTarjeta" formControlName="numeroTarjeta" class="form-control"
+                [class.is-invalid]="errorService.mostrarError(inscripcionForm, 'numeroTarjeta')"
+                placeholder="0000 0000 0000 0000" maxlength="16">
+              <div class="error-container">
+                @if (errorService.mostrarError(inscripcionForm, 'numeroTarjeta')) {
+                <span class="error-message">{{ errorService.getErrorMessage(inscripcionForm, 'numeroTarjeta') }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-7">
+                <div class="campo-formulario">
+                  <app-form-label texto="Expiración" [requerido]="true" ayuda="Formato MM/YY (Mes/Año)"
+                    forId="fechaExp"></app-form-label>
+                  <input type="text" id="fechaExp" formControlName="fechaExp" class="form-control"
+                    [class.is-invalid]="errorService.mostrarError(inscripcionForm, 'fechaExp')" placeholder="MM/YY"
+                    maxlength="5">
+                  <div class="error-container">
+                    @if (errorService.mostrarError(inscripcionForm, 'fechaExp')) {
+                    <span class="error-message">{{ errorService.getErrorMessage(inscripcionForm, 'fechaExp') }}</span>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-5">
+                <div class="campo-formulario">
+                  <app-form-label texto="CVV" [requerido]="true" ayuda="3 dígitos de seguridad"
+                    forId="cvv"></app-form-label>
+                  <input type="text" id="cvv" formControlName="cvv" class="form-control"
+                    [class.is-invalid]="errorService.mostrarError(inscripcionForm, 'cvv')" placeholder="123"
+                    maxlength="3">
+                  <div class="error-container">
+                    @if (errorService.mostrarError(inscripcionForm, 'cvv')) {
+                    <span class="error-message">{{ errorService.getErrorMessage(inscripcionForm, 'cvv') }}</span>
+                    }
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -46,11 +99,6 @@
                 aria-hidden="true"></span>
               {{ cargando ? 'Procesando Inscripción...' : 'Confirmar e Inscribirme' }}
             </button>
-
-            <p class="text-center mt-4 text-muted small" *ngIf="!cargando">
-              Al hacer clic, confirmas tu inscripción en el taller seleccionado. <br>
-              <strong>Aula Viva &copy; 2026</strong>
-            </p>
           </div>
         </form>
       </section>
