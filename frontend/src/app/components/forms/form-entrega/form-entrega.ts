@@ -18,6 +18,7 @@ import { FormLabel } from '../../dialogs/form-label/form-label';
   styleUrl: './form-entrega.scss'
 })
 export class FormEntrega implements OnInit {
+
   // --- Propiedades de Entrada y Salida ---
   @Input() recurso: any;                         // Contexto de la tarea actual
   @Input() entregaExistente: any = null;          // Datos para la carga en modo edición
@@ -30,6 +31,10 @@ export class FormEntrega implements OnInit {
   nuevosArchivos: File[] = [];                    // Buffer temporal de ficheros a subir
   paraEliminar: number[] = [];                    // Registro de IDs marcados para borrado
   cargando: boolean = false;                      // Flag de control para el estado de envío
+
+  // --- Propiedades de Validación de Formatos ---
+  extensionesError: boolean = false;              // Indica si hay archivos con formato inválido
+  mensajeError: string = '';                      // Mensaje descriptivo del error de formato
 
   /**
    * @param fb Constructor de formularios reactivos.
@@ -51,7 +56,7 @@ export class FormEntrega implements OnInit {
    */
   private initForm(): void {
     this.entregaForm = this.fb.group({
-      textoEntrega: ['', [Validators.required, Validators.minLength(10)]]
+      textoEntrega: ['']
     });
   }
 
@@ -72,19 +77,23 @@ export class FormEntrega implements OnInit {
 
   /**
    * Sincroniza la selección del input file con la lista temporal de subida.
+   * Realiza una validación inmediata de las extensiones permitidas.
    */
   onFileChange(event: any): void {
     if (event.target.files.length > 0) {
       this.nuevosArchivos.push(...Array.from(event.target.files) as File[]);
       event.target.value = '';
+      this.validarExtensiones();
     }
   }
 
   /**
    * Elimina un fichero del listado de nuevas cargas antes de procesar el envío.
+   * Revalida las extensiones tras la eliminación.
    */
   quitarNuevo(index: number): void {
     this.nuevosArchivos.splice(index, 1);
+    this.validarExtensiones();
   }
 
   /**
@@ -95,6 +104,37 @@ export class FormEntrega implements OnInit {
     this.archivosExistentes = this.archivosExistentes.filter(a => a.id !== id);
   }
 
+  /**
+   * Valida si los archivos en el buffer 'nuevosArchivos' cumplen con las 
+   * restricciones de formato definidas en el recurso (tarea).
+   * @private
+   */
+  private validarExtensiones(): void {
+    if (!this.recurso?.extensionesPermitidas) {
+      this.extensionesError = false;
+      return;
+    }
+
+    const permitidas = this.recurso.extensionesPermitidas
+      .toLowerCase()
+      .split(',')
+      .map((ext: string) => ext.trim()); 
+
+    const archivosInvalidos = this.nuevosArchivos.filter(file => {
+      const nombre = file.name.toLowerCase();
+      // Tipamos 'ext' también aquí
+      return !permitidas.some((ext: string) => nombre.endsWith(ext)); 
+    });
+
+    if (archivosInvalidos.length > 0) {
+      this.extensionesError = true;
+      this.mensajeError = `Formato no permitido. La tarea solo acepta: ${this.recurso.extensionesPermitidas}`;
+    } else {
+      this.extensionesError = false;
+      this.mensajeError = '';
+    }
+  }
+
   // ===========================================================================
   // --- PROCESAMIENTO Y ENVÍO ---
   // ===========================================================================
@@ -103,7 +143,7 @@ export class FormEntrega implements OnInit {
    * Coordina el flujo de persistencia: actualización de texto, borrado de archivos y subida de nuevos.
    */
   async enviar(): Promise<void> {
-    if (this.entregaForm.invalid) return;
+    if (this.entregaForm.invalid || this.extensionesError) return;
 
     const idUsuario = this.tokenService.getId();
     const idTarea = this.recurso?.idTarea || this.recurso?.id;
@@ -120,7 +160,6 @@ export class FormEntrega implements OnInit {
       let idEntrega: number;
 
       if (this.entregaExistente) {
-        // Flujo de Actualización
         idEntrega = this.entregaExistente.idEntrega;
         await lastValueFrom(this.entregaService.actualizar(idEntrega, datosEntrega));
 
@@ -128,7 +167,6 @@ export class FormEntrega implements OnInit {
           await lastValueFrom(this.archivoEntregaService.eliminar(idF));
         }
       } else {
-        // Flujo de Creación Inicial
         const resp = await lastValueFrom(this.entregaService.enviar({
           idTarea: idTarea,
           idUsuario: idUsuario,
@@ -137,15 +175,17 @@ export class FormEntrega implements OnInit {
         idEntrega = resp.data.idEntrega;
       }
 
-      // Procesamiento de nuevos ficheros adjuntos
       for (const file of this.nuevosArchivos) {
         await lastValueFrom(this.archivoEntregaService.guardar(idEntrega, file));
       }
 
       this.guardado.emit();
       this.cerrar.emit();
-    } catch (e) {
+
+    } catch (e: any) {
       console.error("CRITICAL: Fallo en el proceso de entrega", e);
+      this.extensionesError = true;
+      this.mensajeError = e.error?.message || 'Ocurrió un error al procesar la entrega.';
     } finally {
       this.cargando = false;
     }

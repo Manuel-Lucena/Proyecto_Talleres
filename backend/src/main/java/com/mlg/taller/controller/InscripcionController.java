@@ -2,6 +2,7 @@ package com.mlg.taller.controller;
 
 import com.mlg.taller.model.dtos.InscripcionRequestDTO;
 import com.mlg.taller.model.dtos.InscripcionResponseDTO;
+import com.mlg.taller.model.dtos.NotasAlumnoDTO;
 import com.mlg.taller.service.InscripcionService;
 import com.mlg.taller.service.PdfService;
 import com.mlg.taller.service.TallerService;
@@ -104,6 +105,16 @@ public class InscripcionController {
     public ApiResponse<List<InscripcionResponseDTO>> listarPorUsuario(@PathVariable Long idUsuario) {
         return ApiResponse.success(inscripcionService.listarPorUsuario(idUsuario),
                 "Inscripciones del usuario obtenidas");
+    }
+
+    /**
+     * Obtiene el resumen de calificaciones y entregas de todos los alumnos del taller.
+     * * @param idTaller Identificador único del taller.
+     * @return ApiResponse con la lista de DTOs que contienen promedios y conteo de tareas.
+     */
+    @GetMapping("/taller/{idTaller}/notas-globales")
+    public ApiResponse<List<NotasAlumnoDTO>> obtenerNotasGlobales(@PathVariable Long idTaller) {
+        return ApiResponse.success(inscripcionService.obtenerNotasGlobales(idTaller), "Notas obtenidas");
     }
 
     /**

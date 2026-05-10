@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TareaService } from '../../../../services/Tarea.Service';
 import { EntregaService } from '../../../../services/Entrega.Service';
 import { TokenService } from '../../../../services/Token.Service';
+import { InscripcionService } from '../../../../services/Inscripcion.Service';
 
 /**
  * Componente de Calificaciones del Aula Virtual.
@@ -18,49 +19,128 @@ import { TokenService } from '../../../../services/Token.Service';
   styleUrl: './aula-calificaciones.scss'
 })
 export class AulaCalificaciones implements OnInit {
-
   // --- Estado de Datos ---
   idTaller!: number;
-  filas: any[] = [];         // Listado de datos procesados (Tarea + Entrega)
+  filas: any[] = [];         // Listado para el alumno (Tarea + Entrega)
+  listaAlumnos: any[] = [];  // Listado para el profesor (Resumen de la clase)
+  totalTareasTaller: number = 0;
 
   // --- Estado de UI ---
-  cargando: boolean = true;  // Flag para el skeleton/spinner
+  cargando: boolean = true;
+  esProfesor: boolean = false;
 
   /**
    * @param tareaService Gestión de tareas asignadas.
    * @param entregaService Obtención de calificaciones y feedback.
-   * @param tokenService Identificación del alumno actual.
+   * @param tokenService Identificación del usuario y su rol.
+   * @param inscripcionService Obtención de medias globales (Vista profesor).
    */
   constructor(
     private tareaService: TareaService,
     private entregaService: EntregaService,
+    private inscripcionService: InscripcionService,
     private tokenService: TokenService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private router: Router
-  ) { }
+  ) {
+    // Determinamos el rol una sola vez al instanciar
+    const rol = this.tokenService.getRol();
+    this.esProfesor = rol === 'PROFESOR' || rol === 'ADMIN';
+  }
 
   /**
    * Ciclo de vida: Captura el ID del taller desde la ruta padre
-   * e inicia la carga de datos del alumno.
+   * e inicia la carga de datos según el perfil del usuario.
    */
   ngOnInit(): void {
     this.route.parent?.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
         this.idTaller = Number(id);
-        this.cargarDatos();
+        this.cargarSegunRol();
       }
     });
   }
 
   // ===========================================================================
-  // --- LÓGICA DE CÁLCULO Y NEGOCIO ---
+  // --- LÓGICA DE CARGA SEGÚN ROL ---
   // ===========================================================================
 
   /**
-   * Calcula el promedio de las tareas calificadas.
-   * Solo tiene en cuenta aquellas filas donde la nota no es null.
+   * Deriva la carga de datos hacia la vista de alumno o la de profesor.
+   */
+  cargarSegunRol() {
+    this.cargando = true;
+    if (this.esProfesor) {
+      this.cargarDatosGestionProfesor();
+    } else {
+      this.cargarDatosAlumno();
+    }
+  }
+
+  /**
+   * Lógica para el Profesor: Obtiene cuántas tareas hay en total y
+   * la lista de promedios de todos los alumnos inscritos.
+   */
+  cargarDatosGestionProfesor() {
+    this.inscripcionService.obtenerNotasGlobales(this.idTaller).subscribe({
+      next: (res) => {
+        this.listaAlumnos = res.data || [];
+        this.finalizarCarga();
+      },
+      error: () => this.finalizarCarga()
+    });
+  }
+
+  /**
+   * Lógica para el Alumno: Lista tareas visibles y busca sus entregas.
+   */
+  cargarDatosAlumno() {
+    this.tareaService.listarVisibles(this.idTaller).subscribe({
+      next: (resTareas) => {
+        const tareas = resTareas.data || [];
+        this.filas = [];
+
+        if (tareas.length === 0) {
+          this.finalizarCarga();
+          return;
+        }
+
+        const peticiones = tareas.map(tarea => {
+          return new Promise<void>((resolve) => {
+            this.entregaService.obtenerMiEntrega(tarea.idTarea).subscribe({
+              next: (resEntrega) => {
+                const miEntrega = resEntrega.data;
+                this.filas.push({
+                  idTarea: tarea.idTarea,
+                  titulo: tarea.titulo,
+                  entregado: !!miEntrega,
+                  nota: miEntrega ? miEntrega.calificacion : null,
+                  comentario: miEntrega ? miEntrega.comentarioProfesor : ''
+                });
+                resolve();
+              },
+              error: () => {
+                this.filas.push({ idTarea: tarea.idTarea, titulo: tarea.titulo, entregado: false, nota: null, comentario: '' });
+                resolve();
+              }
+            });
+          });
+        });
+
+        Promise.all(peticiones).then(() => this.finalizarCarga());
+      },
+      error: () => this.finalizarCarga()
+    });
+  }
+
+  // ===========================================================================
+  // --- LÓGICA DE CÁLCULO Y NAVEGACIÓN ---
+  // ===========================================================================
+
+  /**
+   * Calcula el promedio de las tareas calificadas para el alumno actual.
    * @returns Media aritmética con dos decimales.
    */
   get mediaTaller(): number {
@@ -71,64 +151,7 @@ export class AulaCalificaciones implements OnInit {
   }
 
   /**
-   * Proceso de carga en dos pasos:
-   * 1. Lista las tareas que el alumno tiene permiso para ver.
-   * 2. Por cada tarea, busca si existe una entrega del alumno para extraer la nota.
-   */
-  cargarDatos() {
-    this.cargando = true;
-    const idUsuario = this.tokenService.getId();
-
-    this.tareaService.listarVisibles(this.idTaller).subscribe({
-      next: (resTareas) => {
-        const tareas = resTareas.data || [];
-        this.filas = [];
-
-        if (tareas.length === 0) {
-          this.cargando = false;
-          this.cdr.detectChanges();
-          return;
-        }
-
-        // Mapeo cruzado de Tareas y Entregas
-        tareas.forEach((tarea, index) => {
-          this.entregaService.listarPorTarea(tarea.idTarea).subscribe({
-            next: (resEntregas) => {
-              const miEntrega = resEntregas.data.find((e: any) => e.idUsuario === idUsuario);
-              this.filas.push({
-                idTarea: tarea.idTarea,
-                titulo: tarea.titulo,
-                entregado: !!miEntrega,
-                nota: miEntrega ? miEntrega.calificacion : null,
-                comentario: miEntrega ? miEntrega.comentarioProfesor : ''
-              });
-
-              // Finaliza la carga cuando se procesa la última tarea
-              if (index === tareas.length - 1) this.finalizarCarga();
-            },
-            error: () => {
-              this.filas.push({
-                idTarea: tarea.idTarea,
-                titulo: tarea.titulo,
-                entregado: false,
-                nota: null,
-                comentario: ''
-              });
-              if (index === tareas.length - 1) this.finalizarCarga();
-            }
-          });
-        });
-      },
-      error: () => {
-        this.cargando = false;
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
-  /**
-   * Gestiona el cierre visual de la carga con un pequeño delay 
-   * para evitar parpadeos en la UI.
+   * Gestiona el cierre visual de la carga con un pequeño delay.
    */
   finalizarCarga() {
     setTimeout(() => {
@@ -137,15 +160,19 @@ export class AulaCalificaciones implements OnInit {
     }, 100);
   }
 
-  // ===========================================================================
-  // --- NAVEGACIÓN ---
-  // ===========================================================================
-
   /**
    * Navega a la vista detallada de la tarea.
    * @param idTarea Identificador de la tarea seleccionada.
    */
   verDetalle(idTarea: number) {
     this.router.navigate(['/aula-virtual', this.idTaller, 'detalle', 'tarea', idTarea]);
+  }
+
+  /**
+ * Navega a la vista de entregas filtrando por un alumno específico.
+ * @param idAlumno ID del estudiante para ver su expediente.
+ */
+  verExpedienteAlumno(idAlumno: number) {
+    this.router.navigate(['/aula-virtual', this.idTaller, 'seguimiento-alumno', idAlumno]);
   }
 }

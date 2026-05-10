@@ -43,6 +43,27 @@ export class EntregaService {
     }
 
     /**
+   * Recupera el expediente completo de entregas de un alumno para un taller específico.
+   * Permite al docente visualizar el progreso individual del estudiante en todas las actividades.
+   * * @param idAlumno ID del estudiante a consultar.
+   * @param idTaller ID del taller actual.
+   * @returns Observable con las entregas realizadas por el alumno en el taller.
+   */
+    listarPorAlumnoYTaller(idAlumno: number, idTaller: number): Observable<ApiResponse<EntregaResponse[]>> {
+        return this.http.get<ApiResponse<EntregaResponse[]>>(`${this.apiUrl}/alumno/${idAlumno}/taller/${idTaller}`);
+    }
+
+
+    /**
+      * Recupera la entrega realizada por el usuario autenticado para una tarea específica.
+      * * @param idTarea ID de la tarea a consultar.
+      * @returns Observable con la entrega del alumno actual.
+      */
+    obtenerMiEntrega(idTarea: number): Observable<ApiResponse<EntregaResponse>> {
+        return this.http.get<ApiResponse<EntregaResponse>>(`${this.apiUrl}/tarea/${idTarea}/mi-entrega`);
+    }
+
+    /**
      * Registra el envío inicial de una tarea por parte del alumno.
      * @param entrega Objeto con los datos de la entrega (idUsuario, idTarea, texto).
      * @returns Observable con la entrega creada.

@@ -154,3 +154,69 @@
         margin-bottom: 1rem;
     }
 }
+
+.table-custom {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px; // Da ese efecto de "filas separadas" que usas en el resto de la app
+
+    thead th {
+        color: #94a3b8;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        font-weight: 800;
+        padding: 0 1rem;
+        border: none;
+    }
+
+    tbody tr {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+
+        td {
+            padding: 1.2rem 1rem;
+            vertical-align: middle;
+            border-top: 1px solid #f1f5f9;
+            border-bottom: 1px solid #f1f5f9;
+
+            &:first-child {
+                border-left: 1px solid #f1f5f9;
+                border-top-left-radius: 8px;
+                border-bottom-left-radius: 8px;
+            }
+
+            &:last-child {
+                border-right: 1px solid #f1f5f9;
+                border-top-right-radius: 8px;
+                border-bottom-right-radius: 8px;
+            }
+        }
+    }
+}
+
+
+.btn-icon-link {
+    background: transparent;
+    border: none;
+    color: v.$color-superficie-suave; 
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+
+    i {
+        font-size: 1.1rem;
+    }
+
+    &:hover {
+        background: rgba(v.$color-marca-principal, 0.08); 
+        color: v.$color-marca-principal; 
+    }
+}
+
+

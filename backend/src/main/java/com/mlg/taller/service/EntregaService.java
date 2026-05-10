@@ -108,6 +108,47 @@ public class EntregaService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Recupera la entrega realizada por el usuario para una tarea concreta.
+     * * @param idTarea ID de la tarea a consultar.
+     * @return DTO con la entrega si existe, o null si el alumno aún no ha entregado
+     *         nada.
+     */
+    @Transactional(readOnly = true)
+    public EntregaResponseDTO obtenerEntregaUsuario(Long idTarea) {
+        Usuario alumno = SecurityUtils.getUsuarioAutenticado();
+        return entregaRepository.findByTareaIdAndAlumnoId(idTarea, alumno.getId())
+                .map(entregaMapper::toResponse)
+                .orElse(null);
+    }
+
+    /**
+     * Obtiene el expediente de entregas de un alumno para todas las tareas de un
+     * taller.
+     * Se valida que el solicitante sea el administrador o el profesor titular del
+     * taller.
+     * * @param idAlumno ID del estudiante.
+     * 
+     * @param idTaller ID del taller.
+     * @return Lista de DTOs con las entregas realizadas.
+     */
+    @Transactional(readOnly = true)
+    public List<EntregaResponseDTO> listarPorAlumnoYTaller(Long idAlumno, Long idTaller) {
+        Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
+
+        Tarea tareaEjemplo = tareaRepository.findAll().stream()
+                .filter(t -> t.getTaller().getId().equals(idTaller))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se pueden validar permisos: El taller no tiene tareas o no existe."));
+
+        entregaValidator.validarPermisosGestion(solicitante, tareaEjemplo);
+
+        return entregaRepository.findByAlumnoIdAndTarea_Taller_Id(idAlumno, idTaller).stream()
+                .map(entregaMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
     // --- MÉTODOS PUT ---
 
     /**

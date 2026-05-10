@@ -79,6 +79,19 @@ public class HorarioController {
         return ApiResponse.success(horarioService.listarPorTaller(idTaller), "Horarios del taller obtenidos");
     }
 
+
+    /**
+     * Recupera la planificación horaria de los talleres que imparte un profesor.
+     * * @param idProfesor Identificador del profesor.
+     * 
+     * @return ApiResponse con la lista de horarios de sus clases.
+     */
+    @GetMapping("/profesor/{idProfesor}")
+    public ApiResponse<List<HorarioResponseDTO>> listarPorProfesor(@PathVariable Long idProfesor) {
+        return ApiResponse.success(horarioService.listarPorProfesor(idProfesor),
+                "Agenda de profesor obtenida correctamente");
+    }
+
     /**
      * Genera y descarga un PDF con la agenda semanal personalizada de un usuario.
      * El documento organiza cronológicamente todas las sesiones de los talleres
@@ -91,13 +104,15 @@ public class HorarioController {
     @GetMapping("/usuario/{idUsuario}/pdf")
     public void descargarAgendaPdf(@PathVariable Long idUsuario, HttpServletResponse response) {
         var usuario = usuarioService.buscarPorId(idUsuario);
-        var horarios = horarioService.listarPorUsuario(idUsuario);
 
-        // COMENTA ESTA LÍNEA TEMPORALMENTE PARA TESTEAR
-        // response.setContentType("application/pdf");
+        List<HorarioResponseDTO> horarios;
+        if ("PROFESOR".equals(usuario.getNombreRol())) {
+            horarios = horarioService.listarPorProfesor(idUsuario);
+        } else {
+            horarios = horarioService.listarPorUsuario(idUsuario);
+        }
 
-        response.setHeader("Content-Disposition", "attachment; filename=test.pdf");
-
+        response.setHeader("Content-Disposition", "attachment; filename=Agenda_" + usuario.getNombre() + ".pdf");
         pdfService.generarPdf("agenda-semanal", Map.of(
                 "usuario", usuario,
                 "horarios", horarios), response);

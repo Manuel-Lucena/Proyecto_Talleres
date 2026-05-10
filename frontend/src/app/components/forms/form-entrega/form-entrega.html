@@ -1,5 +1,6 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
   <div class="modal-body" (click)="$event.stopPropagation()" [formGroup]="entregaForm">
+    
     <button class="btn-close" (click)="cerrar.emit()">
       <i class="bi bi-x-lg"></i>
     </button>
@@ -18,39 +19,35 @@
       <div class="seccion-input">
         <app-form-label 
           texto="Aclaraciones o comentarios" 
-          ayuda="Puedes añadir una breve explicación sobre tu entrega o dudas que hayas tenido."
+          ayuda="Puedes añadir una breve explicación sobre tu entrega o dudas que hayas tenido." 
           forId="aclaraciones">
         </app-form-label>
-        
-        <textarea 
-          id="aclaraciones" 
-          formControlName="textoEntrega" 
-          class="textarea-entrega" 
-          rows="3" 
-          placeholder="Escribe aquí cualquier observación sobre tu entrega...">
+        <textarea id="aclaraciones" formControlName="textoEntrega" class="textarea-entrega" rows="3" 
+                  placeholder="Escribe aquí cualquier observación sobre tu entrega...">
         </textarea>
-        
-        <div *ngIf="entregaForm.get('textoEntrega')?.invalid && entregaForm.get('textoEntrega')?.touched" class="text-danger small mt-1">
-          El comentario es obligatorio (mínimo 10 caracteres).
-        </div>
       </div>
 
       <div class="seccion-archivos">
         <app-form-label 
           texto="Archivos adjuntos" 
           [requerido]="!entregaExistente" 
-          ayuda="Formatos permitidos: PDF, DOCX, ZIP. Tamaño máximo por archivo: 10MB.">
+          [ayuda]="recurso?.extensionesPermitidas ? 'Formatos aceptados: ' + recurso.extensionesPermitidas : 'Cualquier formato permitido. Máx 10MB.'">
         </app-form-label>
 
-        <div class="dropzone-entrega">
+        <div class="dropzone-entrega" [class.error]="extensionesError">
           <input type="file" multiple (change)="onFileChange($event)" class="input-hidden">
           <div class="dropzone-info">
             <i class="bi bi-cloud-arrow-up-fill"></i>
             <div class="texts">
               <span class="main-text">Arrastra tus archivos o haz clic aquí</span>
-              <span class="sub-text">PDF, DOCX, ZIP (Máx. 10MB)</span>
+              <span class="sub-text">{{ recurso?.extensionesPermitidas || 'PDF, DOCX, ZIP' }} (Máx. 10MB)</span>
             </div>
           </div>
+        </div>
+
+        <div class="mensaje-error-archivo" *ngIf="extensionesError">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span>{{ mensajeError }}</span>
         </div>
 
         <div class="grid-archivos-entregados" *ngIf="archivosExistentes.length > 0 || nuevosArchivos.length > 0">
@@ -78,10 +75,8 @@
         <button type="button" class="btn-cancelar" (click)="cerrar.emit()">
           Cancelar
         </button>
-        <button 
-          (click)="enviar()" 
-          class="btn-enviar-final" 
-          [disabled]="cargando || entregaForm.invalid">
+        <button (click)="enviar()" class="btn-enviar-final" 
+                [disabled]="cargando || entregaForm.invalid || extensionesError || (!entregaExistente && nuevosArchivos.length === 0)">
           <span *ngIf="!cargando">
             {{ entregaExistente ? 'Guardar cambios' : 'Enviar tarea' }}
           </span>

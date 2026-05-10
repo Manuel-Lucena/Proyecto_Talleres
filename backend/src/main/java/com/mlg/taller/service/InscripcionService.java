@@ -4,6 +4,7 @@ import com.mlg.taller.exception.BadRequestException;
 import com.mlg.taller.exception.ResourceNotFoundException;
 import com.mlg.taller.model.dtos.InscripcionRequestDTO;
 import com.mlg.taller.model.dtos.InscripcionResponseDTO;
+import com.mlg.taller.model.dtos.NotasAlumnoDTO;
 import com.mlg.taller.model.entities.Inscripcion;
 import com.mlg.taller.model.entities.Taller;
 import com.mlg.taller.model.entities.Usuario;
@@ -62,6 +63,8 @@ public class InscripcionService {
 
         Usuario usuario = buscarUsuarioInterno(dto.getIdUsuario());
         Taller taller = buscarTallerInterno(dto.getIdTaller());
+
+        inscripcionValidator.validarCupoDisponible(taller);
 
         inscripcionValidator.validarFechaInscripcion(solicitante, taller);
 
@@ -124,6 +127,8 @@ public class InscripcionService {
                             () -> new ResourceNotFoundException("Usuario no encontrado: " + dto.getEmailUsuario()));
 
             Taller taller = buscarTallerInterno(dto.getIdTaller());
+
+            inscripcionValidator.validarCupoDisponible(taller);
 
             inscripcionValidator.verificarDuplicado(usuario.getId(), taller.getId(), usuario.getEmail());
             inscripcionValidator.validarPerfilInscribible(usuario);
@@ -222,6 +227,31 @@ public class InscripcionService {
     }
 
     /**
+     * Recupera el resumen de rendimiento académico de todos los alumnos inscritos
+     * en un taller.
+     * * @param idTaller Identificador del taller a consultar.
+     * 
+     * @return Lista de DTOs con las estadísticas de notas por alumno.
+     */
+    @Transactional(readOnly = true)
+    public List<NotasAlumnoDTO> obtenerNotasGlobales(Long idTaller) {
+        Taller taller = buscarTallerInterno(idTaller);
+        Usuario solicitante = SecurityUtils.getUsuarioAutenticado();
+        inscripcionValidator.validarAccesoNotasGlobales(solicitante, taller);
+
+        List<Object[]> resultados = inscripcionRepository.obtenerDatosNotasRaw(idTaller);
+
+        return resultados.stream()
+                .map(row -> new NotasAlumnoDTO(
+                        (Long) row[0],
+                        (String) row[1],
+                        ((Number) row[2]).longValue(),
+                        ((Number) row[3]).longValue(),
+                        (Double) row[4]))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Analiza la agenda del alumno revisando todos los horarios de sus talleres
      * actuales para detectar posibles colisiones con el nuevo taller.
      * * @param idUsuario Identificador único del alumno.
@@ -309,6 +339,11 @@ public class InscripcionService {
     @Transactional
     public InscripcionResponseDTO cambiarEstado(Long id) {
         Inscripcion inscripcion = buscarInscripcionInterna(id);
+
+        if (!inscripcion.isActiva()) {
+            inscripcionValidator.validarCupoDisponible(inscripcion.getTaller());
+        }
+        
         inscripcion.setActiva(!inscripcion.isActiva());
 
         Inscripcion guardada = inscripcionRepository.save(inscripcion);

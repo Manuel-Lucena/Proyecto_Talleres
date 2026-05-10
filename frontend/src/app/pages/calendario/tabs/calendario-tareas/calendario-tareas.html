@@ -1,7 +1,10 @@
 <div class="calendario-container">
     <div class="calendario-toolbar">
         <div class="toolbar-info">
-            <h2 class="titulo-horario">Agenda de <span>Entregas</span></h2>
+            <h2 class="titulo-horario">
+                {{ tokenService.getRol() === 'PROFESOR' ? 'Panel de Correciones' : 'Agenda de Entregas' }}
+                <span>Calendario</span>
+            </h2>
         </div>
 
         <div class="calendar-nav">

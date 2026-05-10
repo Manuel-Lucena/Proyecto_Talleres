@@ -93,6 +93,20 @@ public class HorarioService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene la agenda de clases que un profesor debe impartir.
+     * * @param idProfesor Identificador del profesor.
+     * 
+     * @return Lista de horarios de los talleres que tiene asignados.
+     */
+    @Transactional(readOnly = true)
+    public List<HorarioResponseDTO> listarPorProfesor(Long idProfesor) {
+        horarioValidator.validarPrivacidadOAdmin(idProfesor);
+
+        return horarioRepository.findHorariosByProfesorImpartiendo(idProfesor).stream()
+                .map(horarioMapper::toResponse)
+                .collect(Collectors.toList());
+    }
     // --- MÉTODOS PUT ---
 
     /**

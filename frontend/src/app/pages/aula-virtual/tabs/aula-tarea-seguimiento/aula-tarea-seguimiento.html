@@ -5,18 +5,21 @@
         <i class="bi bi-arrow-left"></i>
       </button>
       <div class="titulos">
-        <h1>Control de Entregas</h1>
-        <p class="subtitulo">{{ tarea?.titulo || 'Cargando tarea...' }}</p>
+        <h1>{{ modoAlumno ? 'Expediente del Alumno' : 'Control de Entregas' }}</h1>
+        <p class="subtitulo">
+          {{ modoAlumno ? (alumnoExpediente?.nombre + ' ' + alumnoExpediente?.apellidos) : (tarea?.titulo || 'Cargando
+          tarea...') }}
+        </p>
       </div>
     </div>
 
     <div class="header-stats" *ngIf="!cargando && filas.length > 0">
       <div class="stat">
-        <span class="label">Inscritos</span>
+        <span class="label">{{ modoAlumno ? 'Total Tareas' : 'Inscritos' }}</span>
         <span class="valor">{{ filas.length }}</span>
       </div>
       <div class="stat highlight">
-        <span class="label">Entregas</span>
+        <span class="label">{{ modoAlumno ? 'Completadas' : 'Entregas' }}</span>
         <span class="valor">{{ totalEntregados }} <small>/ {{ filas.length }}</small></span>
       </div>
     </div>
@@ -25,14 +28,14 @@
   <div class="card-tabla">
     <div *ngIf="cargando" class="loading-state">
       <div class="spinner-border text-primary"></div>
-      <p>Sincronizando entregas...</p>
+      <p>Sincronizando información...</p>
     </div>
 
     <div class="table-responsive" *ngIf="!cargando && filas.length > 0">
       <table class="tabla-gestion">
         <thead>
           <tr>
-            <th>Alumno</th>
+            <th>{{ modoAlumno ? 'Actividad' : 'Alumno' }}</th>
             <th>Estado</th>
             <th>Fecha Envío</th>
             <th>Nota</th>
@@ -43,17 +46,14 @@
           <tr *ngFor="let f of filas" [class.fila-pendiente]="!f.entrega">
             <td>
               <div class="user-cell">
-                <div class="avatar-wrapper">
-                  <img #imgSeguimiento 
-                       [src]="f.alumno.fotoPerfilRuta 
-                              ? '/usuarios/' + f.alumno.fotoPerfilRuta 
-                              : '/usuarios/Predeterminada.png'"
-                       (error)="imgSeguimiento.src = '/usuarios/Predeterminada.png'" 
-                       alt="Foto de perfil">
+                <div class="avatar-wrapper" *ngIf="!modoAlumno">
+                  <img #imgSeguimiento
+                    [src]="f.alumno?.fotoPerfilRuta ? '/usuarios/' + f.alumno.fotoPerfilRuta : '/usuarios/Predeterminada.png'"
+                    (error)="imgSeguimiento.src = '/usuarios/Predeterminada.png'" alt="Foto de perfil">
                 </div>
                 <div class="user-info">
-                  <span class="user-name">{{ f.alumno.nombre }} {{ f.alumno.apellidos }}</span>
-                  <span class="user-email">{{ f.alumno.email }}</span>
+                  <span class="user-name">{{ f.tituloRow }}</span>
+                  <span class="user-email">{{ f.subtituloRow }}</span>
                 </div>
               </div>
             </td>
@@ -78,7 +78,9 @@
               <button *ngIf="f.entrega" (click)="abrirCalificador(f)" class="btn-accion-revisar">
                 Revisar
               </button>
-              <span *ngIf="!f.entrega" class="esperando-txt">Esperando...</span>
+              <span *ngIf="!f.entrega" class="esperando-txt">
+                {{ modoAlumno ? 'Sin entrega' : 'Esperando...' }}
+              </span>
             </td>
           </tr>
         </tbody>
@@ -87,7 +89,7 @@
 
     <div *ngIf="!cargando && filas.length === 0" class="empty-state">
       <i class="bi bi-person-x"></i>
-      <p>No hay alumnos inscritos en este taller.</p>
+      <p>{{ modoAlumno ? 'Este alumno no tiene tareas asignadas.' : 'No hay alumnos inscritos en este taller.' }}</p>
     </div>
   </div>
 </div>

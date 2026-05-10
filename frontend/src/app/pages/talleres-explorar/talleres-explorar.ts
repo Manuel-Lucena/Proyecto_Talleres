@@ -104,12 +104,12 @@ export class TalleresExplorar implements OnInit {
    * Carga la lista de usuarios con rol profesor para el componente de creación.
    */
   cargarProfesores(): void {
-    this.usuarioService.listar().subscribe({
+    this.usuarioService.listarPorRol(2).subscribe({
       next: (res) => {
-        const datos = res.data || [];
-        this.profesores = datos.filter((u: any) => u.rol === 'PROFESOR' || u.rol === 'ADMIN');
+        this.profesores = res.data || [];
         this.cdr.detectChanges();
-      }
+      },
+      error: (err) => console.error('Error al cargar profesores:', err)
     });
   }
 
@@ -299,7 +299,7 @@ export class TalleresExplorar implements OnInit {
         });
 
         this.mostrarModalInscripcion = false;
-        this.cargarTalleres();        
+        this.cargarTalleres();
         this.cargarMisInscripciones();
         this.cargando = false;
         this.cdr.detectChanges();

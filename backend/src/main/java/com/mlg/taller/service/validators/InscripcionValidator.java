@@ -200,4 +200,32 @@ public class InscripcionValidator {
                     taller.getNombre() + "' ha finalizado.");
         }
     }
+
+ 
+    /**
+     * Valida si el usuario tiene permisos para consultar el panel de notas globales del taller.
+     * * Restringe el acceso exclusivamente al ADMINISTRADOR y al PROFESOR que imparte 
+     * el taller.
+     * * @param solicitante Usuario que intenta acceder a la información.
+     * @param taller      Taller del cual se pretenden obtener las notas.
+     * @throws BadRequestException si el usuario no tiene privilegios de gestión sobre el taller.
+     */
+    public void validarAccesoNotasGlobales(Usuario solicitante, Taller taller) {
+        boolean esAdmin = solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN");
+        boolean esSuProfesor = taller.getProfesor() != null &&
+                taller.getProfesor().getId().equals(solicitante.getId());
+
+        if (!esAdmin && !esSuProfesor) {
+            throw new BadRequestException(
+                    "Acceso denegado: Solo el profesor del taller o el administrador pueden ver las notas globales.");
+        }
+    }
+
+
+    public void validarCupoDisponible(Taller taller) {
+    long inscritos = inscripcionRepository.countByTallerIdAndActivaTrue(taller.getId());
+    if (inscritos >= taller.getPlazasMaximas()) { 
+        throw new BadRequestException("El taller '" + taller.getNombre() + "' ya ha alcanzado su cupo máximo.");
+    }
+}
 }

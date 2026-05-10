@@ -1,49 +1,85 @@
 <div class="calificaciones-container fade-in">
-  
   <div *ngIf="cargando" class="loading-wrapper">
     <div class="spinner-border" role="status"></div>
     <span>Actualizando expediente...</span>
   </div>
 
-  <div *ngIf="!cargando && filas.length > 0">
-    
+  <div *ngIf="!cargando">
+
     <div class="resumen-mini">
       <div class="resumen-content">
-        <span class="label">CALIFICACIÓN TOTAL DEL TALLER:</span>
-        <span class="valor">{{ mediaTaller }} / 10</span>
+        <span class="label">
+          {{ esProfesor ? 'RESUMEN ACADÉMICO DEL TALLER:' : 'CALIFICACIÓN TOTAL DEL TALLER:' }}
+        </span>
+        <span class="valor">
+          {{ esProfesor ? (listaAlumnos.length + ' Alumnos') : (mediaTaller + ' / 10') }}
+        </span>
       </div>
     </div>
 
-    <div class="lista-calificaciones">
+    <div class="tabla-gestion-notas" *ngIf="esProfesor && listaAlumnos.length > 0">
+      <div class="table-responsive">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>Alumno</th>
+              <th class="text-center">Entregas</th>
+              <th class="text-center">Media</th>
+              <th class="text-end"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let alumno of listaAlumnos">
+              <td><strong>{{ alumno.nombreCompleto }}</strong></td>
+              <td class="text-center">
+                {{ alumno.tareasEntregadas }} / {{ alumno.tareasTotalesAsignadas }}
+              </td>
+              <td class="text-center">
+                <span class="nota-numero" [class.tiene-nota]="alumno.promedio !== null">
+                  {{ alumno.promedio !== null ? (alumno.promedio | number:'1.1-2') : '-' }}
+                </span>
+              </td>
+              <td class="text-end">
+                <button class="btn-icon-link" (click)="verExpedienteAlumno(alumno.idUsuario)"
+                  title="Ver expediente detallado">
+                  <i class="bi bi-chevron-right"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="lista-calificaciones" *ngIf="!esProfesor && filas.length > 0">
       <div class="fila-nota" *ngFor="let f of filas" (click)="verDetalle(f.idTarea)">
-        
         <div class="col-principal">
           <h3 class="titulo">{{ f.titulo }}</h3>
           <span class="badge-estado" [class.is-entregado]="f.entregado">
             {{ f.entregado ? 'ENTREGADO' : 'PENDIENTE' }}
           </span>
         </div>
-
         <div class="col-comentario">
           <p class="comentario-texto" *ngIf="f.comentario">
             <i class="bi bi-chat-left-dots"></i> {{ f.comentario }}
           </p>
         </div>
-
         <div class="col-puntos">
           <span class="nota-numero" [class.tiene-nota]="f.nota !== null">
             {{ f.nota !== null ? f.nota : '-' }}
           </span>
         </div>
-
       </div>
     </div>
 
-  </div>
+    <div class="sin-datos" *ngIf="(esProfesor ? listaAlumnos.length === 0 : filas.length === 0)">
+      <i class="bi bi-clipboard-x"></i>
+      <h3>{{ esProfesor ? 'Sin alumnos' : 'Expediente vacío' }}</h3>
+      <p>
+        {{ esProfesor ? 'Aún no hay inscripciones activas en este taller.' : 'Aún no tienes actividades calificadas. Las
+        notas aparecerán aquí en cuanto el profesor evalúe tus entregas.' }}
+      </p>
+    </div>
 
- <div class="sin-datos" *ngIf="!cargando && filas.length === 0">
-    <i class="bi bi-clipboard-x"></i>
-    <h3>Expediente vacío</h3>
-    <p>Aún no tienes actividades calificadas en este taller. Las notas aparecerán aquí en cuanto el profesor evalúe tus entregas.</p>
   </div>
 </div>

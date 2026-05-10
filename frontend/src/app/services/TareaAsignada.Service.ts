@@ -25,6 +25,15 @@ export class TareaAsignadaService {
   }
 
   /**
+   * Recupera la colección de tareas que han sido asignadas a un alumno concreto.
+   * @param idAlumno Identificador único del estudiante.
+   * @returns Observable con el listado de asignaciones del alumno.
+   */
+  listarPorAlumno(idAlumno: number): Observable<ApiResponse<TareaAsignadaResponse[]>> {
+    return this.http.get<ApiResponse<TareaAsignadaResponse[]>>(`${this.apiUrl}/alumno/${idAlumno}`);
+  }
+
+  /**
    * Sincroniza la lista de alumnos asignados a una tarea.
    * Este método reemplaza las asignaciones anteriores por la nueva lista de IDs.
    * @param idTarea Identificador de la tarea a modificar.

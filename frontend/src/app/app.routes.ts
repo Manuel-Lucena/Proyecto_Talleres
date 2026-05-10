@@ -6,41 +6,41 @@ export const routes: Routes = [
   { path: '', redirectTo: '/landing', pathMatch: 'full' },
   { path: 'landing', loadComponent: () => import('./pages/landing/landing').then(m => m.Landing) },
   { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.Login) },
-  { 
-    path: 'noticia/:id', 
-    loadComponent: () => import('./pages/noticia-detalle/noticia-detalle').then(m => m.NoticiaDetalle) 
+  {
+    path: 'noticia/:id',
+    loadComponent: () => import('./pages/noticia-detalle/noticia-detalle').then(m => m.NoticiaDetalle)
   },
-  { 
-    path: 'talleres-explorar', 
-    loadComponent: () => import('./pages/talleres-explorar/talleres-explorar').then(m => m.TalleresExplorar) 
+  {
+    path: 'talleres-explorar',
+    loadComponent: () => import('./pages/talleres-explorar/talleres-explorar').then(m => m.TalleresExplorar)
   },
-  { 
-    path: 'no-autorizado', 
-    loadComponent: () => import('./pages/acceso-denegado/acceso-denegado').then(m => m.AccesoDenegado) 
+  {
+    path: 'no-autorizado',
+    loadComponent: () => import('./pages/acceso-denegado/acceso-denegado').then(m => m.AccesoDenegado)
   },
-  { 
-    path: 'solicitar-recuperacion', 
-    loadComponent: () => import('./pages/solicitar-recuperacion/solicitar-recuperacion').then(m => m.SolicitarRecuperacion) 
+  {
+    path: 'solicitar-recuperacion',
+    loadComponent: () => import('./pages/solicitar-recuperacion/solicitar-recuperacion').then(m => m.SolicitarRecuperacion)
   },
-  { 
-    path: 'reset-password', 
-    loadComponent: () => import('./pages/cambiar-password/cambiar-password').then(m => m.CambiarPassword) 
+  {
+    path: 'reset-password',
+    loadComponent: () => import('./pages/cambiar-password/cambiar-password').then(m => m.CambiarPassword)
   },
 
   // --- RUTAS PROTEGIDAS ---
-  { 
-    path: 'perfil', 
+  {
+    path: 'perfil',
     canActivate: [authGuard],
-    loadComponent: () => import('./pages/perfil/perfil').then(m => m.Perfil) 
+    loadComponent: () => import('./pages/perfil/perfil').then(m => m.Perfil)
   },
-  { 
-    path: 'mis-talleres', 
+  {
+    path: 'mis-talleres',
     canActivate: [authGuard],
-    loadComponent: () => import('./pages/mis-talleres/mis-talleres').then(m => m.MisTalleres) 
+    loadComponent: () => import('./pages/mis-talleres/mis-talleres').then(m => m.MisTalleres)
   },
 
-  { 
-    path: 'calendario', 
+  {
+    path: 'calendario',
     canActivate: [authGuard],
     loadComponent: () => import('./pages/calendario/calendario').then(m => m.Calendario),
     children: [
@@ -51,9 +51,9 @@ export const routes: Routes = [
   },
 
   // --- RUTA PANEL ADMIN ---
-  { 
-    path: 'panel-admin', 
-    canActivate: [authGuard], 
+  {
+    path: 'panel-admin',
+    canActivate: [authGuard],
     data: { roles: ['ADMIN'] },
     loadComponent: () => import('./pages/panel-admin/panel-admin').then(m => m.PanelAdmin),
     children: [
@@ -68,8 +68,8 @@ export const routes: Routes = [
   },
 
   // --- RUTA AULA VIRTUAL ---
-  { 
-    path: 'aula-virtual/:id', 
+  {
+    path: 'aula-virtual/:id',
     canActivate: [authGuard],
     loadComponent: () => import('./pages/aula-virtual/aula-virtual').then(m => m.AulaVirtual),
     children: [
@@ -79,30 +79,36 @@ export const routes: Routes = [
       { path: 'tareas', loadComponent: () => import('./pages/aula-virtual/tabs/aula-tareas/aula-tareas').then(m => m.AulaTareas), data: { breadcrumb: 'Tareas' } },
       { path: 'recursos', loadComponent: () => import('./pages/aula-virtual/tabs/aula-materiales/aula-materiales').then(m => m.AulaMateriales), data: { breadcrumb: 'Materiales' } },
       { path: 'participantes', loadComponent: () => import('./pages/aula-virtual/tabs/aula-participantes/aula-participantes').then(m => m.AulaParticipantes), data: { breadcrumb: 'Participantes' } },
-      
-      { 
-        path: 'tareas/:idRecurso/seguimiento', 
-        canActivate: [authGuard], 
-        data: { roles: ['ADMIN', 'PROFESOR'], breadcrumb: 'Seguimiento' },
+
+      {
+        path: 'tareas/:idRecurso/seguimiento',
+        canActivate: [authGuard],
+        data: { roles: ['ADMIN', 'PROFESOR'], mode: 'TAREA' },
         loadComponent: () => import('./pages/aula-virtual/tabs/aula-tarea-seguimiento/aula-tarea-seguimiento').then(m => m.AulaTareaSeguimiento)
       },
-      { 
-        path: 'detalle/:tipo/nuevo', 
-        canActivate: [authGuard], 
+      {
+        path: 'detalle/:tipo/nuevo',
+        canActivate: [authGuard],
         data: { roles: ['ADMIN', 'PROFESOR'], breadcrumb: 'Nuevo' },
         loadComponent: () => import('./pages/aula-virtual/tabs/aula-detalle/aula-detalle').then(m => m.AulaDetalle)
       },
-      { 
-        path: 'detalle/:tipo/:idRecurso', 
-        canActivate: [authGuard], 
+      {
+        path: 'detalle/:tipo/:idRecurso',
+        canActivate: [authGuard],
         data: { breadcrumb: 'Cargando...' },
         loadComponent: () => import('./pages/aula-virtual/tabs/aula-detalle/aula-detalle').then(m => m.AulaDetalle)
       },
-      { 
-        path: 'calificaciones', 
+      {
+        path: 'calificaciones',
         loadComponent: () => import('./pages/aula-virtual/tabs/aula-calificaciones/aula-calificaciones').then(m => m.AulaCalificaciones),
-        data: { breadcrumb: 'Calificaciones' } 
-      }
+        data: { breadcrumb: 'Calificaciones' }
+      },
+      {
+        path: 'seguimiento-alumno/:idRecurso',
+        canActivate: [authGuard],
+        data: { roles: ['ADMIN', 'PROFESOR'], mode: 'ALUMNO' }, 
+        loadComponent: () => import('./pages/aula-virtual/tabs/aula-tarea-seguimiento/aula-tarea-seguimiento').then(m => m.AulaTareaSeguimiento)
+      },
     ]
   },
 

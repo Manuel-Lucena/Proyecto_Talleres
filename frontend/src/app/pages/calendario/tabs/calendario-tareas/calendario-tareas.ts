@@ -43,7 +43,7 @@ export class CalendarioTareas implements OnInit {
   constructor(
     private tallerService: TallerService,
     private tareaService: TareaService,
-    private tokenService: TokenService,
+    public tokenService: TokenService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
@@ -65,22 +65,44 @@ export class CalendarioTareas implements OnInit {
    * 2. Por cada taller, dispara una petición de tareas visibles.
    * 3. Aplana los resultados en una única colección global.
    */
+  /**
+ * Orquestación asíncrona:
+ * 1. Detecta el rol.
+ * 2. Si es ALUMNO: Lista por sus inscripciones.
+ * 3. Si es PROFESOR: Lista por los talleres que imparte.
+ */
   cargarTareas() {
     const idUser = this.tokenService.getId();
+    const rol = this.tokenService.getRol();
     if (!idUser) return;
 
-    this.tallerService.listarPorUsuario(idUser).pipe(
+    const talleres$ = (rol === 'PROFESOR' || rol === 'ADMIN')
+      ? this.tallerService.listarPorProfesor(idUser)
+      : this.tallerService.listarPorUsuario(idUser);
+
+    talleres$.pipe(
       switchMap(resp => {
         const talleres = resp?.data || [];
         if (talleres.length === 0) return of([]);
 
         const peticiones = talleres.map(taller => {
           const idTaller = (taller as any).idTaller || (taller as any).id;
-          return this.tareaService.listarVisibles(idTaller).pipe(
-            map(res => (res.data || []).map(t => ({ ...t, nombreTaller: taller.nombre }))),
+
+
+          const peticionTareas$ = (rol === 'PROFESOR')
+            ? this.tareaService.listarPorTaller(idTaller)
+            : this.tareaService.listarVisibles(idTaller);
+
+          return peticionTareas$.pipe(
+            map(res => (res.data || []).map(t => ({
+              ...t,
+              nombreTaller: taller.nombre,
+              idTaller: idTaller
+            }))),
             catchError(() => of([]))
           );
         });
+
         return forkJoin(peticiones);
       })
     ).subscribe({
@@ -157,9 +179,17 @@ export class CalendarioTareas implements OnInit {
   // ===========================================================================
 
   /**
-   * Redirige al alumno a la vista de detalle de la tarea seleccionada.
+   * Redirige a la vista de detalle de la tarea seleccionada.
    */
   irATarea(tarea: TareaResponse) {
-    this.router.navigate([`/aula-virtual/${tarea.idTaller}/detalle/tarea/${tarea.idTarea}`]);
+    const rol = this.tokenService.getRol();
+    const idTaller = tarea.idTaller;
+    const idTarea = tarea.idTarea;
+
+    if (rol === 'PROFESOR' || rol === 'ADMIN') {
+      this.router.navigate(['/aula-virtual', idTaller, 'tareas', idTarea, 'seguimiento']);
+    } else {
+      this.router.navigate(['/aula-virtual', idTaller, 'detalle', 'tarea', idTarea]);
+    }
   }
 }

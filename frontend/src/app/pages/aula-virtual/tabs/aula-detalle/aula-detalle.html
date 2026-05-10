@@ -110,8 +110,9 @@
                             <div class="dropdown-extensiones-custom">
                                 <div class="dropdown-trigger-custom"
                                     (click)="toggleDropdownExt(); $event.stopPropagation()">
-                                    <span class="text-truncate">{{ form.get('extensionesPermitidas')?.value ||
-                                        'Seleccionar formatos...' }}</span>
+                                    <span class="text-truncate">
+                                        {{ form.get('extensionesPermitidas')?.value || 'Cualquier formato...' }}
+                                    </span>
                                     <i class="bi bi-chevron-down"></i>
                                 </div>
                                 <div class="dropdown-menu-custom" [class.show]="mostrarDropdownExt">

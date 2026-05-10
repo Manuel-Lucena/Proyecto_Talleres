@@ -234,18 +234,23 @@ export class AulaDetalle implements OnInit {
    * @param idTarea ID de la tarea.
    * @private
    */
+  /**
+ * Lógica para Alumnos: Verifica si el usuario actual ya ha realizado un envío.
+ * @param idTarea ID de la tarea.
+ * @private
+ */
   private verificarEntregaExistente(idTarea: number): void {
     const idUsuario = this.tokenService.getId();
     if (!idUsuario) return;
 
-    this.entregaService.listarPorTarea(idTarea).subscribe({
+    this.entregaService.obtenerMiEntrega(idTarea).subscribe({
       next: (resp) => {
-        const entrega = resp.data.find(e => e.idUsuario === idUsuario);
-        if (entrega) {
-          this.entregaRealizada = entrega;
+        if (resp.data) {
+          this.entregaRealizada = resp.data;
           this.recurso.entregado = true;
-          this.recurso.calificacion = entrega.calificacion;
-          this.archivoEntregaService.listarPorEntrega(entrega.idEntrega).subscribe({
+          this.recurso.calificacion = resp.data.calificacion;
+
+          this.archivoEntregaService.listarPorEntrega(resp.data.idEntrega).subscribe({
             next: (archResp) => {
               this.archivosEntregaExistentes = archResp.data || [];
               this.cdr.detectChanges();
@@ -256,6 +261,10 @@ export class AulaDetalle implements OnInit {
           this.recurso.entregado = false;
           this.archivosEntregaExistentes = [];
         }
+      },
+      error: (err) => {
+        this.entregaRealizada = null;
+        this.recurso.entregado = false;
       }
     });
   }
@@ -346,17 +355,26 @@ export class AulaDetalle implements OnInit {
    * @param event Evento de cambio del checkbox.
    */
   onExtensionChange(event: any): void {
-    const value = event.target.value;
-    let seleccionadas = this.form.get('extensionesPermitidas')?.value
-      ? this.form.get('extensionesPermitidas')?.value.split(',').map((s: string) => s.trim()).filter((s: string) => s !== "")
-      : [];
+    const value: string = event.target.value;
+    const valorActual: string = this.form.get('extensionesPermitidas')?.value || '';
+
+    let seleccionadas: string[] = valorActual
+      .split(',')
+      .map((s: string) => s.trim())
+      .filter((s: string) => s.length > 0);
+
+    const extensionesNuevas: string[] = value.split(',').map((s: string) => s.trim());
 
     if (event.target.checked) {
-      if (!seleccionadas.includes(value)) seleccionadas.push(value);
+      seleccionadas = [...new Set([...seleccionadas, ...extensionesNuevas])];
     } else {
-      seleccionadas = seleccionadas.filter((ext: string) => ext !== value);
+      seleccionadas = seleccionadas.filter((ext: string) => !extensionesNuevas.includes(ext));
     }
-    this.form.patchValue({ extensionesPermitidas: seleccionadas.join(', ') });
+
+    const resultadoFinal: string = seleccionadas.join(', ');
+
+    this.form.patchValue({ extensionesPermitidas: resultadoFinal });
+    this.cdr.detectChanges();
   }
 
   /**

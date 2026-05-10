@@ -53,6 +53,19 @@ public class TareaAsignadaService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene todas las asignaciones de tareas desde la perspectiva de un alumno.
+     * * @param idAlumno Identificador del alumno a consultar.
+     * 
+     * @return Lista de DTOs con la información de las tareas vinculadas.
+     */
+    @Transactional(readOnly = true)
+    public List<TareaAsignadaResponseDTO> listarPorAlumno(Long idAlumno) {
+        return tareaAsignadaRepository.findByAlumnoId(idAlumno).stream()
+                .map(tareaAsignadaMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
     // --- MÉTODOS POST / PUT ---
 
     /**

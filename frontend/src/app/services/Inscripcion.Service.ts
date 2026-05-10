@@ -43,6 +43,16 @@ export class InscripcionService {
   }
 
   /**
+   * Obtiene la sábana de notas global de un taller (Promedios por alumno).
+   * Solo accesible para Profesores del taller o Administradores.
+   * * @param idTaller Identificador del taller a consultar.
+   * @returns Observable con el listado de NotasAlumnoDTO (id, nombre, entregas, promedio).
+   */
+  obtenerNotasGlobales(idTaller: number): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/taller/${idTaller}/notas-globales`);
+  }
+
+  /**
     * Comprueba si el usuario tiene algun horario que se solape con el taller al que va a inscribirse.
     * @param idUsuario Identificador del usuario.
     * @param idUsuario Identificador del taller.

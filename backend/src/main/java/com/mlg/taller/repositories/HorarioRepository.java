@@ -26,4 +26,14 @@ public interface HorarioRepository extends JpaRepository<Horario, Long> {
             "  WHERE i.usuario.id = ?1 AND i.activa = true" +
             ")")
     List<Horario> findHorariosByUsuarioInscrito(Long idUsuario);
+
+    /**
+     * Obtiene la planificación horaria completa de todos los talleres que imparte un profesor.
+     * * @param idProfesor Identificador del docente.
+     * 
+     * @return Lista de horarios asociados a los talleres bajo la tutela del
+     *         profesor.
+     */
+    @Query("SELECT h FROM Horario h WHERE h.taller.profesor.id = ?1")
+    List<Horario> findHorariosByProfesorImpartiendo(Long idProfesor);
 }

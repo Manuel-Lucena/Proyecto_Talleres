@@ -25,11 +25,19 @@ export class HorarioService {
   }
 
   /**
- * Recupera todos los horarios del usuario.
- * @returns Observable con la lista de los horarios del usuario.
+ * Recupera todos los horarios del alumno.
+ * @returns Observable con la lista de los horarios del alumno.
  */
   listarPorUsuario(idUsuario: number | null): Observable<ApiResponse<HorarioResponse[]>> {
     return this.http.get<ApiResponse<HorarioResponse[]>>(`${this.apiUrl}/usuario/${idUsuario}`);
+  }
+
+  /**
+* Recupera todos los horarios del profesor.
+* @returns Observable con la lista de los horarios del profesor.
+*/
+  listarPorProfesor(idProfesor: number): Observable<ApiResponse<HorarioResponse[]>> {
+    return this.http.get<ApiResponse<HorarioResponse[]>>(`${this.apiUrl}/profesor/${idProfesor}`);
   }
 
   /**
