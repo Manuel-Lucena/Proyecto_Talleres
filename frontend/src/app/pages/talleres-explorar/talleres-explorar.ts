@@ -61,7 +61,7 @@ export class TalleresExplorar implements OnInit {
 
   constructor(
     private tallerService: TallerService,
-    private tokenService: TokenService,
+    public tokenService: TokenService,
     private inscripcionService: InscripcionService,
     private usuarioService: UsuarioService,
     private notify: NotificacionService,
@@ -183,7 +183,7 @@ export class TalleresExplorar implements OnInit {
     const { texto, precioMax, soloDisponibles } = this.filtroForm.value;
     const buscar = texto.toLowerCase();
     this.talleresFiltrados = this.talleres.filter(t => {
-      const coincideTexto = t.nombre.toLowerCase().includes(buscar) || t.descripcion.toLowerCase().includes(buscar);
+      const coincideTexto = t.nombre.toLowerCase().includes(buscar);
       const coincidePrecio = t.precio <= precioMax;
       const coincidePlazas = soloDisponibles ? t.plazasDisponibles > 0 : true;
       return coincideTexto && coincidePrecio && coincidePlazas;

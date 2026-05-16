@@ -20,7 +20,6 @@ import { PaginatePipe } from '../../../../pipes/PaginatePipe';
 @Component({
   selector: 'app-admin-talleres',
   standalone: true,
-  // AGREGADO: PaginatePipe en los imports para que funcione el símbolo "|" en el HTML
   imports: [CommonModule, FormsModule, FormTaller, Confirmacion, Notificacion, PaginatePipe], 
   templateUrl: './admin-talleres.html',
   styleUrl: './admin-talleres.scss'
@@ -58,7 +57,7 @@ export class AdminTalleres implements OnInit {
    * @param tallerService Servicios de persistencia de talleres.
    * @param usuarioService Necesario para cargar el listado de profesores disponibles.
    * @param notificacionService Feedback visual y diálogos de sistema.
-   * @param cdr Forzado de detección de cambios (importante tras operaciones asíncronas).
+   * @param cdr Forzado de detección de cambios.
    * @param router Navegación a sub-vistas (Horarios/Inscripciones).
    */
   constructor(

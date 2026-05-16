@@ -134,7 +134,6 @@ export class UsuarioService {
    * @returns Observable con la respuesta de la operación.
    */
   solicitarRecuperacion(email: string): Observable<ApiResponse<void>> {
-    // Enviamos el objeto { email: email } como espera el DTO de Java
     return this.http.post<ApiResponse<void>>(`${this.apiUrl}/password-reset-request`, { email });
   }
 

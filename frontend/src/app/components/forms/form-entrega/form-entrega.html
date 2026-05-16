@@ -1,6 +1,6 @@
 <div class="modal-overlay" (click)="cerrar.emit()">
   <div class="modal-body" (click)="$event.stopPropagation()" [formGroup]="entregaForm">
-    
+
     <button class="btn-close" (click)="cerrar.emit()">
       <i class="bi bi-x-lg"></i>
     </button>
@@ -17,20 +17,16 @@
 
     <div class="modal-content-body">
       <div class="seccion-input">
-        <app-form-label 
-          texto="Aclaraciones o comentarios" 
-          ayuda="Puedes añadir una breve explicación sobre tu entrega o dudas que hayas tenido." 
-          forId="aclaraciones">
+        <app-form-label texto="Aclaraciones o comentarios"
+          ayuda="Puedes añadir una breve explicación sobre tu entrega o dudas que hayas tenido." forId="aclaraciones">
         </app-form-label>
-        <textarea id="aclaraciones" formControlName="textoEntrega" class="textarea-entrega" rows="3" 
-                  placeholder="Escribe aquí cualquier observación sobre tu entrega...">
+        <textarea id="aclaraciones" formControlName="textoEntrega" class="textarea-entrega" rows="3"
+          placeholder="Escribe aquí cualquier observación sobre tu entrega...">
         </textarea>
       </div>
 
       <div class="seccion-archivos">
-        <app-form-label 
-          texto="Archivos adjuntos" 
-          [requerido]="!entregaExistente" 
+        <app-form-label texto="Archivos adjuntos" [requerido]="false"
           [ayuda]="recurso?.extensionesPermitidas ? 'Formatos aceptados: ' + recurso.extensionesPermitidas : 'Cualquier formato permitido. Máx 10MB.'">
         </app-form-label>
 
@@ -75,8 +71,8 @@
         <button type="button" class="btn-cancelar" (click)="cerrar.emit()">
           Cancelar
         </button>
-        <button (click)="enviar()" class="btn-enviar-final" 
-                [disabled]="cargando || entregaForm.invalid || extensionesError || (!entregaExistente && nuevosArchivos.length === 0)">
+        <button (click)="enviar()" class="btn-enviar-final"
+          [disabled]="cargando || entregaForm.invalid || extensionesError">
           <span *ngIf="!cargando">
             {{ entregaExistente ? 'Guardar cambios' : 'Enviar tarea' }}
           </span>

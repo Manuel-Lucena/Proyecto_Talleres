@@ -77,13 +77,14 @@ export class FormEntrega implements OnInit {
 
   /**
    * Sincroniza la selección del input file con la lista temporal de subida.
-   * Realiza una validación inmediata de las extensiones permitidas.
+   * Realiza una validación inmediata de las extensiones y firmas reales.
    */
-  onFileChange(event: any): void {
+  async onFileChange(event: any): Promise<void> {
     if (event.target.files.length > 0) {
-      this.nuevosArchivos.push(...Array.from(event.target.files) as File[]);
+      const files = Array.from(event.target.files) as File[];
+      this.nuevosArchivos.push(...files);
       event.target.value = '';
-      this.validarExtensiones();
+      await this.validarExtensiones();
     }
   }
 
@@ -91,9 +92,9 @@ export class FormEntrega implements OnInit {
    * Elimina un fichero del listado de nuevas cargas antes de procesar el envío.
    * Revalida las extensiones tras la eliminación.
    */
-  quitarNuevo(index: number): void {
+  async quitarNuevo(index: number): Promise<void> {
     this.nuevosArchivos.splice(index, 1);
-    this.validarExtensiones();
+    await this.validarExtensiones();
   }
 
   /**
@@ -105,34 +106,74 @@ export class FormEntrega implements OnInit {
   }
 
   /**
-   * Valida si los archivos en el buffer 'nuevosArchivos' cumplen con las 
-   * restricciones de formato definidas en el recurso (tarea).
+   * Valida si los archivos en el buffer 'nuevosArchivos' cumplen con las
+   * restricciones de formato y no son ejecutables disfrazados.
    * @private
    */
-  private validarExtensiones(): void {
-    if (!this.recurso?.extensionesPermitidas) {
+  private async validarExtensiones(): Promise<void> {
+    if (this.nuevosArchivos.length === 0) {
       this.extensionesError = false;
+      this.mensajeError = '';
       return;
     }
 
-    const permitidas = this.recurso.extensionesPermitidas
-      .toLowerCase()
-      .split(',')
-      .map((ext: string) => ext.trim()); 
+    if (this.recurso?.extensionesPermitidas) {
+      const permitidas = this.recurso.extensionesPermitidas
+        .toLowerCase()
+        .split(',')
+        .map((ext: string) => ext.trim());
 
-    const archivosInvalidos = this.nuevosArchivos.filter(file => {
-      const nombre = file.name.toLowerCase();
-      // Tipamos 'ext' también aquí
-      return !permitidas.some((ext: string) => nombre.endsWith(ext)); 
-    });
+      const tieneNombreInvalido = this.nuevosArchivos.some(file => {
+        const nombre = file.name.toLowerCase();
+        return !permitidas.some((ext: string) => nombre.endsWith(ext));
+      });
 
-    if (archivosInvalidos.length > 0) {
-      this.extensionesError = true;
-      this.mensajeError = `Formato no permitido. La tarea solo acepta: ${this.recurso.extensionesPermitidas}`;
-    } else {
-      this.extensionesError = false;
-      this.mensajeError = '';
+      if (tieneNombreInvalido) {
+        this.setExceptionArchivo(`Formato no permitido por nombre. Use: ${this.recurso.extensionesPermitidas}`);
+        return;
+      }
     }
+
+    // 2. Validación profunda: Evitar ejecutables disfrazados (Magic Numbers)
+    for (const file of this.nuevosArchivos) {
+      const esEjecutable = await this.verificarSiEsEjecutable(file);
+      if (esEjecutable) {
+        this.setExceptionArchivo(`Seguridad: El archivo "${file.name}" es un ejecutable no permitido.`);
+        return;
+      }
+    }
+
+    // Si todo es correcto, limpiamos errores
+    this.extensionesError = false;
+    this.mensajeError = '';
+  }
+
+  /**
+   * Lee los primeros bytes del archivo para detectar firmas MZ (Windows Executable).
+   * @param file Archivo a inspeccionar.
+   * @private
+   */
+  private async verificarSiEsEjecutable(file: File): Promise<boolean> {
+    try {
+      const blob = file.slice(0, 2);
+      const buffer = await blob.arrayBuffer();
+      const uint = new Uint8Array(buffer);
+      // Firma 'MZ' en hexadecimal es 4d 5a
+      const magic = uint[0].toString(16) + uint[1].toString(16);
+      return magic.toLowerCase() === '4d5a';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /**
+   * Centraliza el marcado de error en la UI de archivos.
+   * @param msg Mensaje de error.
+   * @private
+   */
+  private setExceptionArchivo(msg: string): void {
+    this.extensionesError = true;
+    this.mensajeError = msg;
   }
 
   // ===========================================================================

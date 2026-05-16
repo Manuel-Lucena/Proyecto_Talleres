@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class UsuarioValidator {
 
     private final UsuarioRepository usuarioRepository;
-    private final TallerRepository tallerRepository; // Inyectado para verificar carga lectiva
+    private final TallerRepository tallerRepository; 
 
     /**
      * Verifica si un email ya está registrado en el sistema.

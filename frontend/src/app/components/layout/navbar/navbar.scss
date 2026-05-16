@@ -1,257 +1,234 @@
-/* ==========================================================================
-   SISTEMA DE NAVEGACIÓN: NAVBAR PRINCIPAL
-   ========================================================================== */
+/* ========================================================================== 
+        SISTEMA DE NAVEGACIÓN: NAVBAR PRINCIPAL 
+   ========================================================================== */ 
+@use '../../../../styles/variables' as v; 
 
-@use '../../../../styles/variables' as v;
+.main-nav { 
+  min-height: 100px; 
+  background: v.$color-neutro-max; 
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08); 
+  display: flex; 
+  align-items: center; 
+  position: relative; 
+  z-index: 1001; 
 
-.main-nav {
-    min-height: 100px;
-    background: v.$color-neutro-max;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    display: flex;
-    align-items: center;
-    position: relative;
-    z-index: 1001;
+  .navbar-toggler { 
+    &:focus { 
+      box-shadow: none; 
+    } 
+  } 
 
-    .navbar-toggler {
+  // 1. IDENTIDAD VISUAL 
+  .logo-wrapper-static { 
+    height: 70px; 
+    width: 70px; 
+    img { 
+      height: 100%; 
+      width: 100%; 
+      object-fit: contain; 
+    } 
+  } 
 
-        &:focus {
-            box-shadow: none;
-        }
-    }
+  .v-divider { 
+    width: 2px; 
+    height: 40px; 
+    background: #eee; 
+    margin: 0 20px; 
+    @media (max-width: 576px) { 
+      display: none; 
+    } 
+  } 
 
-    // 1. IDENTIDAD VISUAL 
-    .logo-wrapper-static {
-        height: 70px;
-        width: 70px;
+  .brand-text { 
+    h1 { 
+      font-family: v.$fuente-enfasis; 
+      font-size: 1.8rem; 
+      font-weight: 800; 
+      color: v.$color-secundario-frio-2; 
+      margin: 0; 
+      line-height: 1; 
+    } 
+    p { 
+      font-size: 0.8rem; 
+      letter-spacing: 2px; 
+      color: #777; 
+      margin: 0; 
+      text-transform: uppercase; 
+    } 
+  } 
 
-        img {
-            height: 100%;
-            width: 100%;
-            object-fit: contain;
-        }
-    }
+  // 2. MENÚ DE NAVEGACIÓN CENTRAL 
+  .navbar-nav { 
+    .nav-link { 
+      font-family: v.$fuente-enfasis; 
+      font-size: 1.1rem; 
+      font-weight: 700; 
+      color: v.$color-superficie-oscura; 
+      padding: 12px 10px; 
+      transition: all 0.3s ease; 
+      position: relative; 
+      display: block; 
+      @media (min-width: 1200px) { 
+        display: inline-block; 
+        margin: 0 30px; 
+        padding: 10px 0; 
+      } 
 
-    .v-divider {
-        width: 2px;
-        height: 40px;
-        background: #eee;
-        margin: 0 20px;
+      // Indicador inferior 
+      &::after { 
+        content: ''; 
+        position: absolute; 
+        width: 0; 
+        height: 4px; 
+        bottom: -2px; 
+        left: 0; 
+        background-color: v.$color-marca-principal; 
+        transition: width 0.3s ease-in-out; 
+        border-radius: 2px; 
+        @media (max-width: 991px) { 
+          display: none; 
+        } 
+      } 
 
-        @media (max-width: 576px) {
-            display: none;
-        }
-    }
+      &:hover, &.active-link { 
+        color: v.$color-marca-principal; 
+        -webkit-text-stroke: 0.2px #000; 
+        
+        &::after { 
+          width: 100%; 
+        } 
+      } 
+    } 
+  } 
 
-    .brand-text {
-        h1 {
-            font-family: v.$fuente-enfasis;
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: v.$color-secundario-frio-2;
-            margin: 0;
-            line-height: 1;
-        }
+  // 3. ÁREA DE USUARIO 
+  .user-menu-container { 
+    position: relative; 
+    .user-trigger { 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+      cursor: pointer; 
+      padding: 8px 18px; 
+      border-radius: 50px; 
+      background: #f8f9fa; 
+      transition: 0.3s; 
+      &:hover { 
+        background: #f1f1f1; 
+      } 
+      .avatar-box { 
+        width: 40px; 
+        height: 40px; 
+        border-radius: 50%; 
+        overflow: hidden; 
+        border: 2px solid v.$color-marca-principal; 
+        img { 
+          width: 100%; 
+          height: 100%; 
+          object-fit: cover; 
+        } 
+      } 
+      .user-display-name { 
+        font-weight: 700; 
+        color: v.$color-secundario-frio-2; 
+      } 
+      .arrow { 
+        transition: transform 0.3s; 
+        &.open { 
+          transform: rotate(180deg); 
+        } 
+      } 
+    } 
+  } 
+} 
 
-        p {
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            color: #777;
-            margin: 0;
-            text-transform: uppercase;
-        }
-    }
+// 4. DROPDOWN PERSONALIZADO 
+.custom-dropdown-menu { 
+  position: absolute; 
+  top: 115%; 
+  right: 0; 
+  width: 260px; 
+  background: white; 
+  border-radius: 12px; 
+  box-shadow: v.$sombra-nivel-3; 
+  padding: 15px; 
+  z-index: 1002; 
+  border: 1px solid #eee; 
+  @media (max-width: 991px) { 
+    position: static; 
+    width: 100%; 
+    box-shadow: none; 
+    border: none; 
+    padding: 10px 0 10px 20px; 
+    background: #fcfcfc; 
+    margin-top: 10px; 
+  } 
+  .dropdown-header-box { 
+    padding: 10px 0; 
+    text-align: center; 
+    .user-full-name { 
+      font-size: 1.1rem; 
+      font-weight: 800; 
+      color: v.$color-secundario-frio-2; 
+      font-family: v.$fuente-enfasis; 
+      display: block; 
+    } 
+  } 
+  .menu-divider { 
+    height: 1px; 
+    background: #eee; 
+    margin: 10px 0; 
+  } 
+  // Elementos del menú 
+  .item-link { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    padding: 10px; 
+    text-decoration: none; 
+    color: #555; 
+    font-weight: 600; 
+    width: 100%; 
+    border-radius: 8px; 
+    border: none; 
+    background: none; 
+    text-align: left; 
+    transition: 0.3s; 
+    &:hover { 
+      background: #f0fdf4; 
+      color: v.$color-marca-principal; 
+    } 
+    &.logout-btn { 
+      color: v.$color-secundario-calido-1; 
+    } 
+  } 
+} 
 
-    // 2. MENÚ DE NAVEGACIÓN CENTRAL
-    .navbar-nav {
-        .nav-link {
-            font-family: v.$fuente-enfasis;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: v.$color-superficie-oscura;
-            padding: 12px 10px;
-            transition: color 0.3s;
-            position: relative;
-            display: block;
+// 5. BOTÓN DE ACCIÓN GLOBAL (EJ: LOGIN/RESERVAR) 
+.btn-custom { 
+  font-family: v.$fuente-enfasis; 
+  padding: 10px 30px; 
+  font-weight: 800; 
+  border-radius: v.$radio-curvatura; 
+  background: v.$color-secundario-frio-2; 
+  color: white; 
+  text-decoration: none; 
+  display: block; 
+  transition: 0.3s; 
+  @media (min-width: 992px) { 
+    display: inline-block; 
+    margin-left: 20px; 
+  } 
+  &:hover { 
+    opacity: 0.9; 
+    transform: translateY(-1px); 
+    box-shadow: v.$sombra-nivel-1; 
+  } 
+} 
 
-            @media (min-width: 1200px) {
-                display: inline-block;
-                margin: 0 30px;
-                padding: 10px 0;
-            }
-
-            // Indicador inferior 
-            &::after {
-                content: '';
-                position: absolute;
-                width: 0;
-                height: 4px;
-                bottom: -2px;
-                left: 0;
-                background-color: v.$color-marca-principal;
-                transition: width 0.3s ease-in-out;
-                border-radius: 2px;
-
-                @media (max-width: 991px) {
-                    display: none;
-                }
-            }
-
-            &:hover,
-            &.active-link {
-                color: v.$color-marca-principal;
-
-                &::after {
-                    width: 100%;
-                }
-            }
-        }
-    }
-
-    // 3. ÁREA DE USUARIO 
-    .user-menu-container {
-        position: relative;
-
-        .user-trigger {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            padding: 8px 18px;
-            border-radius: 50px;
-            background: #f8f9fa;
-            transition: 0.3s;
-
-            &:hover {
-                background: #f1f1f1;
-            }
-
-            .avatar-box {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                overflow: hidden;
-                border: 2px solid v.$color-marca-principal;
-
-                img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                }
-            }
-
-            .user-display-name {
-                font-weight: 700;
-                color: v.$color-secundario-frio-2;
-            }
-
-            .arrow {
-                transition: transform 0.3s;
-
-                &.open {
-                    transform: rotate(180deg);
-                }
-            }
-        }
-    }
-}
-
-// 4. DROPDOWN PERSONALIZADO
-.custom-dropdown-menu {
-    position: absolute;
-    top: 115%;
-    right: 0;
-    width: 260px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: v.$sombra-nivel-3;
-    padding: 15px;
-    z-index: 1002;
-    border: 1px solid #eee;
-
-    @media (max-width: 991px) {
-        position: static;
-        width: 100%;
-        box-shadow: none;
-        border: none;
-        padding: 10px 0 10px 20px;
-        background: #fcfcfc;
-        margin-top: 10px;
-    }
-
-    .dropdown-header-box {
-        padding: 10px 0;
-        text-align: center;
-
-        .user-full-name {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: v.$color-secundario-frio-2;
-            font-family: v.$fuente-enfasis;
-            display: block;
-        }
-    }
-
-    .menu-divider {
-        height: 1px;
-        background: #eee;
-        margin: 10px 0;
-    }
-
-    // Elementos del menú
-    .item-link {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px;
-        text-decoration: none;
-        color: #555;
-        font-weight: 600;
-        width: 100%;
-        border-radius: 8px;
-        border: none;
-        background: none;
-        text-align: left;
-        transition: 0.3s;
-
-        &:hover {
-            background: #f0fdf4;
-            color: v.$color-marca-principal;
-        }
-
-        &.logout-btn {
-            color: v.$color-secundario-calido-1;
-        }
-    }
-}
-
-// 5. BOTÓN DE ACCIÓN GLOBAL (EJ: LOGIN/RESERVAR)
-.btn-custom {
-    font-family: v.$fuente-enfasis;
-    padding: 10px 30px;
-    font-weight: 800;
-    border-radius: v.$radio-curvatura;
-    background: v.$color-secundario-frio-2;
-    color: white;
-    text-decoration: none;
-    display: block;
-    transition: 0.3s;
-
-    @media (min-width: 992px) {
-        display: inline-block;
-        margin-left: 20px;
-    }
-
-    &:hover {
-        opacity: 0.9;
-        transform: translateY(-1px);
-        box-shadow: v.$sombra-nivel-1;
-    }
-}
-
-// 6. CAPA INVISIBLE PARA CERRAR CLICANDO FUERA
-.click-outside-layer {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
+// 6. CAPA INVISIBLE 
+.click-outside-layer { 
+  position: fixed; 
+  inset: 0; 
+  z-index: 1000; 
 }

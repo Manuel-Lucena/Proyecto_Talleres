@@ -58,6 +58,7 @@ export class TokenService {
   get esAdmin(): boolean {
     return this.getRol() === 'ADMIN';
   }
+  
 
   /**
    * Obtiene el rol asignado al usuario desde el token.
@@ -95,6 +96,7 @@ export class TokenService {
     if (!dec) return false;
     return (dec.exp * 1000) > Date.now();
   }
+  
 
   /**
    * Elimina el token del almacenamiento local, cerrando efectivamente la sesión.

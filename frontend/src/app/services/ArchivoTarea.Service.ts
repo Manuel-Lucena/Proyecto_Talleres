@@ -56,7 +56,6 @@ export class ArchivoTareaService {
     const formData = new FormData();
     const dto = { idTarea: idTarea };
 
-    // Convertimos el DTO a un Blob JSON para que el Backend lo procese correctamente como @RequestPart
     formData.append('datos', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
     formData.append('archivo', archivo);
 

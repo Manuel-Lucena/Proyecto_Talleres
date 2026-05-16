@@ -201,14 +201,17 @@ public class InscripcionValidator {
         }
     }
 
- 
     /**
-     * Valida si el usuario tiene permisos para consultar el panel de notas globales del taller.
-     * * Restringe el acceso exclusivamente al ADMINISTRADOR y al PROFESOR que imparte 
+     * Valida si el usuario tiene permisos para consultar el panel de notas globales
+     * del taller.
+     * * Restringe el acceso exclusivamente al ADMINISTRADOR y al PROFESOR que
+     * imparte
      * el taller.
      * * @param solicitante Usuario que intenta acceder a la información.
-     * @param taller      Taller del cual se pretenden obtener las notas.
-     * @throws BadRequestException si el usuario no tiene privilegios de gestión sobre el taller.
+     * 
+     * @param taller Taller del cual se pretenden obtener las notas.
+     * @throws BadRequestException si el usuario no tiene privilegios de gestión
+     *                             sobre el taller.
      */
     public void validarAccesoNotasGlobales(Usuario solicitante, Taller taller) {
         boolean esAdmin = solicitante.getRol().getNombre().equalsIgnoreCase("ADMIN");
@@ -221,11 +224,22 @@ public class InscripcionValidator {
         }
     }
 
-
+    /**
+     * Valida si el taller dispone de vacantes libres para procesar una nueva
+     * matriculación.
+     * * Realiza un conteo en tiempo real de las inscripciones activas y lo
+     * contrasta con el límite de plazas máximas definido en la entidad Taller. Este control
+     * garantiza la integridad del aforo y evita la sobreventa de plazas.
+     * * @param taller Entidad del taller sobre el que se desea realizar la
+     * comprobación.
+     * 
+     * @throws BadRequestException si el número de inscritos es igual o superior
+     *                             al cupo de plazas máximas permitido.
+     */
     public void validarCupoDisponible(Taller taller) {
-    long inscritos = inscripcionRepository.countByTallerIdAndActivaTrue(taller.getId());
-    if (inscritos >= taller.getPlazasMaximas()) { 
-        throw new BadRequestException("El taller '" + taller.getNombre() + "' ya ha alcanzado su cupo máximo.");
+        long inscritos = inscripcionRepository.countByTallerIdAndActivaTrue(taller.getId());
+        if (inscritos >= taller.getPlazasMaximas()) {
+            throw new BadRequestException("El taller '" + taller.getNombre() + "' ya ha alcanzado su cupo máximo.");
+        }
     }
-}
 }

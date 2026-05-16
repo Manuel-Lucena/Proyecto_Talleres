@@ -20,7 +20,7 @@
           <div class="title-line"></div>
         </div>
 
-        @if (tokenService.getRol()?.toLowerCase() === 'admin' || tokenService.getRol()?.toLowerCase() === 'profesor') {
+        @if (tokenService.getRol()?.toLowerCase() === 'admin') {
         <div class="vertical-divider d-none d-sm-block"></div>
         <button type="button" class="btn-add-news-mini" (click)="abrirCrear()">
           <i class="bi bi-plus-circle-fill"></i>

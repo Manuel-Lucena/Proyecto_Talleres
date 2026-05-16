@@ -28,12 +28,12 @@ import { TareaAsignadaResponse } from '../../../../interfaces/TareaAsignada.Inte
   styleUrl: './aula-tarea-seguimiento.scss'
 })
 export class AulaTareaSeguimiento implements OnInit {
-  
+
   // --- Propiedades de Datos ---
   idTaller: number = 0;
   idTarea: number | null = null;            // ID de la tarea seleccionada (Modo Tarea)
   idAlumno: number | null = null;           // ID del alumno seleccionado (Modo Alumno)
-  
+
   tarea: TareaResponse | null = null;       // Metadatos de la tarea actual
   alumnoExpediente: UsuarioResponse | null = null; // Datos del perfil del alumno
   filas: any[] = [];                        // Datos unificados para la tabla (Alumno o Tarea)
@@ -70,14 +70,14 @@ export class AulaTareaSeguimiento implements OnInit {
   ngOnInit(): void {
     const idRecurso = Number(this.route.snapshot.paramMap.get('idRecurso'));
     const mode = this.route.snapshot.data['mode'];
-    
-    this.idTaller = Number(this.route.snapshot.paramMap.get('id')) || 
-                    Number(this.route.parent?.snapshot.paramMap.get('id'));
+
+    this.idTaller = Number(this.route.snapshot.paramMap.get('id')) ||
+      Number(this.route.parent?.snapshot.paramMap.get('id'));
 
     if (mode === 'ALUMNO') {
       this.modoAlumno = true;
       this.idAlumno = idRecurso;
-      this.idTarea = null; 
+      this.idTarea = null;
     } else {
       this.modoAlumno = false;
       this.idTarea = idRecurso;
@@ -104,6 +104,7 @@ export class AulaTareaSeguimiento implements OnInit {
 
   /**
    * Obtiene tareas del taller, asignaciones del alumno y sus entregas.
+   * Sincroniza la visibilidad para que coincida con lo que el alumno ve en su panel.
    * @param idAlumno ID del alumno a consultar.
    */
   private cargarModoAlumno(idAlumno: number): void {
@@ -121,7 +122,7 @@ export class AulaTareaSeguimiento implements OnInit {
         const misAsig: TareaAsignadaResponse[] = res.misAsignaciones?.data || [];
         const misEntregas: EntregaResponse[] = res.entregas?.data || [];
 
-        // Filtramos y transformamos las tareas en filas de tabla
+        // IMPORTANTE: Ahora filtramos con la lógica corregida de "Tarea Global"
         this.filas = tareas
           .filter(t => this.esTareaVisibleParaAlumno(t, misAsig, misEntregas))
           .map(t => this.mapearFilaAlumno(t, misEntregas));
@@ -152,7 +153,7 @@ export class AulaTareaSeguimiento implements OnInit {
         const alumnosTaller = (res.usuariosTaller?.data || [])
           .filter((u: UsuarioResponse) => u.nombreRol?.toUpperCase() === 'ALUMNO');
 
-      
+
         this.filas = this.generarListaBaseTarea(alumnosTaller, asignaciones)
           .map(asig => this.mapearFilaTarea(asig, entregas));
 
@@ -165,18 +166,21 @@ export class AulaTareaSeguimiento implements OnInit {
   // --- MÉTODOS PRIVADOS DE LÓGICA Y TRANSFORMACIÓN ---
 
   /**
-   * Valida si una tarea debe aparecer en el expediente del alumno.
-   * @param t Tarea a validar.
-   * @param misAsig Lista de asignaciones del alumno.
-   * @param misEntregas Lista de entregas del alumno.
-   * @returns boolean true si es visible.
-   */
+  * Valida si una tarea debe aparecer en el expediente basándose en:
+  * 1. Si está marcada como visible por el profesor.
+  * 2. Si el alumno ya la ha entregado (aunque ya no esté asignada, debe verse la nota).
+  * 3. Si el alumno está asignado específicamente.
+  * 4. SI LA TAREA ES GLOBAL (No tiene ninguna asignación específica creada).
+  * * @param t Tarea a validar.
+  * @param misAsig Lista de asignaciones del alumno.
+  * @param misEntregas Lista de entregas del alumno.
+  */
   private esTareaVisibleParaAlumno(t: TareaResponse, misAsig: TareaAsignadaResponse[], misEntregas: EntregaResponse[]): boolean {
     if (t.visible === false) return false;
-    const yaEntregada = misEntregas.some(e => String(e.idTarea) === String(t.idTarea));
-    const asignadaAMi = misAsig.some(a => String(a.idTarea) === String(t.idTarea));
-    // Visible si: entregada, asignada o si es una tarea global (sin asignaciones específicas en el taller)
-    return yaEntregada || asignadaAMi || misAsig.length === 0;
+
+    return misEntregas.some(e => String(e.idTarea) === String(t.idTarea)) || 
+      misAsig.some(a => String(a.idTarea) === String(t.idTarea)) ||   
+      (!t.alumnosAsignadosIds || t.alumnosAsignadosIds.length === 0);  
   }
 
   /**
@@ -201,9 +205,8 @@ export class AulaTareaSeguimiento implements OnInit {
    * @param asignaciones Alumnos asignados específicamente a esta tarea.
    */
   private generarListaBaseTarea(alumnosTaller: UsuarioResponse[], asignaciones: TareaAsignadaResponse[]): any[] {
-    // Si hay asignaciones específicas, mandan ellas. Si no, todos los alumnos ven la tarea.
     if (asignaciones.length > 0) return asignaciones;
-    
+
     return alumnosTaller.map(u => ({
       idAlumno: u.idUsuario,
       nombreAlumno: u.nombre,
@@ -221,12 +224,12 @@ export class AulaTareaSeguimiento implements OnInit {
   private mapearFilaTarea(asig: any, entregas: EntregaResponse[]) {
     const entrega = entregas.find(e => String(e.idUsuario) === String(asig.idAlumno));
     return {
-      alumno: { 
-        idUsuario: asig.idAlumno, 
-        nombre: asig.nombreAlumno, 
-        apellidos: asig.apellidosAlumno, 
-        fotoPerfilRuta: asig.fotoAlumno, 
-        email: asig.emailAlumno 
+      alumno: {
+        idUsuario: asig.idAlumno,
+        nombre: asig.nombreAlumno,
+        apellidos: asig.apellidosAlumno,
+        fotoPerfilRuta: asig.fotoAlumno,
+        email: asig.emailAlumno
       },
       tituloRow: `${asig.nombreAlumno} ${asig.apellidosAlumno}`,
       subtituloRow: asig.emailAlumno || 'Alumno inscrito',

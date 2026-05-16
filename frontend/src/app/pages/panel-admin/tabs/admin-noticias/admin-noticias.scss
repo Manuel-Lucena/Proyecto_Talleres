@@ -1,238 +1,230 @@
-/* ==========================================================================
-   VISTA: GESTIÓN DE NOTICIAS / NOVEDADES (ADMIN)
-   ========================================================================== */
-@use '../../../../../styles/variables' as v;
-@use '../../../../../styles/mixins' as m;
+/* ========================================================================== 
+   VISTA: GESTIÓN DE NOTICIAS / NOVEDADES (ADMIN) 
+   ========================================================================== */ 
+@use '../../../../../styles/variables' as v; 
+@use '../../../../../styles/mixins' as m; 
 
 // 1. ESTRUCTURA DE SOPORTE 
-.admin-wrapper {
-  padding: 2.5rem;
-  background-color: v.$color-fondo-pagina;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  font-family: v.$fuente-lectura;
-  overflow: hidden;
-  @media (max-width: 768px) {
-    padding: 1.5rem;
-  }
-}
-
-// 2. CABECERA DE LA SECCIÓN
-.admin-header {
-  flex-shrink: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 2rem;
-  gap: 1rem;
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.5rem;
-  }
-  .title-group {
-    .txt-h1 {
-      font-family: v.$fuente-enfasis;
-      font-weight: 700;
-      font-size: v.$tamaño-titular-xl;
-      color: v.$color-secundario-frio-2;
-      margin: 0;
-      @media (max-width: 480px) {
-        font-size: 1.8rem;
-      }
-    }
-    .txt-bajada {
-      color: v.$color-superficie-suave;
-      font-size: 1rem;
-      margin: 0;
-    }
-  }
-  .btn-primario-aula {
-    @include m.boton-primario;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.8rem 1.5rem;
-    white-space: nowrap;
-    @media (max-width: 768px) {
-      width: 100%;
-      padding: 1rem;
-    }
-    .btn-text {
-      margin-left: 12px;
-      font-family: v.$fuente-enfasis;
-      font-weight: 600;
-    }
-  }
-}
-
-// 3. BARRA DE HERRAMIENTAS
-.admin-toolbar {
-  flex-shrink: 0;
-  padding: 0.8rem 1.5rem;
-  display: flex;
-  margin-bottom: 1.5rem;
-  align-items: center;
-  background: white;
-  border-radius: v.$radio-curvatura;
-  box-shadow: v.$sombra-nivel-1;
-  .search-box {
-    position: relative;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    i {
-      position: absolute;
-      left: 15px;
-      color: v.$color-marca-principal;
-      z-index: 2;
-    }
-    .input-aula {
-      @include m.estilo-input-base;
-      padding-left: 45px;
-      width: 100%;
-    }
-  }
-}
-
-// 4. CONTENEDOR DE LA TABLA
-.admin-card {
-  background: white;
-  border-radius: v.$radio-curvatura;
-  box-shadow: v.$sombra-nivel-1;
-  flex: 1;
-  display: flex;          
+.admin-wrapper { 
+  padding: 2.5rem; 
+  background-color: v.$color-fondo-pagina; 
+  min-height: 100vh; 
+  display: flex; 
   flex-direction: column; 
-  min-height: 0;
-  overflow: hidden;       
+  box-sizing: border-box; 
+  font-family: v.$fuente-lectura; 
+  overflow-y: visible; 
+  @media (max-width: 768px) { 
+    padding: 1.5rem; 
+  } 
+} 
 
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: #e0e0e0;
-    border-radius: 10px;
-  }
-
-  .table-responsive {
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: auto;     
-    flex: 1;               
-  }
-}
-
-// 5. ESTILOS DE LA TABLA EDITORIAL
-.admin-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 850px;
-  thead {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: #fafafa;
-    box-shadow: 0 1px 0 #eee;
-  }
-  th {
-    padding: 1.2rem;
-    text-align: left;
-    color: v.$color-superficie-suave;
-    font-family: v.$fuente-enfasis;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-  }
-  td {
-    padding: 1rem 1.2rem;
-    border-bottom: 1px solid #f8f8f8;
-    vertical-align: middle;
-    color: v.$color-secundario-frio-2;
-  }
-
-  // --- MINIATURA DE LA NOTICIA ---
-  .img-preview-table {
-    width: 70px;
-    height: 45px;
-    border-radius: 8px;
-    overflow: hidden;
-    flex-shrink: 0;
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-  }
-
-  // --- INFORMACIÓN DE LA NOTICIA ---
-  .news-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    .u-name {
-      font-weight: 700;
-      font-family: v.$fuente-enfasis;
-      font-size: 0.95rem;
-    }
-    .u-date-tag {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.75rem;
-      color: v.$color-superficie-suave;
-      i {
-        color: v.$color-marca-principal;
-      }
-    }
-  }
-
-  // --- RESUMEN DE TEXTO ---
-  .txt-resumen {
-    font-size: 0.85rem;
-    color: v.$color-superficie-suave;
-    @include m.limitar-lineas(2);
-    max-width: 350px;
-    margin: 0;
-  }
-
-  th:last-child, td:last-child {
-    text-align: right;
-  }
-}
-
-// 6. BOTONERA DE ACCIONES
-.actions-group {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  .btn-tool {
-    width: 36px;
-    height: 36px;
-    border: 1px solid #eee;
-    background: white;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    &:hover {
-      border-color: v.$color-marca-principal;
-      color: v.$color-marca-principal;
-      transform: translateY(-2px);
-    }
-    &.delete:hover {
-      background: #fff1f1;
-      color: v.$color-secundario-calido-1;
-      border-color: v.$color-secundario-calido-1;
-    }
-  }
-}
-
-// 7. PAGINACIÓN
-.admin-pagination {
-  @include m.estilo-paginacion-admin;
+// 2. CABECERA DE LA SECCIÓN 
+.admin-header { 
   flex-shrink: 0; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: flex-end; 
+  margin-bottom: 2rem; 
+  gap: 1rem; 
+  @media (max-width: 768px) { 
+    flex-direction: column; 
+    align-items: flex-start; 
+    gap: 1.5rem; 
+  } 
+  .title-group { 
+    .txt-h1 { 
+      font-family: v.$fuente-enfasis; 
+      font-weight: 700; 
+      font-size: v.$tamaño-titular-xl; 
+      color: v.$color-secundario-frio-2; 
+      margin: 0; 
+      @media (max-width: 480px) { 
+        font-size: 1.8rem; 
+      } 
+    } 
+    .txt-bajada { 
+      color: v.$color-superficie-suave; 
+      font-size: 1.1rem; 
+      margin: 0; 
+    } 
+  } 
+  .btn-primario-aula { 
+    @include m.boton-primario; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    padding: 0.8rem 1.5rem; 
+    white-space: nowrap; 
+    @media (max-width: 768px) { 
+      width: 100%; 
+      padding: 1rem; 
+    } 
+    .btn-text { 
+      margin-left: 12px; 
+      font-family: v.$fuente-enfasis; 
+      font-weight: 600; 
+      font-size: 1rem; 
+    } 
+  } 
+} 
+
+// 3. BARRA DE HERRAMIENTAS 
+.admin-toolbar { 
+  flex-shrink: 0; 
+  padding: 0.8rem 1.5rem; 
+  display: flex; 
+  margin-bottom: 1.5rem; 
+  align-items: center; 
+  background: white; 
+  border-radius: v.$radio-curvatura; 
+  box-shadow: v.$sombra-nivel-1; 
+  .search-box { 
+    position: relative; 
+    flex: 1; 
+    display: flex; 
+    align-items: center; 
+    i { 
+      position: absolute; 
+      left: 15px; 
+      color: v.$color-marca-principal; 
+      z-index: 2; 
+      font-size: 1.1rem;
+    } 
+    .input-aula { 
+      @include m.estilo-input-base; 
+      padding-left: 45px; 
+      width: 100%; 
+      font-size: 1rem; 
+    } 
+  } 
+} 
+
+// 4. CONTENEDOR DE LA TABLA 
+.admin-card { 
+  background: white; 
+  border-radius: v.$radio-curvatura; 
+  box-shadow: v.$sombra-nivel-1; 
+  display: flex; 
+  flex-direction: column; 
+  margin-bottom: 2rem; 
+  .table-responsive { 
+    width: 100%; 
+    overflow-x: auto; 
+    overflow-y: visible; 
+  } 
+} 
+
+// 5. ESTILOS DE LA TABLA EDITORIAL 
+.admin-table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  min-width: 850px; 
+  thead { 
+    position: sticky; 
+    top: 0; 
+    z-index: 10; 
+    background: #fafafa; 
+    box-shadow: 0 1px 0 #eee; 
+  } 
+  th { 
+    padding: 1.2rem; 
+    text-align: left; 
+    color: v.$color-superficie-suave; 
+    font-family: v.$fuente-enfasis; 
+    font-size: 0.85rem;
+    text-transform: uppercase; 
+  } 
+  td { 
+    padding: 0.8rem 1.2rem; 
+    border-bottom: 1px solid #f8f8f8; 
+    vertical-align: middle; 
+    color: v.$color-secundario-frio-2; 
+    font-size: 0.95rem;
+  } 
+  // --- MINIATURA DE LA NOTICIA --- 
+  .img-preview-table { 
+    width: 80px; 
+    height: 50px; 
+    border-radius: 8px; 
+    overflow: hidden; 
+    flex-shrink: 0; 
+    img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+      display: block; 
+    } 
+  } 
+  // --- INFORMACIÓN DE LA NOTICIA --- 
+  .news-meta { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 4px; 
+    .u-name { 
+      font-weight: 700; 
+      font-family: v.$fuente-enfasis; 
+      font-size: 1.05rem; 
+    } 
+    .u-date-tag { 
+      display: flex; 
+      align-items: center; 
+      gap: 6px; 
+      font-size: 0.85rem; 
+      color: v.$color-superficie-suave; 
+      i { 
+        color: v.$color-marca-principal; 
+        font-size: 1rem;
+      } 
+    } 
+  } 
+  // --- RESUMEN DE TEXTO --- 
+  .txt-resumen { 
+    font-size: 0.9rem; 
+    color: v.$color-superficie-suave; 
+    @include m.limitar-lineas(2); 
+    max-width: 350px; 
+    margin: 0; 
+  } 
+  th:last-child, td:last-child { 
+    text-align: right; 
+  } 
+} 
+
+// 6. BOTONERA DE ACCIONES 
+.actions-group { 
+  display: flex; 
+  gap: 8px; 
+  justify-content: flex-end; 
+  .btn-tool { 
+    width: 38px;
+    height: 38px; 
+    border: 1px solid #eee; 
+    background: white; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    transition: 0.2s; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    i { font-size: 1.1rem; }
+    &:hover { 
+      border-color: v.$color-marca-principal; 
+      color: v.$color-marca-principal; 
+      transform: translateY(-2px); 
+    } 
+    &.delete:hover { 
+      background: #fff1f1; 
+      color: v.$color-secundario-calido-1; 
+      border-color: v.$color-secundario-calido-1; 
+    } 
+  } 
+} 
+
+// 7. PAGINACIÓN 
+.admin-pagination { 
+  @include m.estilo-paginacion-admin; 
+  flex-shrink: 0; 
+  padding: 1.5rem; 
+  font-size: 1rem;
 }

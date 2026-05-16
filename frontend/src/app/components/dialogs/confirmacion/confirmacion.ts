@@ -17,7 +17,7 @@ import { ConfirmacionConfig } from '../../../interfaces/Modal.Interface';
 export class Confirmacion {
 
   // --- Propiedades de Estado ---
-  public config$: Observable<ConfirmacionConfig | null>; // Flujo reactivo con los textos y estado del modal
+  public config$: Observable<ConfirmacionConfig | null>; 
 
   /**
    * @param notificacionService Servicio central de mensajes para capturar peticiones de confirmación.

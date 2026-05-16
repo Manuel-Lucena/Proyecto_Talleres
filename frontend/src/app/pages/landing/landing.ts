@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Navbar } from '../../components/layout/navbar/navbar';
 import { Footer } from "../../components/layout/footer/footer";
 import { NoticiaService } from '../../services/Noticia.Service';
+import { NotificacionService } from '../../services/Notificacion.Service';
 import { TokenService } from '../../services/Token.Service';
 import { NoticiaResponse } from '../../interfaces/Noticia.Interface';
 import { FormNoticia } from '../../components/forms/form-noticia/form-noticia';
@@ -40,7 +41,7 @@ export class Landing implements OnInit {
   constructor(
     private noticiaService: NoticiaService,
     public tokenService: TokenService,
-
+    private notificacionService: NotificacionService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -93,17 +94,32 @@ export class Landing implements OnInit {
    * @param datos Objeto FormData que incluye el cuerpo de la noticia y el archivo binario.
    */
   onPublicarNoticia(datos: FormData): void {
-    const accion = this.noticiaSeleccionada
-      ? this.noticiaService.actualizar(this.noticiaSeleccionada.idNoticia, datos)
+    const esEdicion = !!this.noticiaSeleccionada;
+    const accion = esEdicion
+      ? this.noticiaService.actualizar(this.noticiaSeleccionada!.idNoticia, datos)
       : this.noticiaService.crear(datos);
 
     accion.subscribe({
       next: (res) => {
-        this.cerrarModal();
+        // Usamos el patrón de notificación de tu proyecto
+        this.notificacionService.mostrar({
+          titulo: '¡Éxito!',
+          mensaje: esEdicion ? 'Noticia actualizada correctamente' : 'Noticia publicada con éxito',
+          tipo: 'exito'
+        });
 
+        this.cerrarModal();
         this.cargarNoticias();
       },
-      error: (err) => console.error("Error en la persistencia de noticia:", err)
+      error: (err) => {
+        console.error("Error en la persistencia de noticia:", err);
+
+        this.notificacionService.mostrar({
+          titulo: 'Error',
+          mensaje: err.error?.message || 'No se pudo procesar la noticia',
+          tipo: 'error'
+        });
+      }
     });
   }
 

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-taller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-taller
+  template:
+    metadata:
+      labels:
+        app: backend-taller
+    spec:
+      containers:
+      - name: backend
+        image: gestion-talleres-back:latest 
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        env:
+        - name: DB_HOST
+          value: "mysql-service"
+        - name: STORAGE_PUBLIC_PATH
+          value: "/app/data"
+        - name: STORAGE_PROTECTED_PATH
+          value: "/app/data/protected"
+        - name: JWT_SECRET
+          value: "TuClaveSuperSecreta2026"
+        - name: MAIL_HOST
+          value: "sandbox.smtp.mailtrap.io"
+        - name: MAIL_USER
+          value: "696de23914b5ef"
+        - name: MAIL_PASS
+          value: "d52bc693f34b29"
+        volumeMounts:
+        - name: disco-compartido
+          mountPath: "/app/data"
+      volumes:
+      - name: disco-compartido
+        persistentVolumeClaim:
+          claimName: taller-storage-pvc

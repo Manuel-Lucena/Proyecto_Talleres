@@ -23,6 +23,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/usuarios")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
 
 public class UsuarioController {
@@ -201,8 +202,9 @@ public class UsuarioController {
      * @return ApiResponse confirmando el cambio de credenciales.
      */
     @PostMapping("/password-reset-confirm")
-    public ApiResponse<Void> confirmarRestablecimiento(@RequestBody @Valid PasswordChangeRequestDTO dto) {
+    public ApiResponse<Void> confirmarRestablecimiento(@RequestBody PasswordChangeRequestDTO dto) {
+        System.out.println("--- ¡HE LLEGADO AL CONTROLADOR EN KUBERNETES! ---"); // Esto saldrá en los logs
         usuarioService.cambiarPassword(dto);
-        return ApiResponse.success(null, "La contraseña ha sido actualizada correctamente");
+        return ApiResponse.success(null, "OK");
     }
 }

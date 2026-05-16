@@ -44,7 +44,6 @@ export class AulaCalificaciones implements OnInit {
     private cdr: ChangeDetectorRef,
     private router: Router
   ) {
-    // Determinamos el rol una sola vez al instanciar
     const rol = this.tokenService.getRol();
     this.esProfesor = rol === 'PROFESOR' || rol === 'ADMIN';
   }

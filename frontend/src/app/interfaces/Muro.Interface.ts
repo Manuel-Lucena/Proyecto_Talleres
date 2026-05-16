@@ -1,5 +1,5 @@
 import { TareaResponse } from './Tarea.Interface';
-import { MaterialResponse } from './Material.Interface'; // Asumiendo que existe
+import { MaterialResponse } from './Material.Interface';
 
 /**
  * Tipo híbrido para el feed del muro.

@@ -130,7 +130,8 @@ export class AulaDetalle implements OnInit {
     this.form = this.fb.group({
       titulo: ['', Validators.required],
       descripcion: ['', Validators.required],
-      fechaEntrega: [''],
+      // Añadimos el validador personalizado aquí:
+      fechaEntrega: ['', [this.validarAnioCoherente]],
       extensionesPermitidas: ['.pdf, .doc, .docx']
     });
   }
@@ -617,6 +618,21 @@ export class AulaDetalle implements OnInit {
    */
   abrirModalEntrega(): void {
     this.mostrarModalEntrega = true;
+  }
+
+  /**
+   * Validador personalizado para evitar años astronómicos 
+   */
+  private validarAnioCoherente(control: any) {
+    const fechaValue = control.value;
+    if (fechaValue) {
+      const fecha = new Date(fechaValue);
+      const anio = fecha.getFullYear();
+      if (anio < 2024 || anio > 2100) {
+        return { fechaInvalida: true };
+      }
+    }
+    return null;
   }
 
   /**

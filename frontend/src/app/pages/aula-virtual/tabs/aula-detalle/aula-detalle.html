@@ -103,7 +103,11 @@
                     <div class="row" *ngIf="tipo === 'tarea'">
                         <div class="col-md-6 mb-4">
                             <label class="label-form">Fecha de entrega</label>
-                            <input type="datetime-local" formControlName="fechaEntrega" class="form-control-custom">
+                            <input type="datetime-local" formControlName="fechaEntrega" class="form-control-custom"
+                                min="2024-01-01T00:00" max="2100-12-31T23:59">
+                            <small class="error-message" *ngIf="form.get('fechaEntrega')?.hasError('fechaInvalida')">
+                                * La fecha debe ser un año real (ej. 2026)
+                            </small>
                         </div>
                         <div class="col-md-6 mb-4">
                             <label class="label-form">Extensiones permitidas</label>
@@ -178,7 +182,6 @@
                             <i class="bi bi-file-earmark-text" (click)="descargarAdjunto(arch)"></i>
                             <div class="file-meta" (click)="descargarAdjunto(arch)">
                                 <span class="file-name">{{ arch.nombre }}</span>
-                                <span class="file-ext">Existente</span>
                             </div>
                             <button *ngIf="editando" class="btn-borrar-file" (click)="marcarParaEliminar(arch.id)"><i
                                     class="bi bi-x-circle-fill"></i></button>

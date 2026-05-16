@@ -1,376 +1,332 @@
-/* ==========================================================================
-   VISTA: GESTIÓN DE TALLERES (ADMIN DASHBOARD)
-   Estructura de tabla avanzada con visualización de métricas y estados.
-   ========================================================================== */
-@use '../../../../../styles/variables' as v;
-@use '../../../../../styles/mixins' as m;
+/* ========================================================================== 
+   VISTA: GESTIÓN DE TALLERES (ADMIN DASHBOARD) 
+   Estructura de tabla avanzada con visualización de métricas y estados. 
+   ========================================================================== */ 
+@use '../../../../../styles/variables' as v; 
+@use '../../../../../styles/mixins' as m; 
 
-// 1. ESTRUCTURA DE SOPORTE (WRAPPER)
-.admin-wrapper {
-    padding: 2.5rem;
-    background-color: v.$color-fondo-pagina;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    font-family: v.$fuente-lectura;
+// 1. ESTRUCTURA DE SOPORTE (WRAPPER) 
+.admin-wrapper { 
+  padding: 2.5rem; 
+  background-color: v.$color-fondo-pagina; 
+  min-height: 100vh; 
+  display: flex; 
+  flex-direction: column; 
+  box-sizing: border-box; 
+  font-family: v.$fuente-lectura; 
+  overflow-y: visible; 
+  @media (max-width: 768px) { 
+    padding: 1.5rem; 
+  } 
+} 
+
+// 2. CABECERA DE GESTIÓN 
+.admin-header { 
+  flex-shrink: 0; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: flex-end; 
+  margin-bottom: 2rem; 
+  gap: 1.5rem; 
+  @media (max-width: 768px) { 
+    flex-direction: column; 
+    align-items: flex-start; 
+    gap: 1.2rem; 
+    margin-bottom: 1.5rem; 
+  } 
+  .title-group { 
+    .txt-h1 { 
+      font-family: v.$fuente-enfasis; 
+      font-weight: 700; 
+      font-size: v.$tamaño-titular-xl; 
+      color: v.$color-secundario-frio-2; 
+      margin: 0; 
+      @media (max-width: 480px) { 
+        font-size: 1.8rem; 
+      } 
+    } 
+    .txt-bajada { 
+      color: v.$color-superficie-suave; 
+      font-size: 1.1rem; 
+      margin: 0; 
+    } 
+  } 
+  .btn-primario-aula { 
+    @include m.boton-primario; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    padding: 0.8rem 1.5rem; 
+    gap: 10px; 
+    white-space: nowrap; 
+    @media (max-width: 768px) { 
+      width: 100%; 
+      padding: 1rem; 
+    } 
+    .btn-text { 
+      font-family: v.$fuente-enfasis; 
+      font-weight: 600; 
+      font-size: 1rem; 
+    } 
+  } 
+} 
+
+// 3. TOOLBAR CON BUSCADOR COMPUESTO 
+.admin-toolbar { 
+  flex-shrink: 0; 
+  padding: 0.8rem 1.5rem; 
+  background: white; 
+  border-radius: v.$radio-curvatura; 
+  margin-bottom: 1.5rem; 
+  display: flex; 
+  box-shadow: v.$sombra-nivel-1; 
+  .search-group { 
+    display: flex; 
+    flex: 1; 
+    background: #fcfcfc; 
+    border: 1px solid #e2e8f0; 
+    border-radius: v.$radio-curvatura; 
     overflow: hidden; 
+    transition: 0.2s; 
+    &:focus-within { 
+      border-color: v.$color-marca-principal; 
+      box-shadow: 0 0 0 3px rgba(v.$color-marca-principal, 0.1); 
+    } 
+    .criteria-box { 
+      width: 140px; 
+      border-right: 1px solid #e2e8f0; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      .select-criteria { 
+        border: none; 
+        background-color: #f1f5f9; 
+        height: 100%; 
+        width: 100%; 
+        padding: 0 15px; 
+        font-size: 0.95rem;
+        font-weight: 600; 
+        cursor: pointer; 
+        color: v.$color-secundario-frio-2; 
+        outline: none; 
+        appearance: auto; 
+        -webkit-appearance: auto; 
+        background-image: none; 
+      } 
+    } 
+    .search-box { 
+      flex: 1; 
+      position: relative; 
+      display: flex; 
+      align-items: center; 
+      i { 
+        position: absolute; 
+        left: 15px; 
+        color: v.$color-marca-principal; 
+        z-index: 2; 
+        font-size: 1.1rem; 
+      } 
+      .input-aula { 
+        border: none; 
+        background: transparent; 
+        padding-left: 45px; 
+        width: 100%; 
+        height: 45px; 
+        font-size: 1rem; 
+        &:focus { 
+          outline: none; 
+        } 
+      } 
+    } 
+  } 
+} 
 
-    @media (max-width: 768px) {
-        padding: 1.5rem;
-    }
-}
+// 4. CONTENEDOR DE LA TABLA (CARD) 
+.admin-card { 
+  background: white; 
+  border-radius: v.$radio-curvatura; 
+  box-shadow: v.$sombra-nivel-1; 
+  display: flex; 
+  flex-direction: column; 
+  margin-bottom: 2rem; 
+  .table-responsive { 
+    width: 100%; 
+    overflow-x: auto; 
+    overflow-y: visible; 
+  } 
+} 
 
-// 2. CABECERA DE GESTIÓN
-.admin-header {
-    flex-shrink: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 2rem;
-    gap: 1.5rem;
+// 5. ESTILOS DE LA TABLA Y CELDAS 
+.admin-table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  min-width: 950px; 
+  thead { 
+    position: sticky; 
+    top: 0; 
+    z-index: 10; 
+    background: #fafafa; 
+    box-shadow: 0 1px 0 #eee; 
+  } 
+  th { 
+    padding: 1.2rem; 
+    text-align: left; 
+    color: v.$color-superficie-suave; 
+    font-family: v.$fuente-enfasis; 
+    font-size: 0.85rem;
+    text-transform: uppercase; 
+    &:last-child { 
+      text-align: right; 
+    } 
+  } 
+  td { 
+    padding: 1rem 1.2rem; 
+    border-bottom: 1px solid #f8f8f8; 
+    vertical-align: middle; 
+    color: v.$color-secundario-frio-2; 
+    font-size: 0.95rem;
+    &:last-child { 
+      text-align: right; 
+    } 
+  } 
+  // --- BLOQUE DE TALLER --- 
+  .workshop-item { 
+    display: flex; 
+    gap: 1rem; 
+    align-items: center; 
+    text-align: left; 
+    min-width: 0; 
+    max-width: 350px; 
+    .img-frame { 
+      width: 55px; 
+      height: 55px; 
+      border-radius: 8px; 
+      overflow: hidden; 
+      flex-shrink: 0; 
+      img { 
+        width: 100%; 
+        height: 100%; 
+        object-fit: cover; 
+      } 
+    } 
+    .workshop-info { 
+      min-width: 0; 
+      flex: 1; 
+    } 
+    .t-name { 
+      display: block; 
+      font-weight: 700; 
+      font-family: v.$fuente-enfasis; 
+      font-size: 1.05rem;
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+      width: 100%; 
+    } 
+    .t-desc { 
+      font-size: 0.85rem; 
+      color: v.$color-superficie-suave; 
+      @include m.limitar-lineas(1); 
+      margin: 0; 
+      word-wrap: break-word; 
+    } 
+  } 
+  // --- PROFESOR Y FECHAS --- 
+  .prof-tag { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    font-size: 0.95rem; 
+    min-width: 0; 
+    max-width: 200px; 
+    i { 
+      color: v.$color-marca-principal; 
+      flex-shrink: 0; 
+      font-size: 1.1rem;
+    } 
+    span { 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+    } 
+  } 
+  .date-stack { 
+    display: flex; 
+    flex-direction: column; 
+    .d-range { 
+      font-weight: 600; 
+      font-size: 0.95rem; 
+      white-space: nowrap; 
+    } 
+    .d-year { 
+      font-size: 0.8rem; 
+      color: v.$color-superficie-suave; 
+    } 
+  } 
+  // --- BARRA DE PLAZAS DISPONIBLES --- 
+  .plazas-box { 
+    width: 120px; 
+    .p-count { 
+      font-size: 0.9rem; 
+      font-weight: 700; 
+      margin-bottom: 5px; 
+      display: block; 
+    } 
+    .p-bar { 
+      height: 8px; 
+      background: #eee; 
+      border-radius: 10px; 
+      overflow: hidden; 
+      .p-fill { 
+        height: 100%; 
+        background: v.$color-marca-principal; 
+        border-radius: 10px; 
+        transition: width 0.5s ease; 
+      } 
+    } 
+  } 
+  .price-tag { 
+    font-weight: 800; 
+    font-family: v.$fuente-enfasis; 
+    color: v.$color-secundario-frio-2; 
+    font-size: 1.1rem; 
+  } 
+} 
 
-    @media (max-width: 768px) {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1.2rem;
-        margin-bottom: 1.5rem;
-    }
+// 6. ACCIONES DE FILA 
+.actions-group { 
+  display: flex; 
+  gap: 8px; 
+  justify-content: flex-end; 
+  .btn-tool { 
+    width: 38px; 
+    height: 38px; 
+    border: 1px solid #eee; 
+    background: white; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    transition: 0.2s; 
+    i { font-size: 1.1rem; }
+    &:hover { 
+      border-color: v.$color-marca-principal; 
+      color: v.$color-marca-principal; 
+      transform: translateY(-2px); 
+    } 
+    &.delete:hover { 
+      background: #fff1f1; 
+      color: v.$color-secundario-calido-1; 
+      border-color: v.$color-secundario-calido-1; 
+    } 
+  } 
+} 
 
-    .title-group {
-        .txt-h1 {
-            font-family: v.$fuente-enfasis;
-            font-weight: 700;
-            font-size: v.$tamaño-titular-xl;
-            color: v.$color-secundario-frio-2;
-            margin: 0;
-
-            @media (max-width: 480px) {
-                font-size: 1.8rem;
-            }
-        }
-
-        .txt-bajada {
-            color: v.$color-superficie-suave;
-            font-size: 1rem;
-            margin: 0;
-        }
-    }
-
-    .btn-primario-aula {
-        @include m.boton-primario;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.8rem 1.5rem;
-        gap: 10px;
-        white-space: nowrap;
-
-        @media (max-width: 768px) {
-            width: 100%;
-            padding: 1rem;
-        }
-
-        .btn-text {
-            font-family: v.$fuente-enfasis;
-            font-weight: 600;
-        }
-    }
-}
-
-// 3. TOOLBAR CON BUSCADOR COMPUESTO
-.admin-toolbar {
-    flex-shrink: 0;
-    padding: 0.8rem 1.5rem;
-    background: white;
-    border-radius: v.$radio-curvatura;
-    margin-bottom: 1.5rem;
-    display: flex;
-    box-shadow: v.$sombra-nivel-1;
-
-    .search-group {
-        display: flex;
-        flex: 1;
-        background: #fcfcfc;
-        border: 1px solid #e2e8f0;
-        border-radius: v.$radio-curvatura;
-        overflow: hidden;
-        transition: 0.2s;
-
-        &:focus-within {
-            border-color: v.$color-marca-principal;
-            box-shadow: 0 0 0 3px rgba(v.$color-marca-principal, 0.1);
-        }
-
-        .criteria-box {
-            width: 140px;
-            border-right: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            .select-criteria {
-                border: none;
-                background-color: #f1f5f9;
-                height: 100%;
-                width: 100%;
-                padding: 0 15px;
-                font-size: 0.85rem;
-                font-weight: 600;
-                cursor: pointer;
-                color: v.$color-secundario-frio-2;
-                outline: none;
-                appearance: auto;
-                -webkit-appearance: auto;
-                background-image: none;
-            }
-        }
-
-        .search-box {
-            flex: 1;
-            position: relative;
-            display: flex;
-            align-items: center;
-
-            i {
-                position: absolute;
-                left: 15px;
-                color: v.$color-marca-principal;
-                z-index: 2;
-            }
-
-            .input-aula {
-                border: none;
-                background: transparent;
-                padding-left: 45px;
-                width: 100%;
-                height: 45px;
-
-                &:focus {
-                    outline: none;
-                }
-            }
-        }
-    }
-}
-
-// 4. CONTENEDOR DE LA TABLA (CARD)
-.admin-card {
-    background: white;
-    border-radius: v.$radio-curvatura;
-    box-shadow: v.$sombra-nivel-1;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    overflow: hidden; 
-
-    &::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: #e0e0e0;
-        border-radius: 10px;
-    }
-
-    .table-responsive {
-        width: 100%;
-        overflow-x: auto;
-        overflow-y: auto;
-        flex: 1; 
-    }
-}
-
-// 5. ESTILOS DE LA TABLA Y CELDAS
-.admin-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 950px;
-
-    thead {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        background: #fafafa;
-        box-shadow: 0 1px 0 #eee;
-    }
-
-    th {
-        padding: 1.2rem;
-        text-align: left;
-        color: v.$color-superficie-suave;
-        font-family: v.$fuente-enfasis;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-
-        &:last-child {
-            text-align: right;
-        }
-    }
-
-    td {
-        padding: 1rem 1.2rem;
-        border-bottom: 1px solid #f8f8f8;
-        vertical-align: middle;
-        color: v.$color-secundario-frio-2;
-
-        &:last-child {
-            text-align: right;
-        }
-    }
-
-    // --- BLOQUE DE TALLER  ---
-    .workshop-item {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-        text-align: left;
-        min-width: 0;
-        max-width: 350px;
-
-        .img-frame {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            overflow: hidden;
-            flex-shrink: 0;
-
-            img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-        }
-
-        .workshop-info {
-            min-width: 0;
-            flex: 1;
-        }
-
-        .t-name {
-            display: block;
-            font-weight: 700;
-            font-family: v.$fuente-enfasis;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            width: 100%;
-        }
-
-        .t-desc {
-            font-size: 0.75rem;
-            color: v.$color-superficie-suave;
-            @include m.limitar-lineas(1);
-            margin: 0;
-            word-wrap: break-word;
-        }
-    }
-
-    // --- PROFESOR Y FECHAS ---
-    .prof-tag {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.85rem;
-        min-width: 0;
-        max-width: 200px;
-
-        i {
-            color: v.$color-marca-principal;
-            flex-shrink: 0;
-        }
-
-        span {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    }
-
-    .date-stack {
-        display: flex;
-        flex-direction: column;
-
-        .d-range {
-            font-weight: 600;
-            font-size: 0.85rem;
-            white-space: nowrap;
-        }
-
-        .d-year {
-            font-size: 0.7rem;
-            color: v.$color-superficie-suave;
-        }
-    }
-
-    // --- BARRA DE PLAZAS DISPONIBLES ---
-    .plazas-box {
-        width: 110px;
-
-        .p-count {
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .p-bar {
-            height: 6px;
-            background: #eee;
-            border-radius: 10px;
-            overflow: hidden;
-
-            .p-fill {
-                height: 100%;
-                background: v.$color-marca-principal;
-                border-radius: 10px;
-                transition: width 0.5s ease;
-            }
-        }
-    }
-
-    .price-tag {
-        font-weight: 800;
-        font-family: v.$fuente-enfasis;
-        color: v.$color-secundario-frio-2;
-    }
-}
-
-// 6. ACCIONES DE FILA
-.actions-group {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-
-    .btn-tool {
-        width: 36px;
-        height: 36px;
-        border: 1px solid #eee;
-        background: white;
-        border-radius: 6px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: 0.2s;
-
-        &:hover {
-            border-color: v.$color-marca-principal;
-            color: v.$color-marca-principal;
-            transform: translateY(-2px);
-        }
-
-        &.delete:hover {
-            background: #fff1f1;
-            color: v.$color-secundario-calido-1;
-            border-color: v.$color-secundario-calido-1;
-        }
-    }
-}
-
-// 7. PAGINACIÓN
-.admin-pagination {
-    @include m.estilo-paginacion-admin;
-    flex-shrink: 0;
+// 7. PAGINACIÓN 
+.admin-pagination { 
+  @include m.estilo-paginacion-admin; 
+  flex-shrink: 0; 
+  padding: 1.5rem; 
+  font-size: 1rem;
 }

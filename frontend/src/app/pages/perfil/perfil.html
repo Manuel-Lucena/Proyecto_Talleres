@@ -62,7 +62,7 @@
       <div class="form-wrapper">
         <div class="section-title">
           <h2>Ajustes de Perfil</h2>
-          <p>Modifica tus datos personales. El DNI está bloqueado por seguridad.</p>
+          <p>Modifica tus datos personales.</p>
         </div>
 
         <form [formGroup]="perfilForm" (ngSubmit)="actualizarPerfil()" class="av-form">
@@ -107,7 +107,7 @@
           </div>
 
           <div class="av-input-group readonly">
-            <label>Identificación (DNI bloqueado)</label>
+            <label>Identificación</label>
             <input type="text" formControlName="dni" readonly>
             <div class="error-container"></div>
           </div>

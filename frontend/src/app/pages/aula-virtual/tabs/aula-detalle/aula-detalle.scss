@@ -127,8 +127,6 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   padding: 3rem;
   @include m.animacion-entrada;
-
-  // Este margen determinará la separación con el footer
   margin-bottom: 2rem;
 
 
@@ -498,7 +496,6 @@
 }
 
 // 9. DROPDOWN DE EXTENSIONES PERSONALIZADO
-/* Busca tu .dropdown-extensiones-custom y reemplázalo por este */
 .dropdown-extensiones-custom {
   position: relative;
   width: 100%;
@@ -525,8 +522,8 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     display: none;
-    padding: 0; // Cambiado a 0 para que la cabecera gris llegue a los bordes
-    overflow: hidden; // Para que las esquinas de la cabecera no se salgan del radio
+    padding: 0; 
+    overflow: hidden; 
 
     &.show {
       display: block;

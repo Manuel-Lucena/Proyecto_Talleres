@@ -28,12 +28,19 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                
+
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                      // Permite todas las peticiones de tipo OPTIONS (Preflight)
+                        // Permite todas las peticiones de tipo OPTIONS (Preflight)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // =========================================================
+                        // 0. RECURSOS ESTÁTICOS (IMÁGENES)
+                        // =========================================================
+                        .requestMatchers("/usuarios/**").permitAll()
+                        .requestMatchers("/noticias/**").permitAll()
+                        .requestMatchers("/talleres/**").permitAll()
 
                         // =========================================================
                         // 1. ENTIDAD: USUARIOS & AUTH
@@ -160,7 +167,7 @@ public class SecurityConfiguration {
 
                         // Lectura: Profesores y Alumnos pueden ver horarios y agendas (cada uno la
                         // suya)
-                        .requestMatchers(HttpMethod.GET, "/api/horarios/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/horarios/**").permitAll()
 
                         // Escritura: ÚNICAMENTE el ADMIN puede tocar los turnos
                         .requestMatchers(HttpMethod.POST, "/api/horarios/**").hasRole("ADMIN")
@@ -228,8 +235,6 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/descargas/**").authenticated()
 
                         .requestMatchers("/api/email/**").permitAll()
-                 
-
 
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())
@@ -248,7 +253,7 @@ public class SecurityConfiguration {
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    
+
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);
 

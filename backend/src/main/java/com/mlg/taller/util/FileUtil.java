@@ -43,6 +43,11 @@ public class FileUtil {
      * @throws RuntimeException si ocurre un error de E/S durante el guardado.
      */
     public void guardar(MultipartFile archivo, String subCarpeta, String nombre, boolean esPublico) {
+
+        System.out.println("DEBUG FILEUTIL: Intentando guardar archivo...");
+        System.out.println("DEBUG FILEUTIL: Nombre -> " + nombre);
+        System.out.println("DEBUG FILEUTIL: Subcarpeta -> " + subCarpeta);
+        System.out.println("DEBUG FILEUTIL: ¿Es nulo el archivo? -> " + (archivo == null));
         try {
             Path destinoPath = obtenerRuta(subCarpeta, esPublico).resolve(nombre);
 

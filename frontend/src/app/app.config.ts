@@ -8,7 +8,6 @@ import { authInterceptor } from './interceptors/Auth.Interceptor';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 
-// Registramos los datos de español
 registerLocaleData(localeEs);
 
 export const appConfig: ApplicationConfig = {

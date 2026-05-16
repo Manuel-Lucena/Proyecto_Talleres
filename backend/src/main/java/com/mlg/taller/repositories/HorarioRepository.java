@@ -20,6 +20,13 @@ public interface HorarioRepository extends JpaRepository<Horario, Long> {
      */
     List<Horario> findByTallerId(Long idTaller);
 
+    /**
+     * Localiza todos los horarios de los talleres en los que un usuario específico
+     * tiene una inscripción vigente.
+     * * @param idUsuario Identificador del alumno o usuario.
+     * 
+     * @return Lista de horarios que componen la agenda actual del usuario.
+     */
     @Query("SELECT h FROM Horario h " +
             "WHERE h.taller.id IN (" +
             "  SELECT i.taller.id FROM Inscripcion i " +
@@ -28,7 +35,8 @@ public interface HorarioRepository extends JpaRepository<Horario, Long> {
     List<Horario> findHorariosByUsuarioInscrito(Long idUsuario);
 
     /**
-     * Obtiene la planificación horaria completa de todos los talleres que imparte un profesor.
+     * Obtiene la planificación horaria completa de todos los talleres que imparte
+     * un profesor.
      * * @param idProfesor Identificador del docente.
      * 
      * @return Lista de horarios asociados a los talleres bajo la tutela del

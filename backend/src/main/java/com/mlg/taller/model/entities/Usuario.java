@@ -72,6 +72,9 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private boolean activo = true;
 
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Inscripcion> inscripciones;
+
     // ==============================================================
     // IMPLEMENTACIÓN DE USERDETAILS
     // ==============================================================

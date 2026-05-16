@@ -274,13 +274,14 @@ public class UsuarioService {
         PasswordResetToken tokenEntity = PasswordResetToken.builder()
                 .token(token)
                 .usuario(usuario)
-                .fechaExpiracion(LocalDateTime.now().plusMinutes(15))
+                .fechaExpiracion(LocalDateTime.now().plusMinutes(1000))
                 .build();
 
         tokenRepository.save(tokenEntity);
-        String urlFront = "http://localhost:4200/reset-password?token=" + token;
 
-        emailService.enviarCorreo(usuario.getEmail(), "Restablecer contraseña", "recuperar-password",
+        String urlFront = "http://taller.local/reset-password?token=" + token;
+        // String urlFront = "http://localhost:4200/reset-password?token=" + token;
+        emailService.enviarCorreo(usuario.getEmail(), "Restablecer contraseña", "mail/recuperar-password",
                 Map.of("usuario", usuario, "url", urlFront));
     }
 
@@ -291,18 +292,26 @@ public class UsuarioService {
      */
     @Transactional
     public void cambiarPassword(PasswordChangeRequestDTO dto) {
+
         PasswordResetToken tokenReal = tokenRepository.findByToken(dto.getToken())
-                .orElseThrow(() -> new BadRequestException("Token de recuperación no válido o expirado"));
+                .orElseThrow(() -> {
+                    return new BadRequestException("Token de recuperación no válido o expirado");
+                });
 
         if (tokenReal.isExpirado()) {
+
             tokenRepository.delete(tokenReal);
             throw new BadRequestException("El enlace de recuperación ha caducado.");
         }
 
         Usuario usuario = tokenReal.getUsuario();
+
         usuario.setPassword(passwordEncoder.encode(dto.getNuevaPassword()));
         usuarioRepository.save(usuario);
+
+        // Borramos el token para que no se use dos veces
         tokenRepository.delete(tokenReal);
+
     }
 
     // --- MÉTODOS PRIVADOS DE APOYO ---

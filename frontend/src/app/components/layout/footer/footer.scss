@@ -21,7 +21,7 @@
 
         .logo-img {
             width: 45px;
-            filter: brightness(0) invert(1); 
+            filter: brightness(0) invert(1);
         }
 
         span {
@@ -39,6 +39,8 @@
         font-size: 1.2rem;
         margin-bottom: 25px;
         position: relative;
+        display: inline-block; 
+ 
 
         &::after {
             content: '';
@@ -53,7 +55,8 @@
     }
 
     // 3. LISTAS DE ENLACES Y CONTACTO
-    .footer-links, .footer-contact {
+    .footer-links,
+    .footer-contact {
         list-style: none;
         padding: 0;
 
@@ -69,7 +72,7 @@
 
                 &:hover {
                     color: v.$color-marca-principal;
-                    padding-left: 5px; 
+                    padding-left: 5px;
                 }
             }
 
@@ -135,6 +138,29 @@
                 &:hover {
                     color: v.$color-neutro-max;
                 }
+            }
+        }
+
+        .license-link {
+            color: v.$color-marca-claro; 
+            text-decoration: none;
+            margin-left: 10px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border: 1px solid rgba(v.$color-marca-claro, 0.3);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+
+            i {
+                font-size: 0.9rem;
+                vertical-align: middle;
+            }
+
+            &:hover {
+                background-color: v.$color-marca-principal;
+                color: v.$color-neutro-max;
+                border-color: v.$color-marca-principal;
             }
         }
     }

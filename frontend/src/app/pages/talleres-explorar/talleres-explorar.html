@@ -4,7 +4,7 @@
   <header class="header-principal">
     <div class="d-flex align-items-center gap-3">
       <h2>Explorar Talleres</h2>
-      <ng-container *ngIf="puedeGestionar">
+      <ng-container *ngIf="tokenService.esAdmin">
         <div class="linea-vertical"></div>
         <button class="btn-azul-plus" (click)="abrirCreacion()">
           <i class="bi bi-plus-lg"></i> Nuevo Taller
@@ -47,7 +47,7 @@
       </div>
 
       <div class="card-curso-horizontal" *ngFor="let taller of talleresFiltrados">
-        <div class="dropdown admin-dropdown" *ngIf="puedeGestionar">
+        <div class="dropdown admin-dropdown" *ngIf="tokenService.esAdmin">
           <button class="btn-kebab" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-three-dots-vertical"></i>
           </button>

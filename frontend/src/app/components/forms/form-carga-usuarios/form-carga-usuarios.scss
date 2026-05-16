@@ -1,266 +1,280 @@
-/* ==========================================================================
-   SISTEMA DE MODALES: GESTOR DE IMPORTACIÓN MASIVA
-   ========================================================================== */
-@use '../../../../styles/variables' as v;
-@use '../../../../styles/mixins' as m;
-@use '../../../../styles/formularios' as f;
+/* ========================================================================== SISTEMA DE MODALES: GESTOR DE IMPORTACIÓN MASIVA ========================================================================== */ 
+@use '../../../../styles/variables' as v; 
+@use '../../../../styles/mixins' as m; 
+@use '../../../../styles/formularios' as f; 
 
-// 1. OVERLAY
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(v.$color-secundario-frio-2, 0.75);
-    backdrop-filter: blur(6px);
-    z-index: 99999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    @include m.animacion-entrada;
-}
+// 1. OVERLAY 
+.modal-overlay { 
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100vw; 
+  height: 100vh; 
+  background: rgba(v.$color-secundario-frio-2, 0.75); 
+  backdrop-filter: blur(6px); 
+  z-index: 99999; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  padding: 1rem; 
+  @include m.animacion-entrada; 
+} 
 
-// 2. CUERPO DEL GESTOR
-.modal-body {
-    background: v.$color-neutro-max;
-    width: 100%;
-    max-width: 1000px;
-    max-height: 95vh;
-    border-radius: v.$radio-curvatura * 2;
-    box-shadow: v.$sombra-nivel-3;
+// 2. CUERPO DEL GESTOR (Optimizado para aprovechar el alto)
+.modal-body { 
+  background: v.$color-neutro-max; 
+  width: 100%; 
+  max-width: 1150px; 
+  height: 95vh; // Ocupa casi toda la pantalla verticalmente
+  border-radius: v.$radio-curvatura * 1.5; 
+  box-shadow: v.$sombra-nivel-3; 
+  padding: 1.5rem; // Reducido para ganar espacio
+  position: relative; 
+  overflow: hidden; 
+  display: flex; 
+  flex-direction: column; 
+
+  @media (min-width: 768px) { 
     padding: 2rem; 
-    position: relative;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
+  } 
 
-    @media (min-width: 768px) {
-        padding: 3rem;
-    }
+  .btn-close { 
+    position: absolute; 
+    top: 1rem; 
+    right: 1rem; 
+    @include m.boton-cerrar-circular; 
+    border: none; 
+    z-index: 10; 
+  } 
+} 
 
-    .btn-close {
-        position: absolute;
-        top: 1.5rem;
-        right: 1.5rem;
-        @include m.boton-cerrar-circular;
-        border: none;
-        z-index: 10;
-    }
-}
+// 3. CABECERA TÉCNICA (Más compacta)
+.modal-header-simple { 
+  flex-shrink: 0; 
+  margin-bottom: 1rem; 
+  .titulo-formulario { 
+    font-family: v.$fuente-enfasis; 
+    font-size: 1.6rem; 
+    color: v.$color-secundario-frio-2; 
+    margin-bottom: 0.2rem; 
+  } 
+  .subtitulo { 
+    font-size: 0.95rem; 
+    color: v.$color-superficie-suave; 
+    line-height: 1.2; 
+  } 
+} 
 
-// 3. CABECERA TÉCNICA
-.modal-header-simple {
-    margin-bottom: 1.5rem;
+// 4. BARRA DE CARGA E INGESTA (Compactada verticalmente)
+.seccion-ingesta { 
+  flex-shrink: 0; 
+  margin-bottom: 1rem; 
+  app-form-label { 
+    margin-bottom: 0.5rem; 
+    display: block; 
+    font-size: 0.9rem;
+  } 
+} 
 
-    .titulo-formulario {
-        font-family: v.$fuente-enfasis;
-        font-size: 1.6rem;
-        color: v.$color-secundario-frio-2;
-        margin-bottom: 0.5rem;
-    }
+.barra-carga { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 0.8rem; 
+  background: v.$color-fondo-pagina; 
+  padding: 0.75rem; 
+  border-radius: v.$radio-curvatura; 
+  border: 1px solid rgba(v.$color-secundario-frio-2, 0.1); 
+  
+  @media (min-width: 600px) { 
+    flex-direction: row; 
+    align-items: center; 
+  } 
 
-    .subtitulo {
-        font-size: 0.85rem;
-        color: v.$color-superficie-suave;
-        line-height: 1.4;
-    }
-}
+  .input-file-wrapper { 
+    flex-grow: 1; 
+    position: relative; 
+    height: 42px; // Altura reducida
+    background: white; 
+    border: 2px dashed #ccd1d6; 
+    border-radius: 8px; 
+    display: flex; 
+    align-items: center; 
+    padding: 0 1rem; 
+    i { 
+      color: v.$color-marca-principal; 
+      margin-right: 10px; 
+      font-size: 1.1rem;
+    } 
+    input { 
+      position: absolute; 
+      inset: 0; 
+      opacity: 0; 
+      cursor: pointer; 
+    } 
+    .file-custom { 
+      font-size: 0.9rem; 
+      color: v.$color-secundario-frio-2; 
+      font-weight: 600; 
+    } 
+  } 
 
-// 4. BARRA DE CARGA E INGESTA 
-.seccion-ingesta {
-    margin-bottom: 1.5rem;
+  .btn-procesar { 
+    @include m.boton-primario; 
+    height: 42px; 
+    margin: 0; 
+    font-size: 0.9rem;
+    width: 100%; 
+    @media (min-width: 600px) { 
+      width: auto; 
+    } 
+  } 
+} 
 
-    app-form-label {
-        margin-bottom: 0.8rem;
-        display: block;
-    }
-}
+// 5. EDITOR DE DATOS (Zona de máximo crecimiento)
+.contenedor-editor { 
+  flex: 1; 
+  min-height: 0; 
+  border: 1px solid #eef0f2; 
+  border-radius: v.$radio-curvatura; 
+  background: white; 
+  margin-bottom: 1rem; 
+  display: flex;
+  flex-direction: column;
 
-.barra-carga {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    background: v.$color-fondo-pagina;
-    padding: 1rem;
-    border-radius: v.$radio-curvatura;
-    border: 1px solid rgba(v.$color-secundario-frio-2, 0.1);
+  .scroll-tabla { 
+    flex: 1;
+    overflow-x: auto; 
+    overflow-y: auto; 
+  } 
 
-    @media (min-width: 600px) {
-        flex-direction: row;
-        align-items: center;
-    }
+  .tabla-editable { 
+    width: 100%; 
+    min-width: 950px; 
+    border-collapse: collapse; 
+    
+    th { 
+      position: sticky; 
+      top: 0; 
+      background: #f1f5f9; 
+      padding: 0.75rem; 
+      font-size: 0.75rem; 
+      color: v.$color-superficie-suave; 
+      text-transform: uppercase; 
+      border-bottom: 2px solid #e2e8f0; 
+      z-index: 5; 
+    } 
 
-    .input-file-wrapper {
-        flex-grow: 1;
-        position: relative;
-        height: 48px;
-        background: white;
-        border: 2px dashed #ccd1d6;
-        border-radius: 8px;
+    td { 
+      padding: 0.4rem; // Espaciado mínimo para que quepan más filas
+      border-bottom: 1px solid #f1f4f8; 
+      
+      input, select { 
+        width: 100%; 
+        border: 1px solid transparent; 
+        padding: 6px 8px; 
+        height: 34px; // Altura compacta
+        font-size: 0.9rem; 
+        border-radius: 4px;
+        
+        &:focus { 
+          border-color: v.$color-marca-principal; 
+          background: #f8fafc; 
+          outline: none;
+        } 
+        
+        &.input-error { 
+          color: v.$color-secundario-calido-1; 
+          border-color: v.$color-secundario-calido-1; 
+          background: #fffafa;
+        } 
+      } 
+
+      &.col-check { 
+        width: 40px; 
+        text-align: center; 
+        input[type="checkbox"] {
+          width: 16px;
+          height: 16px;
+          cursor: pointer;
+        }
+      } 
+
+      .error-tag { 
+        color: v.$color-secundario-calido-1; 
+        font-size: 0.75rem; 
+        font-weight: 700; 
         display: flex;
         align-items: center;
-        padding: 0 1rem;
+        gap: 4px;
+      } 
 
-        i {
-            color: v.$color-marca-principal;
-            margin-right: 12px;
-        }
-
-        input {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .file-custom {
-            font-size: 0.85rem;
-            color: v.$color-secundario-frio-2;
-            font-weight: 700;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-    }
-
-    .btn-procesar {
-        @include m.boton-primario;
-        height: 48px;
-        margin: 0;
-        width: 100%;
-
-        @media (min-width: 600px) {
-            width: auto;
-        }
-    }
-}
-
-// 5. EDITOR DE DATOS (TABLA DINÁMICA)
-.contenedor-editor {
-    border: 1px solid #eef0f2;
-    border-radius: v.$radio-curvatura;
-    background: white;
-    margin-bottom: 2rem;
-    overflow: hidden;
-    .scroll-tabla {
-        max-height: 400px;
-        overflow-x: auto; 
-        overflow-y: auto;
-    }
-
-    .tabla-editable {
-        width: 100%;
-        min-width: 800px;
-        border-collapse: collapse;
-
-        th {
-            position: sticky;
-            top: 0;
-            background: #f8fafc;
-            padding: 1rem;
-            font-size: 0.7rem;
-            color: v.$color-superficie-suave;
-            text-transform: uppercase;
-            border-bottom: 2px solid #eef0f2;
-            z-index: 5;
-        }
-
-        td {
-            padding: 0.5rem;
-            border-bottom: 1px solid #f1f4f8;
-
-            input,
-            select {
-                width: 100%;
-                border: 1px solid transparent;
-                padding: 6px;
-                font-size: 0.8rem;
-
-                &:focus {
-                    border-color: v.$color-marca-principal;
-                    background: white;
-                }
-
-                &.input-error {
-                    color: v.$color-secundario-calido-1;
-                    border-color: v.$color-secundario-calido-1;
-                }
-            }
-
-            &.col-check {
-                width: 40px;
-                text-align: center;
-            }
-
-            .error-tag {
-                color: v.$color-secundario-calido-1;
-                font-size: 0.7rem;
-                font-weight: 700;
-            }
-
-            .ok-tag {
-                color: v.$color-secundario-calido-2;
-                font-size: 0.7rem;
-                font-weight: 700;
-            }
-        }
-    }
-}
-
-// 6. ACCIONES FINALES
-.acciones-form {
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #eee;
-
-    @media (max-width: 600px) {
-        button {
-            flex: 1;
-            font-size: 0.85rem;
-            padding: 0 0.5rem;
-        }
-    }
-
-    @media (min-width: 600px) {
-        display: grid;
-        grid-template-columns: 1fr 1.5fr;
-    }
-
-    button {
-        height: 50px;
-        border-radius: v.$radio-curvatura;
-        font-family: v.$fuente-enfasis;
-        font-weight: 700;
+      .ok-tag { 
+        color: v.$color-secundario-calido-2; 
+        font-size: 0.75rem; 
+        font-weight: 700; 
         display: flex;
         align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
+        gap: 4px;
+      } 
+    } 
+
+    // Fila con error
+    tr.row-invalid {
+      background-color: rgba(v.$color-secundario-calido-1, 0.02);
     }
+  } 
+} 
 
-    .btn-cancelar {
-        background: v.$color-fondo-pagina;
-        color: v.$color-superficie-suave;
-        border: none;
+// 6. ACCIONES FINALES (Pie de página fijo)
+.acciones-form { 
+  flex-shrink: 0; 
+  display: flex; 
+  flex-direction: row; 
+  gap: 1rem; 
+  padding-top: 1rem; 
+  border-top: 1px solid #eee; 
 
-        &:hover {
-            background: #e2e8f0;
-        }
-    }
+  @media (max-width: 600px) { 
+    button { 
+      flex: 1; 
+      font-size: 0.9rem; 
+    } 
+  } 
 
-    .btn-guardar {
-        @include m.boton-primario;
-        margin: 0;
+  @media (min-width: 600px) { 
+    display: grid; 
+    grid-template-columns: 1fr 1.5fr; 
+  } 
 
-        &:disabled {
-            background: #e0e0e0;
-            color: #999;
-            box-shadow: none;
-            transform: none;
-        }
-    }
+  button { 
+    height: 46px; // Altura optimizada
+    border-radius: v.$radio-curvatura; 
+    font-family: v.$fuente-enfasis; 
+    font-weight: 700; 
+    font-size: 1rem; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    cursor: pointer; 
+    transition: all 0.2s ease; 
+  } 
+
+  .btn-cancelar { 
+    background: v.$color-fondo-pagina; 
+    color: v.$color-superficie-suave; 
+    border: none; 
+    &:hover { background: #e2e8f0; } 
+  } 
+
+  .btn-guardar { 
+    @include m.boton-primario; 
+    margin: 0; 
+    &:disabled { 
+      background: #e2e8f0; 
+      color: #94a3b8; 
+      box-shadow: none; 
+      transform: none; 
+      cursor: not-allowed;
+    } 
+  } 
 }

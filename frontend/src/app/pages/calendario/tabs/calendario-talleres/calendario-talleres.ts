@@ -131,7 +131,6 @@ export class CalendarioTalleres implements OnInit {
         link.href = url;
         const fecha = new Date().toLocaleDateString().replace(/\//g, '-');
 
-        // Nombre de archivo dinámico
         const nombreArchivo = this.tokenService.getRol() === 'PROFESOR' ? 'Agenda_Docente' : 'Mi_Agenda';
         link.download = `${nombreArchivo}_${fecha}.pdf`;
 

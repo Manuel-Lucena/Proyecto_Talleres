@@ -49,8 +49,6 @@ export class AulaTareas implements OnInit {
   ngOnInit(): void {
     const rol = this.tokenService.getRol();
     this.esProfesor = (rol === 'PROFESOR' || rol === 'ADMIN');
-
-    // El ID del taller reside en la ruta padre /aula-virtual/:id
     const idTaller = this.route.parent?.snapshot.paramMap.get('id');
     
     if (idTaller) {

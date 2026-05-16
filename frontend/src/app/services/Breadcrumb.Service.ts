@@ -5,10 +5,10 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class BreadcrumbService {
-  // 1. El Subject que maneja el dato (privado)
+  // El Subject que maneja el dato (privado)
   private recursoNombreSource = new BehaviorSubject<string>('');
 
-  // 2. El Observable al que se suscribe el AulaVirtual
+  // El Observable al que se suscribe el AulaVirtual
   recursoNombre$ = this.recursoNombreSource.asObservable();
 
   constructor() {}

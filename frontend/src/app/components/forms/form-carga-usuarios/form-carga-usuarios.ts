@@ -166,7 +166,6 @@ export class FormCargaUsuarios {
    */
   async confirmarCarga(): Promise<void> {
     const seleccionados = this.usuariosPrevia.filter(u => u.seleccionado);
-
     const ok = await this.notificacion.confirmar({
       titulo: 'Confirmar carga',
       mensaje: `¿Deseas importar ${seleccionados.length} usuarios?`
@@ -175,15 +174,12 @@ export class FormCargaUsuarios {
     if (!ok) return;
 
     this.procesando = true;
-
-
     const data = seleccionados.map(u => ({
       dni: u.dni,
       nombre: u.nombre,
       apellidos: u.apellidos,
       email: u.email,
       idRol: u.rol === 'Profesor' ? 2 : 3,
-
     }));
 
     this.usuarioService.crearVariosUsuarios(data).subscribe({
@@ -194,45 +190,36 @@ export class FormCargaUsuarios {
       },
       error: (err) => {
         this.procesando = false;
-
-
         let errorBackend = err.error?.message || '';
 
-
-        let mensajeAlerta = 'Fallo en la carga masiva. Revisa la conexión.';
-
-
-        const esDuplicado = errorBackend.includes('Duplicate entry') ||
-          errorBackend.includes('ya está registrado') ||
-          errorBackend.includes('constraint');
+        const esDuplicado = errorBackend.toLowerCase().includes('duplicate') ||
+          errorBackend.toLowerCase().includes('ya existe') ||
+          errorBackend.toLowerCase().includes('ya está registrado');
 
         if (esDuplicado) {
-
           const matchesComillas = errorBackend.match(/'([^']+)'/);
-          const matchesEmail = errorBackend.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+          const valorConflictivo = matchesComillas ? matchesComillas[1] : '';
 
-          const valorConflictivo = matchesComillas ? matchesComillas[1] : (matchesEmail ? matchesEmail[0] : '');
-
-          mensajeAlerta = valorConflictivo
-            ? `El dato "${valorConflictivo}" ya está registrado en el sistema.`
-            : errorBackend;
-
-
-          this.usuariosPrevia.forEach(u => {
-            if (u.dni === valorConflictivo || u.email === valorConflictivo) {
-              u.errores = ['Ya registrado en la base de datos'];
-              u.dniError = (u.dni === valorConflictivo);
-              u.emailError = (u.email === valorConflictivo);
-              u.seleccionado = false;
-            }
-          });
+          if (valorConflictivo) {
+            this.usuariosPrevia.forEach(u => {
+              if (u.dni === valorConflictivo || u.email === valorConflictivo) {
+                u.errores = [`${u.dni === valorConflictivo ? 'DNI' : 'Email'} ya registrado en el sistema`];
+                if (u.dni === valorConflictivo) u.dniError = true;
+                if (u.email === valorConflictivo) u.emailError = true;
+                u.seleccionado = false; 
+              }
+            });
+            this.notificacion.mostrar({
+              titulo: 'Dato duplicado',
+              mensaje: `El registro con "${valorConflictivo}" ya existe en la base de datos.`,
+              tipo: 'error'
+            });
+          } else {
+            this.notificacion.mostrar({ titulo: 'Error', mensaje: errorBackend, tipo: 'error' });
+          }
+        } else {
+          this.notificacion.mostrar({ titulo: 'Fallo de importación', mensaje: 'No se pudo completar la carga masiva.', tipo: 'error' });
         }
-
-        this.notificacion.mostrar({
-          titulo: 'Conflicto de Datos',
-          mensaje: mensajeAlerta,
-          tipo: 'error'
-        });
 
         this.cdr.detectChanges();
       }

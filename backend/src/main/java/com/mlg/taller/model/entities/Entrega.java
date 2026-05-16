@@ -5,6 +5,9 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 /**
  * Entidad que gestiona el envío de actividades por parte de los alumnos.
  * Almacena el contenido, la fecha, la nota final y el feedback del profesor.
@@ -31,6 +34,7 @@ public class Entrega {
     /** Alumno (Usuario) propietario de la entrega. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Usuario alumno;
 
     /** Texto explicativo o cuerpo del trabajo en formato largo. */

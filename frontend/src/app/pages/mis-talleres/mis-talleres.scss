@@ -77,11 +77,11 @@
         align-items: flex-start;
         flex-grow: 1;
         gap: 15px;
-        min-width: 0; // Permite que el contenido flex se comprima
+        min-width: 0; 
 
         .texto {
             flex: 1;
-            min-width: 0; // Crucial para que el texto respete el contenedor
+            min-width: 0; 
 
             h3 {
                 font-family: v.$fuente-enfasis;
@@ -90,8 +90,6 @@
                 font-size: 1.3rem;
                 font-weight: 800;
                 line-height: 1.2;
-
-                // Prevención de desbordamiento por nombres largos
                 word-wrap: break-word;
                 overflow-wrap: break-word;
             }

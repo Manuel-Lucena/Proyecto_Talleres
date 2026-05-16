@@ -23,12 +23,12 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
      * @return Lista unificada de participantes sin duplicados.
      */
     @Query(value = """
-                SELECT u.* FROM USUARIO u
-                INNER JOIN TALLER t ON u.id_usuario = t.id_profesor
+                SELECT u.* FROM usuario u
+                INNER JOIN taller t ON u.id_usuario = t.id_profesor
                 WHERE t.id_taller = :idTaller
                 UNION
-                SELECT u.* FROM USUARIO u
-                INNER JOIN INSCRIPCION i ON u.id_usuario = i.id_usuario
+                SELECT u.* FROM usuario u
+                INNER JOIN inscripcion i ON u.id_usuario = i.id_usuario
                 WHERE i.id_taller = :idTaller AND i.activa = true
             """, nativeQuery = true)
     List<Usuario> findAllParticipantesByTallerId(@Param("idTaller") Long idTaller);

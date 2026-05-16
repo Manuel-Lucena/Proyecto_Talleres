@@ -1,379 +1,410 @@
 /* ========================================================================== 
-   VISTA: GESTIÓN DE INSCRIPCIONES (ADMIN) 
-   Layout administrativo con control de colisiones y responsive anticipado.
-   ========================================================================== */
+VISTA: GESTIÓN DE INSCRIPCIONES (ADMIN) 
+========================================================================== */
 @use '../../../../../styles/variables' as v;
 @use '../../../../../styles/mixins' as m;
 
-// 1. ESTRUCTURA DE SOPORTE Y CONTENEDOR PRINCIPAL
+// 1. ESTRUCTURA DE SOPORTE Y CONTENEDOR PRINCIPAL 
 .admin-wrapper {
-  padding: 2.5rem;
-  background-color: v.$color-fondo-pagina;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  overflow-x: hidden;
-  overflow-y: auto;
-  max-width: 100vw;
-  @include m.animacion-entrada;
-
-  @media (max-width: 992px) {
-    padding: 1.5rem 1rem;
-    height: auto;
+    padding: 2.5rem;
+    background-color: v.$color-fondo-pagina;
     min-height: 100vh;
-  }
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow-y: visible;
+    max-width: 100vw;
+    @include m.animacion-entrada;
+
+    @media (max-width: 992px) {
+        padding: 1.5rem 1rem;
+    }
 }
 
-// 2. CABECERA DE PÁGINA
+// 2. CABECERA DE PÁGINA 
 .admin-header {
-  flex-shrink: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  gap: 1.5rem;
-  width: 100%;
-
-  @media (max-width: 1350px) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1.5rem;
-  }
-
-  // Grupo Izquierdo: Retorno y Títulos
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 1.2rem;
-    min-width: 0;
-
-    .btn-back {
-      width: 40px;
-      height: 40px;
-      flex-shrink: 0;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      background: v.$color-neutro-max;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: 0.2s;
-
-      &:hover {
-        border-color: v.$color-marca-principal;
-        color: v.$color-marca-principal;
-        transform: translateX(-3px);
-      }
-    }
-  }
-
-  .title-group {
-    .txt-h1 {
-      font-family: v.$fuente-enfasis;
-      font-weight: 800;
-      font-size: v.$tamaño-titular-xl;
-      color: v.$color-secundario-frio-2;
-      margin: 0;
-      line-height: 1.1;
-    }
-
-    .txt-bajada {
-      color: v.$color-superficie-suave;
-      font-size: 1rem;
-      margin-top: 4px;
-    }
-  }
-
-  // Acciones Globales 
-  .header-actions {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
     flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1.5rem;
+    width: 100%;
 
     @media (max-width: 1350px) {
-      justify-content: flex-start;
-      flex-wrap: wrap;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
     }
 
-    @media (max-width: 600px) {
-      flex-direction: column;
-      width: 100%;
-    }
-
-    .btn-primario-aula,
-    .btn-header-pdf,
-    .btn-header-masivo {
-      height: 52px;
-      padding: 0 1.5rem;
-      border-radius: v.$radio-curvatura;
-      font-family: v.$fuente-enfasis;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      white-space: nowrap;
-      font-size: 0.9rem;
-
-      @media (max-width: 600px) {
-        width: 100%;
-      }
-
-      &:hover:not(:disabled) {
-        transform: translateY(-2px);
-      }
-    }
-
-    .btn-primario-aula {
-      @include m.boton-primario;
-      background-color: #00d64f;
-      border: 1px solid transparent;
-    }
-
-    .btn-header-pdf {
-      background: v.$color-neutro-max;
-      border: 1px solid #e2e8f0;
-      color: v.$color-secundario-frio-2;
-      box-shadow: v.$sombra-nivel-1;
-
-      i {
-        color: #e11d48;
-        font-size: 1.2rem;
-      }
-
-      &:hover:not(:disabled) {
-        border-color: #e11d48;
-      }
-    }
-
-    .btn-header-masivo {
-      background: #15803d;
-      color: v.$color-neutro-max;
-      border: none;
-      box-shadow: v.$sombra-nivel-1;
-
-      &:hover:not(:disabled) {
-        background: #166534;
-      }
-    }
-  }
-}
-
-// 3. BARRA DE HERRAMIENTAS
-.admin-toolbar {
-  flex-shrink: 0;
-  padding: 1.2rem 1.5rem;
-  display: flex;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-  background: v.$color-neutro-max;
-  border-radius: v.$radio-curvatura;
-  box-shadow: v.$sombra-nivel-1;
-  align-items: center;
-
-  @media (max-width: 1100px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .search-group {
-    display: flex;
-    flex: 2;
-    background: #fcfcfc;
-    border: 1px solid #e2e8f0;
-    border-radius: v.$radio-curvatura;
-    overflow: hidden;
-    width: 100%;
-
-    .criteria-box {
-      width: 140px;
-      border-right: 1px solid #e2e8f0;
-      background: #f1f5f9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      .fixed-criteria {
+    // Grupo Izquierdo: Retorno y Títulos 
+    .header-left {
         display: flex;
         align-items: center;
-        gap: 8px;
-        font-weight: 600;
-        color: v.$color-secundario-frio-2;
-        i { color: v.$color-marca-principal; }
-      }
+        gap: 1.2rem;
+        min-width: 0;
+
+        .btn-back {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: v.$color-neutro-max;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+
+            i {
+                font-size: 1.2rem;
+            }
+
+            &:hover {
+                border-color: v.$color-marca-principal;
+                color: v.$color-marca-principal;
+                transform: translateX(-3px);
+            }
+        }
     }
 
-    .search-box {
-      flex: 1;
-      position: relative;
-      display: flex;
-      align-items: center;
-      i { position: absolute; left: 15px; color: v.$color-marca-principal; }
-      .input-aula {
-        border: none;
-        padding-left: 45px;
-        width: 100%;
-        height: 48px;
-        background: transparent;
-        outline: none;
-      }
-    }
-  }
+    .title-group {
+        .txt-h1 {
+            font-family: v.$fuente-enfasis;
+            font-weight: 800;
+            font-size: v.$tamaño-titular-xl;
+            color: v.$color-secundario-frio-2;
+            margin: 0;
+            line-height: 1.1;
+        }
 
-
-  .container-filters {
-    display: flex;
-    gap: 1rem;
-    flex: 1;
-    @media (max-width: 600px) { flex-direction: column; }
-  }
-
-  .filter-box {
-    flex: 1;
-    position: relative;
-    
-    .select-aula {
-      @include m.estilo-input-base;
-      padding-left: 45px;
-      padding-right: 10px; 
-      width: 100%;
-      height: 50px;
-      cursor: pointer;
-      background-color: v.$color-neutro-max;
+        .txt-bajada {
+            color: v.$color-superficie-suave;
+            font-size: 1.1rem;
+            margin-top: 4px;
+        }
     }
-    
-    i {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: v.$color-marca-principal;
-      z-index: 2;
-      pointer-events: none; 
+
+    // Acciones Globales 
+    .header-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-shrink: 0;
+
+        @media (max-width: 1350px) {
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 600px) {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .btn-primario-aula,
+        .btn-header-pdf,
+        .btn-header-masivo {
+            height: 52px;
+            padding: 0 1.5rem;
+            border-radius: v.$radio-curvatura;
+            font-family: v.$fuente-enfasis;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 1rem;
+
+            @media (max-width: 600px) {
+                width: 100%;
+            }
+
+            &:hover:not(:disabled) {
+                transform: translateY(-2px);
+            }
+        }
+
+        .btn-primario-aula {
+            @include m.boton-primario;
+            background-color: #00d64f;
+            border: 1px solid transparent;
+        }
+
+        .btn-header-pdf {
+            background: v.$color-neutro-max;
+            border: 1px solid #e2e8f0;
+            color: v.$color-secundario-frio-2;
+            box-shadow: v.$sombra-nivel-1;
+
+            i {
+                color: #e11d48;
+                font-size: 1.3rem;
+            }
+
+            &:hover:not(:disabled) {
+                border-color: #e11d48;
+            }
+        }
+
+        .btn-header-masivo {
+            background: #15803d;
+            color: v.$color-neutro-max;
+            border: none;
+            box-shadow: v.$sombra-nivel-1;
+
+            &:hover:not(:disabled) {
+                background: #166534;
+            }
+        }
     }
-  }
 }
 
-// 4. ÁREA DE DATOS
-.admin-card {
-  background: v.$color-neutro-max;
-  border-radius: v.$radio-curvatura;
-  box-shadow: v.$sombra-nivel-1;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+// 3. BARRA DE HERRAMIENTAS 
+.admin-toolbar {
+    flex-shrink: 0;
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    background: v.$color-neutro-max;
+    border-radius: v.$radio-curvatura;
+    box-shadow: v.$sombra-nivel-1;
+    align-items: center;
 
-  .table-responsive {
+    @media (max-width: 1100px) {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-group {
+        display: flex;
+        flex: 2;
+        background: #fcfcfc;
+        border: 1px solid #e2e8f0;
+        border-radius: v.$radio-curvatura;
+        overflow: hidden;
+        width: 100%;
+
+        .criteria-box {
+            width: 150px;
+            border-right: 1px solid #e2e8f0;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            .fixed-criteria {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-weight: 600;
+                font-size: 0.95rem;
+                color: v.$color-secundario-frio-2;
+
+                i {
+                    color: v.$color-marca-principal;
+                    font-size: 1.1rem;
+                }
+            }
+        }
+
+        .search-box {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+
+            i {
+                position: absolute;
+                left: 15px;
+                color: v.$color-marca-principal;
+                font-size: 1.1rem;
+            }
+
+            .input-aula {
+                border: none;
+                padding-left: 45px;
+                width: 100%;
+                height: 48px;
+                background: transparent;
+                outline: none;
+                font-size: 1rem;
+            }
+        }
+    }
+
+    .container-filters {
+        display: flex;
+        gap: 1rem;
+        flex: 1;
+
+        @media (max-width: 600px) {
+            flex-direction: column;
+        }
+    }
+
+    .filter-box {
+        flex: 1;
+        position: relative;
+
+        .select-aula {
+            @include m.estilo-input-base;
+            padding-left: 45px;
+            padding-right: 10px;
+            width: 100%;
+            height: 50px;
+            cursor: pointer;
+            background-color: v.$color-neutro-max;
+            font-size: 1rem;
+        }
+
+        i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: v.$color-marca-principal;
+            z-index: 2;
+            pointer-events: none;
+            font-size: 1.1rem;
+        }
+    }
+}
+
+// 4. ÁREA DE DATOS 
+.admin-card {
+    background: v.$color-neutro-max;
+    border-radius: v.$radio-curvatura;
+    box-shadow: v.$sombra-nivel-1;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
+}
+
+.table-responsive {
     width: 100%;
     overflow-x: auto;
-    flex: 1;
-  }
+    overflow-y: visible;
 }
 
 .admin-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 1000px;
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
 
-  thead {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: #fafafa;
+    thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: #fafafa;
 
-    th {
-      padding: 1.2rem;
-      text-align: left;
-      color: v.$color-superficie-suave;
-      font-size: 0.75rem;
-      font-weight: 800;
-      text-transform: uppercase;
+        th {
+            padding: 1.2rem;
+            text-align: left;
+            color: v.$color-superficie-suave;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
     }
-  }
 
-  td {
-    padding: 1rem 1.2rem;
-    border-bottom: 1px solid #f5f5f5;
-    vertical-align: middle;
-    color: v.$color-secundario-frio-2;
-  }
+    td {
+        padding: 1rem 1.2rem;
+        border-bottom: 1px solid #f5f5f5;
+        vertical-align: middle;
+        color: v.$color-secundario-frio-2;
+        font-size: 0.95rem;
+    }
 
-  .main-text {
-    font-weight: 700;
-    font-family: v.$fuente-enfasis;
-  }
+    .main-text {
+        font-weight: 700;
+        font-family: v.$fuente-enfasis;
+        font-size: 1.05rem;
+    }
 }
 
-// 5. COMPONENTES DE ESTADO Y UTILIDADES
+// 5. COMPONENTES DE ESTADO Y UTILIDADES 
 .badge-aula {
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.65rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: inline-block;
 
-  &.success {
-    background: rgba(v.$color-marca-principal, 0.1);
-    color: v.$color-marca-principal;
-  }
+    &.success {
+        background: rgba(v.$color-marca-principal, 0.1);
+        color: v.$color-marca-principal;
+    }
 
-  &.info {
-    background: rgba(v.$color-secundario-frio-1, 0.1);
-    color: v.$color-secundario-frio-1;
-  }
+    &.info {
+        background: rgba(v.$color-secundario-frio-1, 0.1);
+        color: v.$color-secundario-frio-1;
+    }
 }
 
 .actions-group {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-
-  .btn-tool {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    border: 1px solid #edf2f7;
-    background: v.$color-neutro-max;
-    cursor: pointer;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.2s;
+    gap: 8px;
+    justify-content: flex-end;
 
-    &:hover {
-      border-color: v.$color-marca-principal;
-      color: v.$color-marca-principal;
-      transform: translateY(-2px);
+    .btn-tool {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        border: 1px solid #edf2f7;
+        background: v.$color-neutro-max;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+
+        i {
+            font-size: 1.1rem;
+        }
+
+        &:hover {
+            border-color: v.$color-marca-principal;
+            color: v.$color-marca-principal;
+            transform: translateY(-2px);
+        }
+
+        &.btn-delete:hover {
+            border-color: v.$color-secundario-calido-1;
+            color: v.$color-secundario-calido-1;
+            background-color: rgba(v.$color-secundario-calido-1, 0.05);
+        }
     }
-  }
 }
 
 .text-right {
-  text-align: right;
+    text-align: right;
 }
 
 .admin-pagination {
-  @include m.estilo-paginacion-admin;
+    @include m.estilo-paginacion-admin;
+    padding: 1.5rem;
+    font-size: 1rem;
 }
 
 .spin {
-  animation: rotation 1s infinite linear;
-  display: inline-block;
+    animation: rotation 1s infinite linear;
+    display: inline-block;
 }
 
 @keyframes rotation {
-  from {
-    transform: rotate(0deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
 
-  to {
-    transform: rotate(359deg);
-  }
+    to {
+        transform: rotate(359deg);
+    }
 }
